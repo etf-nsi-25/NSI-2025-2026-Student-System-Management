@@ -1,16 +1,24 @@
+using Analytics.Infrastructure;
+using Faculty.Infrastructure;
+// Import module DI namespaces
+using Identity.Infrastructure;
+using Identity.Infrastructure.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
-// Import module DI namespaces
-using Identity.Infrastructure;
-using University.Infrastructure;
-using Faculty.Infrastructure;
-using Support.Infrastructure;
 using Notifications.Infrastructure;
-using Analytics.Infrastructure;
+using Support.Infrastructure;
+using University.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+// One?time key generation: run dotnet with --generate-keys to print keys and exit
+if (args.Contains("--generate-keys"))
+{
+    RsaKeyGenerator.GenerateAndPrintKeys();
+    return;
+}
 
 // Add services from modules
 builder.Services.AddIdentityModule(builder.Configuration);

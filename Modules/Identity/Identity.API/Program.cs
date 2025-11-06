@@ -1,17 +1,25 @@
-using System.Reflection;
-using Identity.Application.Services;
+﻿using Identity.Application.Services;
 using Identity.Core.Interfaces;
+using Identity.Infrastructure.Data;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
-using Identity.Infrastructure.Data;
+using Identity.Infrastructure.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 using System.Security.Cryptography;
 
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+// One‑time key generation: run dotnet with --generate-keys to print keys and exit
+if (args.Contains("--generate-keys"))
+{
+    RsaKeyGenerator.GenerateAndPrintKeys();
+    return;
+}
 
 // Add services to the container
 builder.Services.AddControllers();
