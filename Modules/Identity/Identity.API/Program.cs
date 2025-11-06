@@ -14,12 +14,6 @@ using System.Security.Cryptography;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// One‑time key generation: run dotnet with --generate-keys to print keys and exit
-if (args.Contains("--generate-keys"))
-{
-    RsaKeyGenerator.GenerateAndPrintKeys();
-    return;
-}
 
 // Add services to the container
 builder.Services.AddControllers();

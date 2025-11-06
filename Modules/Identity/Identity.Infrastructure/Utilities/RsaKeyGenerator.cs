@@ -23,23 +23,5 @@ public static class RsaKeyGenerator
         return (privateKey, publicKey);
     }
 
-    /// <summary>
-    /// Generates keys and prints them to console for configuration
-    /// Run this once and add the private key to appsettings.json
-    /// </summary>
-    public static void GenerateAndPrintKeys()
-    {
-        var (privateKey, publicKey) = GenerateKeyPair();
 
-        Console.WriteLine("=== RSA KEY PAIR GENERATED ===");
-        Console.WriteLine();
-        Console.WriteLine("PRIVATE KEY (Add to appsettings.json - JwtSettings:PrivateKey):");
-        Console.WriteLine(privateKey);
-        Console.WriteLine();
-        Console.WriteLine("PUBLIC KEY (For reference - will be exposed via /api/identity/public-key endpoint):");
-        Console.WriteLine(publicKey);
-        Console.WriteLine();
-        Console.WriteLine("IMPORTANT: Keep the private key secure and never commit it to source control!");
-        Console.WriteLine("Use User Secrets or Environment Variables in production.");
-    }
 }
