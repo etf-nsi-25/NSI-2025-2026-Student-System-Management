@@ -78,7 +78,7 @@ public class ArchitectureTests
 
         var result = Types.InAssemblies(coreAssemblies)
             .Should()
-            .NotHaveDependencyOnAll(applicationAssemblyNames)
+            .NotHaveDependencyOnAny(applicationAssemblyNames)
             .GetResult();
 
         result.IsSuccessful.Should().BeTrue();
@@ -111,7 +111,7 @@ public class ArchitectureTests
 
         var result = Types.InAssemblies(coreAssemblies)
             .Should()
-            .NotHaveDependencyOnAll(infrastructureAssemblyNames)
+            .NotHaveDependencyOnAny(infrastructureAssemblyNames)
             .GetResult();
 
         result.IsSuccessful.Should().BeTrue();
@@ -144,7 +144,7 @@ public class ArchitectureTests
 
         var result = Types.InAssemblies(applicationAssemblies)
             .Should()
-            .NotHaveDependencyOnAll(infrastructureAssemblyNames)
+            .NotHaveDependencyOnAny(infrastructureAssemblyNames)
             .GetResult();
 
         result.IsSuccessful.Should().BeTrue();
@@ -177,7 +177,7 @@ public class ArchitectureTests
 
         var result = Types.InAssemblies(coreAssemblies)
             .Should()
-            .NotHaveDependencyOnAll(apiAssemblyNames)
+            .NotHaveDependencyOnAny(apiAssemblyNames)
             .GetResult();
 
         result.IsSuccessful.Should().BeTrue();
@@ -210,7 +210,7 @@ public class ArchitectureTests
 
         var result = Types.InAssemblies(applicationAssemblies)
             .Should()
-            .NotHaveDependencyOnAll(apiAssemblyNames)
+            .NotHaveDependencyOnAny(apiAssemblyNames)
             .GetResult();
 
         result.IsSuccessful.Should().BeTrue();
@@ -243,7 +243,7 @@ public class ArchitectureTests
 
         var result = Types.InAssemblies(infrastructureAssemblies)
             .Should()
-            .NotHaveDependencyOnAll(apiAssemblyNames)
+            .NotHaveDependencyOnAny(apiAssemblyNames)
             .GetResult();
 
         result.IsSuccessful.Should().BeTrue();
@@ -252,25 +252,23 @@ public class ArchitectureTests
     [Fact]
     public void Controllers_Should_BeInApiLayer()
     {
-        var apiAssemblies = new[]
+        var nonApiAssemblies = new[]
         {
-            AnalyticsApiAssembly,
-            CommonApiAssembly,
-            FacultyApiAssembly,
-            IdentityApiAssembly,
-            NotificationsApiAssembly,
-            SupportApiAssembly,
-            UniversityApiAssembly
+            AnalyticsApplicationAssembly, AnalyticsCoreAssembly, AnalyticsInfrastructureAssembly,
+            CommonApplicationAssembly, CommonCoreAssembly, CommonInfrastructureAssembly,
+            FacultyApplicationAssembly, FacultyCoreAssembly, FacultyInfrastructureAssembly,
+            IdentityApplicationAssembly, IdentityCoreAssembly, IdentityInfrastructureAssembly,
+            NotificationsApplicationAssembly, NotificationsCoreAssembly, NotificationsInfrastructureAssembly,
+            SupportApplicationAssembly, SupportCoreAssembly, SupportInfrastructureAssembly,
+            UniversityApplicationAssembly, UniversityCoreAssembly, UniversityInfrastructureAssembly
         };
 
-        var result = Types.InAssemblies(apiAssemblies)
+        var controllerTypes = Types.InAssemblies(nonApiAssemblies)
             .That()
             .Inherit(typeof(Microsoft.AspNetCore.Mvc.ControllerBase))
-            .Should()
-            .BeClasses()
-            .GetResult();
+            .GetTypes();
 
-        result.IsSuccessful.Should().BeTrue();
+        controllerTypes.Should().BeEmpty();
     }
 
     [Fact]
