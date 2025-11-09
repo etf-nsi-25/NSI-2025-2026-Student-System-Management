@@ -4,7 +4,7 @@ namespace Identity.Core.Repositories;
 
 public interface IUserRepository
 {
-    public Task<ApplicationUser> CreateUser(string email);
+    public Task<User> CreateUser(string email);
 
     public Task Save();
 }

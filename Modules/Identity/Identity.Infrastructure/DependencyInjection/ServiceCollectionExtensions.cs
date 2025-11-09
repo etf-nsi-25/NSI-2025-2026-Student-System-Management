@@ -2,6 +2,7 @@ using Identity.Application.Services;
 using Identity.Core.Entities;
 using Identity.Core.Repositories;
 using Identity.Infrastructure.Db;
+using Identity.Infrastructure.Entities;
 using Identity.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
