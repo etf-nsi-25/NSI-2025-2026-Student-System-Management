@@ -9,6 +9,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 	<ProjectReference Include="..\Modules\Identity\Identity.API\Identity.API.csproj" />
 	<ProjectReference Include="..\Modules\University\University.API\University.API.csproj" />
@@ -23,5 +27,10 @@
     <ProjectReference Include="..\Modules\Notifications\Notifications.Infrastructure\Notifications.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Analytics\Analytics.Infrastructure\Analytics.Infrastructure.csproj" />
   </ItemGroup>
+	
+	<Target Name="BuildUI" BeforeTargets="Build">
+		<Exec Command="npm install" WorkingDirectory="../Frontend" />
+		<Exec Command="npm run build" WorkingDirectory="../Frontend" />
+	</Target>
 
 </Project>
