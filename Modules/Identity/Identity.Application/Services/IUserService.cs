@@ -1,8 +1,8 @@
-using Identity.Application.DTOs;
+using Identity.Core.Entities;
 
 namespace Identity.Application.Services;
 
 public interface IUserService
 {
-    public Task<UserDTO> CreateUser(string email);
+    public Task<User> CreateUser(string email);
 }
