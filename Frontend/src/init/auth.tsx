@@ -26,7 +26,7 @@ export function Authentication({ children }: PropsWithChildren<object>) {
     const navigate = useNavigate()
 
     useEffect(() => {
-        const tokenValid = false
+        const tokenValid = true
         if (!tokenValid) {
             // TODO once auth is implemented this should check for validity of token
             // and redirect to /login in case not valid (or attempt silent refresh via refresh token first)

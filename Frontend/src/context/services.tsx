@@ -2,6 +2,7 @@ import type { PropsWithChildren } from 'react';
 import { createContext, useContext } from 'react';
 import { useAuthContext } from '../init/auth.tsx';
 import { API } from '../service/api.ts';
+import { RestClient } from '../service/rest.ts';
 
 export interface Services {
     api: API
@@ -23,7 +24,7 @@ export function ServiceContextProvider({ children }: PropsWithChildren<object>) 
     const value: Services = {
         // Since login API call is done without using API service, and all pages require login,
         // we can be sure auth info is initialized
-        api: new API(authContextData.authInfo!, refreshToken)
+        api: new API(new RestClient(authContextData.authInfo!, refreshToken))
     }
 
     return (
