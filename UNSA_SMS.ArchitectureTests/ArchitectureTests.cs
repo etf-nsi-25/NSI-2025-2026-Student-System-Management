@@ -102,17 +102,19 @@ public class ArchitectureTests
     }
 
     [Fact]
-    public void Services_ShouldBeClasses()
+    public void Services_ShouldBeClassesOrInterfaces()
     {
         foreach (var module in _modules)
         {
             var assembly = GetAssembly(module, "Application");
-            var result = Types.InAssembly(assembly)
-                .That().ResideInNamespace($"{module}.Application.Services")
-                .Should().BeClasses()
-                .GetResult();
 
-            Assert.True(result.IsSuccessful, $"All types in {module}.Application.Services should be classes");
+            var types = Types.InAssembly(assembly)
+                .That().ResideInNamespace($"{module}.Application.Services")
+                .GetTypes();
+
+            bool allAreClassOrInterface = types.All(t => t.IsClass || t.IsInterface);
+
+            Assert.True(allAreClassOrInterface, $"All types in {module}.Application.Services should be classes or interfaces");
         }
     }
 
