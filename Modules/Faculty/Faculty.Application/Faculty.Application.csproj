@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Faculty.Core\Faculty.Core.csproj" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
   </ItemGroup>
 
   <PropertyGroup>
