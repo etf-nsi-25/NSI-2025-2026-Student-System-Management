@@ -1,6 +1,57 @@
-@Faculty.API_HostAddress = http://localhost:5151
+@hostAddress = http://localhost:5151
+@superadminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdXBlcmFkbWluX3VzZXIiLCJqdGkiOiJzb21lX3VuaXF1ZV9pZCIsInJvbGUiOiJTdXBlcmFkbWluIiwiaXNzIjoiU3R1ZGVudFN5c3RlbU1hbmFnZW1lbnQiLCJhdWQiOiJTdHVkZW50U3lzdGVtTWFuYWdlbWVudFVzZXJzIiwiZXhwIjoyMDMxNDQ2NDAwLCJpYXQiOjE3MDAwMDAwMDB9.Z4aJBy26U8DltSQf14Y4mWObHVOn4dIO-aXg49AkCfs
+@regularUserToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyZWd1bGFyX3VzZXIiLCJqdGkiOiJzb21lX3VuaXF1ZV9pZF8yIiwicm9sZSI6IlJlZ3VsYXJVc2VyIiwiaXNzIjoiU3R1ZGVudFN5c3RlbU1hbmFnZW1lbnQiLCJhdWQiOiJTdHVkZW50U3lzdGVtTWFuYWdlbWVudFVzZXJzIiwiZXhwIjoyMDMxNDQ2NDAwLCJpYXQiOjE3MDAwMDAwMDB9.sHxovO4wSmpPKyqRXTLTJMTWHuJ3smRtrcD4it__uT8
 
-GET {{Faculty.API_HostAddress}}/weatherforecast/
+### Get all faculties (requires authentication)
+# Expected: 401 Unauthorized if no token is provided.
+# Expected: 200 OK if a valid JWT token is provided.
+GET {{hostAddress}}/api/Faculty
 Accept: application/json
+Authorization: Bearer {{regularUserToken}}
+
+###
+### Create Faculty (requires Superadmin role)
+# Expected: 401 Unauthorized if no token is provided.
+# Expected: 403 Forbidden if a valid JWT token without 'Superadmin' role is provided.
+# Expected: 200 OK if a valid JWT token with 'Superadmin' role is provided.
+POST {{hostAddress}}/api/Faculty
+Content-Type: application/json
+Authorization: Bearer {{superadminToken}}
+
+{
+  "facultyName": "Computer Science"
+}
+
+###
+### Create Faculty (Validation Error - Short Name)
+# Expected: 400 Bad Request with a descriptive message
+# Requires a valid 'Superadmin' JWT token.
+POST {{hostAddress}}/api/Faculty
+Content-Type: application/json
+Authorization: Bearer {{superadminToken}}
+
+{
+  "facultyName": "CS"
+}
+
+###
+### Create Faculty (Validation Error - Missing Name)
+# Expected: 400 Bad Request with a descriptive message
+# Requires a valid 'Superadmin' JWT token.
+POST {{hostAddress}}/api/Faculty
+Content-Type: application/json
+Authorization: Bearer {{superadminToken}}
+
+{
+  "facultyName": ""
+}
+
+###
+### Trigger Unhandled Exception (requires Superadmin role)
+# Expected: 500 Internal Server Error with a standard JSON error response.
+# Requires a valid 'Superadmin' JWT token.
+GET {{hostAddress}}/api/Faculty/throw-exception
+Accept: application/json
+Authorization: Bearer {{superadminToken}}
 
 ###
