@@ -79,6 +79,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Constants", "Constants", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Util", "Util", "{38DB613D-FFC5-4818-8E3F-2BF55064AA4C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UNSA_SMS.ArchitectureTests", "UNSA_SMS.ArchitectureTests\UNSA_SMS.ArchitectureTests.csproj", "{F33F9490-CF5F-44E1-A47C-2B0F4BDAFC57}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -185,6 +187,10 @@ Global
 		{8CBC3996-90B6-46B1-B85B-581177032161}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CBC3996-90B6-46B1-B85B-581177032161}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CBC3996-90B6-46B1-B85B-581177032161}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F33F9490-CF5F-44E1-A47C-2B0F4BDAFC57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F33F9490-CF5F-44E1-A47C-2B0F4BDAFC57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F33F9490-CF5F-44E1-A47C-2B0F4BDAFC57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F33F9490-CF5F-44E1-A47C-2B0F4BDAFC57}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
