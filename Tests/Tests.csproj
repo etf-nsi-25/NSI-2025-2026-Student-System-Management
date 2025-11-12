@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="NetArchTest.Rules" Version="1.3.2" />
+    <PackageReference Include="Shouldly" Version="4.3.0" />
+    <PackageReference Include="xunit" Version="2.5.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Modules\Analytics\Analytics.API\Analytics.API.csproj" />
+    <ProjectReference Include="..\Modules\Analytics\Analytics.Application\Analytics.Application.csproj" />
+    <ProjectReference Include="..\Modules\Analytics\Analytics.Core\Analytics.Core.csproj" />
+    <ProjectReference Include="..\Modules\Analytics\Analytics.Infrastructure\Analytics.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Faculty\Faculty.API\Faculty.API.csproj" />
+    <ProjectReference Include="..\Modules\Faculty\Faculty.Application\Faculty.Application.csproj" />
+    <ProjectReference Include="..\Modules\Faculty\Faculty.Core\Faculty.Core.csproj" />
+    <ProjectReference Include="..\Modules\Faculty\Faculty.Infrastructure\Faculty.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Identity\Identity.API\Identity.API.csproj" />
+    <ProjectReference Include="..\Modules\Identity\Identity.Application\Identity.Application.csproj" />
+    <ProjectReference Include="..\Modules\Identity\Identity.Core\Identity.Core.csproj" />
+    <ProjectReference Include="..\Modules\Identity\Identity.Infrastructure\Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Notifications\Notifications.API\Notifications.API.csproj" />
+    <ProjectReference Include="..\Modules\Notifications\Notifications.Application\Notifications.Application.csproj" />
+    <ProjectReference Include="..\Modules\Notifications\Notifications.Core\Notifications.Core.csproj" />
+    <ProjectReference Include="..\Modules\Notifications\Notifications.Infrastructure\Notifications.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Support\Support.API\Support.API.csproj" />
+    <ProjectReference Include="..\Modules\Support\Support.Application\Support.Application.csproj" />
+    <ProjectReference Include="..\Modules\Support\Support.Core\Support.Core.csproj" />
+    <ProjectReference Include="..\Modules\Support\Support.Infrastructure\Support.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\University\University.API\University.API.csproj" />
+    <ProjectReference Include="..\Modules\University\University.Application\University.Application.csproj" />
+    <ProjectReference Include="..\Modules\University\University.Core\University.Core.csproj" />
+    <ProjectReference Include="..\Modules\University\University.Infrastructure\University.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>
