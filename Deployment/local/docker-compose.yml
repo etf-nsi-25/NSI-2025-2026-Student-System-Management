@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:18
+    volumes:
+        # You can use the postgres init data script for any seeding once it's needed
+      - ./postgres-init-data/:/docker-entrypoint-initdb.d/
+      - ./.pgdata/:/var/lib/postgresql
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=unsa
+      - POSTGRES_PASSWORD=unsa
+      - POSTGRES_DB=unsa
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U unsa -d unsa" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s

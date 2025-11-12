@@ -1,56 +1,32 @@
-// Identity.API/Controllers/IdentityController.cs
-using Identity.Application.DTOs.Auth;
-using Identity.Core.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+using Identity.API.DTO;
+using Identity.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Identity.API.Controllers;
-
-[ApiController]
-[Route("api/identity")]
-[Produces("application/json")]
-public class IdentityController : ControllerBase
+namespace Identity.API.Controllers
 {
-    private readonly IAuthService _authService;
-    private readonly ILogger<IdentityController> _logger;
-
-    public IdentityController(IAuthService authService, ILogger<IdentityController> logger)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class IdentityController : ControllerBase
     {
-        _authService = authService;
-        _logger = logger;
-    }
+        private readonly IUserService _userService;
 
-    /// <summary>
-    /// Returns the RSA public key for JWT token verification by other microservices
-    /// </summary>
-    /// <returns>RSA public key in Base64 format</returns>
-    /// <response code="200">Public key retrieved successfully</response>
-    /// 
-    [HttpGet("public-key")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(PublicKeyResponseDto), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PublicKeyResponseDto>> GetPublicKey()
-    {
-        try
+        public IdentityController(IUserService userService)
         {
-            var result = await _authService.GetPublicKeyInfoAsync();
-            return Ok(result);
+            _userService = userService;
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error retrieving public key");
-            return StatusCode(500, new { message = "An error occurred retrieving the public key" });
-        }
-    }
 
-    /// <summary>
-    /// Health check endpoint
-    /// </summary>
-    [HttpGet("health")]
-    [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult Health()
-    {
-        return Ok(new { status = "healthy", timestamp = DateTime.UtcNow });
+        [HttpGet]
+        public IActionResult Get() => Ok("Hello from Identity!");
+
+        [HttpPost]
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            return Ok(await _userService.CreateUser(request.Email));
+        }
     }
 }

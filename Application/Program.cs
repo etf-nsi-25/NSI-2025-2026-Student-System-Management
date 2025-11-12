@@ -1,18 +1,17 @@
-using Analytics.Infrastructure;
-using Faculty.Infrastructure;
-// Import module DI namespaces
-using Identity.Infrastructure;
-using Identity.Infrastructure.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Notifications.Infrastructure;
-using Support.Infrastructure;
+
+// Import module DI namespaces
+using Identity.Infrastructure;
 using University.Infrastructure;
+using Faculty.Infrastructure;
+using Support.Infrastructure;
+using Notifications.Infrastructure;
+using Analytics.Infrastructure;
+using Identity.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
-
-
 
 // Add services from modules
 builder.Services.AddIdentityModule(builder.Configuration);
@@ -48,6 +47,7 @@ var app = builder.Build();
 
 // Middleware
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Enable Swagger in all environments

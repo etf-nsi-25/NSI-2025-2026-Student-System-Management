@@ -7,6 +7,6 @@ namespace University.API.Controllers
     public class UniversityController : ControllerBase
     {
         [HttpGet]
-        public IActionResult Get() => Ok("Hello from University API!");
+        public IActionResult Get() => Ok(new JsonResult("Hello from University API!"));
     }
 }

@@ -40,6 +40,13 @@ UNSA_SMS/
 
 ## Running the Application
 
+Before running the application it is necessary to provide environment variables in order to 
+connect to database. Database can be started via `docker-compose` (check Deployment folder).
+
+To connect to the database locally you should set an environment variable such as:
+
+`export ConnectionStrings__Database="Host=localhost;Port=5432;Database=unsa;Username=unsa;Password=unsa"`
+
 1. *Open the solution*
    - Open UNSA_SMS.sln in *Visual Studio 2022+* or *VS Code*.
 
@@ -53,3 +60,14 @@ UNSA_SMS/
     - dotnet run   
 5. *Open Swagger UI*
    https://localhost:7229/index.html
+
+
+## Frontend 
+The frontend is a React 19 application. To install it you will need to install Node 20.
+To start the frontend:
+1. navigate to `Frontend` module
+2. Execute `run npm install` to install dependencies
+3. Execute `run npm dev` to run the app in dev mode
+
+Before commiting new changes to frontend please run `npm run build` to make sure there are no build
+breaking changes.

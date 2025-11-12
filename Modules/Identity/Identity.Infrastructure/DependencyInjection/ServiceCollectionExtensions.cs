@@ -1,34 +1,36 @@
-﻿using Identity.Application.Services;
-using Identity.Core.Interfaces;
-using Identity.Infrastructure.Data;
+using Identity.Application.Services;
+using Identity.Core.Entities;
+using Identity.Core.Repositories;
+using Identity.Infrastructure.Db;
+using Identity.Infrastructure.Entities;
 using Identity.Infrastructure.Repositories;
-using Identity.Infrastructure.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Identity.Infrastructure;
-public static class ServiceCollectionExtensions
+namespace Identity.Infrastructure.DependencyInjection
 {
-    public static IServiceCollection AddIdentityModule(
-        this IServiceCollection services,
-        IConfiguration config)
+    public static class ServiceCollectionExtensions
     {
-        var cs = config.GetConnectionString("DefaultConnection")
-                 ?? throw new InvalidOperationException("Missing ConnectionStrings:DefaultConnection");
+        public static IServiceCollection AddIdentityModule(
+            this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            // Entity Framework   
+            services.AddDbContext<AuthDbContext>(options =>
+                options.UseNpgsql(configuration.GetConnectionString("Database"))
+            );
 
-        services.AddDbContext<IdentityDbContext>(options =>
-            options.UseNpgsql(cs, b => b.MigrationsAssembly(typeof(IdentityDbContext).Assembly.FullName)));
+            // Identity Framework
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<AuthDbContext>();
 
-        // Repositories
-        services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            // Register services
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserService, UserService>();
 
-        // Services (adjust to your layering preference)
-        services.AddScoped<IJwtTokenService, JwtTokenService>();
-        services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IPasswordHasher, PasswordHasher>();
-
-        return services;
+            return services;
+        }
     }
 }
