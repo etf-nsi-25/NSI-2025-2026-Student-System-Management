@@ -115,3 +115,7 @@ _ReSharper*/
 
 # Optional: Ignore secrets if you use user secrets
 **/secrets.json
+
+# Database
+.pgdata/
+postgres-init-data/
