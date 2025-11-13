@@ -43,7 +43,7 @@ public class AuthService : IAuthService
 
         var test = new User(Guid.NewGuid(), "Amar Tahirovic", "atahirovic3@etf.unsa.ba", _passwordHasher.HashPassword("Admin123!"), "User", Guid.NewGuid());
 
-        if (user != test)
+        if (user.Email != test.Email && user.PasswordHash != test.PasswordHash) 
         {
             _logger.LogWarning("Authentication failed: User not found or inactive - {Email}", email);
             throw new UnauthorizedAccessException("Invalid email or password");
@@ -70,7 +70,7 @@ public class AuthService : IAuthService
         var refreshToken = _jwtTokenService.CreateRefreshToken(user.Id, ipAddress, userAgent);
 
         // Save refresh token to repository
-        await _refreshTokenRepository.AddAsync(refreshToken, cancellationToken);
+        //await _refreshTokenRepository.AddAsync(refreshToken, cancellationToken);
 
         // Update last login
         //user.LastLoginAt = DateTime.UtcNow;
