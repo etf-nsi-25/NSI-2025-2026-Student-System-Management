@@ -1,0 +1,42 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.faculty-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #133E87; 
+    color: #ffffff; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    width: 100%;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+/* Logo */
+.faculty-logo img {
+    height: 55px;
+    max-width: 100%;
+}
+
+/* Labela */
+.faculty-label {
+    font-weight: bold;
+    font-size: 16px;
+    color: #ffffff;
+}
+
+/* Responsive: na manjim ekranima */
+@media (max-width: 600px) {
+    .faculty-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 10px 0;
+    }
+    
+    .faculty-logo {
+        margin-bottom: 5px;
+    }
+}

@@ -1,0 +1,33 @@
+.faculty-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; 
+}
+
+/* Glavni kontejner ispod headera */
+.faculty-body {
+    display: flex;
+    flex: 1;
+    background-color: white;
+}
+
+/* Sidebar se ponaša po svom CSS-u (ima širinu 13%) */
+.faculty-sidebar {
+    flex-shrink: 0;
+}
+
+/* Glavni sadržaj pored sidebar-a */
+.faculty-content {
+    flex: 1; /* zauzima sav preostali prostor */
+    padding: 20px;
+    overflow-y: auto;
+    color: #000;
+    background-color: lightblue;
+}
+
+/* Ako želiš da sidebar ostane vidljiv dok se sadržaj skroluje */
+.faculty-sidebar {
+    position: sticky;
+    top: 0;
+    
+}
