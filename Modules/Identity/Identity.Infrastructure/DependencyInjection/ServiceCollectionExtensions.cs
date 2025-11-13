@@ -1,9 +1,11 @@
 using Identity.Application.Services;
 using Identity.Core.Entities;
+using Identity.Core.Interfaces;
 using Identity.Core.Repositories;
 using Identity.Infrastructure.Db;
 using Identity.Infrastructure.Entities;
 using Identity.Infrastructure.Repositories;
+using Identity.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -27,8 +29,16 @@ namespace Identity.Infrastructure.DependencyInjection
                 .AddEntityFrameworkStores<AuthDbContext>();
 
             // Register services
-            services.AddScoped<IUserRepository, UserRepository>();
+            
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
+            services.AddSingleton<IJwtTokenService, JwtTokenService>();
+
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            
+
 
             return services;
         }
