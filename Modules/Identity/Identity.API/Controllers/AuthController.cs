@@ -1,7 +1,6 @@
 // Identity.API/Controllers/AuthController.cs
 using Identity.API.DTO.Auth;
-using Identity.Application.DTOs.Auth;
-using Identity.Core.Interface;
+using Identity.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,14 +20,7 @@ public class AuthController : ControllerBase
         _logger = logger;
     }
 
-    /// <summary>
-    /// Authenticates a user and returns JWT access and refresh tokens
-    /// </summary>
-    /// <param name="request">Login credentials</param>
-    /// <returns>JWT tokens</returns>
-    /// <response code="200">Successfully authenticated</response>
-    /// <response code="401">Invalid credentials</response>
-    /// <response code="400">Invalid request</response>
+
     [HttpPost("login")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
@@ -74,13 +66,7 @@ public class AuthController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Refreshes an access token using a valid refresh token
-    /// </summary>
-    /// <param name="request">Refresh token</param>
-    /// <returns>New JWT tokens</returns>
-    /// <response code="200">Successfully refreshed token</response>
-    /// <response code="401">Invalid or expired refresh token</response>
+
     [HttpPost("refresh")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
@@ -126,12 +112,6 @@ public class AuthController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Logs out a user by revoking their refresh token
-    /// </summary>
-    /// <param name="request">Refresh token to revoke</param>
-    /// <response code="200">Successfully logged out</response>
-    /// <response code="400">Invalid request</response>
     [HttpPost("logout")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]

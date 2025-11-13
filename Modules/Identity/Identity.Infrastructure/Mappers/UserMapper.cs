@@ -7,16 +7,17 @@ public static class UserMapper
 {
     public static User ToCore(this ApplicationUser appUser)
     {
-        return new User(Email: appUser.Email, Id: appUser.Id);
+        return new User(Guid.Parse(appUser.Id),appUser.UserName,Email: appUser.Email,PasswordHash: appUser.PasswordHash,"Role", Guid.NewGuid());
     }
 
     public static ApplicationUser ToInfrastructure(this User user)
     {
         return new ApplicationUser
         {
-            Id = user.Id,
-            UserName = user.Email,
-            Email = user.Email
+            Id = user.Id.ToString(),
+            UserName = user.FullName,
+            Email = user.Email,
+            PasswordHash = user.PasswordHash,
         };
     }
 

@@ -2,6 +2,7 @@ using Identity.Core.Entities;
 using Identity.Core.Repositories;
 using Identity.Infrastructure.Db;
 using Identity.Infrastructure.Entities;
+using Identity.Infrastructure.Mappers;
 
 namespace Identity.Infrastructure.Repositories;
 
@@ -15,7 +16,7 @@ public class UserRepository(AuthDbContext context) : IUserRepository
         await context.Users.AddAsync(newUser);
 
         // TODO: implement mappers
-        return new User(newUser.Id, newUser.UserName);
+        return  UserMapper.ToCore(newUser);
     }
 
     public Task Save()
