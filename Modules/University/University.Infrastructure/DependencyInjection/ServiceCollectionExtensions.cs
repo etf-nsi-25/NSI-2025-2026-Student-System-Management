@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using University.Core.Interfaces;
 using University.Infrastructure.Db;
 using University.Infrastructure.Repositories;
+using University.Application.Services;
 
 namespace University.Infrastructure;
 
@@ -17,6 +18,8 @@ public static class ServiceCollectionExtensions
             options.UseNpgsql(configuration.GetConnectionString("UniversityConnection")));
 
         services.AddScoped<ICourseRepository, CourseRepository>();
+
+        services.AddScoped<CourseService>();
 
         return services;
     }

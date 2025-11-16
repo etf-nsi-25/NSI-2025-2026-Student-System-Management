@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\University.Application\University.Application.csproj" />
     <ProjectReference Include="..\University.Core\University.Core.csproj" />
   </ItemGroup>
 
