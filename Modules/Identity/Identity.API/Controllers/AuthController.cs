@@ -1,6 +1,6 @@
 // Identity.API/Controllers/AuthController.cs
 using Identity.API.DTO.Auth;
-using Identity.Core.Interfaces;
+using Identity.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

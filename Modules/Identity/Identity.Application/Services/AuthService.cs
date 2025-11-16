@@ -1,8 +1,8 @@
 ﻿
 using Identity.Core.Entities;
-using Identity.Core.Interfaces;
+using Identity.Core.Interfaces.Repositories;
+using Identity.Core.Interfaces.Services;
 using Identity.Core.Models;
-using Identity.Core.Repositories;
 using Microsoft.Extensions.Logging;
 
 namespace Identity.Application.Services;
@@ -13,17 +13,20 @@ public class AuthService : IAuthService
     private readonly IJwtTokenService _jwtTokenService;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
+    private readonly IUserRepository _userRepository;
     private readonly ILogger<AuthService> _logger;
 
     public AuthService(
         IJwtTokenService jwtTokenService,
         IPasswordHasher passwordHasher,
         IRefreshTokenRepository refreshTokenRepository,
+        IUserRepository userRepository,
         ILogger<AuthService> logger)
     {
         _jwtTokenService = jwtTokenService;
         _passwordHasher = passwordHasher;
         _refreshTokenRepository = refreshTokenRepository;
+        _userRepository = userRepository;
         _logger = logger;
     }
 
@@ -37,13 +40,10 @@ public class AuthService : IAuthService
         _logger.LogInformation("Authentication attempt for email: {Email}", email);
 
         // Find user by email
-        // var user = await _userRepository.GetByEmailAsync(email, cancellationToken);
+        var user = await _userRepository.GetByEmailAsync(email, cancellationToken);
 
-        var user = new User(Guid.NewGuid(), "Amar Tahirovic", email, _passwordHasher.HashPassword(password), "User",Guid.NewGuid());
 
-        var test = new User(Guid.NewGuid(), "Amar Tahirovic", "atahirovic3@etf.unsa.ba", _passwordHasher.HashPassword("Admin123!"), "User", Guid.NewGuid());
-
-        if (user.Email != test.Email && user.PasswordHash != test.PasswordHash) 
+        if (user == null) 
         {
             _logger.LogWarning("Authentication failed: User not found or inactive - {Email}", email);
             throw new UnauthorizedAccessException("Invalid email or password");
@@ -70,7 +70,7 @@ public class AuthService : IAuthService
         var refreshToken = _jwtTokenService.CreateRefreshToken(user.Id, ipAddress, userAgent);
 
         // Save refresh token to repository
-        //await _refreshTokenRepository.AddAsync(refreshToken, cancellationToken);
+        await _refreshTokenRepository.AddAsync(refreshToken, cancellationToken);
 
         // Update last login
         //user.LastLoginAt = DateTime.UtcNow;

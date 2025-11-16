@@ -1,18 +1,14 @@
 using Identity.API.Filters;
 using Identity.Application.Services;
-using Identity.Core.Interfaces;
-using Identity.Core.Repositories;
+using Identity.Core.Interfaces.Repositories;
+using Identity.Core.Interfaces.Services;
 using Identity.Infrastructure.Configuration;
 using Identity.Infrastructure.Db;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
-using Identity.Infrastructure.Utilities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
-using System.Security.Cryptography;
 
 
 
@@ -79,7 +75,7 @@ builder.Services.AddSwaggerGen(options =>
 // Database Configuration
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseNpgsql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
+        builder.Configuration.GetConnectionString("Database"),
         b => b.MigrationsAssembly("Identity.Infrastructure")));
 
 // JWT Settings

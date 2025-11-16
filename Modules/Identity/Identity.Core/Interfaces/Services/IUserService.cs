@@ -1,6 +1,6 @@
 using Identity.Core.Entities;
 
-namespace Identity.Application.Services;
+namespace Identity.Core.Interfaces.Services;
 
 public interface IUserService
 {

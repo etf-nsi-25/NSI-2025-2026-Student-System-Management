@@ -1,7 +1,7 @@
 using Identity.Application.Services;
 using Identity.Core.Entities;
-using Identity.Core.Interfaces;
-using Identity.Core.Repositories;
+using Identity.Core.Interfaces.Repositories;
+using Identity.Core.Interfaces.Services;
 using Identity.Infrastructure.Db;
 using Identity.Infrastructure.Entities;
 using Identity.Infrastructure.Repositories;

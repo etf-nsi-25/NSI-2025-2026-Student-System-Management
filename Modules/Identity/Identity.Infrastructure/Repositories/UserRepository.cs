@@ -1,26 +1,43 @@
+using Common.Infrastructure.Repositories;
 using Identity.Core.Entities;
-using Identity.Core.Repositories;
+using Identity.Core.Interfaces.Repositories;
 using Identity.Infrastructure.Db;
 using Identity.Infrastructure.Entities;
 using Identity.Infrastructure.Mappers;
+using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Infrastructure.Repositories;
 
-public class UserRepository(AuthDbContext context) : IUserRepository
+public class UserRepository : BaseRepository<User>, IUserRepository
 {
-    // TODO: think about creating BaseRepository abstract class as there will be a lot of repetetive code
-    // A guide can be found here: https://learn.microsoft.com/en-us/aspnet/mvc/overview/older-versions/getting-started-with-ef-5-using-mvc-4/implementing-the-repository-and-unit-of-work-patterns-in-an-asp-net-mvc-application
-    public async Task<User> CreateUser(string email)
-    {
-        ApplicationUser newUser = new ApplicationUser { UserName = email };
-        await context.Users.AddAsync(newUser);
+    private readonly AuthDbContext _context;
 
-        // TODO: implement mappers
-        return  UserMapper.ToCore(newUser);
+public UserRepository(AuthDbContext context) : base(context)
+{
+    // Pass context to BaseRepository
+    _context = context;
+}
+
+    public Task<User> CreateUser(string email)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            throw new ArgumentException("Email cannot be null or empty.", nameof(email));
+        }
+
+        return await FirstOrDefaultAsync(
+            u => u.Email == email,
+            cancellationToken
+        );
     }
 
     public Task Save()
     {
-        return context.SaveChangesAsync();
+        throw new NotImplementedException();
     }
 }

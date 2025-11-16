@@ -1,8 +1,9 @@
 ﻿using Identity.Core.Entities;
+using Common.Core.Interfaces;
 
-namespace Identity.Core.Repositories;
+namespace Identity.Core.Interfaces.Repositories;
 
-public interface IRefreshTokenRepository
+public interface IRefreshTokenRepository : IBaseRepository<RefreshToken>
 {
     Task<RefreshToken?> GetByTokenAsync(string token, CancellationToken cancellationToken = default);
     Task<RefreshToken> AddAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default);

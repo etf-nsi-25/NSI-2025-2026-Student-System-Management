@@ -1,16 +1,15 @@
-﻿using Identity.Core.Interfaces;
-using Identity.Infrastructure.Db;
+﻿using Common.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace Identity.Infrastructure.Repositories;
+namespace Common.Infrastructure.Repositories;
 
 public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class
 {
-    protected readonly AuthDbContext _context;
+    protected readonly DbContext _context;
     protected readonly DbSet<TEntity> _dbSet;
 
-    public BaseRepository(AuthDbContext context)
+    public BaseRepository(DbContext context)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _dbSet = context.Set<TEntity>();

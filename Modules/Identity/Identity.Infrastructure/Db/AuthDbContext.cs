@@ -11,17 +11,6 @@ namespace Identity.Infrastructure.Db
 
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-
-        {
-
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseNpgsql(
-                    "Host=localhost;Port=5432;Database=unsa_sms_db;Username=user;Password=admin");
-            }
-
-        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

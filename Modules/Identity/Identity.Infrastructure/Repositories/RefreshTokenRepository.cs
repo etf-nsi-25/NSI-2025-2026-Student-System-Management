@@ -1,47 +1,36 @@
-﻿using Identity.Core.Entities;
-using Identity.Core.Repositories;
+﻿using Common.Infrastructure.Repositories;
+using Identity.Core.Entities;
+using Identity.Core.Interfaces.Repositories;
 using Identity.Infrastructure.Db;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace Identity.Infrastructure.Repositories;
 
-public class RefreshTokenRepository : IRefreshTokenRepository
+public class RefreshTokenRepository : BaseRepository<RefreshToken>, IRefreshTokenRepository
 {
     private readonly AuthDbContext _context;
 
-    public RefreshTokenRepository(AuthDbContext context)
+    public RefreshTokenRepository(AuthDbContext context) : base(context)
     {
+        // Pass context to BaseRepository
         _context = context;
     }
 
     public async Task<RefreshToken?> GetByTokenAsync(string token, CancellationToken cancellationToken = default)
     {
-        return await _context.RefreshTokens
+        return await _dbSet // _dbSet comes from BaseRepository
             .Include(rt => rt.User)
             .FirstOrDefaultAsync(rt => rt.Token == token, cancellationToken);
     }
-
-    public async Task<RefreshToken> AddAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default)
-    {
-        await _context.RefreshTokens.AddAsync(refreshToken, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
-        return refreshToken;
-    }
-
-    public async Task UpdateAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default)
-    {
-        _context.RefreshTokens.Update(refreshToken);
-        await _context.SaveChangesAsync(cancellationToken);
-    }
-
     public async Task<IEnumerable<RefreshToken>> GetActiveTokensByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        return await _context.RefreshTokens
-            .Where(rt => rt.UserId == userId && !rt.IsRevoked && rt.ExpiresAt > DateTime.UtcNow)
-            .ToListAsync(cancellationToken);
+        return await GetAsync(
+              filter: rt => rt.UserId == userId && !rt.IsRevoked && rt.ExpiresAt > DateTime.UtcNow,
+              orderBy: q => q.OrderByDescending(rt => rt.CreatedAt),
+              cancellationToken: cancellationToken
+          );
     }
+
 
     public async Task RevokeAllUserTokensAsync(Guid userId, string reason, CancellationToken cancellationToken = default)
     {

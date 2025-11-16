@@ -1,6 +1,8 @@
 using System.Runtime.CompilerServices;
 using Identity.Core.Entities;
-using Identity.Core.Repositories;
+using Identity.Core.Interfaces.Repositories;
+using Identity.Core.Interfaces.Services;
+
 
 // Allow injection.
 [assembly: InternalsVisibleTo("Identity.Infrastructure")]

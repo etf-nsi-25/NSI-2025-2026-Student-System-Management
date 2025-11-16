@@ -1,12 +1,12 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
 using Identity.Core.Entities;
-using Identity.Core.Interfaces;
 using Identity.Core.Models;
 using Identity.Infrastructure.Configuration;
+using Identity.Core.Interfaces.Services;
 using Microsoft.Extensions.Options;
+using System.IdentityModel.Tokens.Jwt;
 
 
 namespace Identity.Application.Services;
