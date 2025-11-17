@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Faculty.Core.Entities;
+﻿using Faculty.Core.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Faculty.Infrastructure.Db
 {
@@ -9,8 +9,14 @@ namespace Faculty.Infrastructure.Db
             : base(options)
         {
         }
+
+        public DbSet<FacultyCourse> FacultyCourses { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<FacultyCourse>()
+                .ToTable("faculty_Course");
+
             base.OnModelCreating(modelBuilder);
         }
     }
