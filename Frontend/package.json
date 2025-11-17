@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@coreui/icons-react": "^2.3.0",
+    "@coreui/react": "^5.9.1",
     "patch-package": "^8.0.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

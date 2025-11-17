@@ -1,16 +1,23 @@
-import type { RestClient } from './rest.ts';
+import type { RestClient } from "./rest.ts";
 
 export class API {
-    #restClient: RestClient
+  #restClient: RestClient;
 
-    constructor(restClient: RestClient) {
-        this.#restClient = restClient
-    }
+  constructor(restClient: RestClient) {
+    this.#restClient = restClient;
+  }
 
-    async getHelloUniversity(): Promise<any> {
-        // DO NOT USE ANY, this is only for demonstration
-        return this.#restClient.get('/api/University')
-    }
+  async getHelloUniversity(): Promise<any> {
+    // DO NOT USE ANY, this is only for demonstration
+    return this.#restClient.get("/api/University");
+  }
 
-    // continue with other endpoints
+  async login(email: string, password: string): Promise<any> {
+    return this.#restClient.post("https://localhost:5001/api/auth/login", {
+      email,
+      password,
+    });
+  }
+
+  // continue with other endpoints
 }

@@ -43,10 +43,27 @@ foreach (var asm in moduleControllers)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// CORS Configuration for aggregated host - allow frontend dev server
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 // Middleware
 app.UseHttpsRedirection();
+
+// Ensure routing is enabled before applying CORS so the middleware can handle preflight requests correctly
+app.UseRouting();
+app.UseCors("AllowFrontend");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
