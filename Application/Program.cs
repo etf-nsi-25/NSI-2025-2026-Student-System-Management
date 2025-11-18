@@ -10,7 +10,7 @@ using Support.Infrastructure;
 using Notifications.Infrastructure;
 using Analytics.Infrastructure;
 using Identity.Infrastructure.DependencyInjection;
-using Identity.Core.DomainServices;
+using Identity.Application.DependencyInjection; 
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +21,7 @@ builder.Services.AddFacultyModule();
 builder.Services.AddSupportModule();
 builder.Services.AddNotificationsModule();
 builder.Services.AddAnalyticsModule();
+builder.Services.AddIdentityApplication(); 
 
 // Add controllers and module API assemblies
 var mvcBuilder = builder.Services.AddControllers();

@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Identity.Infrastructure.Services;
+
 
 namespace Identity.Infrastructure.DependencyInjection
 {
@@ -32,6 +34,8 @@ namespace Identity.Infrastructure.DependencyInjection
             // Register services
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
+            services.AddSingleton<IPasswordHasher, PasswordHasher>(); 
+            services.AddSingleton<IEventPublisher, EventPublisher>(); 
 
             services.AddScoped<ITotpProvider, TotpProvider>();
             services.AddScoped<TwoFactorDomainService>();
