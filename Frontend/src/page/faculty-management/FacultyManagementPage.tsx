@@ -1,21 +1,75 @@
-import React from 'react';
-import { FacultyHeader } from '../../component/faculty-management/FacultyHeader';
-import { FacultySidebar } from '../../component/faculty-management/FacultySidebar';
-import './FacultyManagementPage.css';
+import {
+  CContainer,
+  CHeader,
+  CHeaderBrand,
+  CSidebar,
+  CSidebarNav,
+  CNavItem,
+} from '@coreui/react';
+
+import logo from '../../assets/images/logo.jpg';
 import { FacultyListingPage } from './FacultyListingPage';
+import './FacultyManagementPage.css';
 
 export function FacultyManagementPage() {
-    return (
-        <div className="faculty-page">
-            <FacultyHeader />
-            
-            <div className="faculty-body">
-                <FacultySidebar />
-                <div className="faculty-content">
-                    <FacultyListingPage />
+  return (
+    <CContainer fluid className="fm-page">
+      {/* HEADER */}
+      <CHeader position="sticky" className="fm-header">
+        <CHeaderBrand className="fm-header-brand">
+          <img src={logo} alt="Logo" className="fm-logo" />
+          <span className="fm-header-title">UNSA SMS</span>
+        </CHeaderBrand>
 
-                </div>
-            </div>
-        </div>
-    );
+        <div className="fm-header-user">Superadmin</div>
+      </CHeader>
+
+      {/* BODY */}
+      <div className="fm-body">
+        {/* SIDEBAR */}
+        <CSidebar className="fm-sidebar" unfoldable>
+          <CSidebarNav className="fm-sidebar-nav">
+
+            <div className="fm-sidebar-section">Navigation</div>
+
+            <CNavItem className="fm-sidebar-item">
+              <span>Dashboard</span>
+            </CNavItem>
+
+            <CNavItem className="fm-sidebar-item">
+              <span>Course Management</span>
+            </CNavItem>
+
+            <CNavItem className="fm-sidebar-item">
+              <span>User Management</span>
+            </CNavItem>
+
+            <CNavItem className="fm-sidebar-item">
+              <span>Tenant Management</span>
+            </CNavItem>
+
+            <CNavItem className="fm-sidebar-item">
+              <span>Student Support</span>
+            </CNavItem>
+
+            <div className="fm-sidebar-section">Settings</div>
+
+            <CNavItem className="fm-sidebar-item">
+              <span>Settings</span>
+            </CNavItem>
+
+            <CNavItem className="fm-sidebar-item">
+              <span>Help</span>
+            </CNavItem>
+
+          </CSidebarNav>
+        </CSidebar>
+
+        {/* MAIN CONTENT */}
+        <main className="fm-content">
+          <FacultyListingPage />
+        </main>
+      </div>
+    </CContainer>
+  );
 }

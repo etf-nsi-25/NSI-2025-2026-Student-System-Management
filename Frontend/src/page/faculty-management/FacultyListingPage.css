@@ -1,221 +1,230 @@
-.faculty-listing-page {
-    background-color: #fff;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+/* CONTAINER CARD */
+.fl-card {
+  background: white;
+  padding: 24px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-.faculty-listing-page h2 {
-    margin-bottom: 15px;
-    color: #133E87;
+/* HEADER */
+.fl-header h2 {
+  margin: 0 0 16px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #133E87;
 }
 
-.faculty-listing-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
+/* CONTROLS */
+.fl-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 10px;
 }
 
-.faculty-listing-controls input {
-    flex: 1;
-    padding: 8px;
-    margin-right: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+.fl-controls input {
+  flex: 1;
+  padding: 9px 12px;
+  border: 1px solid #d2d6dc;
+  border-radius: 6px;
+  font-size: 14px;
 }
 
-.faculty-listing-controls button {
-    padding: 8px 12px;
-    background-color: #133E87;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
+.fl-controls button {
+  padding: 9px 16px;
+  background-color: #133E87;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
 }
 
-.faculty-listing-controls button:hover {
-    background-color: #0f2e63;
+.fl-controls button:hover {
+  background-color: #0f2e63;
 }
 
-.faculty-table {
-    width: 100%;
-    border-collapse: collapse;
+/* TABLE */
+.fl-table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 16px;
 }
 
-.faculty-table th, .faculty-table td {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    text-align: left;
+.fl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
 }
 
-.faculty-table th {
-    background-color: #f0f2f5;
-    font-weight: bold;
+.fl-table th,
+.fl-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.fl-table th {
+  background-color: #f4f6f9;
+  font-weight: 600;
+}
+
+.sortable {
+  cursor: pointer;
 }
 
 .status-active {
-    color: green;
-    font-weight: 600;
+  color: green;
+  font-weight: 600;
 }
 
 .status-inactive {
-    color: red;
-    font-weight: 600;
+  color: red;
+  font-weight: 600;
 }
 
+/* BUTTONS */
+.edit-btn,
+.delete-btn {
+  padding: 6px 10px;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-btn {
+  background-color: #0048ff;
+}
+
+.edit-btn:hover {
+  background-color: #007bff;
+}
+
+.delete-btn {
+  background-color: #FF4136;
+}
+
+.delete-btn:hover {
+  background-color: #c5302b;
+}
+
+/* PAGINATION */
 .pagination {
-    margin-top: 15px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  align-items: center;
+  margin-top: 12px;
 }
 
 .pagination button {
-    padding: 6px 12px;
-    background-color: #133E87;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
+  padding: 6px 10px;
+  border: none;
+  background: #133E87;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .pagination button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-
-
-
-
-/* Modal overlay */
+/* MODAL */
 .modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
 }
 
-/* Modal box */
 .modal {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    width: 400px;
-    max-width: 90%;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    animation: fadeIn 0.3s ease;
+  background: white;
+  padding: 24px;
+  border-radius: 10px;
+  width: 380px;
+  max-width: 90%;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  animation: fadeIn 0.3s ease;
 }
 
-/* Modal title */
+/* MODAL HEADER */
 .modal h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: #133E87;
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-weight: 600;
+  color: #133E87;
 }
 
-/* Form groups inside modal */
+/* FORM */
 .form-group {
-    margin-bottom: 15px;
+  margin-bottom: 16px;
 }
 
 .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 600;
-    color: #333;
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
 }
 
 .form-group input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
-    box-sizing: border-box;
+  width: 100%;
+  padding: 9px;
+  border: 1px solid #d2d6dc;
+  border-radius: 6px;
+  font-size: 14px;
 }
 
 .error-text {
-    color: red;
-    font-size: 12px;
-    margin-top: 3px;
+  margin-top: 4px;
+  color: red;
+  font-size: 12px;
 }
 
-/* Modal actions */
+/* MODAL ACTIONS */
 .modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .modal-actions button {
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
 }
 
 .modal-actions button[type="button"] {
-    background-color: #ccc;
-    color: #333;
-}
-
-.modal-actions button[type="button"]:hover {
-    background-color: #bbb;
+  background-color: #ccc;
 }
 
 .modal-actions button[type="submit"] {
-    background-color: #133E87;
-    color: #fff;
+  background-color: #133E87;
+  color: white;
 }
 
-.modal-actions button[type="submit"]:hover {
-    background-color: #0f2e63;
+.modal-actions button:hover {
+  opacity: 0.9;
 }
 
-/* Animacija modala */
+/* ANIMATION */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-
-
-
-/* Stil za Edit dugme */
-.faculty-table .edit-btn {
-    padding: 6px 10px;
-    background-color: #0048ff; /* narančasta */
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.faculty-table .edit-btn:hover {
-    background-color: #007bff;
-}
-
-/* Stil za Delete dugme */
-.faculty-table .delete-btn {
-    padding: 6px 10px;
-    background-color: #FF4136; /* crvena */
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.faculty-table .delete-btn:hover {
-    background-color: #c5302b;
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
