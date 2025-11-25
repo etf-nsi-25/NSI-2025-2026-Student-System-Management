@@ -1,7 +1,7 @@
-﻿using Identity.Infrastructure.Entities;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Identity.Core.Entities; 
+using Identity.Infrastructure.Entities;
 
 
 namespace Identity.Infrastructure.Db

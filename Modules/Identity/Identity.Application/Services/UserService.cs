@@ -4,6 +4,7 @@ using Identity.Core.Repositories;
 using Identity.Core.Events;
 using Identity.Core.Enums;
 using Identity.Core.DTO; 
+using Identity.Core.Services;
 
 // Allow injection.
 [assembly: InternalsVisibleTo("Identity.Infrastructure")]
@@ -11,7 +12,7 @@ namespace Identity.Application.Services;
 
 internal class UserService(
     IUserRepository userRepository,
-    IPasswordHasher passwordHasher, 
+    IIdentityHasherService identityHasherService, 
     IEventPublisher eventPublisher) : IUserService
 {
      public async Task<Guid> CreateUserAsync(
@@ -32,9 +33,7 @@ internal class UserService(
         {
              throw new ArgumentException($"Username '{username}' is already taken.", nameof(username));
         }
-
-        var passwordHash = passwordHasher.HashPassword(password);
-
+        var passwordHash = identityHasherService.HashPassword(password);
         var newUser = User.Create(
             username,
             passwordHash,

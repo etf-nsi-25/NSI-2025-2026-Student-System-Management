@@ -1,4 +1,3 @@
 using System.Runtime.CompilerServices;
 
-
-[assembly: InternalsVisibleTo("IdentityTests")]
+[assembly: InternalsVisibleTo("Test")]

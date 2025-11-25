@@ -6,7 +6,7 @@ public class User
 {
     public Guid Id { get; private set; } 
     public string Username { get; private set; } 
-    public byte[] PasswordHash { get; private set; } 
+    public string PasswordHash { get; private set; }
     public string FirstName { get; private set; }
     public string LastName { get; private set; }
     public Guid FacultyId { get; private set; } 
@@ -38,16 +38,16 @@ public class User
     }
 }
 
-    protected User() 
+    internal User() 
     {
         Username = string.Empty; 
-        PasswordHash = new byte[0]; 
+        PasswordHash = string.Empty; 
         FirstName = string.Empty;
         LastName = string.Empty;
         IndexNumber = string.Empty; 
     }
 
-    public static User Create(string username, byte[] passwordHash, string firstName, string lastName, Guid facultyId, UserRole role, string? indexNumber = null)
+    public static User Create(string username, string passwordHash, string firstName, string lastName, Guid facultyId, UserRole role, string? indexNumber = null)
     {
         
         return new User
