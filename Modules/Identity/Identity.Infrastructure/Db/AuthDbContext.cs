@@ -1,16 +1,25 @@
-﻿using Identity.Infrastructure.Entities;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Identity.Core.Entities; 
+using Identity.Infrastructure.Entities;
+
 
 namespace Identity.Infrastructure.Db
 {
-    public class AuthDbContext(DbContextOptions<AuthDbContext> options) : IdentityDbContext<ApplicationUser>(options)
+     public class AuthDbContext : IdentityDbContext<ApplicationUser> 
     {
+        
+        public DbSet<User> DomainUsers { get; set; }
+
+        public AuthDbContext(DbContextOptions<AuthDbContext> options)
+            : base(options)
+        {
+        }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            
-            // TODO: add additional properties here when needed
+            builder.Entity<User>().ToTable("DomainUsers");
         }
     }
 }

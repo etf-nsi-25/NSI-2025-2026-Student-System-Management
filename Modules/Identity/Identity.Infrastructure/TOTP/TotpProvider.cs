@@ -24,13 +24,13 @@ namespace Identity.Infrastructure.TOTP
             return raw.Substring(0, 16).ToUpperInvariant();
         }
 
-        public string GenerateQrCode(string email, string secret)
+        public string GenerateQrCode(string username, string secret)
         {
             // For real: build otpauth:// URL + generate QR and return Base64.
             // For demo: return empty string so frontend just hides the image
             // or you can return the otpauth URI as text.
             var otpauth =
-                $"otpauth://totp/StudentSystem:{email}?secret={secret}&issuer=StudentSystem";
+                $"otpauth://totp/StudentSystem:{username}?secret={secret}&issuer=StudentSystem";
             var bytes = Encoding.UTF8.GetBytes(otpauth);
             return Convert.ToBase64String(bytes); // pseudo "QR" data
         }

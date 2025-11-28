@@ -12,12 +12,11 @@ namespace Identity.Core.DomainServices
             _totpProvider = totpProvider;
         }
 
-        // Generiše novi secret i "QR code" payload za zadani email.
-        public (string Secret, string QrCodeBase64) GenerateSetupFor(string email)
+        // Generiše novi secret i "QR code" payload za zadani username.
+        public (string Secret, string QrCodeBase64) GenerateSetupFor(string username)
         {
             var secret = _totpProvider.GenerateSecret();
-            var qrCode = _totpProvider.GenerateQrCode(email, secret);
-
+            var qrCode = _totpProvider.GenerateQrCode(username, secret);
             return (secret, qrCode);
         }
         

@@ -1,7 +1,8 @@
 using Identity.Core.Entities;
 using Identity.Core.Repositories;
-using Identity.Infrastructure.Db;
-using Identity.Infrastructure.Entities;
+using Identity.Infrastructure.Db; 
+using Microsoft.EntityFrameworkCore;
+using Identity.Core.DTO; 
 
 namespace Identity.Infrastructure.Repositories;
 
@@ -12,26 +13,100 @@ public class UserRepository : IUserRepository
     public UserRepository(AuthDbContext context)
     {
         _context = context;
+
     }
 
-    public async Task<User> CreateUser(string email)
+
+    public async Task AddAsync(User user)
     {
-        var newUser = new ApplicationUser { UserName = email };
-        await _context.Users.AddAsync(newUser);
+        await _context.DomainUsers.AddAsync(user); 
+    }
+
+    public async Task<User?> GetByIdAsync(Guid userId) 
+    {
+        return await _context.DomainUsers.FindAsync(userId); 
+    }
+    
+    public async Task<bool> IsUsernameTakenAsync(string username)
+    {
+        return await _context.DomainUsers.AnyAsync(u => u.Username == username); 
+    }
+    
+    
+    public Task UpdateAsync(User user)
+    {
+        _context.Set<User>().Update(user);
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteAsync(User user)
+    {
+        _context.Set<User>().Remove(user);
+        return Task.CompletedTask;
+    }
+
+    public async Task SaveAsync()
+    {
+        await _context.SaveChangesAsync();
+    }
+    
+    public async Task<IReadOnlyList<User>> GetAllFilteredAsync(UserFilterRequest filter)
+    {
+        var query = _context.DomainUsers.AsNoTracking();
+
+        if (filter.FacultyId.HasValue)
+        {
+            query = query.Where(u => u.FacultyId == filter.FacultyId.Value);
+        }
+        if (filter.Role.HasValue)
+        {
+            query = query.Where(u => u.Role == filter.Role.Value);
+        }
+
         
-        // TODO: implement mappers (za sada direktno mapiramo na domen User)
-        return new User(newUser.Id, newUser.UserName);
+        query = ApplySorting(query, filter.SortBy, filter.SortOrder);
+
+        var skip = (filter.PageNumber - 1) * filter.PageSize;
+        query = query.Skip(skip).Take(filter.PageSize);
+
+        return await query.ToListAsync();
     }
 
-    public async Task<User> GetByIdAsync(string id)
+    public async Task<int> CountAsync(UserFilterRequest filter)
     {
-        var appUser = await _context.Users.FindAsync(id);
-        if (appUser is null) throw new InvalidOperationException($"User with id '{id}' not found.");
-        return new User(appUser.Id, appUser.UserName);
+        var query = _context.DomainUsers.AsNoTracking();
+        
+        if (filter.FacultyId.HasValue)
+        {
+            query = query.Where(u => u.FacultyId == filter.FacultyId.Value);
+        }
+        if (filter.Role.HasValue)
+        {
+            query = query.Where(u => u.Role == filter.Role.Value);
+        }
+
+        return await query.CountAsync();
+    }
+    
+    private static IQueryable<User> ApplySorting(IQueryable<User> query, string? sortBy, string sortOrder)
+{
+    if (string.IsNullOrWhiteSpace(sortBy))
+    {
+        return query.OrderBy(u => u.Id); 
     }
 
-    public Task Save()
+    bool isAscending = sortOrder.ToLowerInvariant() == "asc";
+
+    IOrderedQueryable<User> orderedQuery;
+
+    orderedQuery = sortBy.ToLowerInvariant() switch
     {
-        return _context.SaveChangesAsync();
-    }
+        "username" => isAscending ? query.OrderBy(u => u.Username) : query.OrderByDescending(u => u.Username),
+        "firstname" => isAscending ? query.OrderBy(u => u.FirstName) : query.OrderByDescending(u => u.FirstName),
+        "role" => isAscending ? query.OrderBy(u => u.Role) : query.OrderByDescending(u => u.Role),
+        _ => query.OrderBy(u => u.Id) 
+    };
+
+    return orderedQuery;
+}
 }

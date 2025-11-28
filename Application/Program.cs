@@ -10,7 +10,6 @@ using Support.Infrastructure;
 using Notifications.Infrastructure;
 using Analytics.Infrastructure;
 using Identity.Infrastructure.DependencyInjection;
-using Identity.Core.DomainServices;
 
 var builder = WebApplication.CreateBuilder(args);
 

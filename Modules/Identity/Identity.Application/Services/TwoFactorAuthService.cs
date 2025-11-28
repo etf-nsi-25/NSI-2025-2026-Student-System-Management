@@ -23,9 +23,18 @@ namespace Identity.Application.Services
 
         public async Task<TwoFASetupResult> EnableTwoFactorAsync(string userId)
         {
-            User user = await _userRepository.GetByIdAsync(userId);
+            
+            Guid userGuid = Guid.Parse(userId); 
 
-            var (secret, qrCode) = _twoFactorDomain.GenerateSetupFor(user.Email);
+            User? user = await _userRepository.GetByIdAsync(userGuid);
+
+            if (user is null)
+            {
+                    throw new InvalidOperationException($"User with ID {userId} not found."); 
+            }       
+            var (secret, qrCode) = _twoFactorDomain.GenerateSetupFor(user.Username);
+
+
 
             return new TwoFASetupResult(
                 ManualKey: secret,
