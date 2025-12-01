@@ -9,14 +9,12 @@ namespace Faculty.Infrastructure.Db
             : base(options)
         {
         }
-
         public DbSet<FacultyCourse> FacultyCourses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<FacultyCourse>()
                 .ToTable("FacultyCourses");
-
             base.OnModelCreating(modelBuilder);
         }
     }
