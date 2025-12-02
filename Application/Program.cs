@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services from modules
 builder.Services.AddIdentityModule(builder.Configuration);
-builder.Services.AddUniversityModule();
+builder.Services.AddUniversityModule(builder.Configuration);
 builder.Services.AddFacultyModule();
 builder.Services.AddSupportModule();
 builder.Services.AddNotificationsModule();
