@@ -28,15 +28,15 @@ export class RestClient {
         this.#authFailCallback = authFailCallback;
     }
 
-    async get(url: string) {
-        return this.#submitRequestWithFallback(url, 'GET')
+    async get<T>(url: string): Promise<T> {
+        return this.#submitRequestWithFallback<T>(url, 'GET')
     }
 
-    async post(url: string, body?: any) {
-        return this.#submitRequestWithFallback(url, 'POST', body)
+    async post<T, B>(url: string, body?: B): Promise<T> {
+        return this.#submitRequestWithFallback<T>(url, 'POST', body)
     }
 
-    async #submitRequestWithFallback<T>(url: string, method: Method, body?: unknown) {
+    async #submitRequestWithFallback<T>(url: string, method: Method, body?: unknown): Promise<T> {
         return this.#submitRequest<T>(url, method, body)
             .then(async apiResponse => {
                 if (apiResponse.ok) {
@@ -51,17 +51,18 @@ export class RestClient {
                     const result = await this.#submitRequest<T>(url, method, body);
 
                     if (!result.ok) {
-                        await this.#handleErrorResponse(result)
+                        throw {
+                            message: await apiResponse.errorResponse?.message,
+                            status: apiResponse.errorResponse?.status
+                        }
                     } else {
-                        return result.successResponse
+                        return result.successResponse!
                     }
                 } else {
-                    await this.#handleErrorResponse(apiResponse)
-                }
-            }).catch(error => {
-                throw {
-                    message: error.message,
-                    status: error.status
+                    throw {
+                        message: await apiResponse.errorResponse?.message,
+                        status: apiResponse.errorResponse?.status
+                    }
                 }
             })
     }
@@ -91,12 +92,5 @@ export class RestClient {
                 }
             }
         })
-    }
-
-    async #handleErrorResponse<T>(response: APIResponse<T>): Promise<void> {
-        throw {
-            message: await response.errorResponse?.message,
-            status: response.errorResponse?.status
-        }
     }
 }

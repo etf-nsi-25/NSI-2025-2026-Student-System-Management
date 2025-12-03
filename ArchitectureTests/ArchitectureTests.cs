@@ -142,4 +142,91 @@ public class ArchitectureTests
             }
         }
     }
+
+    [Fact]
+    public void Controllers_ShouldHaveNameEndingWith_Controller()
+    {
+        foreach (var module in _modules)
+        {
+            var assembly = GetAssembly(module, "API");
+
+            var result = Types.InAssembly(assembly)
+                .That().ResideInNamespace($"{module}.API.Controllers")
+                .Should().HaveNameEndingWith("Controller")
+                .GetResult();
+
+            Assert.True(result.IsSuccessful,
+                $"All controllers in {module}.API.Controllers should end with 'Controller'");
+        }
+    }
+
+    [Fact]
+    public void Repositories_ShouldHaveNameEndingWith_Repository()
+    {
+        foreach (var module in _modules)
+        {
+            var assembly = GetAssembly(module, "Infrastructure");
+
+            var result = Types.InAssembly(assembly)
+                .That().ResideInNamespace($"{module}.Infrastructure.Repositories")
+                .Should().HaveNameEndingWith("Repository")
+                .GetResult();
+
+            Assert.True(result.IsSuccessful,
+                $"All repositories in {module}.Infrastructure.Repositories should end with 'Repository'");
+        }
+    }
+
+    [Fact]
+    public void Entities_ShouldLiveIn_CoreEntities_Namespace()
+    {
+        foreach (var module in _modules)
+        {
+            var assembly = GetAssembly(module, "Core");
+
+            var result = Types.InAssembly(assembly)
+                .That().ResideInNamespace($"{module}.Core.Entities")
+                .Should().BeClasses()
+                .GetResult();
+
+            Assert.True(result.IsSuccessful,
+                $"All entities in {module}.Core.Entities should be classes");
+        }
+    }
+
+    [Fact]
+    public void CqrsHandlers_ShouldFollowNamingConvention()
+    {
+        foreach (var module in _modules)
+        {
+            var assembly = GetAssembly(module, "Application");
+
+            var result = Types.InAssembly(assembly)
+                .That().ResideInNamespace($"{module}.Application.Handlers")
+                .Should().HaveNameEndingWith("Handler")
+                .GetResult();
+
+            Assert.True(result.IsSuccessful,
+                $"All CQRS handlers in {module}.Application.Handlers should end with 'Handler'");
+        }
+    }
+
+    [Fact]
+    public void DomainServices_ShouldFollowNamingConvention()
+    {
+        foreach (var module in _modules)
+        {
+            var assembly = GetAssembly(module, "Core");
+
+            var result = Types.InAssembly(assembly)
+                .That().ResideInNamespace($"{module}.Core.Services")
+                .Should().HaveNameEndingWith("Service")
+                .GetResult();
+
+            Assert.True(result.IsSuccessful,
+                $"All domain services in {module}.Core.Services should end with 'Service'");
+        }
+    }
+
+
 }

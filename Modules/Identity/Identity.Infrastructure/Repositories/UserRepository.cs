@@ -1,43 +1,112 @@
-using Common.Infrastructure.Repositories;
 using Identity.Core.Entities;
-using Identity.Core.Interfaces.Repositories;
-using Identity.Infrastructure.Db;
-using Identity.Infrastructure.Entities;
-using Identity.Infrastructure.Mappers;
+using Identity.Core.Repositories;
+using Identity.Infrastructure.Db; 
 using Microsoft.EntityFrameworkCore;
+using Identity.Core.DTO; 
 
 namespace Identity.Infrastructure.Repositories;
 
-public class UserRepository : BaseRepository<User>, IUserRepository
+public class UserRepository : IUserRepository
 {
     private readonly AuthDbContext _context;
 
-public UserRepository(AuthDbContext context) : base(context)
-{
-    // Pass context to BaseRepository
-    _context = context;
-}
-
-    public Task<User> CreateUser(string email)
+    public UserRepository(AuthDbContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
+
     }
 
-    public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)
+
+    public async Task AddAsync(User user)
     {
-        if (string.IsNullOrWhiteSpace(email))
+        await _context.DomainUsers.AddAsync(user); 
+    }
+
+    public async Task<User?> GetByIdAsync(Guid userId) 
+    {
+        return await _context.DomainUsers.FindAsync(userId); 
+    }
+    
+    public async Task<bool> IsUsernameTakenAsync(string username)
+    {
+        return await _context.DomainUsers.AnyAsync(u => u.Username == username); 
+    }
+    
+    
+    public Task UpdateAsync(User user)
+    {
+        _context.Set<User>().Update(user);
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteAsync(User user)
+    {
+        _context.Set<User>().Remove(user);
+        return Task.CompletedTask;
+    }
+
+    public async Task SaveAsync()
+    {
+        await _context.SaveChangesAsync();
+    }
+    
+    public async Task<IReadOnlyList<User>> GetAllFilteredAsync(UserFilterRequest filter)
+    {
+        var query = _context.DomainUsers.AsNoTracking();
+
+        if (filter.FacultyId.HasValue)
         {
-            throw new ArgumentException("Email cannot be null or empty.", nameof(email));
+            query = query.Where(u => u.FacultyId == filter.FacultyId.Value);
+        }
+        if (filter.Role.HasValue)
+        {
+            query = query.Where(u => u.Role == filter.Role.Value);
         }
 
-        return await FirstOrDefaultAsync(
-            u => u.Email == email,
-            cancellationToken
-        );
+        
+        query = ApplySorting(query, filter.SortBy, filter.SortOrder);
+
+        var skip = (filter.PageNumber - 1) * filter.PageSize;
+        query = query.Skip(skip).Take(filter.PageSize);
+
+        return await query.ToListAsync();
     }
 
-    public Task Save()
+    public async Task<int> CountAsync(UserFilterRequest filter)
     {
-        throw new NotImplementedException();
+        var query = _context.DomainUsers.AsNoTracking();
+        
+        if (filter.FacultyId.HasValue)
+        {
+            query = query.Where(u => u.FacultyId == filter.FacultyId.Value);
+        }
+        if (filter.Role.HasValue)
+        {
+            query = query.Where(u => u.Role == filter.Role.Value);
+        }
+
+        return await query.CountAsync();
     }
+    
+    private static IQueryable<User> ApplySorting(IQueryable<User> query, string? sortBy, string sortOrder)
+{
+    if (string.IsNullOrWhiteSpace(sortBy))
+    {
+        return query.OrderBy(u => u.Id); 
+    }
+
+    bool isAscending = sortOrder.ToLowerInvariant() == "asc";
+
+    IOrderedQueryable<User> orderedQuery;
+
+    orderedQuery = sortBy.ToLowerInvariant() switch
+    {
+        "username" => isAscending ? query.OrderBy(u => u.Username) : query.OrderByDescending(u => u.Username),
+        "firstname" => isAscending ? query.OrderBy(u => u.FirstName) : query.OrderByDescending(u => u.FirstName),
+        "role" => isAscending ? query.OrderBy(u => u.Role) : query.OrderByDescending(u => u.Role),
+        _ => query.OrderBy(u => u.Id) 
+    };
+
+    return orderedQuery;
+}
 }

@@ -1,15 +1,19 @@
 using Identity.Application.Services;
+using Identity.Application.Interfaces;
 using Identity.Core.Entities;
-using Identity.Core.Interfaces.Repositories;
-using Identity.Core.Interfaces.Services;
-using Identity.Infrastructure.Db;
 using Identity.Infrastructure.Entities;
+using Identity.Core.Repositories;
+using Identity.Core.DomainServices;
+using Identity.Infrastructure.Db;
 using Identity.Infrastructure.Repositories;
-using Identity.Infrastructure.Services;
+using Identity.Infrastructure.TOTP;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Identity.Infrastructure.Services;
+using Identity.Core.Services;
+
 
 namespace Identity.Infrastructure.DependencyInjection
 {
@@ -29,17 +33,15 @@ namespace Identity.Infrastructure.DependencyInjection
                 .AddEntityFrameworkStores<AuthDbContext>();
 
             // Register services
-            
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<IPasswordHasher, PasswordHasher>();
-            services.AddSingleton<IJwtTokenService, JwtTokenService>();
-
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-            
+            services.AddScoped<IUserService, UserService>();
+            services.AddSingleton<IEventPublisher, EventPublisher>(); 
 
+            services.AddScoped<ITotpProvider, TotpProvider>();
+            services.AddScoped<TwoFactorDomainService>();
+            services.AddScoped<ITwoFactorAuthService, TwoFactorAuthService>();
 
+            services.AddScoped<IIdentityHasherService, IdentityHasherService>();
             return services;
         }
     }
