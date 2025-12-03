@@ -40,7 +40,7 @@ namespace Identity.Infrastructure.DependencyInjection
             services.AddScoped<ITotpProvider, TotpProvider>();
             services.AddScoped<TwoFactorDomainService>();
             services.AddScoped<ITwoFactorAuthService, TwoFactorAuthService>();
-
+            services.AddScoped<ISecretEncryptionService, SecretEncryptionService>();
             services.AddScoped<IIdentityHasherService, IdentityHasherService>();
             return services;
         }
