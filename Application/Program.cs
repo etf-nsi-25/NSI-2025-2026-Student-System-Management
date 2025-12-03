@@ -7,9 +7,16 @@ using Support.Infrastructure;
 using Notifications.Infrastructure;
 using Analytics.Infrastructure;
 using Identity.Infrastructure.DependencyInjection;
+<<<<<<< HEAD
 using Faculty.Infrastructure.DependencyInjection;
 
 
+=======
+using Faculty.Infrastructure.Db;
+using Faculty.Core.Interfaces;
+using Faculty.Core.Services;
+using Microsoft.EntityFrameworkCore;
+>>>>>>> c4e5064 (PBI-301: Implement Faculty database and multi-tenancy infrastructure)
 
 var builder = WebApplication.CreateBuilder(args);
 
