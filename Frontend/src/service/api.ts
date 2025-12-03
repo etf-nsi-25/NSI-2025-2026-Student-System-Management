@@ -9,7 +9,7 @@ export class API {
 
     async getHelloUniversity(): Promise<any> {
         // DO NOT USE ANY, this is only for demonstration
-        return this.#restClient.get('/api/University')
+        return this.#restClient.get('/api/Faculty')
     }
 
     // continue with other endpoints

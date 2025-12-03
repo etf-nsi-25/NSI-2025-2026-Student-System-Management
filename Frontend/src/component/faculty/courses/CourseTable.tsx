@@ -41,10 +41,10 @@ const CourseTable = ({ search, courses, onEdit, onDelete }: Props) => {
           <CTableRow key={course.id}>
             <CTableDataCell>{course.id}</CTableDataCell>
             <CTableDataCell>{course.name}</CTableDataCell>
-            <CTableDataCell>{course.faculty}</CTableDataCell>
+            <CTableDataCell>{course.code}</CTableDataCell>
+            <CTableDataCell>{course.type}</CTableDataCell>
+            <CTableDataCell>{course.programId}</CTableDataCell>
             <CTableDataCell>{course.ects}</CTableDataCell>
-            <CTableDataCell>{course.semester}</CTableDataCell>
-            <CTableDataCell>{course.major}</CTableDataCell>
 
             <CTableDataCell className="text-end">
               <CourseRowActions

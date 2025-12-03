@@ -13,10 +13,10 @@ import {
   CModalFooter,
 } from "@coreui/react";
 
-import type { Course } from "../../../component/university/courses/types/Course";
-import CourseTable from "../../../component/university/courses/CourseTable";
-import CreateCourseModal from "../../../component/university/courses/CreateCourseModal";
-import EditCourseModal from "../../../component/university/courses/EditCourseModal";
+import type { Course } from "../../../component/faculty/courses/types/Course";
+import CourseTable from "../../../component/faculty/courses/CourseTable";
+import CreateCourseModal from "../../../component/faculty/courses/CreateCourseModal";
+import EditCourseModal from "../../../component/faculty/courses/EditCourseModal";
 
 const CourseListPage = () => {
   const [search, setSearch] = useState("");
@@ -30,18 +30,18 @@ const CourseListPage = () => {
     {
       id: "35009",
       name: "Computer Vision",
-      faculty: "ETF",
+      type: "Mandatory",
+      code: "C065",
+      programId: "2",
       ects: 6,
-      semester: 3,
-      major: "Computer Science",
     },
     {
-      id: "35012",
-      name: "Operating Systems",
-      faculty: "ETF",
+      id: "35009",
+      name: "NASP",
+      type: "Mandatory",
+      code: "C065",
+      programId: "2",
       ects: 6,
-      semester: 4,
-      major: "Computer Science",
     },
   ]);
 

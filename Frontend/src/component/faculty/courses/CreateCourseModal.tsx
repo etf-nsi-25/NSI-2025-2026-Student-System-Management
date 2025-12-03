@@ -22,14 +22,11 @@ type Props = {
 
 const CreateCourseModal = ({ visible, onClose, onCreate }: Props) => {
   const [form, setForm] = useState({
-    faculty: "ETF",
-    program: "Bachelor",
-    major: "Computer Science",
-    name: "",               
-    ects: "6",
-    semester: "3",
-    professor: "",
-    assistant: "",
+    name: "",   
+    code: "string",
+    type: "string",     
+    programId: "2",
+    ects: "6",           
   });
 
   const update = (key: string, value: string) => {
@@ -43,12 +40,12 @@ const CreateCourseModal = ({ visible, onClose, onCreate }: Props) => {
     }
 
     const newCourse: Course = {
-      id: Date.now().toString(),          
+      id: Date.now().toString(),
       name: form.name,
-      faculty: form.faculty,
-      ects: Number(form.ects),            
-      semester: Number(form.semester),    
-      major: form.major,
+      ects: Number(form.ects),
+      code: form.code,
+      type: form.type,
+      programId: form.programId
     };
 
     onCreate(newCourse);  
@@ -66,28 +63,28 @@ const CreateCourseModal = ({ visible, onClose, onCreate }: Props) => {
           <CRow className="mb-3">
             <CCol md={4}>
               <CFormSelect
-                label="Faculty"
-                value={form.faculty}
-                onChange={(e) => update("faculty", e.target.value)}
+                label="Type"
+                value={form.type}
+                onChange={(e) => update("type", e.target.value)}
                 options={["ETF"]}
               />
             </CCol>
 
             <CCol md={4}>
               <CFormSelect
-                label="Program"
-                value={form.program}
-                onChange={(e) => update("program", e.target.value)}
-                options={["Bachelor"]}
+                label="Code"
+                value={form.code}
+                onChange={(e) => update("code", e.target.value)}
+                options={["C0585"]}
               />
             </CCol>
 
             <CCol md={4}>
               <CFormSelect
-                label="Major"
-                value={form.major}
-                onChange={(e) => update("major", e.target.value)}
-                options={["Computer Science"]}
+                label="Program"
+                value={form.programId}
+                onChange={(e) => update("programId", e.target.value)}
+                options={["2"]}
               />
             </CCol>
           </CRow>
@@ -110,43 +107,9 @@ const CreateCourseModal = ({ visible, onClose, onCreate }: Props) => {
                 options={["6", "5", "4"]}
               />
             </CCol>
-
-            <CCol md={4}>
-              <CFormSelect
-                label="Semester"
-                value={form.semester}
-                onChange={(e) => update("semester", e.target.value)}
-                options={["1", "2", "3", "4", "5", "6", "7", "8"]}
-              />
-            </CCol>
           </CRow>
 
           <CRow className="mb-3">
-            <CCol md={6}>
-              <CFormSelect
-                label="Professor"
-                value={form.professor}
-                onChange={(e) => update("professor", e.target.value)}
-                options={[
-                  { label: "Choose a professor", value: "" },
-                  { label: "Prof. John", value: "Prof. John" },
-                  { label: "Prof. Anne", value: "Prof. Anne" },
-                ]}
-              />
-            </CCol>
-
-            <CCol md={6}>
-              <CFormSelect
-                label="Assistant"
-                value={form.assistant}
-                onChange={(e) => update("assistant", e.target.value)}
-                options={[
-                  { label: "Choose an assistant", value: "" },
-                  { label: "Sarah Alba", value: "Sarah Alba" },
-                  { label: "Michael Lee", value: "Michael Lee" },
-                ]}
-              />
-            </CCol>
           </CRow>
         </CForm>
       </CModalBody>
