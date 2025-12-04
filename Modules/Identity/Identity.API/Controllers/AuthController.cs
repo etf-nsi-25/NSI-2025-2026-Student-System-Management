@@ -1,6 +1,8 @@
 // Identity.API/Controllers/AuthController.cs
 using Identity.API.DTO.Auth;
+using Identity.Core.Interfaces;
 using Identity.Core.Interfaces.Services;
+using Identity.Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -52,6 +54,18 @@ public class AuthController : ControllerBase
                 TokenType = "Bearer"
             };
 
+            // Create cookie options
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = result.ExpiresAt
+            };
+
+            // Store refresh token in cookie
+            Response.Cookies.Append("refreshToken", result.RefreshToken, cookieOptions);
+
             return Ok(response);
         }
         catch (UnauthorizedAccessException ex)
@@ -71,11 +85,12 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<LoginResponseDto>> RefreshToken([FromBody] RefreshTokenRequestDto request)
+    public async Task<ActionResult<LoginResponseDto>> RefreshToken()
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(request.RefreshToken))
+            // Read refresh token from HTTP-only cookie
+            if (!Request.Cookies.TryGetValue("refreshToken", out var refreshToken) || string.IsNullOrWhiteSpace(refreshToken))
             {
                 return BadRequest(new { message = "Refresh token is required" });
             }
@@ -84,21 +99,29 @@ public class AuthController : ControllerBase
             var userAgent = HttpContext.Request.Headers["User-Agent"].ToString() ?? "unknown";
 
             var result = await _authService.RefreshAuthenticationAsync(
-                request.RefreshToken,
+                refreshToken,
                 ipAddress,
                 userAgent);
+
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = result.ExpiresAt
+            };
+            Response.Cookies.Append("refreshToken", result.RefreshToken, cookieOptions);
 
             // Map domain model to DTO
             var response = new LoginResponseDto
             {
                 AccessToken = result.AccessToken,
-                RefreshToken = result.RefreshToken,
+                RefreshToken = result.RefreshToken, // you can still return it if needed
                 ExpiresAt = result.ExpiresAt,
                 TokenType = "Bearer"
             };
 
             return Ok(response);
-
         }
         catch (UnauthorizedAccessException ex)
         {
@@ -112,20 +135,21 @@ public class AuthController : ControllerBase
         }
     }
 
+
     [HttpPost("logout")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Logout([FromBody] RefreshTokenRequestDto request)
+    public async Task<IActionResult> Logout()
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(request.RefreshToken))
+            if (!Request.Cookies.TryGetValue("refreshToken", out var refreshToken) || string.IsNullOrWhiteSpace(refreshToken))
             {
                 return BadRequest(new { message = "Refresh token is required" });
             }
 
-            await _authService.RevokeAuthenticationAsync(request.RefreshToken);
+            await _authService.RevokeAuthenticationAsync(refreshToken);
 
             return Ok(new { message = "Successfully logged out" });
         }
