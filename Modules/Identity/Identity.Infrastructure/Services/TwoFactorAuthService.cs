@@ -1,81 +1,93 @@
-using System;
-using System.Threading.Tasks;
+using Identity.Application.DTO;
 using Identity.Application.Interfaces;
 using Identity.Core.DomainServices;
-using Identity.Core.Repositories;
 using Identity.Infrastructure.Entities;
 using Microsoft.AspNetCore.Identity;
-using Identity.Application.DTO;
+using System;
+using System.Threading.Tasks;
 
 namespace Identity.Infrastructure.Services
 {
     public class TwoFactorAuthService : ITwoFactorAuthService
     {
-        private readonly IUserRepository _userRepository;
-        private readonly TwoFactorDomainService _twoFactorDomain;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ISecretEncryptionService _encryption;
+        private readonly ITotpProvider _totpProvider;
 
         public TwoFactorAuthService(
-            IUserRepository userRepository,
-            TwoFactorDomainService twoFactorDomain,
             UserManager<ApplicationUser> userManager,
-            ISecretEncryptionService encryption)
+            ITotpProvider totpProvider)
         {
-            _userRepository = userRepository;
-            _twoFactorDomain = twoFactorDomain;
             _userManager = userManager;
-            _encryption = encryption;
+            _totpProvider = totpProvider;
         }
 
         public async Task<TwoFASetupResult> EnableTwoFactorAsync(string userId)
         {
-            Console.WriteLine(">>> USER ID RECEIVED = " + userId);
-            var guid = Guid.Parse(userId);
+            var user = await _userManager.FindByIdAsync(userId);
 
-            // DOMAIN user
-            var domainUser = await _userRepository.GetByIdAsync(guid);
-            if (domainUser == null)
-                throw new InvalidOperationException("Domain user not found.");
+            if (user == null)
+                throw new Exception("User not found.");
 
-            // IDENTITY user
-            var identityUser = await _userManager.FindByIdAsync(userId);
-            if (identityUser == null)
-                throw new InvalidOperationException("Identity user not found.");
+            if (string.IsNullOrEmpty(user.TwoFactorSecretEncrypted))
+            {
+                user.TwoFactorSecretEncrypted = _totpProvider.GenerateSecret();
+                await _userManager.UpdateAsync(user);
+            }
 
-            // Generate raw secret + QR
-            var (secret, qrCode) = _twoFactorDomain.GenerateSetupFor(domainUser.Username);
+            string username = user.Email ?? user.UserName ?? user.Id;
 
-            // Encrypt secret
-            var encrypted = _encryption.Encrypt(secret);
+            string qrCodeBase64 = _totpProvider.GenerateQrCode(
+                username,
+                user.TwoFactorSecretEncrypted
+            );
 
-            // Save encrypted secret into AspNetUsers
-            identityUser.TwoFactorSecretEncrypted = encrypted;
-            await _userManager.UpdateAsync(identityUser);
-
-            return new TwoFASetupResult(secret, qrCode);
+            return new TwoFASetupResult(
+                ManualKey: user.TwoFactorSecretEncrypted,
+                QrCodeImageBase64: qrCodeBase64
+            );
         }
 
-        public Task<TwoFAVerificationResult> VerifySetupAsync(string userId, string code)
+
+        public async Task<TwoFAVerificationResult> VerifySetupAsync(string userId, string code)
         {
-            const string demoSecret = "IGNORED";
-            bool ok = _twoFactorDomain.VerifyCode(demoSecret, code);
+            var user = await _userManager.FindByIdAsync(userId);
 
-            if (!ok)
-                return Task.FromResult(new TwoFAVerificationResult(false, "Invalid or expired code"));
+            if (user == null)
+                return new TwoFAVerificationResult(false, "User not found.");
 
-            return Task.FromResult(new TwoFAVerificationResult(true, null));
+            if (string.IsNullOrEmpty(user.TwoFactorSecretEncrypted))
+                return new TwoFAVerificationResult(false, "2FA setup not generated yet.");
+
+            bool valid = _totpProvider.ValidateCode(user.TwoFactorSecretEncrypted, code);
+
+            if (!valid)
+                return new TwoFAVerificationResult(false, "Invalid authentication code.");
+
+            user.TwoFactorEnabled = true;
+            await _userManager.UpdateAsync(user);
+
+            return new TwoFAVerificationResult(true, "Two-factor setup successful.");
         }
 
-        public Task<TwoFAVerificationResult> VerifyLoginAsync(string userId, string code)
+        public async Task<TwoFAVerificationResult> VerifyLoginAsync(string userId, string code)
         {
-            const string demoSecret = "IGNORED";
-            bool ok = _twoFactorDomain.VerifyCode(demoSecret, code);
+            var user = await _userManager.FindByIdAsync(userId);
 
-            if (!ok)
-                return Task.FromResult(new TwoFAVerificationResult(false, "Invalid login code"));
+            if (user == null)
+                return new TwoFAVerificationResult(false, "User not found.");
 
-            return Task.FromResult(new TwoFAVerificationResult(true, null));
+            if (!user.TwoFactorEnabled)
+                return new TwoFAVerificationResult(false, "Two-factor authentication not enabled.");
+
+            if (string.IsNullOrEmpty(user.TwoFactorSecretEncrypted))
+                return new TwoFAVerificationResult(false, "2FA secret key missing.");
+
+            bool valid = _totpProvider.ValidateCode(user.TwoFactorSecretEncrypted, code);
+
+            if (!valid)
+                return new TwoFAVerificationResult(false, "Invalid authentication code.");
+
+            return new TwoFAVerificationResult(true, "Verification successful.");
         }
     }
 }
