@@ -12,5 +12,21 @@ export class API {
         return this.#restClient.get('/api/Faculty')
     }
 
+    get<T>(url: string) {
+        return this.#restClient.get(url);
+    }
+
+    post<T>(url: string, body?: any) {
+        return this.#restClient.post(url, body);
+    }
+
+    put<T>(url: string, body?: any) {
+        return this.#restClient.put(url, body);
+    }
+
+    delete<T>(url: string) {
+        return this.#restClient.delete(url);
+    }
+
     // continue with other endpoints
 }

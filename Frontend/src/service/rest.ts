@@ -1,4 +1,5 @@
 import type { AuthInfo } from '../init/auth.tsx';
+import { API } from './api.ts';
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE'
 
@@ -35,6 +36,15 @@ export class RestClient {
     async post(url: string, body?: any) {
         return this.#submitRequestWithFallback(url, 'POST', body)
     }
+
+    async put(url: string, body?: any) {
+        return this.#submitRequestWithFallback(url, 'PUT', body);
+    }
+    
+    async delete(url: string) {
+        return this.#submitRequestWithFallback(url, 'DELETE');
+    }
+    
 
     async #submitRequestWithFallback<T>(url: string, method: Method, body?: unknown) {
         return this.#submitRequest<T>(url, method, body)
@@ -100,3 +110,13 @@ export class RestClient {
         }
     }
 }
+
+const authInfo: AuthInfo = {
+    accessToken: "",
+    expiresOn: new Date()
+};
+
+
+const restClient = new RestClient(authInfo, () => {});
+
+export const api = new API(restClient);

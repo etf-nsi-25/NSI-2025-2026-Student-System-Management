@@ -28,10 +28,10 @@ const CourseTable = ({ search, courses, onEdit, onDelete }: Props) => {
         <CTableRow>
           <CTableHeaderCell>ID</CTableHeaderCell>
           <CTableHeaderCell>Name</CTableHeaderCell>
-          <CTableHeaderCell>Faculty</CTableHeaderCell>
+          <CTableHeaderCell>Code</CTableHeaderCell>
+          <CTableHeaderCell>Type</CTableHeaderCell>
+          <CTableHeaderCell>Program</CTableHeaderCell>
           <CTableHeaderCell>ECTS</CTableHeaderCell>
-          <CTableHeaderCell>Semester</CTableHeaderCell>
-          <CTableHeaderCell>Major</CTableHeaderCell>
           <CTableHeaderCell className="text-end">Actions</CTableHeaderCell>
         </CTableRow>
       </CTableHead>

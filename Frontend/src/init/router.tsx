@@ -9,7 +9,7 @@ export function Router(): React.ReactNode {
         <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/page1" element={<Page1 />} />
-            <Route path="/university/courses" element={<CourseListPage />} />
+            <Route path="/faculty/courses" element={<CourseListPage />} />
         </Routes>
     );
 }
