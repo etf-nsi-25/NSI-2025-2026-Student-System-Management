@@ -9,6 +9,7 @@ namespace Identity.Infrastructure.Db
     {
 
         public DbSet<User> DomainUsers { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         public AuthDbContext(DbContextOptions<AuthDbContext> options)
             : base(options)
