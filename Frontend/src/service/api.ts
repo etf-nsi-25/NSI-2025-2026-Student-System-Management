@@ -1,32 +1,26 @@
-import type { RestClient } from './rest.ts';
+import type { RestClient } from './rest';
 
 export class API {
-    #restClient: RestClient
+    #restClient: RestClient;
 
     constructor(restClient: RestClient) {
-        this.#restClient = restClient
+        this.#restClient = restClient;
     }
 
-    async getHelloUniversity(): Promise<any> {
-        // DO NOT USE ANY, this is only for demonstration
-        return this.#restClient.get('/api/Faculty')
-    }
-
+    // ← Ovo su univerzalne metode tako da courseService radi kako treba
     get<T>(url: string) {
-        return this.#restClient.get(url);
+        return this.#restClient.get<T>(url);
     }
 
     post<T>(url: string, body?: any) {
-        return this.#restClient.post(url, body);
+        return this.#restClient.post<T>(url, body);
     }
 
     put<T>(url: string, body?: any) {
-        return this.#restClient.put(url, body);
+        return this.#restClient.put<T>(url, body);
     }
 
     delete<T>(url: string) {
-        return this.#restClient.delete(url);
+        return this.#restClient.delete<T>(url);
     }
-
-    // continue with other endpoints
 }

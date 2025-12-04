@@ -7,49 +7,40 @@ import {
   CButton,
   CForm,
   CFormInput,
-  CFormSelect,
   CRow,
   CCol,
+  CFormSelect,
 } from "@coreui/react";
 import { useState } from "react";
-import type { Course } from "./types/Course";
+import type { CourseDTO } from "../../../service/CourseDTO";
 
 type Props = {
   visible: boolean;
   onClose: () => void;
-  onCreate: (course: Course) => void;
+  onCreate: (dto: CourseDTO) => void;
 };
 
 const CreateCourseModal = ({ visible, onClose, onCreate }: Props) => {
-  const [form, setForm] = useState({
-    name: "",   
-    code: "string",
-    type: "string",     
-    programId: "2",
-    ects: "6",           
+  const [form, setForm] = useState<CourseDTO>({
+    name: "",
+    ects: 0,
+    code: "",
+    type: 1,
+    programId: "",
   });
 
-  const update = (key: string, value: string) => {
+  const update = (key: keyof CourseDTO, value: any) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSubmit = () => {
     if (!form.name.trim()) {
-      alert("Course name is required.");
+      alert("Name is required.");
       return;
     }
 
-    const newCourse: Course = {
-      id: Date.now().toString(),
-      name: form.name,
-      ects: Number(form.ects),
-      code: form.code,
-      type: form.type,
-      programId: form.programId
-    };
-
-    onCreate(newCourse);  
-    onClose();             
+    onCreate(form);
+    onClose();
   };
 
   return (
@@ -61,30 +52,22 @@ const CreateCourseModal = ({ visible, onClose, onCreate }: Props) => {
       <CModalBody>
         <CForm>
           <CRow className="mb-3">
-            <CCol md={4}>
-              <CFormSelect
-                label="Type"
-                value={form.type}
-                onChange={(e) => update("type", e.target.value)}
-                options={["ETF"]}
+            <CCol md={6}>
+              <CFormInput
+                label="Course Name"
+                placeholder="Enter name"
+                value={form.name}
+                onChange={(e) => update("name", e.target.value)}
               />
             </CCol>
 
-            <CCol md={4}>
-              <CFormSelect
-                label="Code"
-                value={form.code}
-                onChange={(e) => update("code", e.target.value)}
-                options={["C0585"]}
-              />
-            </CCol>
-
-            <CCol md={4}>
-              <CFormSelect
-                label="Program"
-                value={form.programId}
-                onChange={(e) => update("programId", e.target.value)}
-                options={["2"]}
+            <CCol md={3}>
+              <CFormInput
+                type="number"
+                label="ECTS"
+                min={1}
+                value={form.ects}
+                onChange={(e) => update("ects", Number(e.target.value))}
               />
             </CCol>
           </CRow>
@@ -92,32 +75,42 @@ const CreateCourseModal = ({ visible, onClose, onCreate }: Props) => {
           <CRow className="mb-3">
             <CCol md={4}>
               <CFormInput
-                label="Course Name"
-                placeholder="Enter course name"
-                value={form.name}
-                onChange={(e) => update("name", e.target.value)}
+                label="Code"
+                placeholder="E.g. C045"
+                value={form.code}
+                onChange={(e) => update("code", e.target.value)}
               />
             </CCol>
 
             <CCol md={4}>
               <CFormSelect
-                label="ECTS"
-                value={form.ects}
-                onChange={(e) => update("ects", e.target.value)}
-                options={["6", "5", "4"]}
+                label="Type"
+                value={form.type}
+                onChange={(e) => update("type", (e.target.value))}
+                options={[
+                  { label: "Mandatory", value: "1" },
+                  { label: "Elective", value: "2" },
+                ]}
               />
             </CCol>
-          </CRow>
 
-          <CRow className="mb-3">
+            <CCol md={4}>
+              <CFormInput
+                label="Program ID"
+                placeholder="Enter program id"
+                value={form.programId}
+                onChange={(e) => update("programId", e.target.value)}
+              />
+            </CCol>
           </CRow>
         </CForm>
       </CModalBody>
 
-      <CModalFooter>
+      <CModalFooter className="d-flex justify-content-end gap-2">
         <CButton color="secondary" variant="outline" onClick={onClose}>
           Cancel
         </CButton>
+
         <CButton color="primary" onClick={handleSubmit}>
           Create
         </CButton>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   CCard,
   CCardBody,
@@ -17,42 +17,45 @@ import type { Course } from "../../../component/faculty/courses/types/Course";
 import CourseTable from "../../../component/faculty/courses/CourseTable";
 import CreateCourseModal from "../../../component/faculty/courses/CreateCourseModal";
 import EditCourseModal from "../../../component/faculty/courses/EditCourseModal";
+import { courseService } from "../../../service/courseService";
+import type { CourseDTO } from "../../../service/CourseDTO";
 
 const CourseListPage = () => {
   const [search, setSearch] = useState("");
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const [showCreate, setShowCreate] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
-
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
 
-  const [courses, setCourses] = useState<Course[]>([
-    {
-      id: "35009",
-      name: "Computer Vision",
-      type: "Mandatory",
-      code: "C065",
-      programId: "2",
-      ects: 6,
-    },
-    {
-      id: "35009",
-      name: "NASP",
-      type: "Mandatory",
-      code: "C065",
-      programId: "2",
-      ects: 6,
-    },
-  ]);
-
-  const handleCreate = (newCourse: Course) => {
-    setCourses((prev) => [...prev, newCourse]);
-    setShowCreate(false);
+  const loadCourses = async () => {
+    try {
+      setLoading(true);
+      const data = await courseService.getAll();
+      setCourses(data ?? []);
+    } catch (err) {
+      setError("Failed to load courses.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSaveEdit = (updated: Course) => {
-    setCourses((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
-    setEditingCourse(null);
+  useEffect(() => {
+    loadCourses();
+  }, []);
+
+  const handleCreate = async (dto: CourseDTO) => {
+    await courseService.create(dto);
+    loadCourses();
+  };
+
+  const handleSaveEdit = async (id: string, dto: CourseDTO) => {
+    await courseService.update(id, dto);
+    loadCourses();
   };
 
   const requestDeleteCourse = (course: Course) => {
@@ -60,12 +63,14 @@ const CourseListPage = () => {
     setShowConfirmDelete(true);
   };
 
-  const handleDeleteConfirmed = () => {
+  const handleDeleteConfirmed = async () => {
     if (!courseToDelete) return;
 
-    setCourses((prev) => prev.filter((c) => c.id !== courseToDelete.id));
+    await courseService.delete(courseToDelete.id);
     setShowConfirmDelete(false);
     setCourseToDelete(null);
+
+    loadCourses();
   };
 
   return (
@@ -74,6 +79,9 @@ const CourseListPage = () => {
         <CCard>
           <CCardBody>
             <h3 className="mb-4">Course Management</h3>
+
+            {error && <p className="text-danger">{error}</p>}
+            {loading && <p>Loading...</p>}
 
             <div className="d-flex justify-content-end mb-4">
               <CButton color="primary" onClick={() => setShowCreate(true)}>
@@ -99,12 +107,14 @@ const CourseListPage = () => {
         </CCard>
       </CCol>
 
+      {/* CREATE MODAL */}
       <CreateCourseModal
         visible={showCreate}
         onClose={() => setShowCreate(false)}
         onCreate={handleCreate}
       />
 
+      {/* EDIT MODAL */}
       <EditCourseModal
         visible={!!editingCourse}
         course={editingCourse}
@@ -112,6 +122,7 @@ const CourseListPage = () => {
         onSave={handleSaveEdit}
       />
 
+      {/* DELETE MODAL */}
       <CModal
         visible={showConfirmDelete}
         onClose={() => setShowConfirmDelete(false)}
@@ -122,7 +133,7 @@ const CourseListPage = () => {
 
         <CModalBody>
           {courseToDelete
-            ? `Are you sure you want to delete the course "${courseToDelete.name}"?`
+            ? `Are you sure you want to delete course "${courseToDelete.name}"?`
             : "Are you sure you want to delete this course?"}
         </CModalBody>
 
@@ -136,7 +147,7 @@ const CourseListPage = () => {
           </CButton>
 
           <CButton color="danger" onClick={handleDeleteConfirmed}>
-            Done
+            Delete
           </CButton>
         </CModalFooter>
       </CModal>

@@ -13,35 +13,38 @@ import {
 } from "@coreui/react";
 import { useEffect, useState } from "react";
 
-type Course = {
-  id: string;
-  name: string;
-  code: string;
-  type: string;
-  programId: string;
-  ects: number;
-};
+import type { Course } from "./types/Course";
+import type { CourseDTO } from "../../../service/CourseDTO";
 
 type Props = {
   visible: boolean;
   course: Course | null;
   onClose: () => void;
-  onSave: (updated: Course) => void;
+  onSave: (id: string, dto: CourseDTO) => void;
 };
 
 const EditCourseModal = ({ visible, course, onClose, onSave }: Props) => {
-  const [form, setForm] = useState<Course | null>(null);
+  const [form, setForm] = useState<CourseDTO | null>(null);
 
+  // Kada se otvori modal – popuni form sa vrijednostima course objeka
   useEffect(() => {
-    if (course) setForm(course);
+    if (course) {
+      setForm({
+        name: course.name,
+        ects: course.ects,
+        code: course.code,
+        type: course.type,
+        programId: course.programId
+      });
+    }
   }, [course]);
 
-  const update = (key: keyof Course, value: any) => {
+  const update = (key: keyof CourseDTO, value: any) => {
     if (!form) return;
     setForm({ ...form, [key]: value });
   };
 
-  if (!form) return null;
+  if (!form || !course) return null;
 
   return (
     <CModal visible={visible} onClose={onClose} alignment="center" size="lg">
@@ -57,27 +60,23 @@ const EditCourseModal = ({ visible, course, onClose, onSave }: Props) => {
                 label="Type"
                 value={form.type}
                 onChange={(e) => update("type", e.target.value)}
-                options={[{ label: "ETF UNSA", value: "ETF UNSA" }]}
+                options={["Mandatory", "Elective"]}
               />
             </CCol>
 
             <CCol md={4}>
-              <CFormSelect
+              <CFormInput
                 label="Code"
-                value="C068"
-                disabled
-                options={[{ label: "Code", value: "Bachelor" }]}
+                value={form.code}
+                onChange={(e) => update("code", e.target.value)}
               />
             </CCol>
 
             <CCol md={4}>
-              <CFormSelect
-                label="Program"
+              <CFormInput
+                label="Program ID"
                 value={form.programId}
                 onChange={(e) => update("programId", e.target.value)}
-                options={[
-                  { label: "Computer Science", value: "Computer Science" },
-                ]}
               />
             </CCol>
           </CRow>
@@ -85,23 +84,21 @@ const EditCourseModal = ({ visible, course, onClose, onSave }: Props) => {
           <CRow className="mb-3">
             <CCol md={4}>
               <CFormInput
-                label="Course"
+                label="Course Name"
                 value={form.name}
                 onChange={(e) => update("name", e.target.value)}
               />
             </CCol>
 
-            <CFormSelect
-              label="ECTS"
-              value={String(form.ects)}
-              onChange={(e) => update("ects", Number(e.target.value))}
-              options={[
-                { label: "6", value: "6" },
-                { label: "5", value: "5" },
-              ]}
-            />
+            <CCol md={4}>
+              <CFormSelect
+                label="ECTS"
+                value={String(form.ects)}
+                onChange={(e) => update("ects", Number(e.target.value))}
+                options={["6", "5", "4"]}
+              />
+            </CCol>
           </CRow>
-          <CRow className="mb-3"></CRow>
         </CForm>
       </CModalBody>
 
@@ -109,8 +106,8 @@ const EditCourseModal = ({ visible, course, onClose, onSave }: Props) => {
         <CButton color="secondary" onClick={onClose}>
           Cancel
         </CButton>
-        <CButton color="primary" onClick={() => onSave(form)}>
-          Done
+        <CButton color="primary" onClick={() => onSave(course.id, form)}>
+          Save
         </CButton>
       </CModalFooter>
     </CModal>

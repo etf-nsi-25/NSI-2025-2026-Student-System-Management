@@ -1,15 +1,16 @@
-import { api } from './rest';
-import type { Course } from '../component/faculty/courses/types/Course';
+import { api } from "./rest";
+import type { Course } from "../component/faculty/courses/types/Course";
+import type { CourseDTO } from "./CourseDTO";
 
 export const courseService = {
-  getAll: () => api.get<Course[]>('/api/Course'),
+  getAll: () => api.get<Course[]>("/api/faculty/courses"),
 
-  get: (id: string) => api.get<Course>(`/api/Course/${id}`),
+  get: (id: string) => api.get<Course>(`/api/faculty/courses/${id}`),
 
-  create: (data: Course) => api.post<Course>('/api/Course', data),
+  create: (dto: CourseDTO) => api.post<Course>("/api/faculty/courses", dto),
 
-  update: (id: string, data: Course) =>
-    api.put<Course>(`/api/Course/${id}`, data),
+  update: (id: string, dto: CourseDTO) =>
+    api.put<Course>(`/api/faculty/courses/${id}`, dto),
 
-  delete: (id: string) => api.delete<void>(`/api/Course/${id}`)
+  delete: (id: string) => api.delete<void>(`/api/faculty/courses/${id}`),
 };

@@ -29,21 +29,22 @@ export class RestClient {
         this.#authFailCallback = authFailCallback;
     }
 
-    async get(url: string) {
-        return this.#submitRequestWithFallback(url, 'GET')
-    }
-
-    async post(url: string, body?: any) {
-        return this.#submitRequestWithFallback(url, 'POST', body)
-    }
-
-    async put(url: string, body?: any) {
-        return this.#submitRequestWithFallback(url, 'PUT', body);
+    async get<T>(url: string) {
+        return this.#submitRequestWithFallback<T>(url, 'GET');
     }
     
-    async delete(url: string) {
-        return this.#submitRequestWithFallback(url, 'DELETE');
+    async post<T>(url: string, body?: any) {
+        return this.#submitRequestWithFallback<T>(url, 'POST', body);
     }
+    
+    async put<T>(url: string, body?: any) {
+        return this.#submitRequestWithFallback<T>(url, 'PUT', body);
+    }
+    
+    async delete<T>(url: string) {
+        return this.#submitRequestWithFallback<T>(url, 'DELETE');
+    }
+    
     
 
     async #submitRequestWithFallback<T>(url: string, method: Method, body?: unknown) {
@@ -97,7 +98,11 @@ export class RestClient {
             } else {
                 return {
                     ok: true,
-                    successResponse: response.text().then(text => (text ? JSON.parse(text) : null) as T)
+                    successResponse: response.text().then(text => {
+                        if (!text) return null as T;  // DELETE, NoContent itd.
+                        return JSON.parse(text) as T;
+                    })
+                    
                 }
             }
         })
