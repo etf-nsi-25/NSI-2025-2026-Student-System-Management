@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Http;
 namespace Faculty.Core.Services;
 
 /// <summary>
-/// HTTP-based implementation of ITenantService that extracts FacultyId from authenticated user claims.
+/// HTTP-based implementation of ITenantService that extracts TenantId from authenticated user claims.
 /// </summary>
 public class HttpTenantService : ITenantService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private const string FacultyIdClaimType = "FacultyId";
+    private const string TenantIdClaimType = "tenant_id";
 
     public HttpTenantService(IHttpContextAccessor httpContextAccessor)
     {
@@ -18,10 +18,10 @@ public class HttpTenantService : ITenantService
     }
 
     /// <summary>
-    /// Gets the current Faculty ID from the authenticated user's claims.
+    /// Gets the current Tenant ID from the authenticated user's claims.
     /// </summary>
-    /// <returns>The Faculty ID (int) if available.</returns>
-    /// <exception cref="UnauthorizedAccessException">Thrown when FacultyId claim is missing or user is not authenticated.</exception>
+    /// <returns>The Tenant ID (int) if available.</returns>
+    /// <exception cref="UnauthorizedAccessException">Thrown when TenantId claim is missing or user is not authenticated.</exception>
     public int GetCurrentFacultyId()
     {
         var httpContext = _httpContextAccessor.HttpContext;
@@ -36,18 +36,18 @@ public class HttpTenantService : ITenantService
             throw new UnauthorizedAccessException("User is not authenticated.");
         }
 
-        var facultyIdClaim = user.FindFirst(FacultyIdClaimType);
-        if (facultyIdClaim == null)
+        var tenantIdClaim = user.FindFirst(TenantIdClaimType);
+        if (tenantIdClaim == null)
         {
-            throw new UnauthorizedAccessException($"FacultyId claim not found in user claims. Available claims: {string.Join(", ", user.Claims.Select(c => c.Type))}");
+            throw new UnauthorizedAccessException($"TenantId claim not found in user claims. Available claims: {string.Join(", ", user.Claims.Select(c => c.Type))}");
         }
 
-        if (!int.TryParse(facultyIdClaim.Value, out var facultyId))
+        if (!int.TryParse(tenantIdClaim.Value, out var tenantId))
         {
-            throw new UnauthorizedAccessException($"Invalid FacultyId format in claim: {facultyIdClaim.Value}. Expected an integer.");
+            throw new UnauthorizedAccessException($"Invalid TenantId format in claim: {tenantIdClaim.Value}. Expected an integer.");
         }
 
-        return facultyId;
+        return tenantId;
     }
 }
 
