@@ -7,13 +7,17 @@ using Support.Infrastructure;
 using Notifications.Infrastructure;
 using Analytics.Infrastructure;
 using Identity.Infrastructure.DependencyInjection;
+using Faculty.Infrastructure.Db;
+using Faculty.Core.Interfaces;
+using Faculty.Core.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services from modules
 builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddUniversityModule();
-builder.Services.AddFacultyModule();
+builder.Services.AddFacultyModule(builder.Configuration);
 builder.Services.AddSupportModule();
 builder.Services.AddNotificationsModule();
 builder.Services.AddAnalyticsModule();
