@@ -1,8 +1,8 @@
-using Identity.Application.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 using Identity.Application.DTO;
-using System;
+using Identity.Application.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/auth")]
@@ -16,19 +16,16 @@ public class TwoFactorAuthController : ControllerBase
     }
 
     [HttpPost("enable-2fa")]
-    public async Task<IActionResult> Enable()
+    public async Task<IActionResult> Enable([FromBody] TwoFAConfirmRequest dto)
     {
-        string userId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
-        Console.WriteLine("LOADING CONTROLLER — CORRECT FILE");
-        var res = await _svc.EnableTwoFactorAsync(userId);
+        var res = await _svc.EnableTwoFactorAsync(dto.UserId);
         return Ok(res);
     }
 
     [HttpPost("verify-2fa-setup")]
     public async Task<IActionResult> VerifySetup([FromBody] TwoFAConfirmRequest dto)
     {
-        string userId = "11111111-1111-1111-1111-111111111111";
-        var res = await _svc.VerifySetupAsync(userId, dto.Code);
+        var res = await _svc.VerifySetupAsync(dto.UserId, dto.Code);
 
         if (!res.Success)
             return BadRequest(res);
@@ -39,8 +36,7 @@ public class TwoFactorAuthController : ControllerBase
     [HttpPost("verify-2fa")]
     public async Task<IActionResult> VerifyLogin([FromBody] TwoFAConfirmRequest dto)
     {
-        string userId = "11111111-1111-1111-1111-111111111111";
-        var res = await _svc.VerifyLoginAsync(userId, dto.Code);
+        var res = await _svc.VerifyLoginAsync(dto.UserId, dto.Code);
 
         if (!res.Success)
             return BadRequest(res);
