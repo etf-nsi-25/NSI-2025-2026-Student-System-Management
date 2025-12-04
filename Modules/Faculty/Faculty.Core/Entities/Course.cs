@@ -1,28 +1,3 @@
-<<<<<<< HEAD
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Faculty.Core.Entities
-{
-    public enum CourseType
-    {
-        Mandatory = 1,
-        Elective = 2
-    }
-    public class Course
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Code { get; set; }
-        public CourseType Type { get; set; }
-        public string ProgramId { get; set; }
-        public int ECTS { get; set; }
-    }
-}
-=======
 using Faculty.Core.Interfaces;
 
 namespace Faculty.Core.Entities;
@@ -53,13 +28,9 @@ public class Course : ITenantAware
 /// <summary>
 /// Enum representing the type of course.
 /// </summary>
-public enum CourseType
-{
-    Lecture,
-    Seminar,
-    Lab,
-    Project,
-    Other
-}
+    public enum CourseType
+    {
+        Mandatory = 1,
+        Elective = 2
+    }
 
->>>>>>> c4e5064 (PBI-301: Implement Faculty database and multi-tenancy infrastructure)

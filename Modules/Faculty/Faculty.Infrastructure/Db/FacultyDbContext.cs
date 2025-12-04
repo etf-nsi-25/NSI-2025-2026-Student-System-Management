@@ -16,9 +16,6 @@ public class FacultyDbContext : DbContext
     public FacultyDbContext(DbContextOptions<FacultyDbContext> options, ITenantService tenantService)
         : base(options)
     {
-<<<<<<< HEAD
-
-=======
         _tenantService = tenantService ?? throw new ArgumentNullException(nameof(tenantService));
         // Resolve and store the current FacultyId during context instantiation
         // This value is used in query filters and can be translated to SQL
@@ -432,6 +429,5 @@ public class FacultyDbContext : DbContext
             entity.HasIndex(e => e.FacultyId);
             entity.HasIndex(e => new { e.StudentId, e.CourseId, e.LectureDate });
         });
->>>>>>> c4e5064 (PBI-301: Implement Faculty database and multi-tenancy infrastructure)
     }
 }
