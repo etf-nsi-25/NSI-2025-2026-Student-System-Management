@@ -1,4 +1,4 @@
-﻿using Common.Core.Interfaces;
+﻿using Common.Core.Interfaces.Repsitories;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 

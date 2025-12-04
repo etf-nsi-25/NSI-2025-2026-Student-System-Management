@@ -1,8 +1,11 @@
 ﻿
 using Identity.Core.Entities;
+using Identity.Core.Enums;
 using Identity.Core.Interfaces.Repositories;
 using Identity.Core.Interfaces.Services;
 using Identity.Core.Models;
+using Identity.Core.Repositories;
+using Identity.Core.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Identity.Application.Services;
@@ -11,14 +14,14 @@ public class AuthService : IAuthService
 {
     //private readonly IUserRepository _userRepository;
     private readonly IJwtTokenService _jwtTokenService;
-    private readonly IPasswordHasher _passwordHasher;
+    private readonly IIdentityHasherService _passwordHasher;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IUserRepository _userRepository;
     private readonly ILogger<AuthService> _logger;
 
     public AuthService(
         IJwtTokenService jwtTokenService,
-        IPasswordHasher passwordHasher,
+        IIdentityHasherService passwordHasher,
         IRefreshTokenRepository refreshTokenRepository,
         IUserRepository userRepository,
         ILogger<AuthService> logger)
@@ -62,8 +65,8 @@ public class AuthService : IAuthService
             UserId = user.Id.ToString(),
             Email = user.Email,
             Role = user.Role,
-            TenantId = user.TenantId.ToString(),
-            FullName = user.FullName
+            TenantId = user.FacultyId.ToString(),
+            FullName = user.FirstName + " " + user.LastName
         };
 
         var accessToken = _jwtTokenService.GenerateAccessToken(tokenClaims);
@@ -106,8 +109,12 @@ public class AuthService : IAuthService
         // Get user
         //var user = await _userRepository.GetByIdAsync(token.UserId, cancellationToken);
 
+        //(Guid.NewGuid(), "Amar Tahirovic", "atahirovic3@etf.unsa.ba", _passwordHasher.HashPassword("Admin123!"), "User", Guid.NewGuid());
 
-        var user = new User(Guid.NewGuid(), "Amar Tahirovic", "atahirovic3@etf.unsa.ba", _passwordHasher.HashPassword("Admin123!"), "User", Guid.NewGuid());
+
+        var user = User.Create("Amar Tahirovic", _passwordHasher.HashPassword("Admin123!") ,"Amar","Tahirovic", "atahirovic3@etf.unsa.ba", Guid.NewGuid(), UserRole.Student, "19006");
+
+
 
         if (user == null)
         {
@@ -126,8 +133,8 @@ public class AuthService : IAuthService
             UserId = user.Id.ToString(),
             Email = user.Email,
             Role = user.Role,
-            TenantId = user.TenantId.ToString(),
-            FullName = user.FullName
+            TenantId = user.FacultyId.ToString(),
+            FullName = user.FirstName + " " + user.LastName
         };
 
         var accessToken = _jwtTokenService.GenerateAccessToken(tokenClaims);

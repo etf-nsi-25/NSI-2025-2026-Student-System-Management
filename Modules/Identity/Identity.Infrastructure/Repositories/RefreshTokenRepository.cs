@@ -8,7 +8,7 @@ namespace Identity.Infrastructure.Repositories;
 
 public class RefreshTokenRepository : BaseRepository<RefreshToken>, IRefreshTokenRepository
 {
-    private readonly AuthDbContext _context;
+    private new readonly AuthDbContext _context;
 
     public RefreshTokenRepository(AuthDbContext context) : base(context)
     {

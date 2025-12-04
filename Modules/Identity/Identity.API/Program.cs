@@ -2,6 +2,8 @@ using Identity.API.Filters;
 using Identity.Application.Services;
 using Identity.Core.Interfaces.Repositories;
 using Identity.Core.Interfaces.Services;
+using Identity.Core.Repositories;
+using Identity.Core.Services;
 using Identity.Infrastructure.Configuration;
 using Identity.Infrastructure.Db;
 using Identity.Infrastructure.Repositories;
@@ -84,7 +86,8 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSet
 // Register Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
-builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddScoped<IIdentityHasherService, IdentityHasherService>();
+builder.Services.AddScoped<IEventPublisher, EventPublisher>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 // Register Repositories

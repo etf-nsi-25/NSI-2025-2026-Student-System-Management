@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Identity.Core.Entities; 
-using Identity.Infrastructure.Entities;
+using Identity.Core.Entities;
 
 
 namespace Identity.Infrastructure.Db
 {
-     public class AuthDbContext : IdentityDbContext<ApplicationUser> 
+    public class AuthDbContext : IdentityDbContext<ApplicationUser>
     {
-        
+
         public DbSet<User> DomainUsers { get; set; }
 
         public AuthDbContext(DbContextOptions<AuthDbContext> options)

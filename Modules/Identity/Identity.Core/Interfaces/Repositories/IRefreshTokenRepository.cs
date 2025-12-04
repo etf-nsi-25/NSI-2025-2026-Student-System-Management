@@ -1,5 +1,5 @@
 ﻿using Identity.Core.Entities;
-using Common.Core.Interfaces;
+using Common.Core.Interfaces.Repsitories;
 
 namespace Identity.Core.Interfaces.Repositories;
 

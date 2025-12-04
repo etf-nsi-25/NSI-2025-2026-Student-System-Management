@@ -45,7 +45,7 @@ public class JwtTokenService : IJwtTokenService
         {
             new Claim(ClaimTypes.NameIdentifier, claims.UserId),
             new Claim(ClaimTypes.Email, claims.Email),
-            new Claim(ClaimTypes.Role, claims.Role),
+            new Claim(ClaimTypes.Role, claims.Role.ToString()),
             new Claim(ClaimTypes.Name, claims.FullName),
             new Claim("tenant_id", claims.TenantId),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
