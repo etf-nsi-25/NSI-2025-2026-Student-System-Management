@@ -13,8 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Faculty\Faculty.Infrastructure\Faculty.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\University\University.Infrastructure\University.Infrastructure.csproj" />
     <ProjectReference Include="..\Support.Core\Support.Core.csproj" />
     <ProjectReference Include="..\Support.Application\Support.Application.csproj" />
+    <ProjectReference Include="..\Support.Infrastructure\Support.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
