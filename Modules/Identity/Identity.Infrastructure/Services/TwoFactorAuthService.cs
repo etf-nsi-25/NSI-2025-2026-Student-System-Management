@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Identity.Application.DTO;
 using Identity.Application.Interfaces;
@@ -60,8 +64,7 @@ namespace Identity.Infrastructure.Services
             if (!string.IsNullOrEmpty(identityUser.TwoFactorSecretPending))
                 return new TwoFASetupResult(
                     false,
-                    "A 2FA setup is already in progress. Verify it first."
-                );
+                    "Two-factor authentication setup is already in progress. Complete verification to continue.");
 
             // Username fallback if domainUser.Username is null
             var username = !string.IsNullOrWhiteSpace(domainUser.Username)
@@ -71,78 +74,91 @@ namespace Identity.Infrastructure.Services
                     ?? $"user-{userId}";
 
             // Generate secret+QR
-            var (secret, qrCode) = _twoFactorDomain.GenerateSetupFor(username);
+            var (manualEntryKey, qrCode, otpauthUri) = _twoFactorDomain.GenerateSetupFor(username);
 
             // Encrypt
-            var encrypted = _encryption.Encrypt(secret);
+            var encrypted = _encryption.Encrypt(manualEntryKey);
 
             // Save pending secret
             identityUser.TwoFactorSecretPending = encrypted;
             identityUser.TwoFactorEnabled = false;
+            identityUser.RecoveryCodesHashed = null;
 
             var res = await _userManager.UpdateAsync(identityUser);
             if (!res.Succeeded)
                 return new TwoFASetupResult(false, "Failed to update user record.");
 
-            return new TwoFASetupResult(true, "Successfully enabled initial data", secret, qrCode);
+            return new TwoFASetupResult(
+                true,
+                "Two-factor authentication setup initiated.",
+                manualEntryKey,
+                qrCode,
+                otpauthUri);
         }
 
         public async Task<TwoFAVerificationResult> VerifySetupAsync(string userId, string code)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
-                return new(false, "User does not exist.");
+                return new(false, "User does not exist.", null, TwoFAVerificationError.UserNotFound);
 
             if (!IsCodeFormatValid(code, out var formatError))
-                return new(false, formatError);
+                return new(false, formatError, null, TwoFAVerificationError.InvalidCode);
 
             if (IsRateLimited(SetupAttempts, userId, out var retryAfter))
-                return new(false, BuildRateLimitMessage(retryAfter));
+                return new(false, BuildRateLimitMessage(retryAfter), null, TwoFAVerificationError.RateLimited);
 
             if (string.IsNullOrEmpty(user.TwoFactorSecretPending))
-                return new(false, "2FA setup was not initialized.");
+                return new(false, "Two-factor authentication setup was not initialized.", null, TwoFAVerificationError.NotInitialized);
 
-            var secret = _encryption.Decrypt(user.TwoFactorSecretPending!);
+            var secret = _encryption.Decrypt(user.TwoFactorSecretPending);
 
             bool ok = _twoFactorDomain.VerifyCode(secret, code);
             if (!ok)
             {
                 RegisterFailure(SetupAttempts, userId);
                 if (IsRateLimited(SetupAttempts, userId, out var retry))
-                    return new(false, BuildRateLimitMessage(retry));
-                return new(false, "Invalid or expired verification code.");
+                    return new(false, BuildRateLimitMessage(retry), null, TwoFAVerificationError.RateLimited);
+                return new(false, "Invalid or expired verification code.", null, TwoFAVerificationError.InvalidCode);
             }
 
             // CONFIRM PERMANENTLY
             user.TwoFactorSecretEncrypted = user.TwoFactorSecretPending;
             user.TwoFactorSecretPending = null;
             user.TwoFactorEnabled = true;
+            var recoveryCodes = GenerateRecoveryCodes();
+            var hashedCodes = HashRecoveryCodes(recoveryCodes);
+            user.RecoveryCodesHashed = JsonSerializer.Serialize(hashedCodes);
 
             await _userManager.UpdateAsync(user);
             ResetAttempts(SetupAttempts, userId);
 
-            return new(true, "Two-factor authentication has been successfully activated.");
+            return new(
+                true,
+                "Two-factor authentication has been successfully activated.",
+                recoveryCodes,
+                TwoFAVerificationError.None);
         }
 
         public async Task<TwoFAVerificationResult> VerifyLoginAsync(string userId, string code)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
-                return new(false, "User does not exist.");
+                return new(false, "User does not exist.", null, TwoFAVerificationError.UserNotFound);
 
             if (!user.TwoFactorEnabled)
-                return new(false, "Two-factor authentication is not enabled for this user.");
+                return new(false, "Two-factor authentication is not enabled for this user.", null, TwoFAVerificationError.NotEnabled);
 
             if (!IsCodeFormatValid(code, out var formatError))
-                return new(false, formatError);
+                return new(false, formatError, null, TwoFAVerificationError.InvalidCode);
 
             if (IsRateLimited(LoginAttempts, userId, out var retryAfter))
-                return new(false, BuildRateLimitMessage(retryAfter));
+                return new(false, BuildRateLimitMessage(retryAfter), null, TwoFAVerificationError.RateLimited);
 
             if (string.IsNullOrEmpty(user.TwoFactorSecretEncrypted))
-                return new(false, "Two-factor secret is missing. Reconfigure 2FA.");
+                return new(false, "Two-factor secret is missing. Reconfigure 2FA.", null, TwoFAVerificationError.NotInitialized);
 
-            var secret = _encryption.Decrypt(user.TwoFactorSecretEncrypted!);
+            var secret = _encryption.Decrypt(user.TwoFactorSecretEncrypted);
 
             bool ok = _twoFactorDomain.VerifyCode(secret, code);
 
@@ -150,8 +166,8 @@ namespace Identity.Infrastructure.Services
             {
                 RegisterFailure(LoginAttempts, userId);
                 if (IsRateLimited(LoginAttempts, userId, out var retry))
-                    return new(false, BuildRateLimitMessage(retry));
-                return new(false, "Invalid code. Please try again.");
+                    return new(false, BuildRateLimitMessage(retry), null, TwoFAVerificationError.RateLimited);
+                return new(false, "Invalid code. Please try again.", null, TwoFAVerificationError.InvalidCode);
             }
 
             ResetAttempts(LoginAttempts, userId);
@@ -231,6 +247,36 @@ namespace Identity.Infrastructure.Services
         {
             var seconds = Math.Max(1, (int)Math.Ceiling(retryAfter.TotalSeconds));
             return $"Too many invalid 2FA attempts. Try again in {seconds} seconds.";
+        }
+
+        private static IReadOnlyCollection<string> GenerateRecoveryCodes(int count = 8)
+        {
+            var codes = new List<string>(count);
+            for (var i = 0; i < count; i++)
+            {
+                codes.Add(GenerateRecoveryCode());
+            }
+
+            return codes;
+        }
+
+        private static string GenerateRecoveryCode()
+        {
+            Span<byte> buffer = stackalloc byte[5];
+            RandomNumberGenerator.Fill(buffer);
+            return Convert.ToHexString(buffer).ToLowerInvariant();
+        }
+
+        private static IReadOnlyCollection<string> HashRecoveryCodes(IEnumerable<string> recoveryCodes)
+        {
+            using var sha = SHA256.Create();
+            return recoveryCodes
+                .Select(code =>
+                {
+                    var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(code));
+                    return Convert.ToHexString(bytes);
+                })
+                .ToArray();
         }
 
         private sealed record AttemptWindow(DateTimeOffset WindowStart, int AttemptCount);

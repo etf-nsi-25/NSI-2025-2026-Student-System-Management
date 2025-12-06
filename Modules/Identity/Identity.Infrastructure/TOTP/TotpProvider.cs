@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Identity.Core.DomainServices;
 using OtpNet;
+using QRCoder;
 
 namespace Identity.Infrastructure.TOTP
 {
@@ -21,13 +22,11 @@ namespace Identity.Infrastructure.TOTP
             return Base32Encoding.ToString(bytes);
         }
 
-        public string GenerateQrCode(string username, string secret)
+        public TotpSetupArtifacts GenerateSetupArtifacts(string username, string secret)
         {
-            string otpauth =
-                $"otpauth://totp/{WebUtility.UrlEncode(Issuer)}:{WebUtility.UrlEncode(username)}"
-                + $"?secret={secret}&issuer={WebUtility.UrlEncode(Issuer)}&digits=6";
-
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes(otpauth));
+            var otpauth = BuildOtpAuthUri(username, secret);
+            var qrBase64 = GenerateQrCodeBase64(otpauth);
+            return new TotpSetupArtifacts(otpauth, qrBase64);
         }
 
         public bool ValidateCode(string secret, string code)
@@ -45,6 +44,20 @@ namespace Identity.Infrastructure.TOTP
                 out _,
                 new VerificationWindow(previous: 2, future: 2)
             );
+        }
+        private static string BuildOtpAuthUri(string username, string secret)
+        {
+            var label = $"{Issuer}:{username}".TrimEnd(':');
+            return $"otpauth://totp/{WebUtility.UrlEncode(label)}?secret={secret}&issuer={WebUtility.UrlEncode(Issuer)}&digits=6";
+        }
+
+        private static string GenerateQrCodeBase64(string otpauth)
+        {
+            var qrGenerator = new QRCodeGenerator();
+            using var qrData = qrGenerator.CreateQrCode(otpauth, QRCodeGenerator.ECCLevel.Q);
+            using var qrCode = new PngByteQRCode(qrData);
+            var qrBytes = qrCode.GetGraphic(10);
+            return $"data:image/png;base64,{Convert.ToBase64String(qrBytes)}";
         }
     }
 }
