@@ -114,6 +114,6 @@ public class UserRepository : IUserRepository
     {
         return await _context.DomainUsers
             .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Username == email, cancellationToken);
+            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
     }
 }

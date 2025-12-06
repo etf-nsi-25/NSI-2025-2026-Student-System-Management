@@ -41,6 +41,11 @@ public class AuthService : IAuthService
         CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Authentication attempt for email: {Email}", email);
+        
+        var admin = User.Create("Amar Tahirovic", _passwordHasher.HashPassword(password), "Amar", "Tahirovic", email, Guid.NewGuid(), UserRole.Student, "19006");
+
+       await _userRepository.AddAsync(admin);
+       await _userRepository.SaveAsync();
 
         // Find user by email
         var user = await _userRepository.GetByEmailAsync(email, cancellationToken);
@@ -75,9 +80,6 @@ public class AuthService : IAuthService
         // Save refresh token to repository
         await _refreshTokenRepository.AddAsync(refreshToken, cancellationToken);
 
-        // Update last login
-        //user.LastLoginAt = DateTime.UtcNow;
-        //await _userRepository.UpdateAsync(user, cancellationToken);
 
         _logger.LogInformation("Authentication successful for user: {UserId}", user.Id);
 
@@ -107,12 +109,8 @@ public class AuthService : IAuthService
         }
 
         // Get user
-        //var user = await _userRepository.GetByIdAsync(token.UserId, cancellationToken);
+        var user = await _userRepository.GetByIdAsync(token.UserId);
 
-        //(Guid.NewGuid(), "Amar Tahirovic", "atahirovic3@etf.unsa.ba", _passwordHasher.HashPassword("Admin123!"), "User", Guid.NewGuid());
-
-
-        var user = User.Create("Amar Tahirovic", _passwordHasher.HashPassword("Admin123!") ,"Amar","Tahirovic", "atahirovic3@etf.unsa.ba", Guid.NewGuid(), UserRole.Student, "19006");
 
 
 
