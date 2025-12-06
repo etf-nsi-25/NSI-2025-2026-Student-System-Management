@@ -7,6 +7,9 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Global error handling middleware
+app.UseMiddleware<Faculty.API.Middleware.ErrorHandlingMiddleware>();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -35,6 +38,8 @@ app.MapGet("/weatherforecast", () =>
 })
 .WithName("GetWeatherForecast")
 .WithOpenApi();
+
+app.MapControllers();
 
 app.Run();
 
