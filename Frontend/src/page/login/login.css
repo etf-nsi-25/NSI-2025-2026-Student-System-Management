@@ -1,0 +1,322 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+.login-container {
+  height: 100vh;
+  width: 100%;
+  background: #133e87;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  font-family: "Inter", -apple-system, Roboto, Helvetica, sans-serif;
+}
+
+.background-decoration {
+  position: absolute;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.background-decoration-top-left {
+  width: min(30%, 435px);
+  height: min(30%, 435px);
+  background: url("../../assets/images/login/background-decoration-top-left.png")
+    no-repeat center;
+  background-size: contain;
+  top: 5%;
+  left: 33%;
+  transform: rotate(-114.313deg);
+}
+
+.background-decoration-bottom-left {
+  width: min(40%, 1426px);
+  height: min(40%, 1329px);
+  background: url("../../assets/images/login/background-decoration-bottom-left.png")
+    no-repeat center;
+  background-size: contain;
+  bottom: 0;
+  left: 0;
+  mix-blend-mode: luminosity;
+}
+
+.background-decoration-bottom-right {
+  width: min(40%, 1543px);
+  height: min(20%, 496px);
+  background: url("../../assets/images/login/background-decoration-bottom-right.png")
+    no-repeat center;
+  background-size: contain;
+  bottom: 0;
+  right: 0;
+  mix-blend-mode: luminosity;
+}
+
+.login-card-wrapper {
+  position: relative;
+  max-width: 80%;
+  width: 100%;
+  max-height: 90%;
+  height: 100%;
+  border-radius: 3rem;
+  background: linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.2) 0%,
+      rgba(0, 0, 0, 0.2) 100%
+    ),
+    #133e87;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1), 0 8px 20px rgba(0, 0, 0, 0.09),
+    0 16px 30px rgba(0, 0, 0, 0.05), 0 32px 40px rgba(0, 0, 0, 0.01);
+  padding: 33px 8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-decoration {
+  position: absolute;
+  pointer-events: none;
+}
+
+.decoration-card-bottom {
+  width: min(60%, 788px);
+  height: min(60%, 788px);
+  background: url("../../assets/images/login/card-decor-bottom.png") no-repeat
+    center;
+  background-size: contain;
+  bottom: -20%;
+  right: 10%;
+  mix-blend-mode: luminosity;
+  opacity: 0.3;
+}
+
+.decoration-card-top {
+  width: min(30%, 435px);
+  height: min(30%, 435px);
+  background: url("../../assets/images/login/card-decor-top.png") no-repeat
+    center;
+  background-size: contain;
+  top: -10%;
+  left: 10%;
+  transform: rotate(-114.313deg);
+  opacity: 0.5;
+}
+
+.decoration-card-right {
+  width: min(60%, 1426px);
+  height: min(60%, 1329px);
+  background: url("../../assets/images/login/card-decor-right.png") no-repeat
+    center;
+  background-size: contain;
+  top: 10%;
+  right: -30%;
+  mix-blend-mode: luminosity;
+  opacity: 0.3;
+}
+
+.login-card {
+  height: 100%;
+  position: relative;
+  z-index: 1;
+  width: fit-content;
+  border-radius: 2.5rem;
+  border: 3px solid rgba(88, 130, 193, 0.49);
+  background: rgba(88, 130, 193, 0.28);
+  backdrop-filter: blur(3px);
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.logo {
+  width: min(100%, 200px);
+  height: auto;
+  aspect-ratio: 425/158;
+}
+
+.login-form {
+  width: 100%;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.login-title {
+  color: #fff;
+}
+
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  color: #fff !important;
+}
+
+.error-message {
+  font-size: clamp(0.6rem, 1.2vw, 0.75rem);
+  font-weight: 400;
+  color: red;
+}
+
+.form-input {
+  background: rgba(255, 255, 255, 1) !important;
+  color: rgb(0,0,0) !important;
+  width: 100%;
+}
+
+.form-input::placeholder {
+  color: #bcbec0 !important;
+}
+
+.form-input:focus {
+  outline: none !important;
+  border-color: #003465 !important;
+  box-shadow: none !important;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  border-radius: 0.9375rem;
+  border: 2.134px solid #bcbec0;
+  background: #fff;
+}
+
+.password-input-wrapper .form-input {
+  border: none !important;
+  padding-right: clamp(1rem, 2vw, 1.5rem) !important;
+}
+
+.password-toggle-wrapper {
+  background: transparent !important;
+  border: none !important;
+  padding-right: clamp(0.35rem, 0.75vw, 0.5rem);
+}
+
+.password-input {
+  padding-right: clamp(1rem, 2vw, 1.5rem);
+}
+
+.password-toggle {
+  position: absolute;
+  right: clamp(0.7rem, 0.75vw, 0.5rem);
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s;
+}
+
+.password-toggle:hover {
+  opacity: 0.7;
+}
+
+.password-toggle svg {
+  width: clamp(1.2rem, 1.5vw, 1rem);
+  height: clamp(1.2rem, 1.5vw, 1rem);
+}
+
+.forgot-password {
+  color: #fff !important;
+  text-decoration: none;
+  /* font-size: clamp(0.6rem, 1.2vw, 0.75rem);
+  align-self: flex-start;
+  transition: opacity 0.3s; */
+}
+
+.forgot-password:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.submit-button {
+  background: #003465 !important;
+  color: #fff !important;
+  text-transform: none !important;
+}
+
+.submit-button:hover {
+  background: #002b52 !important;
+}
+
+.submit-button:active {
+  transform: scale(0.98);
+}
+
+.continue-with {
+  color: #fff;
+  text-align: center;
+  font-size: clamp(0.6rem, 1.2vw, 0.75rem);
+  font-weight: 400;
+}
+
+.register-link {
+  color: #fff;
+  text-align: center;
+  font-size: clamp(0.55rem, 1vw, 0.7rem);
+  font-weight: 400;
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    padding: 1rem;
+  }
+
+  .login-card-wrapper {
+    padding: 1rem;
+  }
+
+  .login-card {
+    padding: 2rem 1.5rem;
+    gap: 2rem;
+  }
+
+  .background-decoration {
+    opacity: 0.3;
+  }
+
+  .card-decoration {
+    opacity: 0.2;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 1.5rem 1rem;
+    gap: 1.5rem;
+  }
+
+  .login-form {
+    gap: 1.5rem;
+  }
+
+  .form-content {
+    gap: 1rem;
+  }
+
+  .form-group {
+    gap: 1rem;
+  }
+}
