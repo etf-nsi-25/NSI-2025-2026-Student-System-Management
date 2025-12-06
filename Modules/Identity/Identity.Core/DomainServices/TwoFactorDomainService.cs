@@ -19,7 +19,7 @@ namespace Identity.Core.DomainServices
             var qrCode = _totpProvider.GenerateQrCode(username, secret);
             return (secret, qrCode);
         }
-        
+
         public bool VerifyCode(string secret, string code)
         {
             return _totpProvider.ValidateCode(secret, code);

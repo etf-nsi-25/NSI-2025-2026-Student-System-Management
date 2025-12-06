@@ -20,7 +20,7 @@ export class API {
     }
 
     async verifyTwoFactorSetup(code: string): Promise<TwoFAConfirmResponse> {
-        return this.#restClient.post('/api/auth/verify-2fa-setup', { code });
+        return this.#restClient.post('/api/auth/enable-2fa/confirm', { code });
     }
 
     async verifyTwoFactorLogin(code: string): Promise<TwoFAConfirmResponse> {

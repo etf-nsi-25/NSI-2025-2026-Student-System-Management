@@ -1,8 +1,8 @@
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using Identity.Core.DomainServices;
 using OtpNet;
-using System.Net; 
 
 namespace Identity.Infrastructure.TOTP
 {
@@ -24,8 +24,8 @@ namespace Identity.Infrastructure.TOTP
         public string GenerateQrCode(string username, string secret)
         {
             string otpauth =
-                $"otpauth://totp/{WebUtility.UrlEncode(Issuer)}:{WebUtility.UrlEncode(username)}" +
-                $"?secret={secret}&issuer={WebUtility.UrlEncode(Issuer)}&digits=6";
+                $"otpauth://totp/{WebUtility.UrlEncode(Issuer)}:{WebUtility.UrlEncode(username)}"
+                + $"?secret={secret}&issuer={WebUtility.UrlEncode(Issuer)}&digits=6";
 
             return Convert.ToBase64String(Encoding.UTF8.GetBytes(otpauth));
         }

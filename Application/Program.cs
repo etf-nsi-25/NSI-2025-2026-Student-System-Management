@@ -1,15 +1,14 @@
+using Analytics.Infrastructure;
+using Faculty.Infrastructure;
+// Import module DI namespaces
+using Identity.Infrastructure;
+using Identity.Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
-// Import module DI namespaces
-using Identity.Infrastructure;
-using University.Infrastructure;
-using Faculty.Infrastructure;
-using Support.Infrastructure;
 using Notifications.Infrastructure;
-using Analytics.Infrastructure;
-using Identity.Infrastructure.DependencyInjection;
+using Support.Infrastructure;
+using University.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,12 +30,14 @@ var moduleControllers = new[]
     typeof(Faculty.API.Controllers.FacultyController).Assembly,
     typeof(Support.API.Controllers.SupportController).Assembly,
     typeof(Notifications.API.Controllers.NotificationsController).Assembly,
-    typeof(Analytics.API.Controllers.AnalyticsController).Assembly
+    typeof(Analytics.API.Controllers.AnalyticsController).Assembly,
 };
 
 foreach (var asm in moduleControllers)
 {
-    mvcBuilder.PartManager.ApplicationParts.Add(new Microsoft.AspNetCore.Mvc.ApplicationParts.AssemblyPart(asm));
+    mvcBuilder.PartManager.ApplicationParts.Add(
+        new Microsoft.AspNetCore.Mvc.ApplicationParts.AssemblyPart(asm)
+    );
 }
 
 // Add Swagger
