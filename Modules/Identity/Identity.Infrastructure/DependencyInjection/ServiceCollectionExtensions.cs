@@ -14,7 +14,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Identity.Infrastructure.Services;
 using Identity.Core.Services;
 
-
 namespace Identity.Infrastructure.DependencyInjection
 {
     public static class ServiceCollectionExtensions
@@ -23,7 +22,7 @@ namespace Identity.Infrastructure.DependencyInjection
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            // Entity Framework   
+            // Entity Framework
             services.AddDbContext<AuthDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("Database"))
             );
@@ -32,16 +31,18 @@ namespace Identity.Infrastructure.DependencyInjection
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AuthDbContext>();
 
-            // Register services
+            // Core user-related services
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
-            services.AddSingleton<IEventPublisher, EventPublisher>(); 
+            services.AddSingleton<IEventPublisher, EventPublisher>();
 
-            services.AddScoped<ITotpProvider, TotpProvider>();
-            services.AddScoped<TwoFactorDomainService>();
-            services.AddScoped<ITwoFactorAuthService, TwoFactorAuthService>();
-            services.AddScoped<ISecretEncryptionService, SecretEncryptionService>();
+            // 2FA Services
+            services.AddScoped<ITotpProvider, TotpProvider>();            // TOTP generator/validator
+            services.AddScoped<ITwoFactorAuthService, TwoFactorAuthService>(); // Main 2FA service
+
+            // Additional identity helpers
             services.AddScoped<IIdentityHasherService, IdentityHasherService>();
+
             return services;
         }
     }

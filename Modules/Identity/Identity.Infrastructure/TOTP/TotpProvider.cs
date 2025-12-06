@@ -1,45 +1,50 @@
 using System.Security.Cryptography;
 using System.Text;
 using Identity.Core.DomainServices;
+using OtpNet;
+using System.Net; 
 
 namespace Identity.Infrastructure.TOTP
 {
     /// <summary>
-    /// Simple demo implementation – for now accepts code "123456".
-    /// Replace with real TOTP algorithm later.
+    /// Full real TOTP implementation using Otp.NET.
+    /// Compatible with Google Authenticator, Microsoft Authenticator, Authy…
     /// </summary>
     public class TotpProvider : ITotpProvider
     {
+        private const string Issuer = "StudentSystem";
+
         public string GenerateSecret()
         {
-            var bytes = RandomNumberGenerator.GetBytes(16);
-            var raw = Convert
-                .ToBase64String(bytes)
-                .Replace("=", string.Empty)
-                .Replace("+", string.Empty)
-                .Replace("/", string.Empty);
+            var bytes = RandomNumberGenerator.GetBytes(20);
 
-            if (raw.Length < 16)
-                raw = raw.PadRight(16, 'A');
-            return raw.Substring(0, 16).ToUpperInvariant();
+            return Base32Encoding.ToString(bytes);
         }
 
         public string GenerateQrCode(string username, string secret)
         {
-            // For real: build otpauth:// URL + generate QR and return Base64.
-            // For demo: return empty string so frontend just hides the image
-            // or you can return the otpauth URI as text.
-            var otpauth =
-                $"otpauth://totp/StudentSystem:{username}?secret={secret}&issuer=StudentSystem";
-            var bytes = Encoding.UTF8.GetBytes(otpauth);
-            return Convert.ToBase64String(bytes); // pseudo "QR" data
+            string otpauth =
+                $"otpauth://totp/{WebUtility.UrlEncode(Issuer)}:{WebUtility.UrlEncode(username)}" +
+                $"?secret={secret}&issuer={WebUtility.UrlEncode(Issuer)}&digits=6";
+
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(otpauth));
         }
 
         public bool ValidateCode(string secret, string code)
         {
-            // DEMO: accept only "123456"
-            // Later: plug real TOTP lib and use secret + current time.
-            return code == "123456";
+            if (string.IsNullOrWhiteSpace(secret) || string.IsNullOrWhiteSpace(code))
+                return false;
+
+            code = code.Replace(" ", "").Replace("-", "");
+
+            var bytes = Base32Encoding.ToBytes(secret);
+            var totp = new Totp(bytes, step: 30, totpSize: 6);
+
+            return totp.VerifyTotp(
+                code,
+                out long _,
+                new VerificationWindow(previous: 1, future: 1)
+            );
         }
     }
 }
