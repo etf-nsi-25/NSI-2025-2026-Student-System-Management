@@ -2,7 +2,7 @@ export type CourseDTO = {
     name: string;
     ects: number;
     code: string;
-    type: number;
+    type: string;
     programId: string;
   };
   

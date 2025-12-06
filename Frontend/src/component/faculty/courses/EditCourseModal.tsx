@@ -26,18 +26,17 @@ type Props = {
 const EditCourseModal = ({ visible, course, onClose, onSave }: Props) => {
   const [form, setForm] = useState<CourseDTO | null>(null);
 
-  // Kada se otvori modal – popuni form sa vrijednostima course objeka
-  useEffect(() => {
-    if (course) {
-      setForm({
-        name: course.name,
-        ects: course.ects,
-        code: course.code,
-        type: course.type,
-        programId: course.programId
-      });
-    }
-  }, [course]);
+useEffect(() => {
+  if (course) {
+    setForm({
+      name: course.name,
+      ects: course.ects,
+      code: course.code,
+      type: course.type.toLowerCase(),
+      programId: course.programId
+    });
+  }
+}, [course]);
 
   const update = (key: keyof CourseDTO, value: any) => {
     if (!form) return;
@@ -60,7 +59,10 @@ const EditCourseModal = ({ visible, course, onClose, onSave }: Props) => {
                 label="Type"
                 value={form.type}
                 onChange={(e) => update("type", e.target.value)}
-                options={["Mandatory", "Elective"]}
+                options={[
+                  { label: "mandatory", value: "mandatory" },
+                  { label: "elective", value: "elective" },
+                ]}
               />
             </CCol>
 
@@ -95,7 +97,7 @@ const EditCourseModal = ({ visible, course, onClose, onSave }: Props) => {
                 label="ECTS"
                 value={String(form.ects)}
                 onChange={(e) => update("ects", Number(e.target.value))}
-                options={["6", "5", "4"]}
+                options={["6", "5", "4", "3", "2", "1"]}
               />
             </CCol>
           </CRow>

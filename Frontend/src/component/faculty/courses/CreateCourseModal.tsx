@@ -25,7 +25,7 @@ const CreateCourseModal = ({ visible, onClose, onCreate }: Props) => {
     name: "",
     ects: 0,
     code: "",
-    type: 1,
+    type: "mandatory", 
     programId: "",
   });
 
@@ -86,10 +86,10 @@ const CreateCourseModal = ({ visible, onClose, onCreate }: Props) => {
               <CFormSelect
                 label="Type"
                 value={form.type}
-                onChange={(e) => update("type", (e.target.value))}
+                onChange={(e) => update("type", e.target.value)}
                 options={[
-                  { label: "Mandatory", value: "1" },
-                  { label: "Elective", value: "2" },
+                  { label: "mandatory", value: "mandatory" },
+                  { label: "elective", value: "elective" },
                 ]}
               />
             </CCol>

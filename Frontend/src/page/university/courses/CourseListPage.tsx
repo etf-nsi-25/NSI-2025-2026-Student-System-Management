@@ -54,8 +54,14 @@ const CourseListPage = () => {
   };
 
   const handleSaveEdit = async (id: string, dto: CourseDTO) => {
-    await courseService.update(id, dto);
-    loadCourses();
+    try {
+      await courseService.update(id, dto);
+      loadCourses();
+      setEditingCourse(null);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update course.");
+    }
   };
 
   const requestDeleteCourse = (course: Course) => {
