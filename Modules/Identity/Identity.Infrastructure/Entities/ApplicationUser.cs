@@ -6,4 +6,5 @@ public class ApplicationUser : IdentityUser
 {
     public string? TwoFactorSecretEncrypted { get; set; }
     public string? TwoFactorSecretPending { get; set; }
+    public string? RecoveryCodesHashed { get; set; }
 }

@@ -16,15 +16,15 @@ export class API {
 
     async enableTwoFactor(): Promise<TwoFASetupResponse> {
         // nema body-a, userId je za sada hardcodan u backendu ("demo")
-        return this.#restClient.post('/api/auth/enable-2fa');
+        return this.#restClient.post('/api/identity/enable-2fa');
     }
 
     async verifyTwoFactorSetup(code: string): Promise<TwoFAConfirmResponse> {
-        return this.#restClient.post('/api/auth/enable-2fa/confirm', { code });
+        return this.#restClient.post('/api/identity/enable-2fa/confirm', { code });
     }
 
     async verifyTwoFactorLogin(code: string): Promise<TwoFAConfirmResponse> {
-        return this.#restClient.post('/api/auth/verify-2fa', { code });
+        return this.#restClient.post('/api/identity/verify-2fa', { code });
     }
 
     // add other endpoints here

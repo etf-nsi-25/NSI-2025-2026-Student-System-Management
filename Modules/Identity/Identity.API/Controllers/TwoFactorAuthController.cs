@@ -2,10 +2,11 @@ using System;
 using System.Threading.Tasks;
 using Identity.Application.DTO;
 using Identity.Application.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("api/auth")]
+[Route("api/identity")]
 public class TwoFactorAuthController : ControllerBase
 {
     private readonly ITwoFactorAuthService _svc;
@@ -28,7 +29,15 @@ public class TwoFactorAuthController : ControllerBase
         var res = await _svc.VerifySetupAsync(dto.UserId, dto.Code);
 
         if (!res.Success)
-            return BadRequest(res);
+        {
+            return res.Error switch
+            {
+                TwoFAVerificationError.InvalidCode => Unauthorized(res),
+                TwoFAVerificationError.RateLimited => StatusCode(StatusCodes.Status429TooManyRequests, res),
+                TwoFAVerificationError.UserNotFound => NotFound(res),
+                _ => BadRequest(res)
+            };
+        }
 
         return Ok(res);
     }
@@ -39,7 +48,15 @@ public class TwoFactorAuthController : ControllerBase
         var res = await _svc.VerifyLoginAsync(dto.UserId, dto.Code);
 
         if (!res.Success)
-            return BadRequest(res);
+        {
+            return res.Error switch
+            {
+                TwoFAVerificationError.InvalidCode => Unauthorized(res),
+                TwoFAVerificationError.RateLimited => StatusCode(StatusCodes.Status429TooManyRequests, res),
+                TwoFAVerificationError.UserNotFound => NotFound(res),
+                _ => BadRequest(res)
+            };
+        }
 
         return Ok(res);
     }
