@@ -55,8 +55,7 @@ public class JwtTokenService : IJwtTokenService
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claimsList),
-            //Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpirationMinutes),
-            Expires = DateTime.UtcNow.AddSeconds(10),
+            Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpirationMinutes),
             Issuer = _jwtSettings.Issuer,
             Audience = _jwtSettings.Audience,
             SigningCredentials = new SigningCredentials(_privateKey, SecurityAlgorithms.RsaSha256)
@@ -81,8 +80,7 @@ public class JwtTokenService : IJwtTokenService
             Id = Guid.NewGuid(),
             Token = GenerateRefreshToken(),
             UserId = userId,
-            //ExpiresAt = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationDays),
-            ExpiresAt = DateTime.UtcNow.AddSeconds(25),
+            ExpiresAt = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationDays),
             CreatedAt = DateTime.UtcNow,
             IpAddress = ipAddress,
             UserAgent = userAgent,
