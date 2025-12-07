@@ -4,5 +4,6 @@ namespace Faculty.Infrastructure.Db
 {
     public class FacultyDbContext : DbContext
     {
+
     }
 }

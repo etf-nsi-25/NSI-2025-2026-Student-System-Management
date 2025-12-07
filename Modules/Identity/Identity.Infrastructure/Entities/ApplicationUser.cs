@@ -1,8 +1,12 @@
+using Identity.Core.Enums;
 using Microsoft.AspNetCore.Identity;
-
-namespace Identity.Infrastructure.Entities;
 
 public class ApplicationUser : IdentityUser
 {
-    // Add additional properties here later
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public Guid FacultyId { get; set; }
+    public string? IndexNumber { get; set; }
+    public UserRole Role { get; set; }
+    public UserStatus Status { get; set; } = UserStatus.Active;
 }

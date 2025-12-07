@@ -1,11 +1,10 @@
 using Identity.Core.Services;
-using Identity.Infrastructure.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace Identity.Infrastructure.Services;
 
 
-internal class IdentityHasherService : IIdentityHasherService
+public class IdentityHasherService : IIdentityHasherService
 {
     private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
 
@@ -17,5 +16,11 @@ internal class IdentityHasherService : IIdentityHasherService
     public string HashPassword(string password)
     {
         return _passwordHasher.HashPassword(new ApplicationUser(), password);
+    }
+
+    public bool VerifyPassword(string password, string hashedPassword)
+    {
+        var result = _passwordHasher.VerifyHashedPassword(new ApplicationUser(), hashedPassword, password);
+        return result == PasswordVerificationResult.Success;
     }
 }

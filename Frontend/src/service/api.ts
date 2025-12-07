@@ -1,4 +1,4 @@
-import type { RestClient } from "./rest.ts";
+import type { RestClient } from "../api/rest";
 import type {
   TwoFASetupResponse,
   TwoFAConfirmResponse,
@@ -12,6 +12,7 @@ export class API {
   }
 
   async getHelloUniversity(): Promise<any> {
+    // DO NOT USE ANY, this is only for demonstration
     return this.#restClient.get("/api/University");
   }
 
