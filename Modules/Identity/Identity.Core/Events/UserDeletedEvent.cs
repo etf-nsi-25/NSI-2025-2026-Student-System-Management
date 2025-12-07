@@ -1,0 +1,8 @@
+using System;
+
+namespace Identity.Core.Events;
+
+
+public record UserDeletedEvent(
+    Guid UserId 
+);

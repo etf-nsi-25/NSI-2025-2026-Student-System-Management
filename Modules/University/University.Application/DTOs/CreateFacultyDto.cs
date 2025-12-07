@@ -1,9 +1,13 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace University.Application.DTOs
 {
     public class CreateFacultyDto
     {
-        public string Name { get; set; }
-        public string Address { get; set; }
-        public string Code { get; set; }
+        [Required]
+        public string Name { get; set; } = string.Empty;
+        public string? Address { get; set; }
+        [Required]
+        public string Code { get; set; } = string.Empty;
     }
 }

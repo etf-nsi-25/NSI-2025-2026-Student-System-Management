@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using University.Application.Interfaces.Services;
+using University.Application.Interfaces;
 using University.Application.Services;
 
 namespace University.Infrastructure
@@ -13,3 +13,4 @@ namespace University.Infrastructure
         }
     }
 }
+

@@ -1,25 +1,18 @@
-using Faculty.Infrastructure.Db;
+﻿using Faculty.Application.Interfaces;
+using Faculty.Application.Services;
 using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 namespace Faculty.Infrastructure.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddFacultyInfrastructure(this IServiceCollection services, string connectionString)
+        public static IServiceCollection AddFacultyModule(this IServiceCollection services, IConfiguration configuration)
         {
-            // Register DbContext
-            services.AddDbContext<FacultyDbContext>(options =>
-            {
-                options.UseNpgsql(connectionString);
-            });
-            
-            // Register repositories
-            services.AddScoped<IFacultyRepository, FacultyRepository>();
-            
+            services.AddScoped<ICourseRepository, CourseRepository>();
+            services.AddScoped<ICourseService, CourseService>();
             return services;
         }
     }

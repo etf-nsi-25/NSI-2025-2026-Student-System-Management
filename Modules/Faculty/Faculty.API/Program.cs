@@ -48,6 +48,9 @@ builder.Services.AddControllers()
 
 var app = builder.Build();
 
+// Global error handling middleware
+app.UseMiddleware<Faculty.API.Middleware.ErrorHandlingMiddleware>();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -62,6 +65,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapControllers();
 
 app.MapControllers();
 

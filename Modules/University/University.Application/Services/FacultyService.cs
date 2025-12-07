@@ -1,37 +1,128 @@
 using University.Application.DTOs;
-using University.Application.Interfaces.Services;
+using University.Application.Interfaces;
 using University.Core.Entities;
 
 namespace University.Application.Services
 {
     public class FacultyService : IFacultyService
     {
-        private static List<Faculty> _faculties = new List<Faculty>
+        // TODO: REMOVE DUMMY DATA AND REPLACE WITH REPOSITORY CALL ONCE DB CODE IS MERGED.
+        private static List<Faculty> _dummyFaculties = new List<Faculty>
         {
-            new Faculty { Id = 1, Name = "Faculty of Electrical Engineering", Address = "Zmaja od Bosne 33-35", Code = "ETF" },
-            new Faculty { Id = 2, Name = "Faculty of Mechanical Engineering", Address = "Zmaja od Bosne 33-35", Code = "MAF" }
+            new Faculty { Id = 1, Name = "Faculty of Electrical Engineering", Address = "Zmaja od Bosne bb", Code = "ETF" },
+            new Faculty { Id = 2, Name = "Faculty of Philosophy", Address = "Franje Račkog 1", Code = "FF" },
+            new Faculty { Id = 3, Name = "Faculty of Economics", Address = "Trg oslobođenja - Alija Izetbegović 1", Code = "EFSA" }
         };
-        private static int _nextId = 3;
+        private static int _nextId = 4;
 
-        public Task<IEnumerable<FacultyDto>> GetAllFacultiesAsync()
+        public Task<IEnumerable<FacultyDto>> GetAllFacultiesAsync(int pageNumber, int pageSize, string? nameFilter)
         {
-            var facultyDtos = _faculties.Select(f => new FacultyDto
+            // TODO: REMOVE DUMMY DATA AND REPLACE WITH REPOSITORY CALL ONCE DB CODE IS MERGED.
+            var faculties = _dummyFaculties.AsEnumerable();
+
+            if (!string.IsNullOrEmpty(nameFilter))
+            {
+                faculties = faculties.Where(f => f.Name.Contains(nameFilter, StringComparison.OrdinalIgnoreCase));
+            }
+
+            var pagedFaculties = faculties.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+
+            var dtos = pagedFaculties.Select(f => new FacultyDto
             {
                 Id = f.Id,
                 Name = f.Name,
                 Address = f.Address,
                 Code = f.Code
             });
-            return Task.FromResult(facultyDtos.AsEnumerable());
+
+            return Task.FromResult(dtos);
         }
 
         public Task<FacultyDto?> GetFacultyByIdAsync(int id)
         {
-            var faculty = _faculties.FirstOrDefault(f => f.Id == id);
+            // TODO: REMOVE DUMMY DATA AND REPLACE WITH REPOSITORY CALL ONCE DB CODE IS MERGED.
+            var faculty = _dummyFaculties.FirstOrDefault(f => f.Id == id);
             if (faculty == null)
             {
                 return Task.FromResult<FacultyDto?>(null);
             }
+
+            var dto = new FacultyDto
+            {
+                Id = faculty.Id,
+                Name = faculty.Name,
+                Address = faculty.Address,
+                Code = faculty.Code
+            };
+            return Task.FromResult<FacultyDto?>(dto);
+        }
+
+        public Task<FacultyDto> CreateFacultyAsync(CreateFacultyDto dto)
+        {
+            // TODO: REMOVE DUMMY DATA AND REPLACE WITH REPOSITORY CALL ONCE DB CODE IS MERGED.
+            if (_dummyFaculties.Any(f => f.Name.Equals(dto.Name, StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new ArgumentException("Faculty with the same name already exists.");
+            }
+
+            if (_dummyFaculties.Any(f => f.Code.Equals(dto.Code, StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new ArgumentException("Faculty with the same code already exists.");
+            }
+
+            var newFaculty = new Faculty
+            {
+                Id = _nextId++,
+                Name = dto.Name,
+                Address = dto.Address,
+                Code = dto.Code
+            };
+
+            _dummyFaculties.Add(newFaculty);
+
+            var facultyDto = new FacultyDto
+            {
+                Id = newFaculty.Id,
+                Name = newFaculty.Name,
+                Address = newFaculty.Address,
+                Code = newFaculty.Code
+            };
+
+            return Task.FromResult(facultyDto);
+        }
+
+        public Task<FacultyDto?> UpdateFacultyAsync(int id, UpdateFacultyDto dto)
+        {
+            // TODO: REMOVE DUMMY DATA AND REPLACE WITH REPOSITORY CALL ONCE DB CODE IS MERGED.
+            var faculty = _dummyFaculties.FirstOrDefault(f => f.Id == id);
+            if (faculty == null)
+            {
+                return Task.FromResult<FacultyDto?>(null);
+            }
+
+            if (dto.Name != null && _dummyFaculties.Any(f => f.Id != id && f.Name.Equals(dto.Name, StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new ArgumentException("Faculty with the same name already exists.");
+            }
+            
+            if (dto.Code != null && _dummyFaculties.Any(f => f.Id != id && f.Code.Equals(dto.Code, StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new ArgumentException("Faculty with the same code already exists.");
+            }
+
+            if (dto.Name != null)
+            {
+                faculty.Name = dto.Name;
+            }
+            if (dto.Address != null)
+            {
+                faculty.Address = dto.Address;
+            }
+            if (dto.Code != null)
+            {
+                faculty.Code = dto.Code;
+            }
+
             var facultyDto = new FacultyDto
             {
                 Id = faculty.Id,
@@ -39,59 +130,22 @@ namespace University.Application.Services
                 Address = faculty.Address,
                 Code = faculty.Code
             };
+
             return Task.FromResult<FacultyDto?>(facultyDto);
-        }
-
-        public Task<FacultyDto> CreateFacultyAsync(CreateFacultyDto facultyDto)
-        {
-            var faculty = new Faculty
-            {
-                Id = _nextId++,
-                Name = facultyDto.Name,
-                Address = facultyDto.Address,
-                Code = facultyDto.Code
-            };
-            _faculties.Add(faculty);
-            var newFacultyDto = new FacultyDto
-            {
-                Id = faculty.Id,
-                Name = faculty.Name,
-                Address = faculty.Address,
-                Code = faculty.Code
-            };
-            return Task.FromResult(newFacultyDto);
-        }
-
-        public Task<FacultyDto?> UpdateFacultyAsync(int id, UpdateFacultyDto facultyDto)
-        {
-            var existingFaculty = _faculties.FirstOrDefault(f => f.Id == id);
-            if (existingFaculty == null)
-            {
-                return Task.FromResult<FacultyDto?>(null);
-            }
-
-            existingFaculty.Name = facultyDto.Name;
-            existingFaculty.Address = facultyDto.Address;
-            existingFaculty.Code = facultyDto.Code;
-
-            var updatedFacultyDto = new FacultyDto
-            {
-                Id = existingFaculty.Id,
-                Name = existingFaculty.Name,
-                Address = existingFaculty.Address,
-                Code = existingFaculty.Code
-            };
-            return Task.FromResult<FacultyDto?>(updatedFacultyDto);
         }
 
         public Task<bool> DeleteFacultyAsync(int id)
         {
-            var facultyToRemove = _faculties.FirstOrDefault(f => f.Id == id);
-            if (facultyToRemove == null)
+            // TODO: REMOVE DUMMY DATA AND REPLACE WITH REPOSITORY CALL ONCE DB CODE IS MERGED.
+            var faculty = _dummyFaculties.FirstOrDefault(f => f.Id == id);
+            if (faculty == null)
             {
                 return Task.FromResult(false);
             }
-            _faculties.Remove(facultyToRemove);
+            
+            // TODO: Check if Faculty is used in Users or Courses tables. If yes, throw Conflict Exception.
+
+            _dummyFaculties.Remove(faculty);
             return Task.FromResult(true);
         }
     }
