@@ -3,7 +3,6 @@ using System;
 using Faculty.Infrastructure.Db;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,11 +11,9 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faculty.Infrastructure.Migrations.FacultyDb
 {
     [DbContext(typeof(FacultyDbContext))]
-    [Migration("20251203215819_InitialFacultySchema")]
-    partial class InitialFacultySchema
+    partial class FacultyDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,8 +31,8 @@ namespace Faculty.Infrastructure.Migrations.FacultyDb
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CourseId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -77,8 +74,8 @@ namespace Faculty.Infrastructure.Migrations.FacultyDb
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CourseId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -112,11 +109,9 @@ namespace Faculty.Infrastructure.Migrations.FacultyDb
 
             modelBuilder.Entity("Faculty.Core.Entities.Course", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -126,7 +121,7 @@ namespace Faculty.Infrastructure.Migrations.FacultyDb
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("ECTS")
+                    b.Property<int>("ECTS")
                         .HasColumnType("integer");
 
                     b.Property<Guid>("FacultyId")
@@ -168,8 +163,8 @@ namespace Faculty.Infrastructure.Migrations.FacultyDb
                     b.Property<int>("AcademicYearId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("CourseId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -206,8 +201,8 @@ namespace Faculty.Infrastructure.Migrations.FacultyDb
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CourseId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -248,8 +243,8 @@ namespace Faculty.Infrastructure.Migrations.FacultyDb
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CourseId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");

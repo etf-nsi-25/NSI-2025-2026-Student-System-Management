@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faculty.Infrastructure.Migrations.FacultyDb
 {
     /// <inheritdoc />
-    public partial class InitialFacultySchema : Migration
+    public partial class InitialFaculty : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -20,14 +20,13 @@ namespace Faculty.Infrastructure.Migrations.FacultyDb
                 schema: "faculty",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     FacultyId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     Code = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Type = table.Column<string>(type: "text", nullable: false),
                     ProgramId = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
-                    ECTS = table.Column<int>(type: "integer", nullable: true),
+                    ECTS = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -87,7 +86,7 @@ namespace Faculty.Infrastructure.Migrations.FacultyDb
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FacultyId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CourseId = table.Column<int>(type: "integer", nullable: false),
+                    CourseId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
                     DueDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -115,7 +114,7 @@ namespace Faculty.Infrastructure.Migrations.FacultyDb
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FacultyId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CourseId = table.Column<int>(type: "integer", nullable: false),
+                    CourseId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
                     ExamDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     RegDeadline = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -143,7 +142,7 @@ namespace Faculty.Infrastructure.Migrations.FacultyDb
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FacultyId = table.Column<Guid>(type: "uuid", nullable: false),
                     StudentId = table.Column<int>(type: "integer", nullable: false),
-                    CourseId = table.Column<int>(type: "integer", nullable: false),
+                    CourseId = table.Column<Guid>(type: "uuid", nullable: false),
                     LectureDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -177,7 +176,7 @@ namespace Faculty.Infrastructure.Migrations.FacultyDb
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FacultyId = table.Column<Guid>(type: "uuid", nullable: false),
                     StudentId = table.Column<int>(type: "integer", nullable: false),
-                    CourseId = table.Column<int>(type: "integer", nullable: false),
+                    CourseId = table.Column<Guid>(type: "uuid", nullable: false),
                     Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     Grade = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -211,7 +210,7 @@ namespace Faculty.Infrastructure.Migrations.FacultyDb
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FacultyId = table.Column<Guid>(type: "uuid", nullable: false),
                     TeacherId = table.Column<int>(type: "integer", nullable: false),
-                    CourseId = table.Column<int>(type: "integer", nullable: false),
+                    CourseId = table.Column<Guid>(type: "uuid", nullable: false),
                     Role = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     AcademicYearId = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
