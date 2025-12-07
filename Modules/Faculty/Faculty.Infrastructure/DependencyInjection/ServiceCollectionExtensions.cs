@@ -1,9 +1,12 @@
-﻿using Faculty.Application.Interfaces;
-using Faculty.Application.Services;
 using Faculty.Core.Interfaces;
-using Faculty.Infrastructure.Repositories;
+using Faculty.Core.Services;
+using Faculty.Infrastructure.Db;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Faculty.Infrastructure.Repositories;
+using Faculty.Application.Services;
+using Faculty.Application.Interfaces;
 
 namespace Faculty.Infrastructure.DependencyInjection
 {
@@ -13,6 +16,15 @@ namespace Faculty.Infrastructure.DependencyInjection
         {
             services.AddScoped<ICourseRepository, CourseRepository>();
             services.AddScoped<ICourseService, CourseService>();
+            services.AddHttpContextAccessor();
+            services.AddScoped<ITenantService, HttpTenantService>();
+            services.AddDbContext<FacultyDbContext>(options =>
+                options.UseNpgsql(
+                    configuration.GetConnectionString("Database"),
+                    npgsqlOptions => npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory_Faculty", "faculty")
+                )
+            );
+
             return services;
         }
     }

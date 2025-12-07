@@ -1,4 +1,3 @@
-
 // Import module DI namespaces
 using Identity.Infrastructure;
 using University.Infrastructure;
@@ -8,8 +7,10 @@ using Notifications.Infrastructure;
 using Analytics.Infrastructure;
 using Identity.Infrastructure.DependencyInjection;
 using Faculty.Infrastructure.DependencyInjection;
-
-
+using Faculty.Infrastructure.Db;
+using Faculty.Core.Interfaces;
+using Faculty.Core.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 

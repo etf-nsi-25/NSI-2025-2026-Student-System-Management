@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../constants/constants.ts';
 import type { AuthInfo } from '../init/auth.tsx';
 import { API } from './api.ts';
 
@@ -88,7 +89,7 @@ export class RestClient {
 
     async #submitRequest<T>(url: string, method: Method, body?: unknown): Promise<APIResponse<T>> {
         return fetch(
-            url,
+            this.#baseUrl + url,
             {
                 method: method,
                 body: JSON.stringify(body),
@@ -112,20 +113,18 @@ export class RestClient {
             }
         })
     }
-
-    async #handleErrorResponse<T>(response: APIResponse<T>): Promise<void> {
-        throw {
-            message: await response.errorResponse?.message,
-            status: response.errorResponse?.status
-        }
-    }
 }
 
 const authInfo: AuthInfo = {
-    accessToken: "",
-    expiresOn: new Date()
+    accessToken: 'mock-token-123',
+    expiresOn: Date.now() + 3600 * 1000,
+    userId: '12345',
+    email: 'mock.user@example.com',
+    role: 'Admin',
+    tenantId: 'tenant-001',
+    fullName: 'Mock User',
 };
 
-const restClient = new RestClient(authInfo, () => {});
+const restClient = new RestClient(authInfo, () => {}, API_BASE_URL);
 
 export const api = new API(restClient);
