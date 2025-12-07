@@ -2,7 +2,6 @@ using Faculty.Core.Entities;
 using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Db;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Faculty.Test;
