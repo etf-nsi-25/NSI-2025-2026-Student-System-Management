@@ -11,8 +11,7 @@ import logo from '../../assets/images/logo.jpg';
 import { FacultyListingPage } from './FacultyListingPage';
 import './FacultyManagementPage.css';
 
-// 👇 Backend ti sluša na http://localhost:5000
-const FACULTIES_API_BASE_URL = 'http://localhost:5000/api/university/faculties';
+const FACULTIES_API_BASE_URL = '/api/university/faculties';
 
 export function FacultyManagementPage() {
   return (

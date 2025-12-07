@@ -18,13 +18,14 @@ import './FacultyListingPage.css';
 type Faculty = {
   id: number;
   name: string;
-  abbreviation: string;
-  status: 'Active' | 'Inactive';
+  address: string;
+  code: string;
 };
 
 type FacultyInput = {
   name: string;
-  abbreviation: string;
+  address: string;
+  code: string;
 };
 
 type ToastType = 'success' | 'error';
@@ -37,7 +38,7 @@ type ToastMessage = {
 };
 
 type FacultyListingPageProps = {
-  apiBaseUrl: string; // npr. http://localhost:5000/api/university/faculties
+  apiBaseUrl: string; // npr. /api/university/faculties
 };
 
 export function FacultyListingPage({ apiBaseUrl }: FacultyListingPageProps) {
@@ -51,7 +52,8 @@ export function FacultyListingPage({ apiBaseUrl }: FacultyListingPageProps) {
   const [editingFaculty, setEditingFaculty] = useState<Faculty | null>(null);
   const [newFaculty, setNewFaculty] = useState<FacultyInput>({
     name: '',
-    abbreviation: '',
+    address: '',
+    code: '',
   });
   const [errors, setErrors] = useState<Partial<FacultyInput>>({});
 
@@ -83,16 +85,14 @@ export function FacultyListingPage({ apiBaseUrl }: FacultyListingPageProps) {
       }
 
       const data = await response.json();
+      console.log('Faculties from API:', data);
 
       // mapiranje DTO -> naš Faculty tip
       const mapped: Faculty[] = data.map((f: any) => ({
         id: f.id,
         name: f.name,
-        abbreviation: f.abbreviation,
-        status:
-          f.status === 'Inactive' || f.status === 'INACTIVE'
-            ? 'Inactive'
-            : 'Active',
+        address: f.address,
+        code: f.code,
       }));
 
       setFaculties(mapped);
@@ -104,15 +104,23 @@ export function FacultyListingPage({ apiBaseUrl }: FacultyListingPageProps) {
 
   const createFaculty = async (input: FacultyInput): Promise<Faculty | null> => {
     try {
+      const payload = {
+        name: input.name,
+        address: input.address,
+        code: input.code,
+      };
+
       const response = await fetch(apiBaseUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(input),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Create failed:', response.status, errorText);
         throw new Error('Failed to create faculty');
       }
 
@@ -121,11 +129,8 @@ export function FacultyListingPage({ apiBaseUrl }: FacultyListingPageProps) {
       const newFaculty: Faculty = {
         id: created.id,
         name: created.name,
-        abbreviation: created.abbreviation,
-        status:
-          created.status === 'Inactive' || created.status === 'INACTIVE'
-            ? 'Inactive'
-            : 'Active',
+        address: created.address,
+        code: created.code,
       };
 
       return newFaculty;
@@ -141,15 +146,24 @@ export function FacultyListingPage({ apiBaseUrl }: FacultyListingPageProps) {
     input: FacultyInput,
   ): Promise<boolean> => {
     try {
+      const payload = {
+        id,
+        name: input.name,
+        address: input.address,
+        code: input.code,
+      };
+
       const response = await fetch(`${apiBaseUrl}/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(input),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Update failed:', response.status, errorText);
         throw new Error('Failed to update faculty');
       }
 
@@ -168,6 +182,8 @@ export function FacultyListingPage({ apiBaseUrl }: FacultyListingPageProps) {
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Delete failed:', response.status, errorText);
         throw new Error('Failed to delete faculty');
       }
 
@@ -221,8 +237,10 @@ export function FacultyListingPage({ apiBaseUrl }: FacultyListingPageProps) {
     const formErrors: Partial<FacultyInput> = {};
     if (!newFaculty.name.trim())
       formErrors.name = 'Faculty name is required.';
-    if (!newFaculty.abbreviation.trim())
-      formErrors.abbreviation = 'Abbreviation is required.';
+    if (!newFaculty.address.trim())
+      formErrors.address = 'Address is required.';
+    if (!newFaculty.code.trim())
+      formErrors.code = 'Code is required.';
 
     const exists = faculties.some(
       (f) =>
@@ -277,7 +295,7 @@ export function FacultyListingPage({ apiBaseUrl }: FacultyListingPageProps) {
       }
     }
 
-    setNewFaculty({ name: '', abbreviation: '' });
+    setNewFaculty({ name: '', address: '', code: '' });
     setEditingFaculty(null);
     setErrors({});
     setShowModal(false);
@@ -285,7 +303,11 @@ export function FacultyListingPage({ apiBaseUrl }: FacultyListingPageProps) {
 
   const handleEdit = (faculty: Faculty) => {
     setEditingFaculty(faculty);
-    setNewFaculty({ name: faculty.name, abbreviation: faculty.abbreviation });
+    setNewFaculty({
+      name: faculty.name,
+      address: faculty.address,
+      code: faculty.code,
+    });
     setErrors({});
     setShowModal(true);
   };
@@ -296,7 +318,6 @@ export function FacultyListingPage({ apiBaseUrl }: FacultyListingPageProps) {
     );
     if (!confirmDelete) return;
 
-    // Ako backend vrati grešku (npr. linked), ovdje bi je mogli pročitati.
     const ok = await deleteFacultyApi(faculty.id);
     if (!ok) return;
 
@@ -310,7 +331,7 @@ export function FacultyListingPage({ apiBaseUrl }: FacultyListingPageProps) {
 
   const openCreateModal = () => {
     setEditingFaculty(null);
-    setNewFaculty({ name: '', abbreviation: '' });
+    setNewFaculty({ name: '', address: '', code: '' });
     setErrors({});
     setShowModal(true);
   };
@@ -346,8 +367,8 @@ export function FacultyListingPage({ apiBaseUrl }: FacultyListingPageProps) {
                 <th onClick={handleSortByName} className="sortable">
                   Faculty Name {sortAsc ? '▲' : '▼'}
                 </th>
-                <th>Abbreviation</th>
-                <th>Status</th>
+                <th>Address</th>
+                <th>Code</th>
                 <th>Edit</th>
                 <th>Delete</th>
               </tr>
@@ -357,16 +378,8 @@ export function FacultyListingPage({ apiBaseUrl }: FacultyListingPageProps) {
               {displayedFaculties.map((faculty) => (
                 <tr key={faculty.id}>
                   <td>{faculty.name}</td>
-                  <td>{faculty.abbreviation}</td>
-                  <td
-                    className={
-                      faculty.status === 'Active'
-                        ? 'status-active'
-                        : 'status-inactive'
-                    }
-                  >
-                    {faculty.status}
-                  </td>
+                  <td>{faculty.address}</td>
+                  <td>{faculty.code}</td>
                   <td>
                     <button
                       type="button"
@@ -422,23 +435,34 @@ export function FacultyListingPage({ apiBaseUrl }: FacultyListingPageProps) {
                   <input
                     type="text"
                     name="name"
-                    value={newFaculty.name}
+                    value={newFaculty.name ?? ''}
                     onChange={handleChange}
                   />
                   {errors.name && <p className="error-text">{errors.name}</p>}
                 </div>
 
                 <div className="form-group">
-                  <label>Abbreviation:</label>
+                  <label>Address:</label>
                   <input
                     type="text"
-                    name="abbreviation"
-                    value={newFaculty.abbreviation}
+                    name="address"
+                    value={newFaculty.address ?? ''}
                     onChange={handleChange}
                   />
-                  {errors.abbreviation && (
-                    <p className="error-text">{errors.abbreviation}</p>
+                  {errors.address && (
+                    <p className="error-text">{errors.address}</p>
                   )}
+                </div>
+
+                <div className="form-group">
+                  <label>Code:</label>
+                  <input
+                    type="text"
+                    name="code"
+                    value={newFaculty.code ?? ''}
+                    onChange={handleChange}
+                  />
+                  {errors.code && <p className="error-text">{errors.code}</p>}
                 </div>
 
                 <div className="modal-actions">
