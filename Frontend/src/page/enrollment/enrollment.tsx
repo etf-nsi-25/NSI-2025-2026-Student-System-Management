@@ -156,7 +156,7 @@ export default function EnrollmentPage() {
           <div className="header-content">
             <h1 className="page-title">Course Enrollment</h1>
             {successMessage && (
-              <CAlert className="ui-alert ui-alert-succes" color="success">
+              <CAlert className="ui-alert ui-alert-success" color="success">
                 <CIcon icon={cilCheckCircle} className="success-icon" />
                 <span className="success-text">{successMessage}</span>
               </CAlert>
