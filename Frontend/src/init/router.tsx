@@ -6,6 +6,7 @@ import CourseListPage from "../page/university/courses/CourseListPage";
 import TwoFASetupPage from "../page/identity/2FASetupPage";
 import { Login } from "../page/login/login.tsx";
 import { ProtectedRoute } from "../component/ProtectedRoute.tsx";
+import EnrollmentPage from "../page/enrollment/enrollment.tsx";
 import DashboardPage from "../page/student dashboard/page.tsx";
 
 export function Router(): React.ReactNode {
@@ -25,6 +26,14 @@ export function Router(): React.ReactNode {
         element={
           <ProtectedRoute>
             <Page1 />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/enrollment"
+        element={
+          <ProtectedRoute>
+            <EnrollmentPage />
           </ProtectedRoute>
         }
       />
