@@ -42,6 +42,7 @@ export default function EnrollmentPage() {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isEnrolling, setIsEnrolling] = useState(false)
 
   const observerRef = useRef<IntersectionObserver | null>(null)
@@ -137,7 +138,12 @@ export default function EnrollmentPage() {
       }, 5000)
     } catch (error) {
       console.error("Enrollment error:", error)
-      alert("Failed to enroll. Please try again.")
+      setErrorMessage("Failed to enroll. Please try again.")
+      setShowModal(false)
+
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
     } finally {
       setIsEnrolling(false)
     }
@@ -150,9 +156,14 @@ export default function EnrollmentPage() {
           <div className="header-content">
             <h1 className="page-title">Course Enrollment</h1>
             {successMessage && (
-              <CAlert className="success-alert" color={"#0A3622"}>
+              <CAlert className="ui-alert ui-alert-succes" color="success">
                 <CIcon icon={cilCheckCircle} className="success-icon" />
                 <span className="success-text">{successMessage}</span>
+              </CAlert>
+            )}
+             {errorMessage && (
+              <CAlert color="danger" className="ui-alert ui-alert-error">
+                <span className="error-text">{errorMessage}</span>
               </CAlert>
             )}
           </div>
