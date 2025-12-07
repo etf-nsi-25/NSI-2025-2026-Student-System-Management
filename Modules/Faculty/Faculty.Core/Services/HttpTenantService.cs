@@ -10,7 +10,7 @@ namespace Faculty.Core.Services;
 public class HttpTenantService : ITenantService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private const string TenantIdClaimType = "tenant_id";
+    private const string TenantIdClaimType = "tenantId";
 
     public HttpTenantService(IHttpContextAccessor httpContextAccessor)
     {
@@ -20,9 +20,9 @@ public class HttpTenantService : ITenantService
     /// <summary>
     /// Gets the current Tenant ID from the authenticated user's claims.
     /// </summary>
-    /// <returns>The Tenant ID (int) if available.</returns>
+    /// <returns>The Tenant ID (Guid) if available.</returns>
     /// <exception cref="UnauthorizedAccessException">Thrown when TenantId claim is missing or user is not authenticated.</exception>
-    public int GetCurrentFacultyId()
+    public Guid GetCurrentFacultyId()
     {
         var httpContext = _httpContextAccessor.HttpContext;
         if (httpContext == null)
@@ -42,9 +42,9 @@ public class HttpTenantService : ITenantService
             throw new UnauthorizedAccessException($"TenantId claim not found in user claims. Available claims: {string.Join(", ", user.Claims.Select(c => c.Type))}");
         }
 
-        if (!int.TryParse(tenantIdClaim.Value, out var tenantId))
+        if (!Guid.TryParse(tenantIdClaim.Value, out var tenantId))
         {
-            throw new UnauthorizedAccessException($"Invalid TenantId format in claim: {tenantIdClaim.Value}. Expected an integer.");
+            throw new UnauthorizedAccessException($"Invalid TenantId format in claim: {tenantIdClaim.Value}. Expected a Guid.");
         }
 
         return tenantId;

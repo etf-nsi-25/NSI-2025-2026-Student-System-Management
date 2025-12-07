@@ -10,21 +10,13 @@ namespace Faculty.Infrastructure.Db;
 public class FacultyDbContext : DbContext
 {
     private readonly ITenantService _tenantService;
-    private readonly int _currentFacultyIdInt;
     private readonly Guid _currentFacultyId;
 
     public FacultyDbContext(DbContextOptions<FacultyDbContext> options, ITenantService tenantService)
         : base(options)
     {
         _tenantService = tenantService ?? throw new ArgumentNullException(nameof(tenantService));
-        // Resolve and store the current FacultyId during context instantiation
-        // This value is used in query filters and can be translated to SQL
-        _currentFacultyIdInt = _tenantService.GetCurrentFacultyId();
-        // Convert int to Guid for use with entities (entities use Guid FacultyId)
-        // Note: This creates a Guid from the int value by embedding it in the first 4 bytes
-        var bytes = new byte[16];
-        BitConverter.GetBytes(_currentFacultyIdInt).CopyTo(bytes, 0);
-        _currentFacultyId = new Guid(bytes);
+        _currentFacultyId = _tenantService.GetCurrentFacultyId();
     }
 
     /// <summary>

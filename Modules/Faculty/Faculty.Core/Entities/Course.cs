@@ -7,13 +7,13 @@ namespace Faculty.Core.Entities;
 /// </summary>
 public class Course : ITenantAware
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public Guid FacultyId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Code { get; set; } = string.Empty;
     public CourseType Type { get; set; }
     public string? ProgramId { get; set; }
-    public int? ECTS { get; set; }
+    public int ECTS { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 
@@ -28,9 +28,9 @@ public class Course : ITenantAware
 /// <summary>
 /// Enum representing the type of course.
 /// </summary>
-    public enum CourseType
-    {
-        Mandatory = 1,
-        Elective = 2
-    }
+public enum CourseType
+{
+    Mandatory = 1,
+    Elective = 2
+}
 

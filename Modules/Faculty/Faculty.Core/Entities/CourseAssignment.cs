@@ -10,7 +10,7 @@ public class CourseAssignment : ITenantAware
     public int Id { get; set; }
     public Guid FacultyId { get; set; }
     public int TeacherId { get; set; }
-    public int CourseId { get; set; }
+    public Guid CourseId { get; set; }
     public string? Role { get; set; }
     public int AcademicYearId { get; set; }
     public DateTime CreatedAt { get; set; }

@@ -10,6 +10,6 @@ public interface ITenantService
     /// </summary>
     /// <returns>The Tenant ID (int) if available.</returns>
     /// <exception cref="UnauthorizedAccessException">Thrown when TenantId claim is missing or user is not authenticated.</exception>
-    int GetCurrentFacultyId();
+    Guid GetCurrentFacultyId();
 }
 

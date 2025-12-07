@@ -10,7 +10,7 @@ public class Enrollment : ITenantAware
     public int Id { get; set; }
     public Guid FacultyId { get; set; }
     public int StudentId { get; set; }
-    public int CourseId { get; set; }
+    public Guid CourseId { get; set; }
     public string? Status { get; set; }
     public int? Grade { get; set; }
     public DateTime CreatedAt { get; set; }

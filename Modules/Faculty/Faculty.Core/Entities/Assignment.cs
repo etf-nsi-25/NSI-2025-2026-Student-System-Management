@@ -9,7 +9,7 @@ public class Assignment : ITenantAware
 {
     public int Id { get; set; }
     public Guid FacultyId { get; set; }
-    public int CourseId { get; set; }
+    public Guid CourseId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
     public DateTime? DueDate { get; set; }

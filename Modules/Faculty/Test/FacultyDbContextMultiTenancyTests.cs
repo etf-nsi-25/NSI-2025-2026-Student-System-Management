@@ -2,6 +2,7 @@ using Faculty.Core.Entities;
 using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Db;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Faculty.Test;
@@ -14,10 +15,10 @@ public class FacultyDbContextMultiTenancyTests : IDisposable
 
     public FacultyDbContextMultiTenancyTests()
     {
-        _facultyAGuid = CreateFacultyGuid(1);
-        _facultyBGuid = CreateFacultyGuid(2);
+        _facultyAGuid = new Guid("215db11f-1204-43b9-80f5-c2941487843c");
+        _facultyBGuid = new Guid("67c33340-63f9-4dd4-90e6-663e6f6af387");
 
-        using var seedContext = CreateContext(new FixedTenantService(1));
+        using var seedContext = CreateContext(new FixedTenantService(_facultyAGuid));
         seedContext.Database.EnsureCreated();
         SeedData(seedContext);
     }
@@ -25,7 +26,7 @@ public class FacultyDbContextMultiTenancyTests : IDisposable
     [Fact]
     public async Task TeachersQuery_ShouldReturnOnlyCurrentFacultyRecords()
     {
-        await using var context = CreateContext(new FixedTenantService(1));
+        await using var context = CreateContext(new FixedTenantService(_facultyAGuid));
 
         var teachers = await context.Teachers.AsNoTracking().ToListAsync();
 
@@ -36,12 +37,12 @@ public class FacultyDbContextMultiTenancyTests : IDisposable
     [Fact]
     public async Task SwitchingTenant_ShouldReturnDifferentDataset()
     {
-        await using var contextA = CreateContext(new FixedTenantService(1));
+        await using var contextA = CreateContext(new FixedTenantService(_facultyAGuid));
         var tenantATeacherIds = (await contextA.Teachers.AsNoTracking().ToListAsync())
             .Select(t => t.Id)
             .ToList();
 
-        await using var contextB = CreateContext(new FixedTenantService(2), ensureCreated: false);
+        await using var contextB = CreateContext(new FixedTenantService(_facultyBGuid), ensureCreated: false);
         var tenantBTeachers = await contextB.Teachers.AsNoTracking().ToListAsync();
 
         Assert.Single(tenantBTeachers);
@@ -52,7 +53,7 @@ public class FacultyDbContextMultiTenancyTests : IDisposable
     [Fact]
     public async Task StudentsQuery_ShouldRespectTenantFilter()
     {
-        await using var context = CreateContext(new FixedTenantService(2));
+        await using var context = CreateContext(new FixedTenantService(_facultyBGuid));
         var students = await context.Students.AsNoTracking().ToListAsync();
 
         Assert.Single(students);
@@ -63,7 +64,7 @@ public class FacultyDbContextMultiTenancyTests : IDisposable
     [Fact]
     public async Task IgnoreQueryFilters_ShouldReturnAllFacultyData_WhenExplicitlyBypassed()
     {
-        await using var context = CreateContext(new FixedTenantService(1));
+        await using var context = CreateContext(new FixedTenantService(_facultyAGuid));
 
         var teachers = await context.Teachers
             .IgnoreQueryFilters()
@@ -140,13 +141,6 @@ public class FacultyDbContextMultiTenancyTests : IDisposable
         context.SaveChanges();
     }
 
-    private static Guid CreateFacultyGuid(int facultyId)
-    {
-        var bytes = new byte[16];
-        BitConverter.GetBytes(facultyId).CopyTo(bytes, 0);
-        return new Guid(bytes);
-    }
-
     public void Dispose()
     {
         // InMemory databases are scoped by name; dispose context to release resources.
@@ -154,14 +148,14 @@ public class FacultyDbContextMultiTenancyTests : IDisposable
 
     private sealed class FixedTenantService : ITenantService
     {
-        private readonly int _facultyId;
+        private readonly Guid _facultyId;
 
-        public FixedTenantService(int facultyId)
+        public FixedTenantService(Guid facultyId)
         {
             _facultyId = facultyId;
         }
 
-        public int GetCurrentFacultyId() => _facultyId;
+        public Guid GetCurrentFacultyId() => _facultyId;
     }
 }
 

@@ -16,11 +16,11 @@ public class FacultyDbContextFactory : IDesignTimeDbContextFactory<FacultyDbCont
     /// </summary>
     private class DesignTimeTenantService : ITenantService
     {
-        public int GetCurrentFacultyId()
+        public Guid GetCurrentFacultyId()
         {
-            // Return a default integer for design-time operations
+            // Return a default Guid value for design-time operations
             // This is only used during migration generation, not at runtime
-            return 0;
+            return new Guid();
         }
     }
 

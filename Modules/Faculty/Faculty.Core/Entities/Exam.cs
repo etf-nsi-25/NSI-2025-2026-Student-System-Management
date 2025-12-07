@@ -9,7 +9,7 @@ public class Exam : ITenantAware
 {
     public int Id { get; set; }
     public Guid FacultyId { get; set; }
-    public int CourseId { get; set; }
+    public Guid CourseId { get; set; }
     public string? Name { get; set; }
     public DateTime? ExamDate { get; set; }
     public DateTime? RegDeadline { get; set; }

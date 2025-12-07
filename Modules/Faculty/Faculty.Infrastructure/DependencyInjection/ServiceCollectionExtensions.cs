@@ -4,6 +4,9 @@ using Faculty.Infrastructure.Db;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Faculty.Infrastructure.Repositories;
+using Faculty.Application.Services;
+using Faculty.Application.Interfaces;
 
 namespace Faculty.Infrastructure.DependencyInjection
 {
@@ -13,13 +16,8 @@ namespace Faculty.Infrastructure.DependencyInjection
         {
             services.AddScoped<ICourseRepository, CourseRepository>();
             services.AddScoped<ICourseService, CourseService>();
-            // Register HttpContextAccessor (required for HttpTenantService)
             services.AddHttpContextAccessor();
-
-            // Register tenant service
             services.AddScoped<ITenantService, HttpTenantService>();
-
-            // Register Entity Framework DbContext
             services.AddDbContext<FacultyDbContext>(options =>
                 options.UseNpgsql(
                     configuration.GetConnectionString("Database"),
