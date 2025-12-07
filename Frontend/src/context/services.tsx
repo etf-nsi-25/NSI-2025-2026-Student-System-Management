@@ -1,8 +1,8 @@
 import type { PropsWithChildren } from 'react';
 import { createContext, useContext, useCallback } from 'react';
 import { useAuthContext } from '../init/auth.tsx';
-import { API } from '../service/api.ts';
-import { RestClient } from '../service/rest.ts';
+import { API } from '../api/api.ts';
+import { RestClient } from '../api/rest.ts';
 import { attemptSilentRefresh, resetAuthInfo } from '../utils/authUtils.ts';
 import { API_BASE_URL } from '../constants/constants.ts';
 

@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@coreui/coreui": "^5.4.3",
+    "@coreui/icons": "^3.0.1",
+    "@coreui/icons-react": "^2.3.0",
     "@coreui/react": "^5.9.1",
     "@vitejs/plugin-basic-ssl": "^2.1.0",
     "jwt-decode": "^4.0.0",
