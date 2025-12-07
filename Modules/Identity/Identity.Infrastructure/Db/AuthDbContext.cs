@@ -1,5 +1,4 @@
 ﻿using Identity.Core.Entities;
-using Identity.Infrastructure.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,7 +6,9 @@ namespace Identity.Infrastructure.Db
 {
     public class AuthDbContext : IdentityDbContext<ApplicationUser>
     {
+
         public DbSet<User> DomainUsers { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         public AuthDbContext(DbContextOptions<AuthDbContext> options)
             : base(options) { }

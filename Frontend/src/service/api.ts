@@ -1,4 +1,4 @@
-import type { RestClient } from './rest.ts';
+import type { RestClient } from '../api/rest.ts';
 import type { TwoFASetupResponse, TwoFAConfirmResponse } from '../models/2fa/TwoFA.types';
 
 export class API {

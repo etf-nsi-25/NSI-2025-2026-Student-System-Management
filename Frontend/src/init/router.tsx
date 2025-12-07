@@ -1,15 +1,36 @@
 import React from 'react';
 import { Route, Routes } from 'react-router';
-import { Home } from '../page/home/home.tsx';
-import { Page1 } from '../page/page1/page1.tsx';
-import TwoFASetupPage from "../page/identity/2FASetupPage";
+import { Home } from '../page/home/home';
+import { Page1 } from '../page/page1/page1';
+import CourseListPage from '../page/university/courses/CourseListPage';
+import TwoFASetupPage from '../page/identity/2FASetupPage';
+import { Login } from '../page/login/login.tsx';
+import { ProtectedRoute } from '../component/ProtectedRoute.tsx';
 
 export function Router(): React.ReactNode {
-    return (
-        <Routes>
-            <Route path="/" element={ <Home /> } />
-            <Route path="/page1" element={<Page1 />} />
-            <Route path="/2fa/setup" element={<TwoFASetupPage />} />
-        </Routes>
-    )
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/" element={
+        <ProtectedRoute>
+          <Home />
+        </ProtectedRoute>
+      } />
+      <Route path="/page1" element={
+        <ProtectedRoute>
+          <Page1 />
+        </ProtectedRoute>
+      } />
+      <Route path="/2fa/setup" element={
+        <ProtectedRoute>
+          <TwoFASetupPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/faculty/courses" element={
+        <ProtectedRoute>
+            <CourseListPage />
+        </ProtectedRoute>
+      } />
+    </Routes>
+  );
 }

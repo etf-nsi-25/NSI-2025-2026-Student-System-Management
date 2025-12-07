@@ -10,7 +10,6 @@ using Identity.Application.DTO;
 using Identity.Application.Interfaces;
 using Identity.Core.DomainServices;
 using Identity.Core.Repositories;
-using Identity.Infrastructure.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace Identity.Infrastructure.Services

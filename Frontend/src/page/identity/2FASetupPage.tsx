@@ -143,10 +143,10 @@ const TwoFASetupPage: React.FC = () => {
             <CRow className="twofa-body g-0 align-items-stretch">
               {/* LEFT SIDE – QR + MANUAL KEY */}
               <CCol md={5} className="twofa-left d-flex flex-column">
-                {data.qrCodeImageBase64 && (
+                {data.qrCodeBase64 && (
                   <div className="twofa-qr-wrapper">
                     <img
-                      src={data.qrCodeImageBase64}
+                      src={data.qrCodeBase64}
                       alt="2FA QR Code"
                       className="twofa-qr"
                     />
@@ -155,7 +155,7 @@ const TwoFASetupPage: React.FC = () => {
 
                 <div className="twofa-manual">
                   <div className="twofa-manual-label">Manual key</div>
-                  <div className="twofa-manual-value">{data.manualKey}</div>
+                  <div className="twofa-manual-value">{data.manualEntryKey}</div>
                   <div className="twofa-manual-hint">
                     Use this only if you can&apos;t scan the QR code.
                   </div>

@@ -18,7 +18,10 @@ public class CreateUserRequest
     
     [Required]
     public required string LastName { get; set; } 
-    
+
+    [Required]
+    public required string Email { get; set; }
+
     [Required]
     public required Guid FacultyId { get; set; }
     

@@ -3,11 +3,11 @@ using Identity.Application.Services;
 using Identity.Core.DomainServices;
 using Identity.Core.Configuration;
 using Identity.Core.Entities;
+using Identity.Core.Interfaces.Repositories;
+using Identity.Core.Interfaces.Services;
 using Identity.Core.Repositories;
 using Identity.Core.Services;
 using Identity.Infrastructure.Db;
-using Identity.Infrastructure.Entities;
-using Identity.Infrastructure.Entities;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
 using Identity.Infrastructure.TOTP;
@@ -43,9 +43,13 @@ namespace Identity.Infrastructure.DependencyInjection
                 .AddEntityFrameworkStores<AuthDbContext>();
 
             // Core user-related services
-            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddSingleton<IJwtTokenService, JwtTokenService>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddSingleton<IEventPublisher, EventPublisher>();
+
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
             // 2FA Services
             services.AddScoped<ITotpProvider, TotpProvider>(); // TOTP generator/validator

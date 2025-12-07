@@ -6,6 +6,8 @@ public class User
 {
     public Guid Id { get; private set; }
     public string Username { get; private set; }
+
+    public string Email { get; private set; }
     public string PasswordHash { get; private set; }
     public string FirstName { get; private set; }
     public string LastName { get; private set; }
@@ -14,24 +16,17 @@ public class User
     public UserRole Role { get; private set; }
     public UserStatus Status { get; private set; } = UserStatus.Active;
 
-    internal User SetId(Guid id)
+    public User SetId(Guid id)
     {
         this.Id = id;
         return this;
     }
-
-    public void FullUpdate(
-        string firstName,
-        string lastName,
-        Guid facultyId,
-        UserRole role,
-        UserStatus status,
-        string? indexNumber = null
-    )
+    public void FullUpdate(string firstName, string lastName,string email, Guid facultyId, UserRole role, UserStatus status, string? indexNumber = null)
     {
         this.FirstName = firstName;
         this.LastName = lastName;
         this.FacultyId = facultyId;
+        this.Email = email;
 
         this.Role = role;
         this.Status = status;
@@ -53,17 +48,10 @@ public class User
         FirstName = string.Empty;
         LastName = string.Empty;
         IndexNumber = string.Empty;
+        Email = string.Empty;
     }
 
-    public static User Create(
-        string username,
-        string passwordHash,
-        string firstName,
-        string lastName,
-        Guid facultyId,
-        UserRole role,
-        string? indexNumber = null
-    )
+    public static User Create(string username, string passwordHash, string firstName, string lastName,string email, Guid facultyId, UserRole role, string? indexNumber = null)
     {
         return new User
         {
@@ -74,20 +62,17 @@ public class User
             LastName = lastName,
             FacultyId = facultyId,
             Role = role,
-            IndexNumber = (role == UserRole.Student) ? indexNumber : null,
+            Email = email,
+            IndexNumber = (role == UserRole.Student) ? indexNumber : null
         };
     }
 
-    public void UpdateDetails(
-        string firstName,
-        string lastName,
-        Guid facultyId,
-        string? indexNumber
-    )
+    public void UpdateDetails(string firstName, string lastName,string email, Guid facultyId, string? indexNumber)
     {
         FirstName = firstName;
         LastName = lastName;
         FacultyId = facultyId;
+        Email = email;
 
         if (Role == UserRole.Student)
         {

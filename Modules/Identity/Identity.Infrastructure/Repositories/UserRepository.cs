@@ -1,8 +1,8 @@
 using Identity.Core.Entities;
 using Identity.Core.Repositories;
-using Identity.Infrastructure.Db; 
+using Identity.Infrastructure.Db;
 using Microsoft.EntityFrameworkCore;
-using Identity.Core.DTO; 
+using Identity.Core.DTO;
 
 namespace Identity.Infrastructure.Repositories;
 
@@ -19,20 +19,20 @@ public class UserRepository : IUserRepository
 
     public async Task AddAsync(User user)
     {
-        await _context.DomainUsers.AddAsync(user); 
+        await _context.DomainUsers.AddAsync(user);
     }
 
-    public async Task<User?> GetByIdAsync(Guid userId) 
+    public async Task<User?> GetByIdAsync(Guid userId)
     {
-        return await _context.DomainUsers.FindAsync(userId); 
+        return await _context.DomainUsers.FindAsync(userId);
     }
-    
+
     public async Task<bool> IsUsernameTakenAsync(string username)
     {
-        return await _context.DomainUsers.AnyAsync(u => u.Username == username); 
+        return await _context.DomainUsers.AnyAsync(u => u.Username == username);
     }
-    
-    
+
+
     public Task UpdateAsync(User user)
     {
         _context.Set<User>().Update(user);
@@ -49,7 +49,7 @@ public class UserRepository : IUserRepository
     {
         await _context.SaveChangesAsync();
     }
-    
+
     public async Task<IReadOnlyList<User>> GetAllFilteredAsync(UserFilterRequest filter)
     {
         var query = _context.DomainUsers.AsNoTracking();
@@ -63,7 +63,7 @@ public class UserRepository : IUserRepository
             query = query.Where(u => u.Role == filter.Role.Value);
         }
 
-        
+
         query = ApplySorting(query, filter.SortBy, filter.SortOrder);
 
         var skip = (filter.PageNumber - 1) * filter.PageSize;
@@ -75,7 +75,7 @@ public class UserRepository : IUserRepository
     public async Task<int> CountAsync(UserFilterRequest filter)
     {
         var query = _context.DomainUsers.AsNoTracking();
-        
+
         if (filter.FacultyId.HasValue)
         {
             query = query.Where(u => u.FacultyId == filter.FacultyId.Value);
@@ -87,26 +87,33 @@ public class UserRepository : IUserRepository
 
         return await query.CountAsync();
     }
-    
+
     private static IQueryable<User> ApplySorting(IQueryable<User> query, string? sortBy, string sortOrder)
-{
-    if (string.IsNullOrWhiteSpace(sortBy))
     {
-        return query.OrderBy(u => u.Id); 
+        if (string.IsNullOrWhiteSpace(sortBy))
+        {
+            return query.OrderBy(u => u.Id);
+        }
+
+        bool isAscending = sortOrder.ToLowerInvariant() == "asc";
+
+        IOrderedQueryable<User> orderedQuery;
+
+        orderedQuery = sortBy.ToLowerInvariant() switch
+        {
+            "username" => isAscending ? query.OrderBy(u => u.Username) : query.OrderByDescending(u => u.Username),
+            "firstname" => isAscending ? query.OrderBy(u => u.FirstName) : query.OrderByDescending(u => u.FirstName),
+            "role" => isAscending ? query.OrderBy(u => u.Role) : query.OrderByDescending(u => u.Role),
+            _ => query.OrderBy(u => u.Id)
+        };
+
+        return orderedQuery;
     }
 
-    bool isAscending = sortOrder.ToLowerInvariant() == "asc";
-
-    IOrderedQueryable<User> orderedQuery;
-
-    orderedQuery = sortBy.ToLowerInvariant() switch
+    public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        "username" => isAscending ? query.OrderBy(u => u.Username) : query.OrderByDescending(u => u.Username),
-        "firstname" => isAscending ? query.OrderBy(u => u.FirstName) : query.OrderByDescending(u => u.FirstName),
-        "role" => isAscending ? query.OrderBy(u => u.Role) : query.OrderByDescending(u => u.Role),
-        _ => query.OrderBy(u => u.Id) 
-    };
-
-    return orderedQuery;
-}
+        return await _context.DomainUsers
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+    }
 }

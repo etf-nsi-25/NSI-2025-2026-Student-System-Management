@@ -1,21 +1,27 @@
-using Analytics.Infrastructure;
-using Faculty.Infrastructure;
 // Import module DI namespaces
-using Identity.Infrastructure;
-using Identity.Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Notifications.Infrastructure;
-using Support.Infrastructure;
+// Import module DI namespaces
+using Identity.Infrastructure;
 using University.Infrastructure;
+using Faculty.Infrastructure;
+using Support.Infrastructure;
+using Notifications.Infrastructure;
+using Analytics.Infrastructure;
+using Identity.Infrastructure.DependencyInjection;
+using Faculty.Infrastructure.DependencyInjection;
+using Faculty.Infrastructure.Db;
+using Faculty.Core.Interfaces;
+using Faculty.Core.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services from modules
 builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddUniversityModule();
-builder.Services.AddFacultyModule();
+builder.Services.AddFacultyModule(builder.Configuration);
 builder.Services.AddSupportModule();
 builder.Services.AddNotificationsModule();
 builder.Services.AddAnalyticsModule();
@@ -44,10 +50,29 @@ foreach (var asm in moduleControllers)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// CORS Configuration for aggregated host - allow frontend dev server
+var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.WithOrigins(allowedOrigins!)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 // Middleware
 app.UseHttpsRedirection();
+
+// Ensure routing is enabled before applying CORS so the middleware can handle preflight requests correctly
+app.UseRouting();
+app.UseCors("CorsPolicy");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
