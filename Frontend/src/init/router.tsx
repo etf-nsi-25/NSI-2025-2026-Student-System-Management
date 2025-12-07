@@ -21,6 +21,9 @@ export function Router(): React.ReactNode {
           <Page1 />
         </ProtectedRoute>
       } />
+      <Route path="/enrollment" element={
+          <EnrollmentPage />
+      } />
       <Route path="/2fa/setup" element={
         <ProtectedRoute>
           <TwoFASetupPage />
