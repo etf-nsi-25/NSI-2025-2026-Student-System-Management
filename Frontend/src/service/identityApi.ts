@@ -17,7 +17,7 @@ export interface User {
     status: Status;
     lastActive: string;
     indexNumber?: string; // Samo za studente
-}
+} 
 
 // Mock Podaci - Služe kao baza podataka
 export let MOCK_USERS: User[] = [
