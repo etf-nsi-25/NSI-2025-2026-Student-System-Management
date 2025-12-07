@@ -13,10 +13,34 @@ import './FacultyManagementPage.css';
 
 const FACULTIES_API_BASE_URL = '/api/university/faculties';
 
+//  Imitating authorization mechanism
+const CURRENT_USER_ROLE = 'Superadmin'; // change to 'User' to check authorization
+
 export function FacultyManagementPage() {
+  if (CURRENT_USER_ROLE !== 'Superadmin') {
+    return (
+      <CContainer fluid className="fm-page fm-unauthorized">
+        <CHeader position="sticky" className="fm-header">
+          <CHeaderBrand className="fm-header-brand">
+            <img src={logo} alt="Logo" className="fm-logo" />
+            <span className="fm-header-title">UNSA SMS</span>
+          </CHeaderBrand>
+
+          <div className="fm-header-user">Guest</div>
+        </CHeader>
+
+        <main className="fm-content">
+          <div className="fm-unauthorized-box">
+            <h2>Unauthorized</h2>
+            <p>You do not have permission to access Faculty Management.</p>
+          </div>
+        </main>
+      </CContainer>
+    );
+  }
+
   return (
     <CContainer fluid className="fm-page">
-      {/* HEADER */}
       <CHeader position="sticky" className="fm-header">
         <CHeaderBrand className="fm-header-brand">
           <img src={logo} alt="Logo" className="fm-logo" />
@@ -26,48 +50,22 @@ export function FacultyManagementPage() {
         <div className="fm-header-user">Superadmin</div>
       </CHeader>
 
-      {/* BODY */}
       <div className="fm-body">
-        {/* SIDEBAR */}
         <CSidebar className="fm-sidebar" unfoldable>
           <CSidebarNav className="fm-sidebar-nav">
             <div className="fm-sidebar-section">Navigation</div>
-
-            <CNavItem className="fm-sidebar-item">
-              <span>Dashboard</span>
-            </CNavItem>
-
-            <CNavItem className="fm-sidebar-item">
-              <span>Course Management</span>
-            </CNavItem>
-
-            <CNavItem className="fm-sidebar-item">
-              <span>User Management</span>
-            </CNavItem>
-
-            <CNavItem className="fm-sidebar-item">
-              <span>Tenant Management</span>
-            </CNavItem>
-
-            <CNavItem className="fm-sidebar-item">
-              <span>Student Support</span>
-            </CNavItem>
-
+            <CNavItem className="fm-sidebar-item"><span>Dashboard</span></CNavItem>
+            <CNavItem className="fm-sidebar-item"><span>Course Management</span></CNavItem>
+            <CNavItem className="fm-sidebar-item"><span>User Management</span></CNavItem>
+            <CNavItem className="fm-sidebar-item"><span>Tenant Management</span></CNavItem>
+            <CNavItem className="fm-sidebar-item"><span>Student Support</span></CNavItem>
             <div className="fm-sidebar-section">Settings</div>
-
-            <CNavItem className="fm-sidebar-item">
-              <span>Settings</span>
-            </CNavItem>
-
-            <CNavItem className="fm-sidebar-item">
-              <span>Help</span>
-            </CNavItem>
+            <CNavItem className="fm-sidebar-item"><span>Settings</span></CNavItem>
+            <CNavItem className="fm-sidebar-item"><span>Help</span></CNavItem>
           </CSidebarNav>
         </CSidebar>
 
-        {/* MAIN CONTENT */}
         <main className="fm-content">
-          {/* 👇 sad ListingPage dobija URL backend-a */}
           <FacultyListingPage apiBaseUrl={FACULTIES_API_BASE_URL} />
         </main>
       </div>
