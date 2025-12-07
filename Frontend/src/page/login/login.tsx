@@ -17,6 +17,7 @@ import { extractApiErrorMessage } from "../../utils/apiError.ts";
 import { validateEmail, validatePassword } from "./loginUtils.ts";
 import { API_BASE_URL } from "../../constants/constants.ts";
 import type { LoginResponse } from "../../models/login/Login.types.ts";
+import { getDashboardRoute } from "../../constants/roles.ts";
 
 export function Login() {
   const [email, setEmail] = useState("");
@@ -67,7 +68,21 @@ export function Login() {
       };
 
       setAuthInfo(authInfoData);
-      navigate("/2fa/setup");
+
+      // Check if user needs to complete 2FA setup
+      // If your API returns a flag like `requires2FASetup`, check it here
+      // For now, assuming 2FA setup is always required first
+      
+      // Navigate based on user role after 2FA setup
+      // First, send to 2FA setup
+      // result.requires2FASetup)
+
+      if (!decoded.email) {
+        navigate("/2fa/setup");
+      } else {
+        const dashboardRoute = getDashboardRoute(decoded.role);
+        navigate(dashboardRoute);
+      }
     } catch (error) {
       setError(extractApiErrorMessage(error));
     }
