@@ -22,7 +22,9 @@ export function Router(): React.ReactNode {
         </ProtectedRoute>
       } />
       <Route path="/enrollment" element={
+        <ProtectedRoute>
           <EnrollmentPage />
+        </ProtectedRoute>  
       } />
       <Route path="/2fa/setup" element={
         <ProtectedRoute>
