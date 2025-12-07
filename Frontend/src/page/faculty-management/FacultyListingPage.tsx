@@ -1,6 +1,7 @@
 import {
   useState,
   useMemo,
+  useEffect,
   type ChangeEvent,
   type FormEvent,
 } from 'react';
@@ -35,15 +36,12 @@ type ToastMessage = {
   message: string;
 };
 
-export function FacultyListingPage() {
-  const [faculties, setFaculties] = useState<Faculty[]>([
-    { id: 1, name: 'Faculty of Engineering', abbreviation: 'ENG', status: 'Active' },
-    { id: 2, name: 'Faculty of Medicine', abbreviation: 'MED', status: 'Active' },
-    { id: 3, name: 'Faculty of Law', abbreviation: 'LAW', status: 'Inactive' },
-    { id: 4, name: 'Faculty of Science', abbreviation: 'SCI', status: 'Active' },
-    { id: 5, name: 'Faculty of Arts', abbreviation: 'ART', status: 'Inactive' },
-  ]);
+type FacultyListingPageProps = {
+  apiBaseUrl: string; // npr. http://localhost:5000/api/university/faculties
+};
 
+export function FacultyListingPage({ apiBaseUrl }: FacultyListingPageProps) {
+  const [faculties, setFaculties] = useState<Faculty[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortAsc, setSortAsc] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -74,6 +72,119 @@ export function FacultyListingPage() {
   const removeToast = (id: number) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
+
+  // ---------- API METODE (mapiramo na controller) ----------
+
+  const fetchFaculties = async () => {
+    try {
+      const response = await fetch(apiBaseUrl);
+      if (!response.ok) {
+        throw new Error('Failed to load faculties');
+      }
+
+      const data = await response.json();
+
+      // mapiranje DTO -> naš Faculty tip
+      const mapped: Faculty[] = data.map((f: any) => ({
+        id: f.id,
+        name: f.name,
+        abbreviation: f.abbreviation,
+        status:
+          f.status === 'Inactive' || f.status === 'INACTIVE'
+            ? 'Inactive'
+            : 'Active',
+      }));
+
+      setFaculties(mapped);
+    } catch (error) {
+      console.error(error);
+      pushToast('error', 'Load failed', 'Unable to load faculties from API.');
+    }
+  };
+
+  const createFaculty = async (input: FacultyInput): Promise<Faculty | null> => {
+    try {
+      const response = await fetch(apiBaseUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(input),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create faculty');
+      }
+
+      const created = await response.json();
+
+      const newFaculty: Faculty = {
+        id: created.id,
+        name: created.name,
+        abbreviation: created.abbreviation,
+        status:
+          created.status === 'Inactive' || created.status === 'INACTIVE'
+            ? 'Inactive'
+            : 'Active',
+      };
+
+      return newFaculty;
+    } catch (error) {
+      console.error(error);
+      pushToast('error', 'Create failed', 'Unable to create faculty.');
+      return null;
+    }
+  };
+
+  const updateFaculty = async (
+    id: number,
+    input: FacultyInput,
+  ): Promise<boolean> => {
+    try {
+      const response = await fetch(`${apiBaseUrl}/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(input),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update faculty');
+      }
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      pushToast('error', 'Update failed', 'Unable to update faculty.');
+      return false;
+    }
+  };
+
+  const deleteFacultyApi = async (id: number): Promise<boolean> => {
+    try {
+      const response = await fetch(`${apiBaseUrl}/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete faculty');
+      }
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      pushToast('error', 'Delete failed', 'Unable to delete faculty.');
+      return false;
+    }
+  };
+
+  // ---------- Učitavanje podataka na mount ----------
+
+  useEffect(() => {
+    fetchFaculties();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiBaseUrl]);
 
   /* FILTER + SORT */
   const filteredFaculties = useMemo(
@@ -123,33 +234,47 @@ export function FacultyListingPage() {
     setErrors(formErrors);
 
     if (Object.keys(formErrors).length > 0) {
-      pushToast('error', 'Validation error', 'Please fix the highlighted fields.');
+      pushToast(
+        'error',
+        'Validation error',
+        'Please fix the highlighted fields.',
+      );
       return false;
     }
 
     return true;
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     if (editingFaculty) {
-      setFaculties((prev) =>
-        prev.map((f) =>
-          f.id === editingFaculty.id ? { ...f, ...newFaculty } : f,
-        ),
-      );
-      pushToast('success', 'Faculty updated', 'Faculty has been updated successfully.');
+      // UPDATE
+      const ok = await updateFaculty(editingFaculty.id, newFaculty);
+      if (ok) {
+        setFaculties((prev) =>
+          prev.map((f) =>
+            f.id === editingFaculty.id ? { ...f, ...newFaculty } : f,
+          ),
+        );
+        pushToast(
+          'success',
+          'Faculty updated',
+          'Faculty has been updated successfully.',
+        );
+      }
     } else {
-      const newRecord: Faculty = {
-        id: Date.now(),
-        name: newFaculty.name,
-        abbreviation: newFaculty.abbreviation,
-        status: 'Active',
-      };
-      setFaculties((prev) => [...prev, newRecord]);
-      pushToast('success', 'Faculty created', 'Faculty has been created successfully.');
+      // CREATE
+      const created = await createFaculty(newFaculty);
+      if (created) {
+        setFaculties((prev) => [...prev, created]);
+        pushToast(
+          'success',
+          'Faculty created',
+          'Faculty has been created successfully.',
+        );
+      }
     }
 
     setNewFaculty({ name: '', abbreviation: '' });
@@ -165,25 +290,22 @@ export function FacultyListingPage() {
     setShowModal(true);
   };
 
-  const handleDelete = (faculty: Faculty) => {
+  const handleDelete = async (faculty: Faculty) => {
     const confirmDelete = window.confirm(
       'Are you sure you want to delete this faculty?',
     );
     if (!confirmDelete) return;
 
-    const linked = false;
-
-    if (linked) {
-      pushToast(
-        'error',
-        'Delete blocked',
-        'Faculty is linked to other entities and cannot be deleted.',
-      );
-      return;
-    }
+    // Ako backend vrati grešku (npr. linked), ovdje bi je mogli pročitati.
+    const ok = await deleteFacultyApi(faculty.id);
+    if (!ok) return;
 
     setFaculties((prev) => prev.filter((f) => f.id !== faculty.id));
-    pushToast('success', 'Faculty deleted', 'Faculty has been deleted successfully.');
+    pushToast(
+      'success',
+      'Faculty deleted',
+      'Faculty has been deleted successfully.',
+    );
   };
 
   const openCreateModal = () => {
@@ -342,9 +464,7 @@ export function FacultyListingPage() {
             color={toast.type === 'success' ? 'success' : 'danger'}
             onClose={() => removeToast(toast.id)}
           >
-            <CToastHeader closeButton>
-              {toast.title}
-            </CToastHeader>
+            <CToastHeader closeButton>{toast.title}</CToastHeader>
             <CToastBody>{toast.message}</CToastBody>
           </CToast>
         ))}

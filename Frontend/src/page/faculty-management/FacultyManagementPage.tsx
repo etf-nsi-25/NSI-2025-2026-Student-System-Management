@@ -11,6 +11,9 @@ import logo from '../../assets/images/logo.jpg';
 import { FacultyListingPage } from './FacultyListingPage';
 import './FacultyManagementPage.css';
 
+// 👇 Backend ti sluša na http://localhost:5000
+const FACULTIES_API_BASE_URL = 'http://localhost:5000/api/university/faculties';
+
 export function FacultyManagementPage() {
   return (
     <CContainer fluid className="fm-page">
@@ -29,7 +32,6 @@ export function FacultyManagementPage() {
         {/* SIDEBAR */}
         <CSidebar className="fm-sidebar" unfoldable>
           <CSidebarNav className="fm-sidebar-nav">
-
             <div className="fm-sidebar-section">Navigation</div>
 
             <CNavItem className="fm-sidebar-item">
@@ -61,13 +63,13 @@ export function FacultyManagementPage() {
             <CNavItem className="fm-sidebar-item">
               <span>Help</span>
             </CNavItem>
-
           </CSidebarNav>
         </CSidebar>
 
         {/* MAIN CONTENT */}
         <main className="fm-content">
-          <FacultyListingPage />
+          {/* 👇 sad ListingPage dobija URL backend-a */}
+          <FacultyListingPage apiBaseUrl={FACULTIES_API_BASE_URL} />
         </main>
       </div>
     </CContainer>
