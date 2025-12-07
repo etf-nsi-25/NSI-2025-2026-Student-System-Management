@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using University.Application.Interfaces;
+using University.Application.Services;
 
 namespace University.Infrastructure
 {
@@ -6,7 +8,9 @@ namespace University.Infrastructure
     {
         public static IServiceCollection AddUniversityModule(this IServiceCollection services)
         {
+            services.AddScoped<IFacultyService, FacultyService>();
             return services;
         }
     }
 }
+
