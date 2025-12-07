@@ -1,0 +1,386 @@
+/* ====== GLOBAL ====== */
+body {
+  background-color: #d9e7f59a !important;
+}
+
+/* ====== GLOBAL RESET ====== */
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100%;
+  height: 100%;
+}
+
+
+/* Modal styling: centered card, rounded, soft shadow, dim backdrop */
+.modal-super-high-zindex {
+  z-index: 200000 !important;
+}
+
+.modal-backdrop {
+  z-index: 199999 !important;
+  background-color: rgba(8, 24, 48, 0.55) !important; /* slightly darker overlay */
+}
+
+
+/* Modal positioning: center using flexbox to avoid layout bleed-through */
+.modal-super-high-zindex {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.modal-super-high-zindex .modal-dialog {
+  margin: 0 !important;
+  width: auto !important;
+  max-width: 360px !important; /* narrower, taller card to match screenshot */
+  box-sizing: border-box !important;
+}
+
+.modal-super-high-zindex .modal-content {
+  background-color: #ffffff !important;
+  border-radius: 16px !important;
+  padding: 0 !important;
+  box-shadow: 0 14px 50px rgba(15, 23, 42, 0.14) !important;
+  overflow: hidden !important;
+  font-family: inherit !important;
+}
+
+
+/* Header styling */
+.modal-super-high-zindex .modal-header {
+  border-bottom: none !important;
+  padding: 14px 12px 8px 12px !important; /* top right bottom left */
+}
+
+.modal-super-high-zindex .modal-title {
+  color: #0b4fa3 !important; /* brand blue */
+  font-weight: 700 !important;
+  font-size: 15px !important; /* small tweak */
+  line-height: 1 !important;
+  margin: 0 !important; /* remove extra margins around title */
+}
+
+/* Body spacing */
+.modal-super-high-zindex .modal-body {
+  padding: 6px 12px !important;
+}
+
+/* Center form content inside modal and constrain width so fields sit centered above footer */
+.modal-super-high-zindex .modal-body {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+.modal-super-high-zindex .modal-body .mb-3 {
+  width: 100% !important;
+  max-width: 420px !important; /* control the form width inside the modal */
+  margin-bottom: 8px !important;
+}
+
+.modal-super-high-zindex .modal-body .mb-3 label {
+  text-align: left !important; /* keep labels left-aligned within the constrained column */
+}
+
+.modal-super-high-zindex .modal-body .mb-3 .form-control,
+.modal-super-high-zindex .modal-body .mb-3 input,
+.modal-super-high-zindex .modal-body .mb-3 select,
+.modal-super-high-zindex .modal-body .mb-3 .c-form-control {
+  width: 100% !important; /* fill the constrained column */
+}
+
+.modal-super-high-zindex .modal-footer {
+  padding-top: 10px !important; /* slightly tighter footer spacing */
+}
+
+
+/* Inputs & selects inside modal */
+.modal-super-high-zindex .modal-body .mb-3 .form-control,
+.modal-super-high-zindex .modal-body .mb-3 input,
+.modal-super-high-zindex .modal-body .mb-3 select,
+.modal-super-high-zindex .modal-body .mb-3 .c-form-control {
+  width: 100% !important;
+  background: #f2f4f7 !important;
+  border: 1px solid #e1e6ea !important;
+  border-radius: 0 !important; /* rectangular inputs */
+  padding: 7px 10px !important; /* slightly smaller input padding */
+  height: 34px !important; /* compact input height */
+  font-size: 13px !important;
+  box-sizing: border-box !important;
+}
+
+
+/* Label styling */
+.modal-super-high-zindex .modal-body label {
+  display: block !important;
+  margin-bottom: 4px !important;
+  color: #0f1720 !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+}
+
+
+/* Reduce vertical spacing between fields */
+.modal-super-high-zindex .modal-body .mb-3 {
+  margin-bottom: 8px !important;
+}
+
+
+/* Two-column row for faculty/status on wide screens */
+.modal-super-high-zindex .modal-body .two-col-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+.modal-super-high-zindex .modal-body .two-col-row > * {
+  flex: 1 1 0;
+}
+
+
+/* Footer buttons */
+.modal-super-high-zindex .modal-footer {
+  padding: 10px 14px !important;
+  border-top: none !important;
+  display: flex !important;
+  gap: 8px !important;
+  justify-content: center !important; /* center buttons horizontally */
+}
+
+/* UJEDNAČENI MODAL BUTTONI */
+.modal-super-high-zindex .modal-footer .btn-primary,
+.modal-super-high-zindex .modal-footer .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 120px;        /* ista širina */
+  height: 36px;            /* ista visina */
+  padding: 0 16px;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+  box-sizing: border-box;
+}
+
+.modal-super-high-zindex .modal-footer .btn-primary {
+  background-color: #0b5ed7 !important;
+  border-color: #0b5ed7 !important;
+  color: #fff !important;
+}
+
+.modal-super-high-zindex .modal-footer .btn-secondary {
+  background-color: #e6e9ee !important;
+  border-color: #d1d6db !important;
+  color: #334155 !important;
+}
+
+
+/* Hide any decorative/empty element that might appear as a tiny pill below the title */
+.modal-super-high-zindex .modal-body > *:first-child:empty {
+  display: none !important;
+}
+.modal-super-high-zindex .modal-body > *:first-child {
+  margin-top: 0 !important;
+  min-height: 0 !important;
+}
+
+
+/* Hide CoreUI's header close button inside this modal */
+.modal-super-high-zindex .btn-close {
+  display: none !important;
+}
+
+
+/* Responsive: small screens use near-full width */
+@media (max-width: 520px) {
+  .modal-super-high-zindex .modal-dialog {
+    max-width: 92% !important;
+  }
+  .modal-super-high-zindex .modal-body {
+    padding: 14px !important;
+  }
+}
+
+
+/* ====== KARTICE ====== */
+.filter-card,
+.table-card {
+  background: #ffffff !important;
+  border-radius: 14px !important;
+  box-shadow: 0 6px 18px rgba(29, 30, 31, 0.06);
+  width: 70% !important;
+  margin: 0 auto !important;
+  padding: 32px 40px !important;
+}
+
+.table-card {
+  margin-top: 32px !important;
+}
+
+
+/* ====== RED 1: Search – Faculty – Role ====== */
+
+.filter-row {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;          /* poravnaj donje rubove inputa/selecta */
+  gap: 32px;
+  margin-bottom: 26px;
+}
+
+.filter-col {
+  width: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* Label iznad, bold kao na slici */
+.top-label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #000;
+}
+
+
+/* Select */
+.top-select {
+  height: 44px !important;
+  background: #F2F4F7 !important;
+  border: 1px solid #d8dce0 !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  padding: 8px 10px !important;        /* dodaj isti padding kao input */
+  width: 220px !important;
+  box-sizing: border-box !important;   /* dodaj ovo */
+}
+
+
+/* ====== SEARCH INPUT – sada u istom redu ====== */
+.search-input {
+  width: 220px !important;
+  height: 44px !important;
+  background: #F2F4F7 !important;
+  border-radius: 6px !important;
+  border: 1px solid #d8dce0 !important;
+  text-align: left;
+  font-size: 14px !important;
+  padding: 8px 10px !important;        /* specificiraj sve 4 strane */
+  margin: 0 !important;
+  box-sizing: border-box !important;   /* dodaj ovo */
+}
+
+
+/* ====== Dugmad ispod searcha ====== */
+.button-row {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.btn-blue,
+.btn-grey {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 140px;          /* ista širina */
+  height: 40px;              /* ista visina */
+  padding: 0 20px;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  box-sizing: border-box;
+}
+
+.btn-blue {
+  background-color: #003B82 !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+.btn-grey {
+  background-color: #e6e9ee !important;
+  color: #000 !important;
+  border: none !important;
+}
+
+
+/* ====== TABELA ====== */
+.user-table table {
+  width: auto !important; /* let the table size to its content so we can center it */
+  border-collapse: collapse !important;
+}
+
+/* Header */
+.user-table th {
+  background: #f7f9fb !important;
+  border-bottom: 1px solid #dbe1e6 !important;
+  padding: 12px 16px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+}
+
+/* Data cells */
+.user-table td {
+  padding: 12px 16px !important;
+  border-bottom: 1px solid #e3e6ea !important;
+  font-size: 14px !important;
+}
+
+/* Center the table within the card and limit its max width so it doesn't hug the left side */
+.table-card .user-table {
+  margin: 0 auto !important;
+  max-width: 920px !important;
+}
+
+/* No vertical borders */
+.user-table th,
+.user-table td {
+  border-left: none !important;
+  border-right: none !important;
+}
+
+/* Buttons inside table */
+.action-btns button {
+  background-color: #F5F6F7 !important;
+  border: 1px solid #D4D9DE !important;
+  color: #3A3F44 !important;
+  padding: 4px 12px !important;
+  border-radius: 3px !important;
+  font-size: 12px !important;
+  margin-right: 6px;
+}
+
+
+/* ====== Bottom buttons ====== */
+.bottom-btn-row {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 26px;
+}
+
+
+/* Staro faculty-role poravnanje (ako ti zatreba negdje drugo) */
+.faculty-role-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 32px;
+  margin-bottom: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.faculty-col {
+  display: flex;
+  flex-direction: column;
+  padding-top: 0 !important;
+}

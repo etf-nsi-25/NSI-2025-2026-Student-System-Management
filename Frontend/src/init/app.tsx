@@ -3,6 +3,8 @@ import { DummyContextProvider } from '../context/dummy/dummy-context.tsx';
 import { ServiceContextProvider } from '../context/services.tsx';
 import { Authentication } from './auth.tsx';
 import { Router } from './router.tsx';
+import AppLayout from '../component/AppLayout/AppLayout.tsx';
+
 
 export function App() {
     return (
@@ -11,7 +13,9 @@ export function App() {
                 <Authentication>
                     <ServiceContextProvider>
                         <DummyContextProvider>
-                            <Router />
+                            <AppLayout> 
+                                <Router />
+                            </AppLayout>
                         </DummyContextProvider>
                     </ServiceContextProvider>
                 </Authentication>
