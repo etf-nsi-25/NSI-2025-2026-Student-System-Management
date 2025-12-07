@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using System;
 using University.Application.DTOs;
 using University.Application.Interfaces;
 
@@ -7,7 +9,7 @@ namespace University.API.Controllers
 {
     [ApiController]
     [Route("api/university/faculties")]
-    [Authorize(Roles = "Superadmin")]
+    //[Authorize(Roles = "Superadmin")]
     public class FacultyController : ControllerBase
     {
         private readonly IFacultyService _facultyService;
@@ -18,11 +20,11 @@ namespace University.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllFaculties([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? name = null)
+        public async Task<IActionResult> GetAllFaculties([FromQuery] string? name = null)
         {
             try
             {
-                var faculties = await _facultyService.GetAllFacultiesAsync(pageNumber, pageSize, name);
+                var faculties = await _facultyService.GetAllFacultiesAsync(name);
                 return Ok(faculties);
             }
             catch (Exception)

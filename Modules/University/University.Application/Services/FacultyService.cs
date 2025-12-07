@@ -15,7 +15,7 @@ namespace University.Application.Services
         };
         private static int _nextId = 4;
 
-        public Task<IEnumerable<FacultyDto>> GetAllFacultiesAsync(int pageNumber, int pageSize, string? nameFilter)
+        public Task<IEnumerable<FacultyDto>> GetAllFacultiesAsync(string? nameFilter)
         {
             // TODO: REMOVE DUMMY DATA AND REPLACE WITH REPOSITORY CALL ONCE DB CODE IS MERGED.
             var faculties = _dummyFaculties.AsEnumerable();
@@ -25,9 +25,8 @@ namespace University.Application.Services
                 faculties = faculties.Where(f => f.Name.Contains(nameFilter, StringComparison.OrdinalIgnoreCase));
             }
 
-            var pagedFaculties = faculties.Skip((pageNumber - 1) * pageSize).Take(pageSize);
 
-            var dtos = pagedFaculties.Select(f => new FacultyDto
+            var dtos = faculties.Select(f => new FacultyDto
             {
                 Id = f.Id,
                 Name = f.Name,
@@ -104,7 +103,7 @@ namespace University.Application.Services
             {
                 throw new ArgumentException("Faculty with the same name already exists.");
             }
-            
+
             if (dto.Code != null && _dummyFaculties.Any(f => f.Id != id && f.Code.Equals(dto.Code, StringComparison.OrdinalIgnoreCase)))
             {
                 throw new ArgumentException("Faculty with the same code already exists.");
@@ -142,7 +141,7 @@ namespace University.Application.Services
             {
                 return Task.FromResult(false);
             }
-            
+
             // TODO: Check if Faculty is used in Users or Courses tables. If yes, throw Conflict Exception.
 
             _dummyFaculties.Remove(faculty);
