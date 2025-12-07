@@ -7,7 +7,7 @@ import DashboardPage from "../page/student dashboard/page.tsx";
 export function Router(): React.ReactNode {
   return (
     <Routes>
-      <Route path="/" element={<DashboardPage />} />
+      <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/page1" element={<Page1 />} />
       <Route path="/2fa/setup" element={<TwoFASetupPage />} />
     </Routes>
