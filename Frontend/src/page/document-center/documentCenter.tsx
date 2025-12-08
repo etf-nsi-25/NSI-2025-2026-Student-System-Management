@@ -35,7 +35,7 @@ import './DocumentCenter.css';
 
 const API_BASE_URL = 'https://localhost:5001'; 
 
-export default function DocumentCenter() {
+export default function DocumentCenterDashboard() {
   const [requestType, setRequestType] = useState('');
   const [status, setStatus] = useState('');
   const [details, setDetails] = useState('');

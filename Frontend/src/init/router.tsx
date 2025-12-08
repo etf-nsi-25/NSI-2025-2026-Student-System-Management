@@ -9,6 +9,7 @@ import { ProtectedRoute } from '../component/ProtectedRoute.tsx';
 import { DocumentCenter,  ProfileSettings, RequestManagement, StudentAnalytics, StudentLayout, StudentSupport } from '../features/student/index.ts';
 import EnrollmentPage from "../page/enrollment/enrollment.tsx";
 import DashboardPage from '../page/student dashboard/dashboard.tsx';
+import DocumentCenterDashboard from '../page/document-center/documentCenter.tsx'
 
 export function Router(): React.ReactNode {
   return (
@@ -47,6 +48,14 @@ export function Router(): React.ReactNode {
         <Route path="support" element={<StudentSupport />} />
         <Route index element={<DashboardPage />} /> {/* Default to dashboard */}
       </Route>
+      <Route
+        path="/document-center"
+        element={
+          <ProtectedRoute>
+            <DocumentCenterDashboard />
+          </ProtectedRoute>
+        }
+      />
       {/* Unauthorized Page */}
       <Route path="/unauthorized" element={
         <div className="d-flex flex-column justify-content-center align-items-center" style={{ height: '100vh' }}>
