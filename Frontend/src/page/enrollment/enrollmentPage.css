@@ -1,0 +1,58 @@
+.student-enrollment-page {
+  background-color: #e6edf7;
+  min-height: 100%;
+}
+
+.student-enrollment-page h2 {
+  color: rgba(37, 42.92, 54.02, 0.95);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.student-enrollment-page .card {
+  border-radius: 1rem;
+  border: none;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.student-enrollment-page .card-header {
+  background-color: #ffffff;
+  border-bottom: none;
+  padding: 1rem 1.5rem 0.25rem;
+}
+
+.student-enrollment-page .card-body {
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+.student-enrollment-page .table thead {
+  background-color: rgba(var(--cui-primary-rgb, 54, 79, 199), 0.06);
+}
+
+.student-enrollment-page .table thead th {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(37, 42.92, 54.02, 0.95);
+  border-bottom: none;
+}
+
+.student-enrollment-page .table tbody td {
+  font-size: 0.85rem;
+  padding-top: 0.55rem;
+  padding-bottom: 0.55rem;
+  border-top-color: rgba(148, 163, 184, 0.35);
+}
+
+.student-enrollment-page .table-hover tbody tr:hover {
+  background-color: rgba(var(--cui-primary-rgb, 54, 79, 199), 0.04);
+}
+
+.student-enrollment-page .btn {
+  border-radius: 999px;
+}
+
+@media (max-width: 768px) {
+  .student-enrollment-page {
+    padding: 1rem;
+  }
+}

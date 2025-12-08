@@ -8,6 +8,7 @@ import { Login } from '../page/login/login.tsx';
 import { ProtectedRoute } from '../component/ProtectedRoute.tsx';
 import { DocumentCenter,  ProfileSettings, RequestManagement, StudentAnalytics, StudentLayout, StudentSupport } from '../features/student/index.ts';
 import EnrollmentPage from "../page/enrollment/enrollment.tsx";
+import { EnrollmentStudentPage } from '../page/enrollment/enrollmentPage.tsx';
 import DashboardPage from '../page/student dashboard/dashboard.tsx';
 import DocumentCenterDashboard from '../page/document-center/documentCenter.tsx'
 
@@ -46,6 +47,7 @@ export function Router(): React.ReactNode {
         <Route path="enrollment" element={<EnrollmentPage />} />
         <Route path="profile-settings" element={<ProfileSettings />} />
         <Route path="support" element={<StudentSupport />} />
+        <Route path="student-enrollment" element={<EnrollmentStudentPage />} />  
         <Route index element={<DashboardPage />} /> {/* Default to dashboard */}
       </Route>
       <Route

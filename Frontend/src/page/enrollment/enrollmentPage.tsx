@@ -1,0 +1,265 @@
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  CAlert,
+  CButton,
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CCol,
+  CForm,
+  CFormLabel,
+  CFormSelect,
+  CRow,
+  CSpinner,
+  CTable,
+  CTableBody,
+  CTableDataCell,
+  CTableHead,
+  CTableHeaderCell,
+  CTableRow,
+} from "@coreui/react";
+import type {
+  Enrollment,
+  Faculty,
+} from "../../models/enrollment/Enrollment.types";
+import { studentEnrollmentService } from "../../service/enrollment/studentEnrollmentService";
+
+const CURRENT_ACADEMIC_YEAR = "2025/2026";
+
+export const EnrollmentStudentPage: React.FC = () => {
+  const [faculties, setFaculties] = useState<Faculty[]>([]);
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const [selectedFacultyId, setSelectedFacultyId] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const { activeEnrollments, previousEnrollments } = useMemo(() => {
+    const active = enrollments.filter((e) => e.status !== "Done");
+    const previous = enrollments.filter((e) => e.status === "Done");
+    return { activeEnrollments: active, previousEnrollments: previous };
+  }, [enrollments]);
+
+  const loadData = async () => {
+    try {
+      setIsLoading(true);
+      const [facultiesRes, enrollmentsRes] = await Promise.all([
+        studentEnrollmentService.getFaculties(),
+        studentEnrollmentService.getEnrollments(),
+      ]);
+      setFaculties(facultiesRes);
+      setEnrollments(enrollmentsRes);
+    } catch (e) {
+      console.error(e);
+      setErrorMessage("Failed to load enrollment data.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleCancel = () => {
+    setSelectedFacultyId("");
+    setSuccessMessage(null);
+    setErrorMessage(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedFacultyId) {
+      setErrorMessage("Please choose your faculty.");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setErrorMessage(null);
+      setSuccessMessage(null);
+
+      await studentEnrollmentService.createEnrollment(
+        selectedFacultyId,
+        CURRENT_ACADEMIC_YEAR
+      );
+
+      setSuccessMessage("Your enrollment request has been submitted.");
+      setSelectedFacultyId("");
+
+      await loadData();
+    } catch (e) {
+      console.error(e);
+      setErrorMessage("Failed to submit enrollment request.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center h-100">
+        <CSpinner />
+      </div>
+    );
+  }
+
+  return (
+    <div className="student-enrollment-page  px-4 py-3">
+      <h2 style={{ color: "#1e4d8b" }} className="mb-4 fw-semibold">
+        Welcome back, Jane!
+      </h2>
+
+      <CCard className="mb-4 shadow-sm border-0">
+        <CCardHeader className="bg-white border-0 pb-0">
+          <h5 style={{ color: "#1e4d8b" }} className="fw-semibold mb-0">
+            Enrollment for Academic Year {CURRENT_ACADEMIC_YEAR}
+          </h5>
+        </CCardHeader>
+        <CCardBody>
+          {successMessage && (
+            <CAlert color="success" className="mb-3">
+              {successMessage}
+            </CAlert>
+          )}
+          {errorMessage && (
+            <CAlert color="danger" className="mb-3">
+              {errorMessage}
+            </CAlert>
+          )}
+
+          <CForm onSubmit={handleSubmit}>
+            <CRow className="align-items-end">
+              <CCol md={4}>
+                <CFormLabel className="fw-semibold">Faculty</CFormLabel>
+                <CFormSelect
+                  value={selectedFacultyId}
+                  onChange={(e) => setSelectedFacultyId(e.target.value)}
+                >
+                  <option value="">Choose your faculty</option>
+                  {faculties.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.name}
+                    </option>
+                  ))}
+                </CFormSelect>
+              </CCol>
+
+              <CCol className="text-end">
+                <CButton
+                  type="button"
+                  color="secondary"
+                  variant="outline"
+                  className="me-2 px-4"
+                  onClick={handleCancel}
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </CButton>
+                <CButton
+                  type="submit"
+                  style={{
+                    backgroundColor: "#1e4d8b",
+                    borderColor: "#1e4d8b",
+                    color: "white",
+                  }}
+                  className="px-4"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? <CSpinner size="sm" /> : "Submit"}
+                </CButton>
+              </CCol>
+            </CRow>
+          </CForm>
+        </CCardBody>
+      </CCard>
+
+      <CCard className="mb-3 shadow-sm border-0">
+        <CCardHeader className="bg-white border-0 pb-0">
+          <h5 style={{ color: "#1e4d8b" }} className="fw-semibold mb-2">
+            Active enrollments
+          </h5>
+        </CCardHeader>
+        <CCardBody>
+          <CTable hover responsive>
+            <CTableHead className="bg-light">
+              <CTableRow>
+                <CTableHeaderCell>Faculty</CTableHeaderCell>
+                <CTableHeaderCell>Date</CTableHeaderCell>
+                <CTableHeaderCell>Academic Year</CTableHeaderCell>
+                <CTableHeaderCell>Status</CTableHeaderCell>
+              </CTableRow>
+            </CTableHead>
+            <CTableBody>
+              {activeEnrollments.length === 0 ? (
+                <CTableRow>
+                  <CTableDataCell
+                    colSpan={4}
+                    className="text-center text-muted"
+                  >
+                    No active enrollments.
+                  </CTableDataCell>
+                </CTableRow>
+              ) : (
+                activeEnrollments.map((e) => (
+                  <CTableRow key={e.id}>
+                    <CTableDataCell>{e.facultyName}</CTableDataCell>
+                    <CTableDataCell>
+                      {new Date(e.date).toLocaleDateString()}
+                    </CTableDataCell>
+                    <CTableDataCell>{e.academicYear}</CTableDataCell>
+                    <CTableDataCell>{e.status}</CTableDataCell>
+                  </CTableRow>
+                ))
+              )}
+            </CTableBody>
+          </CTable>
+        </CCardBody>
+      </CCard>
+
+      <CCard className="shadow-sm border-0">
+        <CCardHeader className="bg-white border-0 pb-0">
+          <h5 style={{ color: "#1e4d8b" }} className="fw-semibold mb-2">
+            Previous enrollments
+          </h5>
+        </CCardHeader>
+        <CCardBody>
+          <CTable hover responsive>
+            <CTableHead className="bg-light">
+              <CTableRow>
+                <CTableHeaderCell>Faculty</CTableHeaderCell>
+                <CTableHeaderCell>Date</CTableHeaderCell>
+                <CTableHeaderCell>Academic Year</CTableHeaderCell>
+                <CTableHeaderCell>Status</CTableHeaderCell>
+              </CTableRow>
+            </CTableHead>
+            <CTableBody>
+              {previousEnrollments.length === 0 ? (
+                <CTableRow>
+                  <CTableDataCell
+                    colSpan={4}
+                    className="text-center text-muted"
+                  >
+                    No previous enrollments.
+                  </CTableDataCell>
+                </CTableRow>
+              ) : (
+                previousEnrollments.map((e) => (
+                  <CTableRow key={e.id}>
+                    <CTableDataCell>{e.facultyName}</CTableDataCell>
+                    <CTableDataCell>
+                      {new Date(e.date).toLocaleDateString()}
+                    </CTableDataCell>
+                    <CTableDataCell>{e.academicYear}</CTableDataCell>
+                    <CTableDataCell>{e.status}</CTableDataCell>
+                  </CTableRow>
+                ))
+              )}
+            </CTableBody>
+          </CTable>
+        </CCardBody>
+      </CCard>
+    </div>
+  );
+};
