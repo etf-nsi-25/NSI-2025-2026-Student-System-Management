@@ -1,0 +1,323 @@
+/* CoreUI custom styles for enrollment page */
+
+/* Page Layout */
+.enrollment-page {
+  background-color: #c5d5e4;
+  min-height: 100vh;
+  padding: 2rem 0;
+}
+
+/* Header Section */
+.enrollment-header {
+  margin-bottom: 2rem;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+/* Centered page title to match Figma design */
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1e4d8b;
+  margin: 0;
+  text-align: center;
+  width: 100%;
+}
+
+/* Success Alert */
+.success-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: #d4edda !important;
+  border: 1px solid #c3e6cb !important;
+  color: #155724 !important;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.375rem;
+  margin: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.success-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #28a745;
+}
+
+.success-text {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Search and Filter */
+.search-input-group {
+  background-color: white;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.search-icon-wrapper {
+  background-color: white !important;
+  border: none !important;
+  padding-left: 1rem;
+}
+
+.search-input {
+  border: none !important;
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+}
+
+.search-input:focus {
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.semester-select {
+  background-color: white;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Course Cards */
+.course-card {
+  background-color: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  height: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+}
+
+/* Blue outline only appears on hover */
+.course-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #2563eb;
+}
+
+.required-card {
+  border-color: #e5e7eb;
+  border-width: 2px;
+}
+
+.course-card-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.course-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 0.25rem;
+  line-height: 1.3;
+}
+
+.course-code {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.course-professor {
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.course-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  margin-top: auto;
+}
+
+.course-ects {
+  font-size: 0.9rem;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Status Badges */
+.status-badge {
+  padding: 0.375rem 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: 0.375rem;
+}
+
+.status-required {
+  background-color: #f4a5a5 !important;
+  color: #7f1d1d !important;
+}
+
+.status-elective {
+  background-color: #86d993 !important;
+  color: #14532d !important;
+}
+
+.status-enrolled {
+  background-color: #9ca3af !important;
+  color: #374151 !important;
+}
+
+/* Buttons are now centered and sized to match Figma (not full width) */
+.enroll-button {
+  width: 150px;
+  padding: 0.625rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  border: none;
+  transition: all 0.2s ease;
+  display: block;
+  margin: 0 auto;
+}
+
+.active-button {
+  background-color: #1e4d8b !important;
+  color: white !important;
+}
+
+.active-button:hover {
+  background-color: #163a6b !important;
+  transform: translateY(-1px);
+}
+
+.enrolled-button {
+  background-color: #8b92a0 !important;
+  color: white !important;
+  cursor: not-allowed;
+}
+
+.enrolled-button:disabled {
+  opacity: 1;
+}
+
+/* Infinite Scroll */
+.load-more-trigger {
+  padding: 2rem;
+  text-align: center;
+}
+
+.loading-text {
+  color: #6c757d;
+  font-size: 1rem;
+}
+
+/* Modal Styles */
+.modal-header-custom {
+  border-bottom: none !important;
+  padding: 2.5rem 2.5rem 1rem 2.5rem;
+}
+
+.modal-title-custom {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #000;
+  text-align: left;
+}
+
+.modal-body-custom {
+  padding: 1rem 2.5rem 2rem 2.5rem;
+  text-align: left;
+}
+
+.modal-content-wrapper {
+  text-align: left;
+}
+
+.modal-course-name {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 0.5rem;
+}
+
+.modal-course-code {
+  font-size: 1.5rem;
+  color: #666;
+  margin-bottom: 3rem;
+}
+
+.modal-professor {
+  font-size: 1.5rem;
+  color: #000;
+  margin-bottom: 0;
+}
+
+.professor-label {
+  font-weight: 700;
+}
+
+.modal-footer-custom {
+  padding: 0 2.5rem 2.5rem 2.5rem;
+  border-top: none !important;
+  display: flex;
+  justify-content: center;
+}
+
+/* Confirm button centered and sized to match Figma modal design */
+.confirm-button {
+  width: auto;
+  min-width: 400px;
+  padding: 1rem 3rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  background-color: #1e4d8b !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 3rem;
+  transition: all 0.2s ease;
+}
+
+.confirm-button:hover:not(:disabled) {
+  background-color: #163a6b !important;
+  transform: translateY(-1px);
+}
+
+.confirm-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .success-alert {
+    position: relative;
+    right: auto;
+    top: 5%;
+    width: 100%;
+  }
+
+  .confirm-button {
+    min-width: 100%;
+  }
+}

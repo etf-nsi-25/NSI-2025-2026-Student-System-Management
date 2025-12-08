@@ -1,0 +1,207 @@
+/* src/features/student/dashboard/DashboardPage.css */
+
+/* Page wrapper */
+.dashboard-page {
+  padding: 2rem;
+  background-color: #d1dae6;
+  min-height: 100vh;
+}
+
+/* Loading state centered */
+.dashboard-loading {
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Make padding smaller on smaller screens */
+@media (max-width: 992px) {
+  .dashboard-page {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .dashboard-page {
+    padding: 1rem;
+  }
+}
+
+/* Header */
+.dashboard-header-title {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 600;
+  color: #1e3a5f;
+}
+
+/* Search input */
+.dashboard-search-input input {
+  background-color: #ffffff;
+}
+
+.dashboard-search-icon {
+  background-color: #ffffff;
+  border: none;
+}
+
+/* Stat cards */
+.dashboard-stats-card {
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+}
+
+.dashboard-stats-value {
+  font-size: clamp(1.2rem, 3vw, 2.5rem);
+  white-space: nowrap;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-stats-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Section titles */
+.dashboard-section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e3a5f;
+}
+
+/* Course cards */
+.dashboard-course-card {
+  border: none;
+  background-color: #f9f7f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 16px;
+}
+
+.dashboard-course-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.dashboard-course-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.dashboard-course-professor {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Upcoming list */
+.dashboard-upcoming-item {
+  background-color: transparent;
+  border: none;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.dashboard-upcoming-icon {
+  margin-top: 4px;
+  color: #6b7280;
+}
+
+.dashboard-upcoming-title {
+  font-weight: 600;
+}
+
+.dashboard-upcoming-day {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.dashboard-upcoming-button {
+  background-color: #4f46e5;
+  border: none;
+}
+
+/* Right side panel (calendar + quick actions) */
+.dashboard-right-col {
+  /* Adds spacing on smaller screens when stacked */
+}
+
+@media (max-width: 992px) {
+  .dashboard-right-col {
+    margin-top: 1.5rem;
+  }
+}
+
+.dashboard-right-card {
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+}
+
+/* Calendar */
+.dashboard-calendar-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.dashboard-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+.dashboard-calendar-weekday {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #9ca3af;
+  padding: 0.5rem 0;
+}
+
+.dashboard-calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  border-radius: 8px;
+}
+
+/* Quick actions */
+.dashboard-quick-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.dashboard-quick-action {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard-quick-action-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.dashboard-quick-action-label {
+  font-weight: 500;
+}
+
+.dashboard-quick-action-more {
+  color: #9ca3af;
+}
