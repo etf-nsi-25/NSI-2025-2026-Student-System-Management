@@ -10,14 +10,12 @@ import {
 } from "@coreui/react";
 import "./login.css";
 import logoImage from "../../assets/images/login/unsa-sms-logo.png";
-import { useAuthContext, type AccessToken } from "../../init/auth.tsx";
-import { jwtDecode } from "jwt-decode";
+import { useAuthContext } from "../../init/auth.tsx";
 import { useNavigate } from "react-router";
 import { extractApiErrorMessage } from "../../utils/apiError.ts";
 import { validateEmail, validatePassword } from "./loginUtils.ts";
-import { API_BASE_URL } from "../../constants/constants.ts";
-import type { LoginResponse } from "../../models/login/Login.types.ts";
 import { getDashboardRoute } from "../../constants/roles.ts";
+import { loginWithCredentials } from "../../utils/authUtils.ts";
 
 export function Login() {
   const [email, setEmail] = useState("");
@@ -40,33 +38,9 @@ export function Login() {
     console.log("Login attempt:", { email, password });
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: 'include', // Include cookies in request
-        body: JSON.stringify({ email, password }),
-      });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(JSON.stringify(errorData));
-      }
-
-      const result : LoginResponse = await response.json();
-
-      const decoded = jwtDecode<AccessToken>(result.accessToken);
-      const authInfoData = {
-        accessToken: result.accessToken,
-        expiresOn: decoded.exp * 1000,
-        email: decoded.email,
-        userId: decoded.userId,
-        role: decoded.role,
-        tenantId: decoded.tenantId,
-        fullName: decoded.fullName,
-      };
-
+      const authInfoData = await loginWithCredentials(email, password);
+      
       setAuthInfo(authInfoData);
 
       // Check if user needs to complete 2FA setup
@@ -77,10 +51,10 @@ export function Login() {
       // First, send to 2FA setup
       // result.requires2FASetup)
 
-      if (!decoded.email) {
+      if (!authInfoData.email) {
         navigate("/2fa/setup");
       } else {
-        const dashboardRoute = getDashboardRoute(decoded.role);
+        const dashboardRoute = getDashboardRoute(authInfoData.role);
         navigate(dashboardRoute);
       }
     } catch (error) {

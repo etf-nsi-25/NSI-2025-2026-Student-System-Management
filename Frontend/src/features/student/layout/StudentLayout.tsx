@@ -1,5 +1,5 @@
 // src/features/student/layout/StudentLayout.tsx
-import { Outlet, NavLink } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import {
     CSidebar,
     CSidebarBrand,
@@ -24,11 +24,28 @@ import {
 import { useAuthContext } from '../../../init/auth';
 import logo from '../../../assets/images/login/unsa-sms-logo.png';
 import './StudentLayout.css';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { logoutFromServer, resetAuthInfo } from '../../../utils/authUtils';
+
 
 export function StudentLayout() {
-    const { authInfo, logout } = useAuthContext();
+    const { authInfo, setAuthInfo } = useAuthContext();
     const [sidebarOpen, setSidebarOpen] = useState(true);
+    const navigate = useNavigate();
+
+
+    const logout = useCallback(async () => {
+
+        try {
+            await logoutFromServer();
+        } catch (err) {
+            console.warn("Server logout failed, clearing client session anyway");
+        }
+
+        resetAuthInfo(setAuthInfo);
+
+        navigate('/login');
+    }, [navigate, setAuthInfo]);
 
     return (
         <div className="student-portal-wrapper">

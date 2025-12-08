@@ -12,6 +12,63 @@ interface RefreshResponse {
  * @returns Updated AuthInfo with new access token
  * @throws Error if refresh fails
  */
+
+export async function loginWithCredentials(email: string, password: string): Promise<AuthInfo> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+      credentials: 'include', // Include HTTP-only cookies
+    });
+    if (!response.ok) {
+      console.warn('Login failed:', response.status);
+      throw new Error('Login failed');
+    }
+    const data : RefreshResponse = await response.json();
+    // Decode JWT to extract claims
+    const decoded = jwtDecode<AccessToken>(data.accessToken);
+    const authInfo: AuthInfo = {
+      accessToken: data.accessToken,
+      expiresOn: decoded.exp * 1000,
+      email: decoded.email,
+      userId: decoded.userId,
+      role: decoded.role,
+      tenantId: decoded.tenantId,
+      fullName: decoded.fullName,
+    };
+    return authInfo;
+  } catch (error) {
+
+    console.error('Login error:', error);
+    throw error;
+  }
+};
+
+export async function logoutFromServer(): Promise<void> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Include HTTP-only cookies
+    });
+
+    console.log('Logout response status:', response.status);
+
+    if (!response.ok) {
+      console.warn('Logout failed:', response.status);
+      throw new Error('Logout failed');
+    }
+  } catch (error) {
+    console.error('Logout error:', error);
+    throw error;
+  }
+}
+
 export async function attemptSilentRefresh(): Promise<AuthInfo> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {

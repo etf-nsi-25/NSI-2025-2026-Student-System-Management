@@ -28,7 +28,6 @@ export interface AuthInfo {
 export interface AuthContextData {
     authInfo?: AuthInfo,
     setAuthInfo: (authInfo: AuthInfo | undefined) => void;
-    logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData)
@@ -61,11 +60,6 @@ export function Authentication({ children }: PropsWithChildren<object>) {
         }
     }, []);
 
-    const logout = useCallback(() => {
-        resetAuthInfo(setAuthInfoState);
-        
-        navigate('/login');
-    }, [navigate]);
 
     const refreshToken = useCallback(async () => {
         try {
@@ -88,7 +82,7 @@ export function Authentication({ children }: PropsWithChildren<object>) {
     }, [authInfo, refreshToken]);
 
     return (
-        <AuthContext.Provider value={{ authInfo, setAuthInfo, logout }}>
+        <AuthContext.Provider value={{ authInfo, setAuthInfo }}>
             { children }
         </AuthContext.Provider>
     )
