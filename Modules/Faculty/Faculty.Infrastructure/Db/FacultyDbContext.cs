@@ -19,11 +19,18 @@ public class FacultyDbContext : DbContext
         _currentFacultyId = _tenantService.GetCurrentFacultyId();
     }
 
-    /// <summary>
-    /// Gets the current Faculty ID that was resolved during context instantiation.
-    /// This value is used in query filters and can be properly translated to SQL.
-    /// </summary>
-    private Guid CurrentFacultyId => _currentFacultyId;
+	public FacultyDbContext(DbContextOptions<FacultyDbContext> options)
+		: base(options)
+	{
+		// Za migracije nam tenant ne treba – filteri će koristiti Guid.Empty
+		_currentFacultyId = Guid.Empty;
+	}
+
+	/// <summary>
+	/// Gets the current Faculty ID that was resolved during context instantiation.
+	/// This value is used in query filters and can be properly translated to SQL.
+	/// </summary>
+	private Guid CurrentFacultyId => _currentFacultyId;
 
     // DbSets
     public DbSet<Teacher> Teachers { get; set; } = null!;

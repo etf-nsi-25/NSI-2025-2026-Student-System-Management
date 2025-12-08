@@ -13,12 +13,13 @@ using Faculty.Core.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+const string CorsPolicyName = "ReactDevClient";
 
 // Add services from modules
 builder.Services.AddIdentityModule(builder.Configuration);
-builder.Services.AddUniversityModule();
+builder.Services.AddUniversityModule(builder.Configuration);
 builder.Services.AddFacultyModule(builder.Configuration);
-builder.Services.AddSupportModule();
+builder.Services.AddSupportModule(builder.Configuration);
 builder.Services.AddNotificationsModule();
 builder.Services.AddAnalyticsModule();
 
@@ -39,6 +40,18 @@ foreach (var asm in moduleControllers)
 {
     mvcBuilder.PartManager.ApplicationParts.Add(new Microsoft.AspNetCore.Mvc.ApplicationParts.AssemblyPart(asm));
 }
+
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy(CorsPolicyName, policy =>
+	{
+		policy
+			.WithOrigins("http://localhost:5173")  
+			.AllowAnyHeader()
+			.AllowAnyMethod()
+		    .AllowCredentials();   
+	});
+});
 
 // Add Swagger
 builder.Services.AddEndpointsApiExplorer();
