@@ -1,9 +1,8 @@
-﻿using System.Threading.Tasks;
-using Common.Infrastructure.Repositories;
+﻿using Common.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using University.Infrastructure.Db;
 using University.Core.Interfaces;
-using University.Infrastructure.Entities;
+using University.Core.Entities;
 
 namespace University.Infrastructure.Repositories
 {
@@ -21,9 +20,23 @@ namespace University.Infrastructure.Repositories
             if (string.IsNullOrWhiteSpace(code))
                 return null;
 
-            return await _context.Faculties
+            var faculty = await _context.Faculties
                 .AsNoTracking()
                 .FirstOrDefaultAsync(f => f.Code == code);
+
+            if (faculty == null)
+                return null;
+
+            return new Faculty
+            {
+                Id = faculty.Id,
+                Name = faculty.Name,
+                Address = faculty.Address,
+                Code = faculty.Code,
+                Description = faculty.Description,
+                EstablishedDate = faculty.EstablishedDate,
+                DeanName = faculty.DeanName,
+            };
         }
     }
 }

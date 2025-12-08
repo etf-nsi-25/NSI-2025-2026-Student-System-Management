@@ -1,9 +1,8 @@
-﻿using System.Threading.Tasks;
-using Common.Infrastructure.Repositories;
+﻿using Common.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using University.Infrastructure.Db;
 using University.Core.Interfaces;
-using University.Infrastructure.Entities;
+using University.Core.Entities;
 
 namespace University.Infrastructure.Repositories
 {
@@ -18,9 +17,21 @@ namespace University.Infrastructure.Repositories
 
         public async Task<AcademicYear?> GetActiveAcademicYearAsync()
         {
-            return await _context.AcademicYears
+            var entity = await _context.AcademicYears
                 .AsNoTracking()
                 .FirstOrDefaultAsync(ay => ay.IsActive);
+
+            if (entity == null)
+                return null;
+
+            return new AcademicYear
+            {
+                Id = entity.Id,
+                Year = entity.Year,
+                StartDate = entity.StartDate,
+                EndDate = entity.EndDate,
+                IsActive = entity.IsActive,
+            };
         }
     }
 }

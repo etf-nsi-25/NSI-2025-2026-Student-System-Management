@@ -4,6 +4,7 @@ using Notifications.Infrastructure;
 using Analytics.Infrastructure;
 using Identity.Infrastructure.DependencyInjection;
 using Faculty.Infrastructure.DependencyInjection;
+using University.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 const string CorsPolicyName = "ReactDevClient";

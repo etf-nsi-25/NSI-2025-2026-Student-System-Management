@@ -1,22 +1,14 @@
-<<<<<<< HEAD
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using University.Infrastructure.Db;
 using Microsoft.EntityFrameworkCore;
 using University.Core.Interfaces;
 using University.Infrastructure.Repositories;
-=======
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using University.Infrastructure.Db;
->>>>>>> 28ad086ec194b0f4e021dae55008bf0e637ee75d
 
 namespace University.Infrastructure
 {
     public static class ServiceCollectionExtensions
     {
-<<<<<<< HEAD
         public static IServiceCollection AddUniversityModule(
             this IServiceCollection services,
             IConfiguration configuration)
@@ -42,13 +34,3 @@ namespace University.Infrastructure
         }
     }
 }
-=======
-		public static IServiceCollection AddUniversityModule(this IServiceCollection services, IConfiguration configuration)
-		{
-			services.AddDbContext<UniversityDbContext>(options =>
-				options.UseNpgsql(configuration.GetConnectionString("Database")));
-			return services;
-		}
-	}
-}
->>>>>>> 28ad086ec194b0f4e021dae55008bf0e637ee75d

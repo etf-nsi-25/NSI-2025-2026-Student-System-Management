@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using University.Infrastructure.Db;
 using University.Core.Interfaces;
-using University.Infrastructure.Entities;
+using University.Core.Entities;
 
 namespace University.Infrastructure.Repositories
 {
@@ -17,10 +17,21 @@ namespace University.Infrastructure.Repositories
 
         public async Task<IEnumerable<Program>> GetAllByDepartmentIdAsync(Guid departmentId)
         {
-            return await _context.Programs
+            var programs = await _context.Programs
                 .AsNoTracking()
                 .Where(p => p.DepartmentId == departmentId)
                 .ToListAsync();
+
+            return programs.Select(p => new Program
+            {
+                Id = p.Id,
+                DepartmentId = p.DepartmentId,
+                Name = p.Name,
+                Code = p.Code,
+                DegreeType = p.DegreeType,
+                DurationYears = p.DurationYears,
+                Credits = p.Credits,
+            });
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using Common.Core.Interfaces;
-using University.Infrastructure.Entities;
+﻿using Common.Core.Interfaces.Repsitories;
+using University.Core.Entities;
 
 namespace University.Core.Interfaces
 {

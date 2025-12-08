@@ -5,13 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
+  
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\Common.API\Common.API.csproj" />
-    <ProjectReference Include="..\..\Common\Common.Application\Common.Application.csproj" />
-    <ProjectReference Include="..\..\Common\Common.Core\Common.Core.csproj" />
     <ProjectReference Include="..\..\Common\Common.Infrastructure\Common.Infrastructure.csproj" />
-	<ProjectReference Include="..\..\University\University.Infrastructure\University.Infrastructure.csproj" />
   </ItemGroup>
-
 </Project>

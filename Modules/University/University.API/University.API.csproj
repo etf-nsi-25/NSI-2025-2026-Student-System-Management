@@ -13,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\University.Core\University.Infrastructure.csproj" />
-    <ProjectReference Include="..\University.Application\University.Application.csproj" />
+    <ProjectReference Include="..\University.Core\University.Core.csproj" />
+    <ProjectReference Include="..\University.Infrastructure\University.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

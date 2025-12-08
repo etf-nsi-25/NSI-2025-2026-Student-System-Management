@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Common.Infrastructure.Repositories;
+﻿using Common.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using University.Infrastructure.Db;
 using University.Core.Interfaces;
-using University.Infrastructure.Entities;
+using University.Core.Entities;
 
 namespace University.Infrastructure.Repositories
 {
@@ -20,10 +17,19 @@ namespace University.Infrastructure.Repositories
 
         public async Task<IEnumerable<Department>> GetAllByFacultyIdAsync(Guid facultyId)
         {
-            return await _context.Departments
+            var entities = await _context.Departments
                 .AsNoTracking()
                 .Where(d => d.FacultyId == facultyId)
                 .ToListAsync();
+
+            return entities.Select(d => new Department
+            {
+                Id = d.Id,
+                FacultyId = d.FacultyId,
+                Name = d.Name,
+                Code = d.Code,
+                HeadOfDepartment = d.HeadOfDepartment,
+            });
         }
     }
 }
