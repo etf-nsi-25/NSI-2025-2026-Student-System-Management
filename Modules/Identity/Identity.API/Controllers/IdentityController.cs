@@ -1,15 +1,12 @@
 ﻿using Identity.Application.Services;
 using Microsoft.AspNetCore.Mvc;
-using Identity.Core.DTO; 
-using Identity.Core.Enums; 
-using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http; 
+using Identity.Core.DTO;
+using Identity.Core.Enums;
 
 namespace Identity.API.Controllers
 {
     [ApiController]
-    [Route("api/users")] 
+    [Route("api/users")]
     public class IdentityController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -37,38 +34,39 @@ namespace Identity.API.Controllers
                     request.Password,
                     request.FirstName,
                     request.LastName,
+                    request.Email,
                     request.FacultyId,
                     request.IndexNumber,
                     request.Role
                 );
 
                 return CreatedAtAction(
-                    nameof(GetUserById), 
-                    new { userId = userId }, 
-                    new UserResponse 
-                    { 
-                        Id = userId, 
+                    nameof(GetUserById),
+                    new { userId = userId },
+                    new UserResponse
+                    {
+                        Id = userId,
                         Username = request.Username,
-                        FirstName = request.FirstName, 
-                        LastName = request.LastName, 
+                        FirstName = request.FirstName,
+                        LastName = request.LastName,
                         IndexNumber = request.IndexNumber,
                         Role = request.Role,
                         FacultyId = request.FacultyId,
-                        Status = UserStatus.Active 
+                        Status = UserStatus.Active
                     }
                 );
             }
-            catch (InvalidOperationException ex) 
+            catch (InvalidOperationException ex)
             {
                 return BadRequest(new { Error = ex.Message });
             }
             catch (ArgumentException ex) when (ex.ParamName == "username")
             {
-                return Conflict(new { Error = "Username already exists." }); 
+                return Conflict(new { Error = "Username already exists." });
             }
             catch (Exception)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { Error = "An unexpected error occurred. Please try again." });           
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Error = "An unexpected error occurred. Please try again." });
             }
         }
 
@@ -94,13 +92,13 @@ namespace Identity.API.Controllers
             {
                 return BadRequest(ModelState);
             }
-            
+
             var usersList = await _userService.GetAllUsersAsync(filter);
             return Ok(usersList);
         }
 
         [HttpPut("{userId:guid}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)] 
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdateUser(Guid userId, [FromBody] UpdateUserRequest request)
@@ -116,10 +114,10 @@ namespace Identity.API.Controllers
 
                 if (!result)
                 {
-                    return NotFound(); 
+                    return NotFound();
                 }
 
-                return NoContent(); 
+                return NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -139,19 +137,19 @@ namespace Identity.API.Controllers
         {
             try
             {
-                
+
                 var result = await _userService.DeactivateUserAsync(userId);
 
                 if (!result)
                 {
-                    return NotFound(); 
+                    return NotFound();
                 }
-                
-                return NoContent(); 
+
+                return NoContent();
             }
-            catch (InvalidOperationException ex) 
+            catch (InvalidOperationException ex)
             {
-                return BadRequest(new { Error = ex.Message }); 
+                return BadRequest(new { Error = ex.Message });
             }
             catch (Exception)
             {
@@ -174,9 +172,9 @@ namespace Identity.API.Controllers
                     return NotFound();
                 }
 
-                return NoContent(); 
+                return NoContent();
             }
-            catch (InvalidOperationException ex) 
+            catch (InvalidOperationException ex)
             {
                 return BadRequest(new { Error = ex.Message });
             }

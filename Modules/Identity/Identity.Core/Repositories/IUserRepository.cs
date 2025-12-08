@@ -1,7 +1,6 @@
 using Identity.Core.Entities;
 using Identity.Core.DTO;
 
-
 namespace Identity.Core.Repositories;
 
 public interface IUserRepository
@@ -20,5 +19,5 @@ public interface IUserRepository
     Task<IReadOnlyList<User>> GetAllFilteredAsync(UserFilterRequest filter);
 
     Task<int> CountAsync(UserFilterRequest filter);
-    
+    Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken);
 }
