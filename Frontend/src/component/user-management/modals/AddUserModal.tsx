@@ -10,8 +10,11 @@ interface AddUserModalProps {
 
 export default function AddUserModal({ onClose, onAdd }: AddUserModalProps) {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
+    firstName: '',
+    lastName: '',
+    username: '',
+    password: '',
+    indexNumber: '',
     role: 'Professor',
     faculty: 'ETF UNSA',
     lastActive: 'Today',
@@ -19,7 +22,7 @@ export default function AddUserModal({ onClose, onAdd }: AddUserModalProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email) {
+    if (!formData.username || !formData.password) {
       alert('Please fill all required fields');
       return;
     }
@@ -32,22 +35,42 @@ export default function AddUserModal({ onClose, onAdd }: AddUserModalProps) {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-semibold mb-2">Full Name:</label>
+          <label className="block text-sm font-semibold mb-2">First Name:</label>
           <input
             type="text"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            value={formData.firstName}
+            onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
             className="w-full px-4 py-2 border border-gray-300 rounded text-sm"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold mb-2">Email Address:</label>
+          <label className="block text-sm font-semibold mb-2">Last Name:</label>
           <input
-            type="email"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            type="text"
+            value={formData.lastName}
+            onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+            className="w-full px-4 py-2 border border-gray-300 rounded text-sm"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold mb-2">Username:</label>
+          <input
+            type="text"
+            value={formData.username}
+            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+            className="w-full px-4 py-2 border border-gray-300 rounded text-sm"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold mb-2">Password:</label>
+          <input
+            type="password"
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             className="w-full px-4 py-2 border border-gray-300 rounded text-sm"
             required
           />
@@ -77,7 +100,17 @@ export default function AddUserModal({ onClose, onAdd }: AddUserModalProps) {
             <option>ETF UNSA</option>
           </select>
         </div>
-
+        {formData.role === 'Student' && (
+          <div>
+            <label className="block text-sm font-semibold mb-2">Index Number:</label>
+            <input
+              type="text"
+              value={formData.indexNumber}
+              onChange={(e) => setFormData({ ...formData, indexNumber: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded text-sm"
+            />
+          </div>
+        )}
         <div className="flex gap-3 justify-end mt-6">
           <button
             type="button"

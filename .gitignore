@@ -115,3 +115,9 @@ _ReSharper*/
 
 # Optional: Ignore secrets if you use user secrets
 **/secrets.json
+
+# Local Docker
+Deployment/local/.pgdata/
+
+# SSL certificates
+Frontend/certs/

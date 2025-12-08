@@ -1,7 +1,3 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-
 // Import module DI namespaces
 using Identity.Infrastructure;
 using University.Infrastructure;
@@ -10,14 +6,20 @@ using Support.Infrastructure;
 using Notifications.Infrastructure;
 using Analytics.Infrastructure;
 using Identity.Infrastructure.DependencyInjection;
+using Faculty.Infrastructure.DependencyInjection;
+using Faculty.Infrastructure.Db;
+using Faculty.Core.Interfaces;
+using Faculty.Core.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+const string CorsPolicyName = "ReactDevClient";
 
 // Add services from modules
 builder.Services.AddIdentityModule(builder.Configuration);
-builder.Services.AddUniversityModule();
-builder.Services.AddFacultyModule();
-builder.Services.AddSupportModule();
+builder.Services.AddUniversityModule(builder.Configuration);
+builder.Services.AddFacultyModule(builder.Configuration);
+builder.Services.AddSupportModule(builder.Configuration);
 builder.Services.AddNotificationsModule();
 builder.Services.AddAnalyticsModule();
 
@@ -39,14 +41,45 @@ foreach (var asm in moduleControllers)
     mvcBuilder.PartManager.ApplicationParts.Add(new Microsoft.AspNetCore.Mvc.ApplicationParts.AssemblyPart(asm));
 }
 
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy(CorsPolicyName, policy =>
+	{
+		policy
+			.WithOrigins("http://localhost:5173")  
+			.AllowAnyHeader()
+			.AllowAnyMethod()
+		    .AllowCredentials();   
+	});
+});
+
 // Add Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// CORS Configuration for aggregated host - allow frontend dev server
+var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.WithOrigins(allowedOrigins!)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
 
 var app = builder.Build();
 
 // Middleware
 app.UseHttpsRedirection();
+
+// Ensure routing is enabled before applying CORS so the middleware can handle preflight requests correctly
+app.UseRouting();
+app.UseCors("CorsPolicy");
+
 app.UseAuthentication();
 app.UseAuthorization();
 

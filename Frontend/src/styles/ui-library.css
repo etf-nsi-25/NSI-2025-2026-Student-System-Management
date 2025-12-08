@@ -1,0 +1,353 @@
+/* ==========================================================================
+   Global UI library (theme layer za CoreUI)
+
+   Ideja:
+   - CoreUI komponentama (CCard, CButton, CAlert, CFormInput...)
+     dajemo .ui-* klase da sve stranice izgledaju konzistentno.
+   - Ovaj fajl importuješ jednom (npr. u main.tsx ili App.tsx),
+     a onda u kodu kombinujemo:
+       <CButton color="primary" className="ui-button-cta">...</CButton>
+
+   Rezultat:
+   - Struktura i behavior iz CoreUI
+   - Izgled i "brand" iz ovih ui-* klasa
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. Design Tokens (colors, radii, shadows, typography)
+   - Centralno mjesto za temu (dark background, accent boje, radius, shadow…)
+   - Ako se ikad radi redesign, prvo se diraju ovi tokeni.
+   ========================================================================== */
+
+   :root {
+    --ui-bg-main: #050509;
+    --ui-bg-gradient-dark: radial-gradient(
+      circle at top left,
+      #1a1b27 0,
+      #050509 40%,
+      #050509 100%
+    );
+  
+    --ui-surface-glass: rgba(15, 15, 24, 0.75);
+    --ui-border-strong: rgba(255, 255, 255, 0.12);
+    --ui-border-soft: rgba(255, 255, 255, 0.06);
+  
+    --ui-accent: #4f9cff;
+    --ui-accent-soft: rgba(79, 156, 255, 0.18);
+    --ui-accent-strong: #61d0ff;
+  
+    --ui-text-main: #f5f5f7;
+    --ui-text-muted: #9a9aaf;
+  
+    --ui-error: #ff5c7a;
+    --ui-success: #3ad99f;
+  
+    --ui-radius-xl: 28px;
+    --ui-radius-lg: 20px;
+  
+    --ui-shadow-soft: 0 24px 80px rgba(0, 0, 0, 0.7);
+    --ui-glass-blur: 28px;
+  }
+  
+  
+  /* ==========================================================================
+     2. Page layout helpers
+     - Wrapper za cijele ekrane (npr. 2FA, login, wizard).
+     - Koristi se zajedno sa CoreUI gridom unutar:
+         <div className="ui-page-center">
+           <CCard className="ui-surface-glass-card">...</CCard>
+         </div>
+     ========================================================================== */
+  
+  .ui-page-center {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    background: var(--ui-bg-gradient-dark);
+    color: var(--ui-text-main);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+      "Segoe UI", sans-serif;
+  }
+  
+  
+  /* ==========================================================================
+     3. Glass surface (cards / panels)
+     - Skin za CoreUI kartice/panele koji treba da izgledaju kao 2FA panel.
+     - Primjer:
+         <CCard className="ui-surface-glass-card">
+           ...
+         </CCard>
+     ========================================================================== */
+  
+  .ui-surface-glass-card {
+    width: 100%;
+    border-radius: var(--ui-radius-xl);
+    background:
+      linear-gradient(
+        140deg,
+        rgba(255, 255, 255, 0.06),
+        rgba(255, 255, 255, 0.02)
+      ),
+      var(--ui-surface-glass);
+    backdrop-filter: blur(var(--ui-glass-blur));
+    box-shadow: var(--ui-shadow-soft);
+    border: 1px solid var(--ui-border-strong);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .ui-surface-glass-card::before {
+    content: "";
+    position: absolute;
+    inset: -120px;
+    background: radial-gradient(
+      circle at top right,
+      rgba(97, 208, 255, 0.16),
+      transparent 55%
+    );
+    opacity: 0.9;
+    pointer-events: none;
+  }
+  
+  .ui-surface-glass-card::after {
+    content: "";
+    position: absolute;
+    inset: -60px;
+    background: radial-gradient(
+      circle at bottom left,
+      rgba(131, 88, 255, 0.22),
+      transparent 60%
+    );
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  
+  .ui-surface-glass-card > * {
+    position: relative;
+    z-index: 1;
+  }
+  
+  
+  /* ==========================================================================
+     4. Badges (labels za status, step indikatore itd.)
+     - Koristi se direktno sa CoreUI <CBadge> ili običnim span-om:
+         <CBadge className="ui-badge ui-badge-soft">Security</CBadge>
+         <CBadge className="ui-badge ui-badge-primary">STEP 1 · ENABLE 2FA</CBadge>
+     ========================================================================== */
+  
+  .ui-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+  }
+  
+  .ui-badge-soft {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--ui-border-soft);
+    color: var(--ui-text-muted);
+  }
+  
+  .ui-badge-primary {
+    background: var(--ui-accent-soft);
+    border-color: rgba(79, 156, 255, 0.45);
+    color: var(--ui-accent-strong);
+  }
+  
+  
+  /* ==========================================================================
+     5. Alerts (success / error poruke)
+     - Namijenjeno da se koristi sa CoreUI <CAlert>:
+         <CAlert color="danger" className="ui-alert ui-alert-error">...</CAlert>
+         <CAlert color="success" className="ui-alert ui-alert-success">...</CAlert>
+     ========================================================================== */
+  
+  .ui-alert {
+    font-size: 12px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+  }
+  
+  .ui-alert-error {
+    background: rgba(255, 92, 122, 0.08);
+    border-color: rgba(255, 92, 122, 0.4);
+    color: var(--ui-error);
+  }
+  
+  .ui-alert-success {
+    background: rgba(58, 217, 159, 0.08);
+    border-color: rgba(58, 217, 159, 0.45);
+    color: var(--ui-success);
+  }
+  
+  
+  /* ==========================================================================
+     6. Primary CTA button
+     - Glavni “call to action” stil koji se lijepi na CoreUI dugme.
+     - Primjer:
+         <CButton className="ui-button-cta" color="primary">Confirm</CButton>
+     - Može i na <button>, ali ideja je da se koristi uz CButton.
+     ========================================================================== */
+  
+  .ui-button-cta {
+    padding: 11px 16px;
+    border-radius: 999px;
+    border: none;
+    background: radial-gradient(circle at top left, #61d0ff, #4f9cff);
+    color: #030308;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 18px 40px rgba(79, 156, 255, 0.6);
+    transition:
+      transform 0.12s ease,
+      box-shadow 0.12s ease,
+      filter 0.12s ease,
+      opacity 0.12s ease;
+  }
+  
+  .ui-button-cta:disabled {
+    opacity: 0.65;
+    cursor: default;
+    box-shadow: 0 10px 24px rgba(79, 156, 255, 0.4);
+  }
+  
+  .ui-button-cta:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 22px 48px rgba(79, 156, 255, 0.75);
+    filter: brightness(1.05);
+  }
+  
+  .ui-button-cta:not(:disabled):active {
+    transform: translateY(0);
+    box-shadow: 0 14px 32px rgba(79, 156, 255, 0.6);
+  }
+  
+  
+  /* ==========================================================================
+     7. OTP / 6-digit code input
+     - Izgled za verifikacijski kod (2FA, reset lozinke, sl.).
+     - Tipično se koristi sa <CFormInput>:
+         <CFormInput className="ui-input-otp" maxLength={6} ... />
+     ========================================================================== */
+  
+  .ui-input-otp {
+    padding: 12px 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(3, 3, 10, 0.8);
+    color: var(--ui-text-main);
+    font-size: 20px;
+    letter-spacing: 0.4em;
+    text-align: center;
+    outline: none;
+    transition:
+      border-color 0.15s ease,
+      background 0.15s ease,
+      box-shadow 0.15s ease,
+      transform 0.05s ease;
+  }
+  
+  .ui-input-otp::placeholder {
+    color: rgba(255, 255, 255, 0.18);
+  }
+  
+  .ui-input-otp:focus {
+    border-color: var(--ui-accent);
+    background: rgba(3, 3, 12, 0.95);
+    box-shadow: 0 0 0 1px rgba(79, 156, 255, 0.45);
+    transform: translateY(-1px);
+  }
+  
+  
+  /* ==========================================================================
+     8. Typography helpers
+     - Standardizirane heading i “muted” tekst klase.
+     - Koristi se i uz CoreUI i uz plain HTML:
+         <h1 className="ui-heading-lg">Title</h1>
+         <p className="ui-text-muted">Helper text</p>
+     ========================================================================== */
+  
+  .ui-heading-lg {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  
+  .ui-heading-md {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
+  
+  .ui-text-muted {
+    color: var(--ui-text-muted);
+  }
+  
+  .ui-text-caption {
+    font-size: 11px;
+    color: var(--ui-text-muted);
+  }
+  
+  
+  /* ==========================================================================
+     9. Form field layout & base input
+     - Layout + bazni stil za form polja.
+     - Koristi se npr. sa CoreUI inputima:
+         <div className="ui-form-field">
+           <CFormLabel className="ui-field-label">Email</CFormLabel>
+           <CFormInput className="ui-input-base" ... />
+         </div>
+     ========================================================================== */
+  
+  .ui-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .ui-field-label {
+    font-size: 12px;
+    color: var(--ui-text-muted);
+  }
+  
+  .ui-input-base {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(3, 3, 10, 0.8);
+    color: var(--ui-text-main);
+    font-size: 14px;
+    outline: none;
+    transition:
+      border-color 0.15s ease,
+      background 0.15s ease,
+      box-shadow 0.15s ease,
+      transform 0.05s ease;
+  }
+  
+  .ui-input-base::placeholder {
+    color: rgba(255, 255, 255, 0.26);
+  }
+  
+  .ui-input-base:focus {
+    border-color: var(--ui-accent);
+    background: rgba(3, 3, 12, 0.95);
+    box-shadow: 0 0 0 1px rgba(79, 156, 255, 0.45);
+    transform: translateY(-1px);
+  }
+  

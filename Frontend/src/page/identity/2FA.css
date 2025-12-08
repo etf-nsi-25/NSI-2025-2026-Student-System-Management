@@ -1,0 +1,259 @@
+/* ==========================================================================
+   2FA page styles
+   - Uses global design tokens & components from ui-library.css (.ui-*)
+   - This file only defines 2FA-specific layout and tweaks.
+   ========================================================================== */
+
+/* Full-page background for the 2FA screen */
+.twofa-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    background: var(--ui-bg-gradient-dark);
+    color: var(--ui-text-main);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+}
+
+/* Card container
+   - Combined with .ui-surface-glass-card to get glassmorphism look.
+   - Example: <div className="twofa-card ui-surface-glass-card">...</div>
+*/
+.twofa-card {
+    width: 100%;
+    max-width: 960px;
+    border-radius: var(--ui-radius-xl);
+    /* keep same gradient as original design */
+    background:
+        linear-gradient(
+            140deg,
+            rgba(255, 255, 255, 0.06),
+            rgba(255, 255, 255, 0.02)
+        ),
+        var(--ui-surface-glass);
+    backdrop-filter: blur(var(--ui-glass-blur));
+    box-shadow: var(--ui-shadow-soft);
+    border: 1px solid var(--ui-border-strong);
+    padding: 28px 28px 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* glow layers – copied from original, keep exact look */
+.twofa-card::before {
+    content: "";
+    position: absolute;
+    inset: -120px;
+    background: radial-gradient(
+        circle at top right,
+        rgba(97, 208, 255, 0.16),
+        transparent 55%
+    );
+    opacity: 0.9;
+    pointer-events: none;
+}
+
+.twofa-card::after {
+    content: "";
+    position: absolute;
+    inset: -60px;
+    background: radial-gradient(
+        circle at bottom left,
+        rgba(131, 88, 255, 0.22),
+        transparent 60%
+    );
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.twofa-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Header section
+   -------------------------------------------------------------------------- */
+
+.twofa-header {
+    margin-bottom: 24px;
+}
+
+.twofa-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+/* title/subtitle match Figma design */
+.twofa-title {
+    margin: 0 0 6px;
+    font-size: 26px;
+    letter-spacing: 0.01em;
+}
+
+.twofa-subtitle {
+    margin: 0;
+    font-size: 14px;
+    color: var(--ui-text-muted);
+    max-width: 520px;
+}
+
+/* --------------------------------------------------------------------------
+   Main layout – left (QR + manual key) / right (form)
+   -------------------------------------------------------------------------- */
+
+.twofa-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr);
+    gap: 24px;
+}
+
+.twofa-left {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* --------------------------------------------------------------------------
+   Left side: QR code + manual key
+   -------------------------------------------------------------------------- */
+
+.twofa-qr-wrapper {
+    border-radius: var(--ui-radius-lg);
+    padding: 16px;
+    background:
+        radial-gradient(
+            circle at top,
+            rgba(97, 208, 255, 0.22),
+            transparent 60%
+        ),
+        rgba(0, 0, 0, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.twofa-qr {
+    width: 210px;
+    height: 210px;
+    border-radius: 16px;
+    background: #fff;
+    padding: 10px;
+}
+
+.twofa-manual {
+    border-radius: var(--ui-radius-lg);
+    padding: 12px 14px;
+    border: 1px solid var(--ui-border-soft);
+    background: rgba(6, 6, 12, 0.75);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.twofa-manual-label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ui-text-muted);
+}
+
+.twofa-manual-value {
+    font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+    font-size: 14px;
+    letter-spacing: 0.14em;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.twofa-manual-hint {
+    font-size: 11px;
+    color: var(--ui-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Right side: form container
+   - Inside use:
+       ui-input-otp      -> for the 6-digit input
+       ui-alert-*        -> for messages
+       ui-button-cta     -> for primary CTA
+   -------------------------------------------------------------------------- */
+
+.twofa-right {
+    display: flex;
+    align-items: stretch;
+}
+
+.twofa-form {
+    width: 100%;
+    border-radius: var(--ui-radius-lg);
+    padding: 16px 18px 14px;
+    border: 1px solid var(--ui-border-soft);
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.05),
+            rgba(255, 255, 255, 0.01)
+        ),
+        rgba(10, 10, 18, 0.8);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.twofa-label {
+    font-size: 12px;
+    color: var(--ui-text-muted);
+}
+
+/* Button uses ui-button-cta for visual style; this keeps spacing. */
+.twofa-button {
+    margin-top: 2px;
+}
+
+.twofa-footer-text {
+    font-size: 11px;
+    color: var(--ui-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Loading / top-level error states (when there is no data yet)
+   -------------------------------------------------------------------------- */
+
+.twofa-loading,
+.twofa-error {
+    font-size: 14px;
+    text-align: center;
+}
+
+.twofa-error {
+    color: var(--ui-error);
+}
+
+/* --------------------------------------------------------------------------
+   Responsive tweaks
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 840px) {
+    .twofa-card {
+        padding: 22px 18px 18px;
+        border-radius: 22px;
+    }
+
+    .twofa-body {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .twofa-qr {
+        width: 180px;
+        height: 180px;
+    }
+}
