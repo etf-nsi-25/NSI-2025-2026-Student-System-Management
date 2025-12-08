@@ -20,7 +20,50 @@ public class AuthController : ControllerBase
         _logger = logger;
     }
 
-
+    /// <summary>
+    /// Authenticates a user using email and password.
+    /// Returns a JWT access token and sets an HTTP-only refresh token cookie if credentials are valid.
+    /// </summary>
+    /// <remarks>
+    /// ## Example request:
+    /// 
+    ///     {
+    ///         "email": "student@example.com",
+    ///         "password": "Password123!"
+    ///     }
+    ///
+    /// ## Example successful response (200):
+    ///
+    ///     {
+    ///         "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    ///         "tokenType": "Bearer"
+    ///     }
+    ///
+    /// The refresh token is NOT included in the JSON body.
+    /// It is sent as an HTTP-only secure cookie named <c>refreshToken</c>.
+    ///
+    /// ## Example invalid credentials (401):
+    ///
+    ///     {
+    ///         "message": "Invalid email or password"
+    ///     }
+    ///
+    /// ## Example validation error (400):
+    ///
+    ///     {
+    ///         "email": [ "The Email field is required." ]
+    ///     }
+    ///
+    /// ## Example internal error (500):
+    ///
+    ///     {
+    ///         "message": "An error occurred during login"
+    ///     }
+    /// </remarks>
+    /// <response code="200">User successfully authenticated. Returns access token.</response>
+    /// <response code="400">Invalid request body or missing required fields.</response>
+    /// <response code="401">Invalid email or password.</response>
+    /// <response code="500">Unexpected error during authentication.</response>
     [HttpPost("login")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
