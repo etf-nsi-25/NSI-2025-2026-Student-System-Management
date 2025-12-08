@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Identity.Core.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,13 +12,16 @@ namespace University.Infrastructure.Entities
         public Guid Id { get; set; }
         public Guid FacultyId { get; set; }
         public string Name { get; set; } = default!;
-        public string Code { get; set; } = default!;
-        public string? HeadOfDepartment { get; set; }
+        public string Code { get; set; } = default!; 
+        public Guid? HeadOfDepartmentId { get; set; }
+
+        // Navigation property
+        public User? HeadOfDepartment { get; set; }
 
         public Faculty Faculty { get; set; } = default!;
         public ICollection<Program> Programs { get; set; } = new List<Program>();
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
     }
 }
