@@ -1,19 +1,47 @@
 import type { PropsWithChildren } from 'react';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { attemptSilentRefresh } from '../utils/authUtils.ts';
+import { resetAuthInfo } from '../utils/authUtils.ts';
+
+export interface AccessToken {
+  iat: number;
+  exp: number;
+  jti: string;
+  userId: string;
+  email: string;
+  role: string;
+  tenantId: string;
+  fullName: string;
+}
 
 export interface AuthInfo {
     accessToken: string,
-    expiresOn: Date,
-    // TODO probably add user info like username here
+    expiresOn: number,
+    userId: string,
+    email: string,
+    role: string,
+    tenantId: string,
+    fullName: string,
 }
 
 export interface AuthContextData {
     authInfo?: AuthInfo,
-    setAuthInfo: (authInfo: AuthInfo) => void;
+    setAuthInfo: (authInfo: AuthInfo | undefined) => void;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData)
+
+const getInitialAuthInfo = (): AuthInfo | undefined => {
+    try {
+        const stored = localStorage.getItem('authInfo');
+        if (stored) {
+            return JSON.parse(stored);
+        }
+    } catch (error) {
+    }
+    return undefined;
+};
 
 // TODO: use this to import this auth context into /login page, and use setAuthInfo after fetching from backend
 // Then the initial data (default-token) should be removed
@@ -22,17 +50,36 @@ export function useAuthContext() {
 }
 
 export function Authentication({ children }: PropsWithChildren<object>) {
-    const [authInfo, setAuthInfo] = useState<AuthInfo>({ accessToken: 'default-token', expiresOn: new Date() })
-    const navigate = useNavigate()
+    const [authInfo, setAuthInfoState] = useState<AuthInfo | undefined>(getInitialAuthInfo)
+    const navigate = useNavigate();
+
+    const setAuthInfo = useCallback((newAuthInfo: AuthInfo | undefined) => {
+        setAuthInfoState(newAuthInfo);
+        if(newAuthInfo) {
+          localStorage.setItem('authInfo', JSON.stringify(newAuthInfo));
+        }
+    }, []);
+
+
+    const refreshToken = useCallback(async () => {
+        try {
+            const newAuthInfo = await attemptSilentRefresh();
+
+            setAuthInfo(newAuthInfo);
+        } catch (error) {
+            resetAuthInfo(setAuthInfoState);
+            navigate('/login');
+        }
+    }, [navigate, setAuthInfo]);
 
     useEffect(() => {
-        const tokenValid = true
-        if (!tokenValid) {
-            // TODO once auth is implemented this should check for validity of token
-            // and redirect to /login in case not valid (or attempt silent refresh via refresh token first)
-            navigate('/page1')
+        // If token is invalid or expired, attempt silent refresh before redirecting to login
+        const isTokenExpired = authInfo?.expiresOn && Date.now() >= authInfo.expiresOn;
+
+        if (isTokenExpired) {
+            refreshToken();
         }
-    }, [ authInfo ]);
+    }, [authInfo, refreshToken]);
 
     return (
         <AuthContext.Provider value={{ authInfo, setAuthInfo }}>

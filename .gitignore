@@ -118,3 +118,6 @@ _ReSharper*/
 
 # Local Docker
 Deployment/local/.pgdata/
+
+# SSL certificates
+Frontend/certs/

@@ -1,4 +1,5 @@
 using Identity.API.Filters;
+using Identity.Application.Interfaces;
 using Identity.Application.Services;
 using Identity.Core.Interfaces.Repositories;
 using Identity.Core.Interfaces.Services;
@@ -94,16 +95,6 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
-// CORS Configuration
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
 
 // Health Checks
 //builder.Services.AddHealthChecks()
@@ -129,7 +120,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("AllowAll");
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

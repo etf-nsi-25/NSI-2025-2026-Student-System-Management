@@ -1,4 +1,3 @@
-
 // Import module DI namespaces
 using Identity.Infrastructure;
 using University.Infrastructure;
@@ -7,15 +6,20 @@ using Support.Infrastructure;
 using Notifications.Infrastructure;
 using Analytics.Infrastructure;
 using Identity.Infrastructure.DependencyInjection;
+using Faculty.Infrastructure.DependencyInjection;
+using Faculty.Infrastructure.Db;
+using Faculty.Core.Interfaces;
+using Faculty.Core.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 const string CorsPolicyName = "ReactDevClient";
 
 // Add services from modules
 builder.Services.AddIdentityModule(builder.Configuration);
-builder.Services.AddUniversityModule(builder.Configuration);
+builder.Services.AddUniversityModule();
 builder.Services.AddFacultyModule(builder.Configuration);
-builder.Services.AddSupportModule(builder.Configuration);
+builder.Services.AddSupportModule();
 builder.Services.AddNotificationsModule();
 builder.Services.AddAnalyticsModule();
 
@@ -53,12 +57,29 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// CORS Configuration for aggregated host - allow frontend dev server
+var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.WithOrigins(allowedOrigins!)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 // Middleware
 app.UseHttpsRedirection();
-app.UseRouting();               
-app.UseCors(CorsPolicyName);
+
+// Ensure routing is enabled before applying CORS so the middleware can handle preflight requests correctly
+app.UseRouting();
+app.UseCors("CorsPolicy");
+
 app.UseAuthentication();
 app.UseAuthorization();
 

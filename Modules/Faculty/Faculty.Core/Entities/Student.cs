@@ -1,20 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Faculty.Core.Interfaces;
 
-namespace Faculty.Core.Entities
+namespace Faculty.Core.Entities;
+
+/// <summary>
+/// Represents a student in the faculty system.
+/// </summary>
+public class Student : ITenantAware
 {
-	public class Student
-	{
-		public int Id { get; set; }
-		public string UserId { get; set; }
-		public string IndexNumber { get; set; }
-		public string FirstName { get; set; }
-		public string LastName { get; set; }
-		public DateOnly EnrollmentDate { get; set; }
+    public int Id { get; set; }
+    public Guid FacultyId { get; set; }
+    public string UserId { get; set; } = string.Empty;
+    public string IndexNumber { get; set; } = string.Empty;
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    public DateTime? EnrollmentDate { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 
-
-	}
+    // Navigation properties
+    public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
+    public ICollection<StudentAssignment> StudentAssignments { get; set; } = new List<StudentAssignment>();
+    public ICollection<ExamRegistration> ExamRegistrations { get; set; } = new List<ExamRegistration>();
+    public ICollection<StudentExamGrade> StudentExamGrades { get; set; } = new List<StudentExamGrade>();
+    public ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();
 }
+
