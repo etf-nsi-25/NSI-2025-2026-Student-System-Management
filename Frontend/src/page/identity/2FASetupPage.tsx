@@ -165,13 +165,16 @@ const TwoFASetupPage: React.FC = () => {
               {/* RIGHT SIDE – FORM */}
               <CCol md={7} className="twofa-right d-flex">
                 <CForm onSubmit={handleSubmit} className="twofa-form w-100">
-                  <CFormLabel className="twofa-label">
+                  <CFormLabel htmlFor="twofa-code" className="twofa-label">
                     6-digit code from your authenticator app
                   </CFormLabel>
 
                   <CFormInput
+                    id="twofa-code"
+                    name="twofaCode"
                     type="text"
                     inputMode="numeric"
+                    autoComplete="one-time-code"
                     maxLength={6}
                     value={code}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {

@@ -6,6 +6,6 @@ namespace University.Core.Entities
         public Guid FacultyId { get; set; }
         public string Name { get; set; } = default!;
         public string Code { get; set; } = default!;
-        public string? HeadOfDepartment { get; set; }
+        public Guid HeadOfDepartment { get; set; }
     }
 }

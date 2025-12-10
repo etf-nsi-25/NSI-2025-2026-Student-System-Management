@@ -28,7 +28,7 @@ namespace University.Infrastructure.Repositories
                 FacultyId = d.FacultyId,
                 Name = d.Name,
                 Code = d.Code,
-                HeadOfDepartment = d.HeadOfDepartment,
+                HeadOfDepartment = d.HeadOfDepartmentId,
             });
         }
     }

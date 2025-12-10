@@ -2,8 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using University.Infrastructure.Db;
 using Microsoft.EntityFrameworkCore;
-using University.Core.Interfaces;
-using University.Infrastructure.Repositories;
 
 namespace University.Infrastructure
 {
@@ -25,10 +23,9 @@ namespace University.Infrastructure
                 )
             );
 
-            services.AddScoped<IAcademicYearRepository, AcademicYearRepository>();
-            services.AddScoped<IFacultyRepository, FacultyRepository>();
-            services.AddScoped<IDepartmentRepository, DepartmentRepository>();
-            services.AddScoped<IProgramRepository, ProgramRepository>();
+            // TODO: Register University-specific services or repositories here
+            // Example:
+            // services.AddScoped<IStudentRepository, StudentRepository>();
 
             return services;
         }
