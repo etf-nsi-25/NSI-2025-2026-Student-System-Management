@@ -1,6 +1,8 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+using University.Application.Interfaces;
+using University.Application.Services;
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using University.Infrastructure.Db;
 
 namespace University.Infrastructure
@@ -11,6 +13,8 @@ namespace University.Infrastructure
 		{
 			services.AddDbContext<UniversityDbContext>(options =>
 				options.UseNpgsql(configuration.GetConnectionString("Database")));
+      
+      services.AddScoped<IFacultyService, FacultyService>();
 			return services;
 		}
 	}
