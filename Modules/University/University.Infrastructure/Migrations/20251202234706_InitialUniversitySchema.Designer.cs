@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using University.Infrastructure.Db;
@@ -11,9 +12,11 @@ using University.Infrastructure.Db;
 namespace University.Infrastructure.Migrations
 {
     [DbContext(typeof(UniversityDbContext))]
-    partial class UniversityDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251202234706_InitialUniversitySchema")]
+    partial class InitialUniversitySchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,49 +24,6 @@ namespace University.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("Identity.Core.Entities.User", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("FacultyId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("IndexNumber")
-                        .HasColumnType("text");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Role")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("User");
-                });
 
             modelBuilder.Entity("University.Infrastructure.Entities.AcademicYear", b =>
                 {
@@ -83,7 +43,7 @@ namespace University.Infrastructure.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("UpdatedAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Year")
@@ -116,20 +76,18 @@ namespace University.Infrastructure.Migrations
                     b.Property<Guid>("FacultyId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("HeadOfDepartmentId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("HeadOfDepartment")
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<DateTime?>("UpdatedAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("HeadOfDepartmentId");
 
                     b.HasIndex("FacultyId", "Code")
                         .IsUnique();
@@ -156,8 +114,8 @@ namespace University.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("DeanId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("DeanName")
+                        .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -170,15 +128,12 @@ namespace University.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<DateTime?>("UpdatedAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Code")
-                        .IsUnique();
-
-                    b.HasIndex("DeanId")
                         .IsUnique();
 
                     b.ToTable("Faculties", "university");
@@ -216,7 +171,7 @@ namespace University.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<DateTime?>("UpdatedAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
@@ -235,24 +190,7 @@ namespace University.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Identity.Core.Entities.User", "HeadOfDepartment")
-                        .WithMany()
-                        .HasForeignKey("HeadOfDepartmentId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.Navigation("Faculty");
-
-                    b.Navigation("HeadOfDepartment");
-                });
-
-            modelBuilder.Entity("University.Infrastructure.Entities.Faculty", b =>
-                {
-                    b.HasOne("Identity.Core.Entities.User", "Dean")
-                        .WithOne()
-                        .HasForeignKey("University.Infrastructure.Entities.Faculty", "DeanId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Dean");
                 });
 
             modelBuilder.Entity("University.Infrastructure.Entities.Program", b =>

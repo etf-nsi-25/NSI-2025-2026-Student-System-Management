@@ -12,8 +12,8 @@ namespace Support.Application.DTOs
         [Required(ErrorMessage = "UserId is required.")]
         public string UserId { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "FacultyId must be greater than 0.")]
-        public int FacultyId { get; set; }
+		[Range(1, int.MaxValue, ErrorMessage = "FacultyId must be greater than 0.")]
+		public Guid FacultyId { get; set; }
 
         [Required(ErrorMessage = "DocumentType is required.")]
         [StringLength(100, ErrorMessage = "DocumentType cannot exceed 100 characters.")]
