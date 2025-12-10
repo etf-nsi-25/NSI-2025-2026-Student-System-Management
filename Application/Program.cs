@@ -1,16 +1,10 @@
 // Import module DI namespaces
-using Identity.Infrastructure;
-using University.Infrastructure;
-using Faculty.Infrastructure;
 using Support.Infrastructure;
 using Notifications.Infrastructure;
 using Analytics.Infrastructure;
 using Identity.Infrastructure.DependencyInjection;
 using Faculty.Infrastructure.DependencyInjection;
-using Faculty.Infrastructure.Db;
-using Faculty.Core.Interfaces;
-using Faculty.Core.Services;
-using Microsoft.EntityFrameworkCore;
+using University.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 const string CorsPolicyName = "ReactDevClient";
