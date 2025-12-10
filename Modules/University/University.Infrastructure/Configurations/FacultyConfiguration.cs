@@ -21,11 +21,6 @@ namespace University.Infrastructure.Configurations
             builder.Property(x => x.Code).IsRequired().HasMaxLength(20);
 
             builder.HasIndex(x => x.Code).IsUnique();
-
-            builder.HasOne(f => f.Dean)
-              .WithOne() 
-              .HasForeignKey<Faculty>(f => f.DeanId)
-              .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

@@ -25,11 +25,6 @@ namespace University.Infrastructure.Configurations
                 .WithMany(f => f.Departments)
                 .HasForeignKey(d => d.FacultyId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(d => d.HeadOfDepartment)
-                .WithMany() 
-                .HasForeignKey(d => d.HeadOfDepartmentId)
-                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

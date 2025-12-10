@@ -15,8 +15,7 @@ namespace University.Infrastructure.Entities
         public string Code { get; set; } = default!;
         public string? Description { get; set; }
         public DateTime EstablishedDate { get; set; }
-        public Guid? DeanId { get; set; }
-        public User? Dean { get; set; }
+        public Guid DeanId { get; set; }
 
         public ICollection<Department> Departments { get; set; } = new List<Department>();
 
