@@ -14,7 +14,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\University.Core\University.Core.csproj" />
-    <ProjectReference Include="..\University.Infrastructure\University.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

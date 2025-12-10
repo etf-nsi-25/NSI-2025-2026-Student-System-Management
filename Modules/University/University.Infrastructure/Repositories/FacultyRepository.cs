@@ -21,7 +21,6 @@ namespace University.Infrastructure.Repositories
                 return null;
 
             var faculty = await _context.Faculties
-                .AsNoTracking()
                 .FirstOrDefaultAsync(f => f.Code == code);
 
             if (faculty == null)

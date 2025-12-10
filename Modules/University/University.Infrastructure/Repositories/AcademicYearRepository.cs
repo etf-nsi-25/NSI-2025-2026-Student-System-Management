@@ -18,7 +18,6 @@ namespace University.Infrastructure.Repositories
         public async Task<AcademicYear?> GetActiveAcademicYearAsync()
         {
             var entity = await _context.AcademicYears
-                .AsNoTracking()
                 .FirstOrDefaultAsync(ay => ay.IsActive);
 
             if (entity == null)

@@ -18,7 +18,6 @@ namespace University.Infrastructure.Repositories
         public async Task<IEnumerable<Program>> GetAllByDepartmentIdAsync(Guid departmentId)
         {
             var programs = await _context.Programs
-                .AsNoTracking()
                 .Where(p => p.DepartmentId == departmentId)
                 .ToListAsync();
 
