@@ -43,19 +43,11 @@ public class JwtTokenService : IJwtTokenService
 
         var claimsList = new List<Claim>
         {
-<<<<<<< Updated upstream
-            new Claim("userId", claims.UserId),
-            new Claim(ClaimTypes.Email, claims.Email),
-            new Claim(ClaimTypes.Role, claims.Role.ToString()),
-            new Claim("fullName", claims.FullName),
-            new Claim("tenantId", claims.TenantId),
-=======
             new Claim(ClaimTypes.NameIdentifier, claims.UserId),
             new Claim(ClaimTypes.Email, claims.Email),
             new Claim(ClaimTypes.Role, claims.Role.ToString()),
             new Claim(ClaimTypes.Name, claims.FullName),
             new Claim("tenant_id", claims.TenantId),
->>>>>>> Stashed changes
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString())
         };

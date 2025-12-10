@@ -1,10 +1,12 @@
+import { CHeader, CContainer } from '@coreui/react';
 
 export default function Header() {
   return (
-    <div className="bg-blue-900 text-white px-8 py-4 flex justify-between items-center">
-        <img src="/unsa.png" alt="UNSA Logo" className="h-12 w-28" />
-      
-      <span className="text-sm">Faculty admin</span>
-    </div>
+    <CHeader className="bg-primary text-white py-3">
+      <CContainer className="d-flex justify-content-between align-items-center px-3">
+        <img src="/unsa.png" alt="UNSA Logo" style={{ height: 48, width: 112 }} />
+        <span className="small">Faculty admin</span>
+      </CContainer>
+    </CHeader>
   );
 }

@@ -1,6 +1,15 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import type { User } from "../../../types/user-types";
 import Modal from "../../Modal";
+import { CForm, CFormInput, CFormSelect, CButton, CFormLabel } from '@coreui/react';
+
+const ROLE_MAP: Record<number, string> = {
+  1: 'Superadmin',
+  2: 'Admin',
+  3: 'Teacher',
+  4: 'Assistant',
+  5: 'Student',
+};
 
 interface EditUserModalProps {
   user: User;
@@ -9,85 +18,96 @@ interface EditUserModalProps {
 }
 
 export default function EditUserModal({ user, onClose, onSave }: EditUserModalProps) {
-  const [formData, setFormData] = useState(user);
+  const findRoleKey = (label: string | number | undefined) => {
+    const entry = Object.entries(ROLE_MAP).find(([, v]) => v === label || v === String(label));
+    return entry ? entry[0] : '5';
+  };
+
+  const [formData, setFormData] = useState(() => ({
+    ...user,
+    role: String(findRoleKey(user.role as any)),
+  } as any));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email) {
-      alert('Please fill all required fields');
-      return;
-    }
     onSave(formData);
   };
 
   return (
     <Modal onClose={onClose}>
-      <h2 className="text-lg font-bold text-blue-900 mb-6">Edit User</h2>
+      <h2 className="h5 text-primary mb-3">Edit User</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-semibold mb-2">Full Name:</label>
-          <input
-            type="text"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded text-sm"
+      <CForm onSubmit={handleSubmit}>
+        <div className="mb-2">
+          <CFormLabel htmlFor="firstName" className="text-dark">First Name</CFormLabel>
+          <CFormInput
+            id="firstName"
+            placeholder="Enter first name"
+            value={formData.firstName}
+            onChange={(e: any) => setFormData({ ...formData, firstName: e.target.value })}
             required
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-semibold mb-2">Email Address:</label>
-          <input
-            type="email"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded text-sm"
+        <div className="mb-2">
+          <CFormLabel htmlFor="lastName" className="text-dark">Last Name</CFormLabel>
+          <CFormInput
+            id="lastName"
+            placeholder="Enter last name"
+            value={formData.lastName}
+            onChange={(e: any) => setFormData({ ...formData, lastName: e.target.value })}
             required
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-semibold mb-2">Role:</label>
-          <select
+        <div className="mb-2">
+          <CFormLabel htmlFor="roleSelect" className="text-dark">Role</CFormLabel>
+          <CFormSelect
+            id="roleSelect"
             value={formData.role}
-            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded text-sm"
+            onChange={(e: any) => setFormData({ ...formData, role: e.target.value })}
           >
-            <option>Professor</option>
-            <option>Assistant</option>
-            <option>Student</option>
-            <option>Staff</option>
-          </select>
+            {Object.entries(ROLE_MAP).map(([k, v]) => (
+              <option key={k} value={k}>{v}</option>
+            ))}
+          </CFormSelect>
         </div>
 
-        <div>
-          <label className="block text-sm font-semibold mb-2">Faculty:</label>
-          <select
+        <div className="mb-2">
+          <CFormLabel htmlFor="facultySelect" className="text-dark">Faculty</CFormLabel>
+          <CFormSelect
+            id="facultySelect"
             value={formData.faculty}
-            onChange={(e) => setFormData({ ...formData, faculty: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded text-sm"
+            onChange={(e: any) => setFormData({ ...formData, faculty: e.target.value })}
           >
             <option>ETF UNSA</option>
-          </select>
+          </CFormSelect>
         </div>
 
-        <div className="flex gap-3 justify-end mt-6">
-          <button
-            type="button"
-            onClick={onClose}
-            className="bg-gray-300 text-gray-900 px-6 py-2 rounded text-sm font-semibold hover:bg-gray-400"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="bg-blue-900 text-white px-6 py-2 rounded text-sm font-semibold hover:bg-blue-800"
-          >
-            Save
-          </button>
+        {Number(formData.role) === 5 && (
+          <div className="mb-2">
+            <CFormLabel htmlFor="indexNumber" className="text-dark">Index Number</CFormLabel>
+            <CFormInput
+              id="indexNumber"
+              placeholder="Enter index number"
+              value={formData.indexNumber}
+              onChange={(e: any) => setFormData({ ...formData, indexNumber: e.target.value })}
+            />
+          </div>
+
+
+        )}
+        <div className="d-flex justify-content-end gap-2 mt-3">
+          <CButton color="secondary" onClick={onClose} type="button">Cancel</CButton>
+          <CButton color="primary" type="submit">Save</CButton>
         </div>
-      </form>
+      </CForm>
+
+
+
+
+
+
     </Modal>
   );
 }

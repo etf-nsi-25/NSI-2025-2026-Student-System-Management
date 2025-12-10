@@ -1,8 +1,10 @@
 export interface User {
   id: number;
-  name: string;
-  email: string;
+  firstName: string;
+  lastName: string;
+  username: string;
   role: string;
   faculty: string;
+  indexNumber: string;
   lastActive: string;
 }

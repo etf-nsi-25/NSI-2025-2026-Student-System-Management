@@ -1,5 +1,5 @@
 import type { User } from "../../types/user-types";
-
+import { CTable, CButton } from '@coreui/react';
 
 interface UsersTableProps {
   users: User[];
@@ -17,64 +17,61 @@ export default function UsersTable({
   onDelete,
 }: UsersTableProps) {
   return (
-    <div className="bg-white rounded-lg shadow p-6 overflow-hidden">
-      <table className="w-full text-sm  border border-gray-200 rounded-lg">
-        <thead className="bg-gray-100 rounded-lg">
-          <tr className="border-b border-gray-200">
-            <th className="text-left font-semibold py-3 px-4">Name</th>
-            <th className="text-left font-semibold py-3 px-4">Email</th>
-            <th className="text-left font-semibold py-3 px-4">Role</th>
-            <th className="text-left font-semibold py-3 px-4">Last Active</th>
-            <th className="text-left font-semibold py-3 px-4">Actions</th>
+    <div className="card p-3">
+      <CTable responsive small hover>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Faculty</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {users.map((user) => (
             <tr
               key={user.id}
-              className={`border-b border-gray-200 cursor-pointer ${
-                selectedUser?.id === user.id ? 'bg-blue-50' : 'hover:bg-gray-50'
-              }`}
               onClick={() => onSelectUser(user)}
+              style={{ cursor: 'pointer', background: selectedUser?.id === user.id ? '#e9f2ff' : undefined }}
             >
-              <td className="py-3 px-4">{user.name}</td>
-              <td className="py-3 px-4">{user.email}</td>
-              <td className="py-3 px-4">{user.role}</td>
-              <td className="py-3 px-4">{user.lastActive}</td>
-              <td className="py-3 px-4 flex gap-2">
-                <button
-                  onClick={(e) => {
+              <td>{user.firstName + " " + user.lastName}</td>
+              <td>{user.username}</td>
+              <td>{user.role}</td>
+              <td>{user.faculty}</td>
+              <td>
+                <CButton
+                  color="secondary"
+                  size="sm"
+                  className="me-2"
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     onSelectUser(user);
                     onEdit();
                   }}
-                  className="bg-blue-100 text-blue-900 px-3 py-1 rounded text-xs font-semibold hover:bg-blue-200"
                 >
                   Edit
-                </button>
-                <button
-                  onClick={(e) => {
+                </CButton>
+                <CButton
+                  color="light"
+                  size="sm"
+                  onClick={(e: any) => {
                     e.stopPropagation();
                     onSelectUser(user);
                     onDelete();
                   }}
-                  className="bg-gray-200 text-gray-900 px-3 py-1 rounded text-xs font-semibold hover:bg-gray-300"
                 >
                   Delete
-                </button>
+                </CButton>
               </td>
             </tr>
           ))}
         </tbody>
-      </table>
+      </CTable>
 
-      <div className="flex gap-3 mt-6">
-        <button className="bg-blue-900 text-white px-6 py-2 rounded text-sm font-semibold hover:bg-blue-800">
-          Save attendance
-        </button>
-        <button className="bg-gray-400 text-white px-6 py-2 rounded text-sm font-semibold hover:bg-gray-500">
-          Export report
-        </button>
+      <div className="d-flex gap-2 mt-3">
+        <CButton color="primary">Save attendance</CButton>
+        <CButton color="secondary">Export report</CButton>
       </div>
     </div>
   );

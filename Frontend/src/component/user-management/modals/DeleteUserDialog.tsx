@@ -1,5 +1,6 @@
 import type { User } from "../../../types/user-types";
 import Modal from "../../Modal";
+import { CButton } from '@coreui/react';
 
 interface DeleteConfirmDialogProps {
   user: User | null;
@@ -11,23 +12,13 @@ export default function DeleteConfirmDialog({ user, onConfirm, onCancel }: Delet
   return (
     <Modal onClose={onCancel}>
       <div className="text-center">
-        <h2 className="text-lg font-bold text-red-600 mb-4">Delete User</h2>
-        <p className="text-gray-700 mb-6">
-          Are you sure you want to delete <span className="font-semibold">{user?.name}</span>? This action cannot be undone.
+        <h2 className="h5 text-danger mb-3">Delete User</h2>
+        <p className="mb-4">
+          Are you sure you want to delete <span className="fw-semibold">{user?.username}</span>? This action cannot be undone.
         </p>
-        <div className="flex gap-3 justify-center">
-          <button
-            onClick={onCancel}
-            className="bg-gray-300 text-gray-900 px-6 py-2 rounded text-sm font-semibold hover:bg-gray-400"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            className="bg-red-600 text-white px-6 py-2 rounded text-sm font-semibold hover:bg-red-700"
-          >
-            Delete
-          </button>
+        <div className="d-flex justify-content-center gap-2">
+          <CButton color="secondary" onClick={onCancel}>Cancel</CButton>
+          <CButton color="danger" onClick={onConfirm}>Delete</CButton>
         </div>
       </div>
     </Modal>

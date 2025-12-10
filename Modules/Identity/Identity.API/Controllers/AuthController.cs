@@ -44,29 +44,11 @@ public class AuthController : ControllerBase
                 ipAddress,
                 userAgent);
 
-<<<<<<< Updated upstream
-            // Set HTTP-only cookie for refresh token
-            HttpContext.Response.Cookies.Append(
-                "refreshToken",
-                result.RefreshToken,
-                new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.None,
-                    Expires = result.ExpiresAt
-                });
-
-            var response = new LoginResponseDto
-            {
-                AccessToken = result.AccessToken,
-=======
             var response = new LoginResponseDto
             {
                 AccessToken = result.AccessToken,
                 RefreshToken = result.RefreshToken,
                 ExpiresAt = result.ExpiresAt,
->>>>>>> Stashed changes
                 TokenType = "Bearer"
             };
 
@@ -89,19 +71,11 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-<<<<<<< Updated upstream
-    public async Task<ActionResult<LoginResponseDto>> RefreshToken()
-    {
-        try
-        {
-            if (!HttpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken) || string.IsNullOrWhiteSpace(refreshToken))
-=======
     public async Task<ActionResult<LoginResponseDto>> RefreshToken([FromBody] RefreshTokenRequestDto request)
     {
         try
         {
             if (string.IsNullOrWhiteSpace(request.RefreshToken))
->>>>>>> Stashed changes
             {
                 return BadRequest(new { message = "Refresh token is required" });
             }
@@ -110,38 +84,16 @@ public class AuthController : ControllerBase
             var userAgent = HttpContext.Request.Headers["User-Agent"].ToString() ?? "unknown";
 
             var result = await _authService.RefreshAuthenticationAsync(
-<<<<<<< Updated upstream
-                refreshToken,
-                ipAddress,
-                userAgent);
-
-            // Set HTTP-only cookie for new refresh token
-            HttpContext.Response.Cookies.Append(
-                "refreshToken",
-                result.RefreshToken,
-                new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.None,
-                    Expires = result.ExpiresAt
-                });
-
-=======
                 request.RefreshToken,
                 ipAddress,
                 userAgent);
 
->>>>>>> Stashed changes
             // Map domain model to DTO
             var response = new LoginResponseDto
             {
                 AccessToken = result.AccessToken,
-<<<<<<< Updated upstream
-=======
                 RefreshToken = result.RefreshToken,
                 ExpiresAt = result.ExpiresAt,
->>>>>>> Stashed changes
                 TokenType = "Bearer"
             };
 
@@ -164,31 +116,16 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-<<<<<<< Updated upstream
-    public async Task<IActionResult> Logout()
-    {
-        try
-        {
-            if (!HttpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken) || string.IsNullOrWhiteSpace(refreshToken))
-=======
     public async Task<IActionResult> Logout([FromBody] RefreshTokenRequestDto request)
     {
         try
         {
             if (string.IsNullOrWhiteSpace(request.RefreshToken))
->>>>>>> Stashed changes
             {
                 return BadRequest(new { message = "Refresh token is required" });
             }
 
-<<<<<<< Updated upstream
-            await _authService.RevokeAuthenticationAsync(refreshToken);
-
-            // Clear the refresh token cookie
-            HttpContext.Response.Cookies.Delete("refreshToken");
-=======
             await _authService.RevokeAuthenticationAsync(request.RefreshToken);
->>>>>>> Stashed changes
 
             return Ok(new { message = "Successfully logged out" });
         }
