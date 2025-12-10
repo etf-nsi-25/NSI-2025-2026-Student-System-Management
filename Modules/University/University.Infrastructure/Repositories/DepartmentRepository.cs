@@ -18,16 +18,26 @@ namespace University.Infrastructure.Repositories
         public async Task<IEnumerable<Department>> GetAllByFacultyIdAsync(Guid facultyId)
         {
             var entities = await _context.Departments
+                .Include(d => d.Faculty)
                 .Where(d => d.FacultyId == facultyId)
                 .ToListAsync();
 
             return entities.Select(d => new Department
             {
                 Id = d.Id,
-                FacultyId = d.FacultyId,
                 Name = d.Name,
                 Code = d.Code,
                 HeadOfDepartment = d.HeadOfDepartmentId,
+                Faculty = new Faculty
+                {
+                    Id = d.Faculty.Id,
+                    Name = d.Faculty.Name,
+                    Description = d.Faculty.Description,
+                    Address = d.Faculty.Address,
+                    Code = d.Faculty.Code,
+                    EstablishedDate =  d.Faculty.EstablishedDate,
+                    DeanId =  d.Faculty.DeanId
+                },
             });
         }
     }

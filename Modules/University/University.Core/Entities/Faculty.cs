@@ -8,6 +8,6 @@ namespace University.Core.Entities
         public string Code { get; set; } = default!;
         public string? Description { get; set; }
         public DateTime EstablishedDate { get; set; }
-        public Guid DeanName { get; set; }
+        public Guid DeanId { get; set; }
     }
 }

@@ -34,7 +34,7 @@ namespace University.Infrastructure.Repositories
                 Code = faculty.Code,
                 Description = faculty.Description,
                 EstablishedDate = faculty.EstablishedDate,
-                DeanName = faculty.DeanId,
+                DeanId = faculty.DeanId,
             };
         }
     }
