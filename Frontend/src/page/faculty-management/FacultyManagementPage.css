@@ -1,0 +1,101 @@
+/* GLOBAL FONT */
+* {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  box-sizing: border-box;
+}
+
+/* PAGE LAYOUT */
+.fm-page {
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+.fm-header {
+  background-color: #133E87;
+  color: white;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fm-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fm-logo {
+  height: 48px;
+}
+
+.fm-header-title {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.fm-header-user {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* BODY */
+.fm-body {
+  display: flex;
+  flex: 1;
+  background-color: #f5f7fa;
+}
+
+/* SIDEBAR */
+.fm-sidebar {
+  background-color: #133E87;
+  color: white;
+  width: 240px;
+  min-height: 100vh;
+  padding-top: 20px;
+  position: sticky;
+  top: 0;
+}
+
+.fm-sidebar-nav {
+  width: 100%;
+  padding: 0 10px;
+}
+
+/* SECTION LABEL */
+.fm-sidebar-section {
+  font-weight: 600;
+  font-size: 13px;
+  color: #cdd9ff;
+  margin: 20px 0 8px 10px;
+  text-transform: uppercase;
+}
+
+/* SIDEBAR ITEM */
+.fm-sidebar-item {
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* centrirano horizontalno */
+  text-align: center;
+  font-weight: 500; /* sidebar je 500 */
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  margin-bottom: 6px;
+}
+
+.fm-sidebar-item:hover {
+  background-color: #7788d8;
+}
+
+/* MAIN CONTENT */
+.fm-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}

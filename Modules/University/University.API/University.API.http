@@ -1,6 +1,33 @@
-@University.API_HostAddress = http://localhost:5106
+@API_HostAddress = http://localhost:5106/api/university/faculties
 
-GET {{University.API_HostAddress}}/weatherforecast/
+### Get all faculties
+GET {{API_HostAddress}}
 Accept: application/json
 
-###
+### Get faculty by id
+GET {{API_HostAddress}}/1
+Accept: application/json
+
+### Create faculty
+POST {{API_HostAddress}}
+Content-Type: application/json
+
+{
+  "name": "Faculty of Science",
+  "address": "Zmaja od Bosne 33-35",
+  "code": "PMF"
+}
+
+### Update faculty
+PUT {{API_HostAddress}}/1
+Content-Type: application/json
+
+{
+  "name": "Faculty of Electrical Engineering Updated",
+  "address": "Zmaja od Bosne 33-35",
+  "code": "ETF"
+}
+
+### Delete faculty
+DELETE {{API_HostAddress}}/1
+
