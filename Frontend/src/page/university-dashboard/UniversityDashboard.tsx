@@ -1,5 +1,8 @@
 import React from "react";
 import { CCard, CCardBody } from "@coreui/react";
+import CIcon from "@coreui/icons-react";
+import { cilPeople, cilUser, cilBook, cilChart, } from "@coreui/icons";
+
 
 const cardStyle: React.CSSProperties = {
   backgroundColor: "#ffffff",
@@ -11,11 +14,10 @@ const cardStyle: React.CSSProperties = {
   alignItems: "center",
 };
 
-const titleStyle: React.CSSProperties = {
-  fontSize: "30px",                  // veći naslov
-  fontWeight: 400,
-  color: "#000000",                  // CRNA boja
-  marginBottom: "10px",
+
+const subtitleStyle: React.CSSProperties = {
+  fontSize: "20px",
+  color: "#000000ff", // siva kao na slici
 };
 
 
@@ -31,33 +33,129 @@ const UniversityDashboard: React.FC = () => {
         gap: "36px",
       }}
     >
-      {/* STUDENTS */}
-      <CCard style={cardStyle}>
-        <CCardBody className="p-0">
-          <div style={titleStyle}>Students</div>
-        </CCardBody>
-      </CCard>
+   <CCard style={cardStyle}>
+  <CCardBody
+    className="p-0"
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "20px",
+    
+    }}
+  >
+    {/* ICON LEFT */}
+    <CIcon icon={cilPeople} size="3xl" style={{ color: "#000" }} />
 
-      {/* EMPLOYEES */}
-      <CCard style={cardStyle}>
-        <CCardBody className="p-0">
-          <div style={titleStyle}>Employees</div>
-        </CCardBody>
-      </CCard>
+    {/* TEXT RIGHT */}
+    <div>
+      <div style={{ fontSize: "20px", color: "#000", marginBottom: "30px" }}>
+        Students
+      </div>
 
-      {/* COURSES */}
-      <CCard style={cardStyle}>
-        <CCardBody className="p-0">
-          <div style={titleStyle}>Courses</div>
-        </CCardBody>
-      </CCard>
+      <div style={{ fontSize: "28px", fontWeight: 700, color: "#000"}}>
+        1,052
+      </div>
 
-      {/* ACTIVITY */}
-      <CCard style={cardStyle}>
-        <CCardBody className="p-0">
-          <div style={titleStyle}>Activity</div>
-        </CCardBody>
-      </CCard>
+      <div style={subtitleStyle}>
+        Total students
+      </div>
+    </div>
+  </CCardBody>
+</CCard>
+
+
+
+    <CCard style={cardStyle}>
+  <CCardBody
+    className="p-0"
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "20px",
+    }}
+  >
+    {/* ICON LEFT */}
+    <CIcon icon={cilUser} size="3xl" style={{ color: "#000" }} />
+
+    {/* TEXT RIGHT */}
+    <div>
+      <div style={{ fontSize: "20px", color: "#000", marginBottom: "30px" }}>
+        Employees
+      </div>
+
+      <div style={{ fontSize: "28px", fontWeight: 700, color: "#000" }}>
+        121
+      </div>
+
+      <div style={subtitleStyle}>
+        Total employees
+      </div>
+    </div>
+  </CCardBody>
+</CCard>
+
+
+<CCard style={cardStyle}>
+  <CCardBody
+    className="p-0"
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "20px",
+    }}
+  >
+    {/* ICON LEFT */}
+    <CIcon icon={cilBook} size="3xl" style={{ color: "#000" }} />
+
+    {/* TEXT RIGHT */}
+    <div>
+      <div style={{ fontSize: "20px", color: "#000", marginBottom: "30px" }}>
+        Courses
+      </div>
+
+      <div style={{ fontSize: "28px", fontWeight: 700, color: "#000" }}>
+        86
+      </div>
+
+      <div style={subtitleStyle}>
+        Total courses
+      </div>
+    </div>
+  </CCardBody>
+</CCard>
+
+
+
+     <CCard style={cardStyle}>
+  <CCardBody
+    className="p-0"
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "20px",
+    }}
+  >
+    {/* ICON LEFT */}
+    <CIcon icon={cilChart} size="3xl" style={{ color: "#000" }} />
+
+    {/* TEXT RIGHT */}
+    <div>
+      <div style={{ fontSize: "20px", color: "#000", marginBottom: "30px" }}>
+        Activity
+      </div>
+
+      <div style={{ fontSize: "28px", fontWeight: 700, color: "#000" }}>
+        72%
+      </div>
+
+      <div style={subtitleStyle}>
+        Active users
+      </div>
+    </div>
+  </CCardBody>
+</CCard>
+
+
     </div>
   );
 };
