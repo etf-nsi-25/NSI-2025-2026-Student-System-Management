@@ -5,6 +5,9 @@ using EventBus.Infrastructure;
 using Faculty.Infrastructure.Db;
 using Faculty.Infrastructure.DependencyInjection;
 using Identity.API.Controllers;
+using Microsoft.EntityFrameworkCore;
+using Support.Infrastructure.Db;
+using University.Infrastructure.Db;
 using Identity.Infrastructure.Db;
 using Identity.Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
@@ -19,6 +22,12 @@ using University.Infrastructure;
 using University.Infrastructure.Db;
 using FacultyController = Faculty.API.Controllers.FacultyController;
 
+using Faculty.Application.Interfaces; 
+using Faculty.Application.Services;
+
+using System.Reflection;
+using System.IO;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services from modules
@@ -29,7 +38,10 @@ builder.Services.AddFacultyModule(builder.Configuration);
 builder.Services.AddSupportModule(builder.Configuration);
 builder.Services.AddNotificationsModule();
 builder.Services.AddAnalyticsModule();
+
 builder.Services.AddEventBus();
+
+builder.Services.AddScoped<IRequestService, RequestService>();
 
 // Add controllers and module API assemblies
 var mvcBuilder = builder.Services.AddControllers();

@@ -383,6 +383,7 @@ html, body {
   padding-top: 0 !important;
 }
 
+<<<<<<< HEAD
 /* 1. STILIZACIJA SIDEBARA I NAVIGACIJE */
 
 /* Glavna Sidebar pozadina */
@@ -440,3 +441,5 @@ html, body {
     font-weight: bold;
     font-size: 1.5rem; /* Povećaj font za naslov */
 }
+=======
+>>>>>>> 020f3e0 (Request Management Screen Implementation)
