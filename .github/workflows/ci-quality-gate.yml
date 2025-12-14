@@ -1,0 +1,70 @@
+name: CI Quality Gate
+
+on:
+  push:
+    branches: [ main, develop, pipeline_addition ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-backend:
+    name: Build .NET Backend
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+      
+      - name: Restore packages
+        run: dotnet restore
+      
+      - name: Build solution
+        run: dotnet build --configuration Release --no-restore
+  
+  run-architecture-tests:
+    name: Run Architecture Tests
+    runs-on: ubuntu-latest
+    needs: build-backend
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+      
+      - name: Run Architecture Tests
+        run: |
+          cd ArchitectureTests
+          dotnet test --configuration Release --verbosity normal --no-build
+  
+  build-frontend:
+    name: Build React Frontend
+    runs-on: ubuntu-latest
+    needs: build-backend
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: Frontend/package-lock.json
+      
+      - name: Install frontend dependencies
+        working-directory: ./Frontend
+        run: npm ci
+      
+      - name: Build frontend for production
+        working-directory: ./Frontend
+        run: npm run build
