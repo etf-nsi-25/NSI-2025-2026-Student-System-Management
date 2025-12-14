@@ -38,7 +38,7 @@ const UserManagementPage: React.FC = () => {
 
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   const [selectedFaculty, setSelectedFaculty] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
