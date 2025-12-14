@@ -1,34 +1,147 @@
+/* ========================================= */
+/* GLOBAL STYLES */
+/* ========================================= */
+
 .page-container {
-  width: 100%;
+    width: 100%;
 }
 
 .page-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: white;
-  margin-bottom: 2rem;
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 2rem;
 }
 
 .content-card {
-  background: white;
-  border-radius: 12px;
-  border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: white;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .content-card .card-header {
-  background: transparent;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 1.25rem 1.5rem;
+    background: transparent;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1.25rem 1.5rem;
 }
 
 .content-card .card-header strong {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1e293b;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e293b;
 }
 
 .content-card .card-body {
-  padding: 1.5rem;
-  color: #64748b;
+    padding: 1.5rem;
+    color: #64748b;
+}
+
+/* Custom CoreUI table spacing */
+.ui-table-custom {
+    border-collapse: separate;
+    border-spacing: 0 4px;
+}
+
+
+/* ========================================= */
+/* REQUEST MANAGEMENT UI STYLES */
+/* ========================================= */
+
+/* Card header customization */
+.ui-card-custom .card-header {
+    background-color: transparent !important;
+    border-bottom: none !important;
+}
+
+/* Status badge styling */
+.c-badge {
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.c-badge.rounded-pill {
+    border-radius: 50rem !important;
+    padding: 0.35em 0.65em !important;
+    color: white !important;
+}
+
+
+/* === CUSTOM SEARCH BAR === */
+
+.ui-search-input-group {
+    max-width: 400px;
+    border-radius: 50px !important;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.ui-search-input {
+    border: 1px solid #ced4da !important;
+    border-right: none !important;
+    height: 38px !important;
+    padding-left: 15px !important;
+}
+
+.ui-search-input:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+    z-index: 3;
+}
+
+.ui-search-icon-bg {
+    background-color: white !important;
+    border: 1px solid #ced4da !important;
+    border-left: none !important;
+    padding: 0.375rem 0.75rem !important;
+}
+
+.ui-search-icon {
+    color: #ced4da;
+}
+
+/* === ACTION BUTTONS IN TABLE === */
+
+.ui-btn-action {
+    padding: 6px !important;
+    border: none !important;
+    background-color: transparent !important;
+    opacity: 0.8;
+    border-radius: 6px !important;
+    font-size: 16px;
+    transition: background-color 0.15s ease, opacity 0.15s ease;
+}
+
+.ui-btn-action:hover:not(:disabled) {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    opacity: 1;
+}
+
+/* Plus button (Create Confirmation) */
+.ui-btn-plus {
+    color: var(--cui-success, #47b255) !important;
+}
+
+/* View details button */
+.ui-btn-view {
+    color: #4f9cff !important;
+}
+
+/* Input/select fields */
+.ui-input-base {
+    border-radius: 8px !important;
+    padding: 0.75rem 1rem !important;
+    height: auto !important;
+    border: 1px solid #d1d5db !important;
+}
+
+/* Read-only fields */
+.ui-input-base[readonly] {
+    background-color: #f3f4f6 !important;
+}
+
+/* Fix select options in dark themes */
+.form-select option {
+    background: white !important;
+    color: black !important;
 }

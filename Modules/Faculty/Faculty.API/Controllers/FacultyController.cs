@@ -2,7 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Faculty.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Mvc;
+
+using System.Collections.Generic;   
+
 
 namespace Faculty.API.Controllers
 {
@@ -80,8 +84,57 @@ namespace Faculty.API.Controllers
             bool ok = await _service.DeleteAsync(id);
             return ok ? Ok(new { success = true }) : NotFound();
         }
+    }
+
+    [ApiController]
+    [Route("api/faculty/requests")] 
+
+    public class RequestController : ControllerBase
+    {
+        private readonly IRequestService _requestService;
+
+        public RequestController(IRequestService requestService)
+        {
+            _requestService = requestService;
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<StudentRequestDto>), 200)]
+        public async Task<IActionResult> GetAllRequests()
+        {
+            var requests = await _requestService.GetAllRequestsAsync();
+            return Ok(requests);
+        }
+
+        [HttpPost("{requestId}/confirm")]
+        [ProducesResponseType(typeof(StudentRequestDto), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> CreateConfirmation(
+            Guid requestId, 
+            [FromBody] CreateConfirmationRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var updatedRequest = await _requestService.ProcessRequestAsync(requestId, request);
+                
+                return Ok(updatedRequest); 
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound($"Request with the ID {requestId} is not found.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message }); 
+            }
+        }
+    }
 
     }
-}
+
 
 

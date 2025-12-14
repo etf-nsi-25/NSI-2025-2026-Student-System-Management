@@ -18,15 +18,19 @@ import CourseListPage from '../page/university/courses/CourseListPage';
 import TwoFASetupPage from "../page/identity/2FASetupPage";
 import { Login } from '../page/login/login.tsx';
 import { ProtectedRoute } from '../component/ProtectedRoute.tsx';
-import { DocumentCenter, ProfileSettings, RequestManagement, StudentAnalytics, StudentLayout, StudentSupport } from '../features/student/index.ts';
+import { DocumentCenter, ProfileSettings, StudentAnalytics, StudentLayout, StudentSupport } from '../features/student/index.ts';
 import EnrollmentPage from "../page/enrollment/enrollment.tsx";
 import { EnrollmentStudentPage } from '../page/enrollment/enrollmentPage.tsx';
 import StudentDashboardPage from '../page/student dashboard/dashboard.tsx';
 import DocumentCenterDashboard from '../page/document-center/documentCenter.tsx';
+<<<<<<< HEAD
 import AppLayout from '../component/AppLayout/AppLayout.tsx';
 import DefaultLayout from '../component/UniversityDashboardLayout/DefaultLayout.tsx';
 import UniversityDashboard from "../page/university-dashboard/UniversityDashboard.tsx";
 
+=======
+import RequestManagement from '../page/requests/RequestManagement';
+>>>>>>> 020f3e0 (Request Management Screen Implementation)
 
 export function Router(): React.ReactNode {
   return (
@@ -91,6 +95,17 @@ export function Router(): React.ReactNode {
       <Route path="/support" element={<DefaultLayout><StudentSupport /></DefaultLayout>} />
       <Route path="/help" element={<DefaultLayout><HelpPage /></DefaultLayout>} />
 
+
+      {/* REQUEST MANAGEMENT*/}
+      <Route path="/student/request-management" element={
+        <ProtectedRoute>
+          <RequestManagement />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/faculty/request-management" element={ 
+          <RequestManagement />
+      } />
 
       {/* error pages */}
       <Route path="/unauthorized" element={
