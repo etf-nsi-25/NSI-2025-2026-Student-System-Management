@@ -12,6 +12,9 @@ using Faculty.Core.Interfaces;
 using Faculty.Core.Services;
 using Microsoft.EntityFrameworkCore;
 
+using System.Reflection;
+using System.IO;
+
 var builder = WebApplication.CreateBuilder(args);
 const string CorsPolicyName = "ReactDevClient";
 
@@ -55,7 +58,16 @@ builder.Services.AddCors(options =>
 
 // Add Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    // Load all XML documentation files (e.g. Application.xml, Identity.API.xml)
+    var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml");
+
+    foreach (var xmlPath in xmlFiles)
+    {
+        c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+    }
+});
 
 // CORS Configuration for aggregated host - allow frontend dev server
 var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();

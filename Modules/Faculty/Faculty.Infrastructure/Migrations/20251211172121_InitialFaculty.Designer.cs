@@ -3,17 +3,20 @@ using System;
 using Faculty.Infrastructure.Db;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Faculty.Infrastructure.Migrations.FacultyDb
+namespace Faculty.Infrastructure.Migrations
 {
     [DbContext(typeof(FacultyDbContext))]
-    partial class FacultyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251211172121_InitialFaculty")]
+    partial class InitialFaculty
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
