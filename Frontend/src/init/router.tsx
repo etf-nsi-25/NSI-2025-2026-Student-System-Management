@@ -21,6 +21,7 @@ import { DocumentCenter, ProfileSettings, RequestManagement, StudentAnalytics, S
 import EnrollmentPage from "../page/enrollment/enrollment.tsx";
 import StudentDashboardPage from '../page/student dashboard/dashboard.tsx';
 import DocumentCenterDashboard from '../page/document-center/documentCenter.tsx';
+import AppLayout from '../component/AppLayout/AppLayout.jsx';
 
 export function Router(): React.ReactNode {
   return (
@@ -64,14 +65,14 @@ export function Router(): React.ReactNode {
       } />
 
       {/* feature/PBI_258 routes */}
-      <Route path="/page1" element={<Page1 />} />
-      <Route path="/users" element={<UserManagementPage />} />
-      <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="/course-management" element={<CourseManagementPage />} />
-      <Route path="/tenant-management" element={<TenantManagementPage />} />
-      <Route path="/student-support" element={<StudentSupportPage />} />
-      <Route path="/settings" element={<SettingsPage />} />
-      <Route path="/help" element={<HelpPage />} />
+      <Route path="/page1" element={<AppLayout><Page1 /></AppLayout>} />
+      <Route path="/users" element={<AppLayout><UserManagementPage /></AppLayout>} />
+      <Route path="/dashboard" element={<AppLayout><DashboardPage /></AppLayout>} />
+      <Route path="/course-management" element={<AppLayout><CourseManagementPage /></AppLayout>} />
+      <Route path="/tenant-management" element={<AppLayout><TenantManagementPage /></AppLayout>} />
+      <Route path="/student-support" element={<AppLayout><StudentSupportPage /></AppLayout>} />
+      <Route path="/settings" element={<AppLayout><SettingsPage /></AppLayout>} />
+      <Route path="/help" element={<AppLayout><HelpPage /></AppLayout>} />
 
       {/* error pages */}
       <Route path="/unauthorized" element={
