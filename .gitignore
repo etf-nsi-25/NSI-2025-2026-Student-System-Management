@@ -17,9 +17,6 @@ Deployment/local/.data/**
 *.swp
 *.swo
 
-### IGNORE EF Migrations SNAPSHOTS ###
-**/Migrations/
-
 # Build results
 [Bb]in/
 [Oo]bj/

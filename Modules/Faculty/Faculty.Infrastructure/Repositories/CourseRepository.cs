@@ -1,53 +1,34 @@
 ﻿using Faculty.Core.Entities;
 using Faculty.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Faculty.Infrastructure.Db;
 
 namespace Faculty.Infrastructure.Repositories
 {
     public class CourseRepository : ICourseRepository
     {
-        private static readonly List<Course> _data = new()
+        private readonly FacultyDbContext _context;
+
+        public CourseRepository(FacultyDbContext context)
         {
-            new Course
-            {
-                Id = Guid.NewGuid(),
-                Name = "Algorithms",
-                Code = "CS101",
-                Type = CourseType.Mandatory,
-                ProgramId = "CS",
-                ECTS = 6
-            },
-            new Course
-            {
-                Id = Guid.NewGuid(),
-                Name = "Databases",
-                Code = "CS202",
-                Type = CourseType.Mandatory,
-                ProgramId = "CS",
-                ECTS = 5
-            }
-        };
+            _context = context;
+        }
 
         public Task<Course> AddAsync(Course course)
         {
             course.Id = Guid.NewGuid();
-            _data.Add(course);
+            _context.Courses.Add(course);
             return Task.FromResult(course);
         }
 
         public Task<Course?> GetByIdAsync(Guid id)
-            => Task.FromResult(_data.FirstOrDefault(x => x.Id == id));
+            => Task.FromResult(_context.Courses.FirstOrDefault(x => x.Id == id));
 
         public Task<List<Course>> GetAllAsync()
-            => Task.FromResult(_data.ToList());
+            => Task.FromResult(_context.Courses.ToList());
 
         public Task<Course?> UpdateAsync(Course course)
         {
-            var existing = _data.FirstOrDefault(x => x.Id == course.Id);
+            var existing = _context.Courses.FirstOrDefault(x => x.Id == course.Id);
             if (existing == null)
                 return Task.FromResult<Course?>(null);
 
@@ -62,11 +43,11 @@ namespace Faculty.Infrastructure.Repositories
 
         public Task<bool> DeleteAsync(Guid id)
         {
-            var existing = _data.FirstOrDefault(x => x.Id == id);
+            var existing = _context.Courses.FirstOrDefault(x => x.Id == id);
             if (existing == null)
                 return Task.FromResult(false);
 
-            _data.Remove(existing);
+            _context.Courses.Remove(existing);
             return Task.FromResult(true);
         }
     }

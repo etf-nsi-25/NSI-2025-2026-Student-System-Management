@@ -1,11 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace University.Core.Entities
+namespace University.Application.DTOs
 {
-    public class Faculty
+    public class CreateFacultyDto
     {
-        [Key]
-        public int Id { get; set; }
         [Required]
         public string Name { get; set; } = string.Empty;
         public string? Address { get; set; }

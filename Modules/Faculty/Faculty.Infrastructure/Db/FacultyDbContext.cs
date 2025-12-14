@@ -19,13 +19,6 @@ public class FacultyDbContext : DbContext
         _currentFacultyId = _tenantService.GetCurrentFacultyId();
     }
 
-	public FacultyDbContext(DbContextOptions<FacultyDbContext> options)
-		: base(options)
-	{
-		// Za migracije nam tenant ne treba – filteri će koristiti Guid.Empty
-		_currentFacultyId = Guid.Empty;
-	}
-
 	/// <summary>
 	/// Gets the current Faculty ID that was resolved during context instantiation.
 	/// This value is used in query filters and can be properly translated to SQL.
@@ -49,8 +42,8 @@ public class FacultyDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Set default schema to "faculty"
-        modelBuilder.HasDefaultSchema("faculty");
+        // Set default schema to "public"
+        modelBuilder.HasDefaultSchema("public");
 
         // Configure entities with Fluent API
         ConfigureTeacher(modelBuilder);

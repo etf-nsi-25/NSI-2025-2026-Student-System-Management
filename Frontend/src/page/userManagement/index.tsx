@@ -132,7 +132,7 @@ export default function UserManagement() {
   };
 
   return (
-    <CContainer fluid className="p-0" style={{ minHeight: '100vh', background: '#f3f4f6' }}>
+    <CContainer fluid className="p-0 " style={{ minHeight: '100vh', background: '#f3f4f6', }}>
       <div className="d-flex flex-column" style={{ minHeight: '100vh' }}>
         <Header />
         <CContainer className="py-4">
