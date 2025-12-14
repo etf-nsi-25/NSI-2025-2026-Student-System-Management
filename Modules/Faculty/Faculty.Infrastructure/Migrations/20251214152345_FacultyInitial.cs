@@ -7,17 +7,17 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faculty.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialFaculty : Migration
+    public partial class FacultyInitial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
-                name: "faculty");
+                name: "public");
 
             migrationBuilder.CreateTable(
                 name: "Course",
-                schema: "faculty",
+                schema: "public",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -37,7 +37,7 @@ namespace Faculty.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Student",
-                schema: "faculty",
+                schema: "public",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -58,7 +58,7 @@ namespace Faculty.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Teacher",
-                schema: "faculty",
+                schema: "public",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -80,7 +80,7 @@ namespace Faculty.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Assignment",
-                schema: "faculty",
+                schema: "public",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -100,7 +100,7 @@ namespace Faculty.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_Assignment_Course_CourseId",
                         column: x => x.CourseId,
-                        principalSchema: "faculty",
+                        principalSchema: "public",
                         principalTable: "Course",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -108,7 +108,7 @@ namespace Faculty.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Exam",
-                schema: "faculty",
+                schema: "public",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -127,7 +127,7 @@ namespace Faculty.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_Exam_Course_CourseId",
                         column: x => x.CourseId,
-                        principalSchema: "faculty",
+                        principalSchema: "public",
                         principalTable: "Course",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -135,7 +135,7 @@ namespace Faculty.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Attendance",
-                schema: "faculty",
+                schema: "public",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -154,14 +154,14 @@ namespace Faculty.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_Attendance_Course_CourseId",
                         column: x => x.CourseId,
-                        principalSchema: "faculty",
+                        principalSchema: "public",
                         principalTable: "Course",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Attendance_Student_StudentId",
                         column: x => x.StudentId,
-                        principalSchema: "faculty",
+                        principalSchema: "public",
                         principalTable: "Student",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -169,7 +169,7 @@ namespace Faculty.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Enrollment",
-                schema: "faculty",
+                schema: "public",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -188,14 +188,14 @@ namespace Faculty.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_Enrollment_Course_CourseId",
                         column: x => x.CourseId,
-                        principalSchema: "faculty",
+                        principalSchema: "public",
                         principalTable: "Course",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Enrollment_Student_StudentId",
                         column: x => x.StudentId,
-                        principalSchema: "faculty",
+                        principalSchema: "public",
                         principalTable: "Student",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -203,7 +203,7 @@ namespace Faculty.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "CourseAssignment",
-                schema: "faculty",
+                schema: "public",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -222,14 +222,14 @@ namespace Faculty.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_CourseAssignment_Course_CourseId",
                         column: x => x.CourseId,
-                        principalSchema: "faculty",
+                        principalSchema: "public",
                         principalTable: "Course",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_CourseAssignment_Teacher_TeacherId",
                         column: x => x.TeacherId,
-                        principalSchema: "faculty",
+                        principalSchema: "public",
                         principalTable: "Teacher",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -237,7 +237,7 @@ namespace Faculty.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "StudentAssignment",
-                schema: "faculty",
+                schema: "public",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -259,14 +259,14 @@ namespace Faculty.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_StudentAssignment_Assignment_AssignmentId",
                         column: x => x.AssignmentId,
-                        principalSchema: "faculty",
+                        principalSchema: "public",
                         principalTable: "Assignment",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_StudentAssignment_Student_StudentId",
                         column: x => x.StudentId,
-                        principalSchema: "faculty",
+                        principalSchema: "public",
                         principalTable: "Student",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -274,7 +274,7 @@ namespace Faculty.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "ExamRegistration",
-                schema: "faculty",
+                schema: "public",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -293,14 +293,14 @@ namespace Faculty.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_ExamRegistration_Exam_ExamId",
                         column: x => x.ExamId,
-                        principalSchema: "faculty",
+                        principalSchema: "public",
                         principalTable: "Exam",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ExamRegistration_Student_StudentId",
                         column: x => x.StudentId,
-                        principalSchema: "faculty",
+                        principalSchema: "public",
                         principalTable: "Student",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -308,7 +308,7 @@ namespace Faculty.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "StudentExamGrade",
-                schema: "faculty",
+                schema: "public",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -329,14 +329,14 @@ namespace Faculty.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_StudentExamGrade_Exam_ExamId",
                         column: x => x.ExamId,
-                        principalSchema: "faculty",
+                        principalSchema: "public",
                         principalTable: "Exam",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_StudentExamGrade_Student_StudentId",
                         column: x => x.StudentId,
-                        principalSchema: "faculty",
+                        principalSchema: "public",
                         principalTable: "Student",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -344,176 +344,176 @@ namespace Faculty.Infrastructure.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_Assignment_CourseId",
-                schema: "faculty",
+                schema: "public",
                 table: "Assignment",
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Assignment_FacultyId",
-                schema: "faculty",
+                schema: "public",
                 table: "Assignment",
                 column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Attendance_CourseId",
-                schema: "faculty",
+                schema: "public",
                 table: "Attendance",
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Attendance_FacultyId",
-                schema: "faculty",
+                schema: "public",
                 table: "Attendance",
                 column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Attendance_StudentId_CourseId_LectureDate",
-                schema: "faculty",
+                schema: "public",
                 table: "Attendance",
                 columns: new[] { "StudentId", "CourseId", "LectureDate" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Course_Code",
-                schema: "faculty",
+                schema: "public",
                 table: "Course",
                 column: "Code");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Course_FacultyId",
-                schema: "faculty",
+                schema: "public",
                 table: "Course",
                 column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CourseAssignment_CourseId",
-                schema: "faculty",
+                schema: "public",
                 table: "CourseAssignment",
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CourseAssignment_FacultyId",
-                schema: "faculty",
+                schema: "public",
                 table: "CourseAssignment",
                 column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CourseAssignment_TeacherId_CourseId",
-                schema: "faculty",
+                schema: "public",
                 table: "CourseAssignment",
                 columns: new[] { "TeacherId", "CourseId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Enrollment_CourseId",
-                schema: "faculty",
+                schema: "public",
                 table: "Enrollment",
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Enrollment_FacultyId",
-                schema: "faculty",
+                schema: "public",
                 table: "Enrollment",
                 column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Enrollment_StudentId_CourseId",
-                schema: "faculty",
+                schema: "public",
                 table: "Enrollment",
                 columns: new[] { "StudentId", "CourseId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Exam_CourseId",
-                schema: "faculty",
+                schema: "public",
                 table: "Exam",
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Exam_FacultyId",
-                schema: "faculty",
+                schema: "public",
                 table: "Exam",
                 column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ExamRegistration_ExamId",
-                schema: "faculty",
+                schema: "public",
                 table: "ExamRegistration",
                 column: "ExamId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ExamRegistration_FacultyId",
-                schema: "faculty",
+                schema: "public",
                 table: "ExamRegistration",
                 column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ExamRegistration_StudentId_ExamId",
-                schema: "faculty",
+                schema: "public",
                 table: "ExamRegistration",
                 columns: new[] { "StudentId", "ExamId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Student_FacultyId",
-                schema: "faculty",
+                schema: "public",
                 table: "Student",
                 column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Student_IndexNumber",
-                schema: "faculty",
+                schema: "public",
                 table: "Student",
                 column: "IndexNumber");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Student_UserId",
-                schema: "faculty",
+                schema: "public",
                 table: "Student",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentAssignment_AssignmentId",
-                schema: "faculty",
+                schema: "public",
                 table: "StudentAssignment",
                 column: "AssignmentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentAssignment_FacultyId",
-                schema: "faculty",
+                schema: "public",
                 table: "StudentAssignment",
                 column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentAssignment_StudentId_AssignmentId",
-                schema: "faculty",
+                schema: "public",
                 table: "StudentAssignment",
                 columns: new[] { "StudentId", "AssignmentId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentExamGrade_ExamId",
-                schema: "faculty",
+                schema: "public",
                 table: "StudentExamGrade",
                 column: "ExamId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentExamGrade_FacultyId",
-                schema: "faculty",
+                schema: "public",
                 table: "StudentExamGrade",
                 column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentExamGrade_StudentId_ExamId",
-                schema: "faculty",
+                schema: "public",
                 table: "StudentExamGrade",
                 columns: new[] { "StudentId", "ExamId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Teacher_FacultyId",
-                schema: "faculty",
+                schema: "public",
                 table: "Teacher",
                 column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Teacher_UserId",
-                schema: "faculty",
+                schema: "public",
                 table: "Teacher",
                 column: "UserId");
         }
@@ -523,47 +523,47 @@ namespace Faculty.Infrastructure.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Attendance",
-                schema: "faculty");
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "CourseAssignment",
-                schema: "faculty");
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "Enrollment",
-                schema: "faculty");
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "ExamRegistration",
-                schema: "faculty");
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "StudentAssignment",
-                schema: "faculty");
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "StudentExamGrade",
-                schema: "faculty");
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "Teacher",
-                schema: "faculty");
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "Assignment",
-                schema: "faculty");
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "Exam",
-                schema: "faculty");
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "Student",
-                schema: "faculty");
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "Course",
-                schema: "faculty");
+                schema: "public");
         }
     }
 }

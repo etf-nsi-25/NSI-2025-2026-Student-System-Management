@@ -12,15 +12,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faculty.Infrastructure.Migrations
 {
     [DbContext(typeof(FacultyDbContext))]
-    [Migration("20251211172121_InitialFaculty")]
-    partial class InitialFaculty
+    [Migration("20251214152345_FacultyInitial")]
+    partial class FacultyInitial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("faculty")
+                .HasDefaultSchema("public")
                 .HasAnnotation("ProductVersion", "9.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -66,7 +66,7 @@ namespace Faculty.Infrastructure.Migrations
 
                     b.HasIndex("FacultyId");
 
-                    b.ToTable("Assignment", "faculty");
+                    b.ToTable("Assignment", "public");
                 });
 
             modelBuilder.Entity("Faculty.Core.Entities.Attendance", b =>
@@ -107,7 +107,7 @@ namespace Faculty.Infrastructure.Migrations
 
                     b.HasIndex("StudentId", "CourseId", "LectureDate");
 
-                    b.ToTable("Attendance", "faculty");
+                    b.ToTable("Attendance", "public");
                 });
 
             modelBuilder.Entity("Faculty.Core.Entities.Course", b =>
@@ -152,7 +152,7 @@ namespace Faculty.Infrastructure.Migrations
 
                     b.HasIndex("FacultyId");
 
-                    b.ToTable("Course", "faculty");
+                    b.ToTable("Course", "public");
                 });
 
             modelBuilder.Entity("Faculty.Core.Entities.CourseAssignment", b =>
@@ -193,7 +193,7 @@ namespace Faculty.Infrastructure.Migrations
 
                     b.HasIndex("TeacherId", "CourseId");
 
-                    b.ToTable("CourseAssignment", "faculty");
+                    b.ToTable("CourseAssignment", "public");
                 });
 
             modelBuilder.Entity("Faculty.Core.Entities.Enrollment", b =>
@@ -235,7 +235,7 @@ namespace Faculty.Infrastructure.Migrations
                     b.HasIndex("StudentId", "CourseId")
                         .IsUnique();
 
-                    b.ToTable("Enrollment", "faculty");
+                    b.ToTable("Enrollment", "public");
                 });
 
             modelBuilder.Entity("Faculty.Core.Entities.Exam", b =>
@@ -274,7 +274,7 @@ namespace Faculty.Infrastructure.Migrations
 
                     b.HasIndex("FacultyId");
 
-                    b.ToTable("Exam", "faculty");
+                    b.ToTable("Exam", "public");
                 });
 
             modelBuilder.Entity("Faculty.Core.Entities.ExamRegistration", b =>
@@ -316,7 +316,7 @@ namespace Faculty.Infrastructure.Migrations
 
                     b.HasIndex("StudentId", "ExamId");
 
-                    b.ToTable("ExamRegistration", "faculty");
+                    b.ToTable("ExamRegistration", "public");
                 });
 
             modelBuilder.Entity("Faculty.Core.Entities.Student", b =>
@@ -365,7 +365,7 @@ namespace Faculty.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Student", "faculty");
+                    b.ToTable("Student", "public");
                 });
 
             modelBuilder.Entity("Faculty.Core.Entities.StudentAssignment", b =>
@@ -415,7 +415,7 @@ namespace Faculty.Infrastructure.Migrations
 
                     b.HasIndex("StudentId", "AssignmentId");
 
-                    b.ToTable("StudentAssignment", "faculty");
+                    b.ToTable("StudentAssignment", "public");
                 });
 
             modelBuilder.Entity("Faculty.Core.Entities.StudentExamGrade", b =>
@@ -462,7 +462,7 @@ namespace Faculty.Infrastructure.Migrations
 
                     b.HasIndex("StudentId", "ExamId");
 
-                    b.ToTable("StudentExamGrade", "faculty");
+                    b.ToTable("StudentExamGrade", "public");
                 });
 
             modelBuilder.Entity("Faculty.Core.Entities.Teacher", b =>
@@ -513,7 +513,7 @@ namespace Faculty.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Teacher", "faculty");
+                    b.ToTable("Teacher", "public");
                 });
 
             modelBuilder.Entity("Faculty.Core.Entities.Assignment", b =>
