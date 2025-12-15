@@ -19,11 +19,7 @@ namespace Faculty.Infrastructure.DependencyInjection
             services.AddHttpContextAccessor();
             services.AddScoped<ITenantService, HttpTenantService>();
             services.AddDbContext<FacultyDbContext>(options =>
-                options.UseNpgsql(
-                    configuration.GetConnectionString("Database"),
-                    npgsqlOptions => npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory_Faculty", "faculty")
-                )
-            );
+                options.UseNpgsql(configuration.GetConnectionString("Database")));
 
             return services;
         }

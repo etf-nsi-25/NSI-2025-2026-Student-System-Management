@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace University.Core.Entities
 {
-	public class Faculty
-	{
-		public int Id { get; set;  }
-		public string Name { get; set; }
-		public string Address { get; set; }
-		public string Code { get; set; }
-	}
+    public class Faculty
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        public string Name { get; set; } = string.Empty;
+        public string? Address { get; set; }
+        [Required]
+        public string Code { get; set; } = string.Empty;
+    }
 }

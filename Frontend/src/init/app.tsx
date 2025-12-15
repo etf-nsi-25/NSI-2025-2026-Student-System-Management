@@ -4,6 +4,7 @@ import { ServiceContextProvider } from '../context/services.tsx';
 import { Authentication } from './auth.tsx';
 import { Router } from './router.tsx';
 
+
 export function App() {
     return (
         <div>
@@ -11,7 +12,7 @@ export function App() {
                 <Authentication>
                     <ServiceContextProvider>
                         <DummyContextProvider>
-                            <Router />
+                                <Router />
                         </DummyContextProvider>
                     </ServiceContextProvider>
                 </Authentication>

@@ -1,16 +1,14 @@
 // Import module DI namespaces
-using Identity.Infrastructure;
 using University.Infrastructure;
-using Faculty.Infrastructure;
 using Support.Infrastructure;
 using Notifications.Infrastructure;
 using Analytics.Infrastructure;
 using Identity.Infrastructure.DependencyInjection;
 using Faculty.Infrastructure.DependencyInjection;
-using Faculty.Infrastructure.Db;
-using Faculty.Core.Interfaces;
-using Faculty.Core.Services;
 using Microsoft.EntityFrameworkCore;
+using Support.Infrastructure.Db;
+using University.Infrastructure.Db;
+using Identity.Infrastructure.Db;
 
 var builder = WebApplication.CreateBuilder(args);
 const string CorsPolicyName = "ReactDevClient";
@@ -55,7 +53,16 @@ builder.Services.AddCors(options =>
 
 // Add Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    // Load all XML documentation files (e.g. Application.xml, Identity.API.xml)
+    var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml");
+
+    foreach (var xmlPath in xmlFiles)
+    {
+        c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+    }
+});
 
 // CORS Configuration for aggregated host - allow frontend dev server
 var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
@@ -72,6 +79,75 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// Put false if you dont want to apply migrations on start
+var applyMigrations = true;
+
+if (applyMigrations)
+{
+
+    using (var scope = app.Services.CreateScope())
+    {
+    var services = scope.ServiceProvider;
+
+    // Identity module
+    try
+    {
+        var identityDb = services.GetRequiredService<AuthDbContext>();
+        identityDb.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error migrating IdentityDbContext: {ex.Message}");
+    }
+
+    // University module
+    try
+    {
+        var universityDb = services.GetRequiredService<UniversityDbContext>();
+        universityDb.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error migrating UniversityDbContext: {ex.Message}");
+    }
+
+    // Support module
+    try
+    {
+        var supportDb = services.GetRequiredService<SupportDbContext>();
+        supportDb.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error migrating SupportDbContext: {ex.Message}");
+    }
+
+    // Notifications module - still no migrations present so commenting this code for now
+    //try
+    //{
+    //var notificationsDb = services.GetRequiredService<NotificationsDbContext>();
+    //notificationsDb.Database.Migrate();
+    //}
+    //catch (Exception ex)
+    //{
+    // Console.WriteLine($"Error migrating NotificationsDbContext: {ex.Message}");
+    //}
+
+    // Analytics module - still no migrations present so commenting this code for now
+    //try
+    //{
+    // var analyticsDb = services.GetRequiredService<AnalyticsDbContext>();
+    // analyticsDb.Database.Migrate();
+    //}
+    //catch (Exception ex)
+    //{
+    // Console.WriteLine($"Error migrating AnalyticsDbContext: {ex.Message}");
+    //}
+    }
+
+}
+
 
 // Middleware
 app.UseHttpsRedirection();
