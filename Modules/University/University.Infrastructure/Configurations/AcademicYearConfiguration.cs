@@ -8,7 +8,7 @@ namespace University.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<AcademicYear> builder)
         {
-            builder.ToTable("AcademicYears", "university");
+            builder.ToTable("AcademicYears");
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Year)

@@ -8,7 +8,7 @@ namespace University.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<Program> builder)
         {
-            builder.ToTable("Programs", "university");
+            builder.ToTable("Programs");
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Name).IsRequired().HasMaxLength(200);
