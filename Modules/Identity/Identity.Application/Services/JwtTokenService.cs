@@ -3,10 +3,10 @@ using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
 using Identity.Core.Entities;
 using Identity.Core.Models;
-using Identity.Infrastructure.Configuration;
 using Identity.Core.Interfaces.Services;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
+using Identity.Core.Configuration;
 
 
 namespace Identity.Application.Services;

@@ -31,7 +31,7 @@ import {
   CAlert,
   CSpinner,
 } from '@coreui/react';
-import './DocumentCenter.css';
+import './documentCenter.css';
 
 const API_BASE_URL = 'https://localhost:5001'; 
 
