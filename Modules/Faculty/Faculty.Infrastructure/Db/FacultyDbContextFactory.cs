@@ -1,5 +1,4 @@
 ﻿using Faculty.Core.Interfaces;
-using Faculty.Core.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
@@ -53,10 +52,8 @@ public class FacultyDbContextFactory : IDesignTimeDbContextFactory<FacultyDbCont
 
         // Configure DbContext options
         var optionsBuilder = new DbContextOptionsBuilder<FacultyDbContext>();
-        optionsBuilder.UseNpgsql(
-            connectionString,
-            npgsqlOptions => npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory_Faculty", "faculty")
-        );
+
+        optionsBuilder.UseNpgsql(connectionString);
 
         // Create design-time tenant service
         var tenantService = new DesignTimeTenantService();

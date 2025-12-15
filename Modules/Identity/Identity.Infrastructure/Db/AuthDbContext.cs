@@ -16,10 +16,10 @@ namespace Identity.Infrastructure.Db
         {
         }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(builder);
-            builder.Entity<User>().ToTable("DomainUsers");
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AuthDbContext).Assembly);
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

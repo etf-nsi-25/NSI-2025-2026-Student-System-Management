@@ -14,7 +14,7 @@ namespace University.Infrastructure
 			services.AddDbContext<UniversityDbContext>(options =>
 				options.UseNpgsql(configuration.GetConnectionString("Database")));
       
-      services.AddScoped<IFacultyService, FacultyService>();
+			services.AddScoped<IFacultyService, FacultyService>();
 			return services;
 		}
 	}
