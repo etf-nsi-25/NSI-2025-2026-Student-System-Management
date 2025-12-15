@@ -25,27 +25,9 @@ jobs:
       
       - name: Build solution
         run: dotnet build --configuration Release --no-restore
-  
-  run-architecture-tests:
-    name: Run Architecture Tests
-    runs-on: ubuntu-latest
-    needs: build-backend
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      
-      - name: Setup .NET 8
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.x'
-      
-      - name: Build and Run Architecture Tests
-        run: |
-          cd ArchitectureTests
-          dotnet build --configuration Release
-          dotnet test --configuration Release --verbosity normal
-      
+
+      - name: Test
+        run: dotnet test --configuration Release --no-build
   
   build-frontend:
     name: Build React Frontend
