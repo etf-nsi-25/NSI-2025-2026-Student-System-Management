@@ -41,16 +41,11 @@ public class AuthService : IAuthService
         CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Authentication attempt for email: {Email}", email);
-        
-        var admin = User.Create("Amar Tahirovic", _passwordHasher.HashPassword(password), "Amar", "Tahirovic", email, Guid.NewGuid(), UserRole.Student, "19006");
-
-       await _userRepository.AddAsync(admin);
-       await _userRepository.SaveAsync();
 
         // Find user by email
         var user = await _userRepository.GetByEmailAsync(email, cancellationToken);
 
-        if (user == null) 
+        if (user == null)
         {
             _logger.LogWarning("Authentication failed: User not found or inactive - {Email}", email);
             throw new UnauthorizedAccessException("Invalid email or password");
