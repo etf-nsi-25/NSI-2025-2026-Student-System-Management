@@ -1,0 +1,147 @@
+using Faculty.Application.DTOs;
+using Faculty.Application.Interfaces;
+using Faculty.Core.Entities;
+using Faculty.Core.Interfaces;
+
+namespace Faculty.Application.Services;
+
+/// <summary>
+/// Service implementation for attendance management operations.
+/// </summary>
+public class AttendanceService : IAttendanceService
+{
+    private readonly IAttendanceRepository _attendanceRepository;
+
+    public AttendanceService(IAttendanceRepository attendanceRepository)
+    {
+        _attendanceRepository = attendanceRepository ?? throw new ArgumentNullException(nameof(attendanceRepository));
+    }
+
+    /// <summary>
+    /// Verifies that the current user is assigned to the specified course.
+    /// </summary>
+    private async Task VerifyTeacherAssignmentAsync(Guid courseId, string userId)
+    {
+        var isAssigned = await _attendanceRepository.IsTeacherAssignedToCourseAsync(userId, courseId);
+        if (!isAssigned)
+        {
+            throw new UnauthorizedAccessException("You are not assigned to this course.");
+        }
+    }
+
+    public async Task<List<StudentAttendanceDTO>> GetStudentsWithAttendanceAsync(Guid courseId, DateTime date, string userId)
+    {
+        await VerifyTeacherAssignmentAsync(courseId, userId);
+
+        var enrollments = await _attendanceRepository.GetEnrolledStudentsAsync(courseId);
+
+        var attendanceRecords = new Dictionary<int, Attendance>();
+        foreach (var enrollment in enrollments)
+        {
+            var attendance = await _attendanceRepository.GetAttendanceAsync(enrollment.StudentId, courseId, date);
+            if (attendance != null)
+            {
+                attendanceRecords[enrollment.StudentId] = attendance;
+            }
+        }
+
+        return enrollments.Select(enrollment =>
+        {
+            var attendance = attendanceRecords.TryGetValue(enrollment.StudentId, out var att) ? att : null;
+            return new StudentAttendanceDTO
+            {
+                StudentId = enrollment.Student.Id,
+                IndexNumber = enrollment.Student.IndexNumber,
+                FirstName = enrollment.Student.FirstName ?? string.Empty,
+                LastName = enrollment.Student.LastName ?? string.Empty,
+                Status = attendance?.Status,
+                Note = attendance?.Note
+            };
+        }).ToList();
+    }
+
+    public async Task SaveAttendanceAsync(SaveAttendanceRequestDTO request, string userId)
+    {
+        await VerifyTeacherAssignmentAsync(request.CourseId, userId);
+
+        var enrollments = await _attendanceRepository.GetEnrolledStudentsAsync(request.CourseId);
+        var enrolledStudentIds = enrollments.Select(e => e.StudentId).ToHashSet();
+
+        var invalidStudentIds = request.Records
+            .Select(r => r.StudentId)
+            .Where(id => !enrolledStudentIds.Contains(id))
+            .ToList();
+
+        if (invalidStudentIds.Any())
+        {
+            throw new ArgumentException($"Invalid student IDs: {string.Join(", ", invalidStudentIds)}. These students are not enrolled in the course.");
+        }
+
+        var dateOnly = DateTime.SpecifyKind(request.Date.Date, DateTimeKind.Utc);
+        var facultyId = await _attendanceRepository.GetCourseFacultyIdAsync(request.CourseId);
+
+        foreach (var record in request.Records)
+        {
+            var attendance = new Attendance
+            {
+                FacultyId = facultyId,
+                StudentId = record.StudentId,
+                CourseId = request.CourseId,
+                LectureDate = dateOnly,
+                Status = record.Status,
+                Note = record.Note
+            };
+
+            await _attendanceRepository.CreateOrUpdateAttendanceAsync(attendance);
+        }
+    }
+
+    public async Task<AttendanceStatisticsDTO> GetAttendanceStatisticsAsync(Guid courseId, DateTime startDate, DateTime endDate, string userId)
+    {
+        await VerifyTeacherAssignmentAsync(courseId, userId);
+
+        var attendances = await _attendanceRepository.GetAttendanceForDateRangeAsync(courseId, startDate, endDate);
+
+        var totalRecords = attendances.Count;
+
+        static bool IsStatus(Attendance a, string expected)
+            => string.Equals(a.Status?.Trim(), expected, StringComparison.OrdinalIgnoreCase);
+
+        var presentCount = attendances.Count(a => IsStatus(a, "Present"));
+        var absentCount = attendances.Count(a => IsStatus(a, "Absent"));
+        var lateCount = attendances.Count(a => IsStatus(a, "Late"));
+
+        var presentPercentage = totalRecords > 0 ? (double)presentCount / totalRecords * 100 : 0;
+        var absentPercentage = totalRecords > 0 ? (double)absentCount / totalRecords * 100 : 0;
+        var latePercentage = totalRecords > 0 ? (double)lateCount / totalRecords * 100 : 0;
+
+        return new AttendanceStatisticsDTO
+        {
+            TotalRecords = totalRecords,
+            PresentCount = presentCount,
+            AbsentCount = absentCount,
+            LateCount = lateCount,
+            PresentPercentage = Math.Round(presentPercentage, 2),
+            AbsentPercentage = Math.Round(absentPercentage, 2),
+            LatePercentage = Math.Round(latePercentage, 2)
+        };
+    }
+
+    public async Task<byte[]> ExportAttendanceReportAsync(Guid courseId, DateTime date, string userId)
+    {
+        await VerifyTeacherAssignmentAsync(courseId, userId);
+
+        var students = await GetStudentsWithAttendanceAsync(courseId, date, userId);
+
+        var csv = new System.Text.StringBuilder();
+        csv.AppendLine("Index Number,First Name,Last Name,Status,Note");
+
+        foreach (var student in students)
+        {
+            csv.AppendLine($"{student.IndexNumber},{student.FirstName},{student.LastName},{student.Status ?? "Not Recorded"},{student.Note ?? ""}");
+        }
+
+        return System.Text.Encoding.UTF8.GetBytes(csv.ToString());
+    }
+}
+

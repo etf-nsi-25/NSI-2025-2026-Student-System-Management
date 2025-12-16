@@ -16,6 +16,8 @@ namespace Faculty.Infrastructure.DependencyInjection
         {
             services.AddScoped<ICourseRepository, CourseRepository>();
             services.AddScoped<ICourseService, CourseService>();
+            services.AddScoped<IAttendanceRepository, AttendanceRepository>();
+            services.AddScoped<IAttendanceService, AttendanceService>();
             services.AddScoped<IStudentExamRegistrationRepository, StudentExamRegistrationRepository>();
             services.AddScoped<IStudentExamRegistrationService, StudentExamRegistrationService>();
             services.AddHttpContextAccessor();
