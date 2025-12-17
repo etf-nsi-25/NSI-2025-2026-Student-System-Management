@@ -8,7 +8,7 @@ using University.Application.Interfaces;
 namespace University.API.Controllers
 {
     [ApiController]
-    [Route("api/university/faculties")]
+    [Route("api/university/faculty-management")] //IMA ISTU RUTU KAO FACULTIES, stavljena ova random jer se ne koristi, provjeriti!!!
     //[Authorize(Roles = "Superadmin")]
     public class FacultyController : ControllerBase
     {
