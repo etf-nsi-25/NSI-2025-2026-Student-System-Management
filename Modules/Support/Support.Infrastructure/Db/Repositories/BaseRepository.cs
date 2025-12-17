@@ -1,16 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using University.Core.Interfaces.Repositories;
-using University.Infrastructure.Db;
+using Support.Core.Interfaces.Repositories;
+using Support.Infrastructure.Db;
 
-namespace University.Infrastructure.Db.Repositories
+namespace Support.Infrastructure.Db.Repositories
 {
     public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class
     {
-        protected readonly UniversityDbContext _context;
+        protected readonly SupportDbContext _context;
         protected readonly DbSet<TEntity> _dbSet;
 
-        public BaseRepository(UniversityDbContext context)
+        public BaseRepository(SupportDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _dbSet = context.Set<TEntity>();

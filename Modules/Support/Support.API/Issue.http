@@ -1,0 +1,47 @@
+### Support Issue API Endpoints
+
+@baseUrl = https://localhost:5001/api
+@issueEndpoint = {{baseUrl}}/issue
+
+### 1. Get all categories
+GET {{issueEndpoint}}/categories
+
+### 2. Create a new issue
+POST {{issueEndpoint}}
+Content-Type: application/json
+
+{
+  "subject": "Cannot access course materials",
+  "description": "I'm unable to access the course materials for Computer Science 101. The download link appears to be broken.",
+  "categoryId": 1,
+  "userId": "user123"
+}
+
+### 3. Get all issues
+GET {{issueEndpoint}}
+
+### 4. Get issue by ID
+GET {{issueEndpoint}}/1
+
+### 5. Get issues by user ID
+GET {{issueEndpoint}}/user/user123
+
+### 6. Update an issue
+PUT {{issueEndpoint}}/1
+Content-Type: application/json
+
+{
+  "subject": "Updated: Cannot access course materials",
+  "status": 1
+}
+
+### 7. Update issue status to Closed
+PUT {{issueEndpoint}}/1
+Content-Type: application/json
+
+{
+  "status": 2
+}
+
+### 8. Delete an issue
+DELETE {{issueEndpoint}}/1

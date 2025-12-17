@@ -1,4 +1,4 @@
-namespace University.Core.Entities
+namespace Support.Core.Entities
 {
     public enum Status
     {

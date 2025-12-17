@@ -1,6 +1,6 @@
-using University.Core.Entities;
+using Support.Core.Entities;
 
-namespace University.Core.Interfaces.Repositories
+namespace Support.Core.Interfaces.Repositories
 {
     public interface ICategoryRepository : IBaseRepository<Category>
     {
