@@ -10,6 +10,16 @@ using Support.Infrastructure.Db;
 using University.Infrastructure.Db;
 using Identity.Infrastructure.Db;
 
+using Faculty.Application.Interfaces;
+using Faculty.Application.Services;
+
+using University.Application.Interfaces.Services;
+using University.Application.Services;
+using Faculty.API;
+using Faculty.Core.Interfaces;
+
+
+
 var builder = WebApplication.CreateBuilder(args);
 const string CorsPolicyName = "ReactDevClient";
 
@@ -20,6 +30,25 @@ builder.Services.AddFacultyModule(builder.Configuration);
 builder.Services.AddSupportModule(builder.Configuration);
 builder.Services.AddNotificationsModule();
 builder.Services.AddAnalyticsModule();
+
+
+// Faculty application services
+builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+
+// University application services
+//builder.Services.AddScoped<IFacultyService, FacultyService>();
+
+
+//ZBOG JWT, JER NE RADI LOGIN
+/*if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddScoped<ITenantService, DevTenantServiceFAKE>();
+}*/
+builder.Services.AddScoped<ITenantService, DevTenantServiceFAKE>();
+
+
+
 
 // Add controllers and module API assemblies
 var mvcBuilder = builder.Services.AddControllers();
@@ -41,14 +70,14 @@ foreach (var asm in moduleControllers)
 
 builder.Services.AddCors(options =>
 {
-	options.AddPolicy(CorsPolicyName, policy =>
-	{
-		policy
-			.WithOrigins("http://localhost:5173")  
-			.AllowAnyHeader()
-			.AllowAnyMethod()
-		    .AllowCredentials();   
-	});
+    options.AddPolicy(CorsPolicyName, policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
 });
 
 // Add Swagger
@@ -88,62 +117,62 @@ if (applyMigrations)
 
     using (var scope = app.Services.CreateScope())
     {
-    var services = scope.ServiceProvider;
+        var services = scope.ServiceProvider;
 
-    // Identity module
-    try
-    {
-        var identityDb = services.GetRequiredService<AuthDbContext>();
-        identityDb.Database.Migrate();
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error migrating IdentityDbContext: {ex.Message}");
-    }
+        // Identity module
+        try
+        {
+            var identityDb = services.GetRequiredService<AuthDbContext>();
+            identityDb.Database.Migrate();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error migrating IdentityDbContext: {ex.Message}");
+        }
 
-    // University module
-    try
-    {
-        var universityDb = services.GetRequiredService<UniversityDbContext>();
-        universityDb.Database.Migrate();
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error migrating UniversityDbContext: {ex.Message}");
-    }
+        // University module
+        try
+        {
+            var universityDb = services.GetRequiredService<UniversityDbContext>();
+            universityDb.Database.Migrate();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error migrating UniversityDbContext: {ex.Message}");
+        }
 
-    // Support module
-    try
-    {
-        var supportDb = services.GetRequiredService<SupportDbContext>();
-        supportDb.Database.Migrate();
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error migrating SupportDbContext: {ex.Message}");
-    }
+        // Support module
+        try
+        {
+            var supportDb = services.GetRequiredService<SupportDbContext>();
+            supportDb.Database.Migrate();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error migrating SupportDbContext: {ex.Message}");
+        }
 
-    // Notifications module - still no migrations present so commenting this code for now
-    //try
-    //{
-    //var notificationsDb = services.GetRequiredService<NotificationsDbContext>();
-    //notificationsDb.Database.Migrate();
-    //}
-    //catch (Exception ex)
-    //{
-    // Console.WriteLine($"Error migrating NotificationsDbContext: {ex.Message}");
-    //}
+        // Notifications module - still no migrations present so commenting this code for now
+        //try
+        //{
+        //var notificationsDb = services.GetRequiredService<NotificationsDbContext>();
+        //notificationsDb.Database.Migrate();
+        //}
+        //catch (Exception ex)
+        //{
+        // Console.WriteLine($"Error migrating NotificationsDbContext: {ex.Message}");
+        //}
 
-    // Analytics module - still no migrations present so commenting this code for now
-    //try
-    //{
-    // var analyticsDb = services.GetRequiredService<AnalyticsDbContext>();
-    // analyticsDb.Database.Migrate();
-    //}
-    //catch (Exception ex)
-    //{
-    // Console.WriteLine($"Error migrating AnalyticsDbContext: {ex.Message}");
-    //}
+        // Analytics module - still no migrations present so commenting this code for now
+        //try
+        //{
+        // var analyticsDb = services.GetRequiredService<AnalyticsDbContext>();
+        // analyticsDb.Database.Migrate();
+        //}
+        //catch (Exception ex)
+        //{
+        // Console.WriteLine($"Error migrating AnalyticsDbContext: {ex.Message}");
+        //}
     }
 
 }
