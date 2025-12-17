@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Support.Infrastructure.Db;
 using University.Infrastructure.Db;
 using Identity.Infrastructure.Db;
+using Faculty.Infrastructure.Db;
 
 var builder = WebApplication.CreateBuilder(args);
 const string CorsPolicyName = "ReactDevClient";
@@ -112,16 +113,27 @@ if (applyMigrations)
         Console.WriteLine($"Error migrating UniversityDbContext: {ex.Message}");
     }
 
-    // Support module
+    // Faculty module
     try
     {
-        var supportDb = services.GetRequiredService<SupportDbContext>();
-        supportDb.Database.Migrate();
+        var facultyDb = services.GetRequiredService<FacultyDbContext>();
+        facultyDb.Database.Migrate();
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Error migrating SupportDbContext: {ex.Message}");
+        Console.WriteLine($"Error migrating FacultyDbContext: {ex.Message}");
     }
+
+    // Support module
+        try
+        {
+            var supportDb = services.GetRequiredService<SupportDbContext>();
+            supportDb.Database.Migrate();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error migrating SupportDbContext: {ex.Message}");
+        }
 
     // Notifications module - still no migrations present so commenting this code for now
     //try
