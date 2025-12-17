@@ -1,0 +1,70 @@
+.cc-card{
+  width: 100%;
+  min-height: 160px;              /* kartica viša */
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 22px 18px;             /* više vertikalnog prostora */
+  text-align: center;             /* sav tekst centriran */
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+
+  display: flex;                  /* centriranje sadržaja */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  cursor: default;
+  transition: 
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.cc-card:disabled{
+  opacity: 1;
+}
+
+.cc-title{
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.25;
+  margin-bottom: 10px;
+}
+
+.cc-desc{
+  font-size: 0.9rem;
+  color: rgba(15, 23, 42, 0.7);
+  line-height: 1.45;
+
+  /* RESPONSIVE prelamanje teksta */
+  max-width: 26ch;                /* kontrolisana širina teksta */
+  white-space: normal;
+  word-break: break-word;
+}
+
+.cc-clickable{
+  cursor: pointer;
+}
+
+.cc-clickable:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.10);
+  border-color: rgba(15, 23, 42, 0.16);
+}
+
+.cc-clickable:active{
+  transform: translateY(-1px);
+}
+
+/* Mobile dodatno zbijanje */
+@media (max-width: 600px){
+  .cc-card{
+    min-height: 140px;
+    padding: 18px 14px;
+  }
+
+  .cc-desc{
+    max-width: 100%;
+  }
+}
