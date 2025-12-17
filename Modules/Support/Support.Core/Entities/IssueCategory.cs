@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Support.Core.Entities
 {
-    public class Category
+    public class IssueCategory
     {
         [Key]
         public int Id { get; set; }

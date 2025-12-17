@@ -16,7 +16,7 @@ namespace Support.Infrastructure
 				options.UseNpgsql(configuration.GetConnectionString("Database")));
 
 			services.AddScoped<IIssueRepository, IssueRepository>();
-			services.AddScoped<ICategoryRepository, CategoryRepository>();
+			services.AddScoped<IIssueCategoryRepository, IssueCategoryRepository>();
 
 			services.AddScoped<IIssueService, IssueService>();
 

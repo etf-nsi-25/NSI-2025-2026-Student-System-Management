@@ -4,9 +4,9 @@ using Support.Infrastructure.Db;
 
 namespace Support.Infrastructure.Db.Repositories
 {
-    public class CategoryRepository : BaseRepository<Category>, ICategoryRepository
+    public class IssueCategoryRepository : BaseRepository<IssueCategory>, IIssueCategoryRepository
     {
-        public CategoryRepository(SupportDbContext context) : base(context)
+        public IssueCategoryRepository(SupportDbContext context) : base(context)
         {
         }
     }

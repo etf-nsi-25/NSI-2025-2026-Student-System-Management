@@ -12,11 +12,11 @@ namespace Support.Application.Services
         Task<IssueDto?> UpdateIssueAsync(int id, UpdateIssueDto updateIssueDto, CancellationToken cancellationToken = default);
         Task<bool> DeleteIssueAsync(int id, CancellationToken cancellationToken = default);
 
-        // Category methods
-        Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto createCategoryDto, CancellationToken cancellationToken = default);
-        Task<CategoryDto?> GetCategoryByIdAsync(int id, CancellationToken cancellationToken = default);
-        Task<IEnumerable<CategoryDto>> GetAllCategoriesAsync(CancellationToken cancellationToken = default);
-        Task<CategoryDto?> UpdateCategoryAsync(int id, UpdateCategoryDto updateCategoryDto, CancellationToken cancellationToken = default);
+        // IssueCategory methods
+        Task<IssueCategoryDto> CreateCategoryAsync(CreateIssueCategoryDto createCategoryDto, CancellationToken cancellationToken = default);
+        Task<IssueCategoryDto?> GetCategoryByIdAsync(int id, CancellationToken cancellationToken = default);
+        Task<IEnumerable<IssueCategoryDto>> GetAllCategoriesAsync(CancellationToken cancellationToken = default);
+        Task<IssueCategoryDto?> UpdateCategoryAsync(int id, UpdateIssueCategoryDto updateCategoryDto, CancellationToken cancellationToken = default);
         Task<bool> DeleteCategoryAsync(int id, CancellationToken cancellationToken = default);
     }
 }

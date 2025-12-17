@@ -13,9 +13,9 @@ namespace Support.Core.Entities
         public string Description { get; set; } = string.Empty;
 
         [Required]
-        [ForeignKey("Category")]
+        [ForeignKey("IssueCategory")]
         public int CategoryId { get; set; }
-        public Category? Category { get; set; }
+        public IssueCategory? Category { get; set; }
 
         [Required]
         public string UserId { get; set; } = string.Empty;

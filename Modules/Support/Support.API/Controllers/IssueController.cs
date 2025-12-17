@@ -154,8 +154,8 @@ namespace Support.API.Controllers
         }
 
         [HttpGet("categories")]
-        [ProducesResponseType(typeof(IEnumerable<CategoryDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<CategoryDto>>> GetAllCategories(CancellationToken cancellationToken)
+        [ProducesResponseType(typeof(IEnumerable<IssueCategoryDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<IssueCategoryDto>>> GetAllCategories(CancellationToken cancellationToken)
         {
             try
             {
@@ -164,8 +164,8 @@ namespace Support.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving categories");
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving categories" });
+                _logger.LogError(ex, "Error retrieving issue categories");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving issue categories" });
             }
         }
     }

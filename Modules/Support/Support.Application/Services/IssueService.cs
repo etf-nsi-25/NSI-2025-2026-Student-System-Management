@@ -7,9 +7,9 @@ namespace Support.Application.Services
     public class IssueService : IIssueService
     {
         private readonly IIssueRepository _issueRepository;
-        private readonly ICategoryRepository _categoryRepository;
+        private readonly IIssueCategoryRepository _categoryRepository;
 
-        public IssueService(IIssueRepository issueRepository, ICategoryRepository categoryRepository)
+        public IssueService(IIssueRepository issueRepository, IIssueCategoryRepository categoryRepository)
         {
             _issueRepository = issueRepository ?? throw new ArgumentNullException(nameof(issueRepository));
             _categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
@@ -131,9 +131,9 @@ namespace Support.Application.Services
             return true;
         }
 
-        public async Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto createCategoryDto, CancellationToken cancellationToken = default)
+        public async Task<IssueCategoryDto> CreateCategoryAsync(CreateIssueCategoryDto createCategoryDto, CancellationToken cancellationToken = default)
         {
-            var category = new Category
+            var category = new IssueCategory
             {
                 Title = createCategoryDto.Title,
                 Priority = createCategoryDto.Priority
@@ -141,7 +141,7 @@ namespace Support.Application.Services
 
             var createdCategory = await _categoryRepository.AddAsync(category, cancellationToken);
 
-            return new CategoryDto
+            return new IssueCategoryDto
             {
                 Id = createdCategory.Id,
                 Title = createdCategory.Title,
@@ -149,13 +149,13 @@ namespace Support.Application.Services
             };
         }
 
-        public async Task<CategoryDto?> GetCategoryByIdAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<IssueCategoryDto?> GetCategoryByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             var category = await _categoryRepository.GetByIdAsync(id, cancellationToken);
             if (category == null)
                 return null;
 
-            return new CategoryDto
+            return new IssueCategoryDto
             {
                 Id = category.Id,
                 Title = category.Title,
@@ -163,14 +163,14 @@ namespace Support.Application.Services
             };
         }
 
-        public async Task<IEnumerable<CategoryDto>> GetAllCategoriesAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<IssueCategoryDto>> GetAllCategoriesAsync(CancellationToken cancellationToken = default)
         {
             var categories = await _categoryRepository.GetAsync(
                 orderBy: q => q.OrderBy(c => c.Priority).ThenBy(c => c.Title),
                 cancellationToken: cancellationToken
             );
 
-            return categories.Select(c => new CategoryDto
+            return categories.Select(c => new IssueCategoryDto
             {
                 Id = c.Id,
                 Title = c.Title,
@@ -178,7 +178,7 @@ namespace Support.Application.Services
             });
         }
 
-        public async Task<CategoryDto?> UpdateCategoryAsync(int id, UpdateCategoryDto updateCategoryDto, CancellationToken cancellationToken = default)
+        public async Task<IssueCategoryDto?> UpdateCategoryAsync(int id, UpdateIssueCategoryDto updateCategoryDto, CancellationToken cancellationToken = default)
         {
             var category = await _categoryRepository.GetByIdAsync(id, cancellationToken);
             if (category == null)
@@ -192,7 +192,7 @@ namespace Support.Application.Services
 
             await _categoryRepository.UpdateAsync(category, cancellationToken);
 
-            return new CategoryDto
+            return new IssueCategoryDto
             {
                 Id = category.Id,
                 Title = category.Title,

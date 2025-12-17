@@ -1,6 +1,6 @@
 namespace Support.Application.DTOs
 {
-    public class CategoryDto
+    public class IssueCategoryDto
     {
         public int Id { get; set; }
         public string Title { get; set; } = string.Empty;

@@ -2,9 +2,9 @@
 
 @baseUrl = https://localhost:5001/api
 @issueEndpoint = {{baseUrl}}/issue
-@categoryEndpoint = {{baseUrl}}/category
+@categoryEndpoint = {{baseUrl}}/issue-category
 
-### === CATEGORY ENDPOINTS ===
+### === ISSUE CATEGORY ENDPOINTS ===
 
 ### 1. Create a new category
 POST {{categoryEndpoint}}

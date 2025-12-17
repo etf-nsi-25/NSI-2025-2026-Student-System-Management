@@ -15,7 +15,7 @@ namespace Support.Infrastructure.DependencyInjection
             // Repozitoriji
             services.AddScoped<IRequestRepository, RequestRepository>();
             services.AddScoped<IIssueRepository, IssueRepository>();
-            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IIssueCategoryRepository, IssueCategoryRepository>();
 
             // Servisi
             services.AddScoped<IRequestService, RequestService>();

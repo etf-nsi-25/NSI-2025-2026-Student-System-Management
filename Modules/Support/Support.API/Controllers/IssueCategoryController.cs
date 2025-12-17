@@ -5,22 +5,22 @@ using Support.Application.Services;
 namespace Support.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
-    public class CategoryController : ControllerBase
+    [Route("api/issue-category")]
+    public class IssueCategoryController : ControllerBase
     {
         private readonly IIssueService _issueService;
-        private readonly ILogger<CategoryController> _logger;
+        private readonly ILogger<IssueCategoryController> _logger;
 
-        public CategoryController(IIssueService issueService, ILogger<CategoryController> logger)
+        public IssueCategoryController(IIssueService issueService, ILogger<IssueCategoryController> logger)
         {
             _issueService = issueService ?? throw new ArgumentNullException(nameof(issueService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(CategoryDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(IssueCategoryDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<CategoryDto>> CreateCategory([FromBody] CreateCategoryDto createCategoryDto, CancellationToken cancellationToken)
+        public async Task<ActionResult<IssueCategoryDto>> CreateCategory([FromBody] CreateIssueCategoryDto createCategoryDto, CancellationToken cancellationToken)
         {
             try
             {
@@ -38,9 +38,9 @@ namespace Support.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(CategoryDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IssueCategoryDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<CategoryDto>> GetCategoryById(int id, CancellationToken cancellationToken)
+        public async Task<ActionResult<IssueCategoryDto>> GetCategoryById(int id, CancellationToken cancellationToken)
         {
             try
             {
@@ -58,8 +58,8 @@ namespace Support.API.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<CategoryDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<CategoryDto>>> GetAllCategories(CancellationToken cancellationToken)
+        [ProducesResponseType(typeof(IEnumerable<IssueCategoryDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<IssueCategoryDto>>> GetAllCategories(CancellationToken cancellationToken)
         {
             try
             {
@@ -74,10 +74,10 @@ namespace Support.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [ProducesResponseType(typeof(CategoryDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IssueCategoryDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<CategoryDto>> UpdateCategory(int id, [FromBody] UpdateCategoryDto updateCategoryDto, CancellationToken cancellationToken)
+        public async Task<ActionResult<IssueCategoryDto>> UpdateCategory(int id, [FromBody] UpdateIssueCategoryDto updateCategoryDto, CancellationToken cancellationToken)
         {
             try
             {
