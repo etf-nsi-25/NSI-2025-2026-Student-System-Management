@@ -11,7 +11,7 @@ namespace Faculty.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/faculty/attendance")]
-[Authorize]
+
 public class AttendanceController : ControllerBase
 {
     private readonly IAttendanceService _attendanceService;
