@@ -55,21 +55,32 @@ export const studentEnrollmentService = {
     return ENROLLMENTS_MOCK;
   },
 
-  async createEnrollment(facultyId: string, academicYear: string): Promise<void> {
-    await delay(400);
+async createEnrollment(academicYear: string): Promise<void> {
+  await delay(400);
 
-    const faculty = FACULTIES_MOCK.find((f) => f.id === facultyId);
-    if (!faculty) throw new Error("Faculty not found");
+  const existingEnrollment = ENROLLMENTS_MOCK[0];
 
-    const newEnrollment: Enrollment = {
-      id: crypto.randomUUID(),
-      facultyId,
-      facultyName: faculty.name,
-      date: new Date().toISOString(),
-      academicYear,
-      status: "Pending",
-    };
+  if (!existingEnrollment) {
+    throw new Error("Cannot determine student faculty");
+  }
 
-    ENROLLMENTS_MOCK = [newEnrollment, ...ENROLLMENTS_MOCK];
-  },
+  const facultyId = existingEnrollment.facultyId;
+
+  const faculty = FACULTIES_MOCK.find((f) => f.id === facultyId);
+
+  if (!faculty) {
+    throw new Error("Faculty not found");
+  }
+
+  const newEnrollment: Enrollment = {
+    id: crypto.randomUUID(),
+    facultyId: faculty.id,
+    facultyName: faculty.name,
+    date: new Date().toISOString(),
+    academicYear,
+    status: "Pending",
+  };
+
+  ENROLLMENTS_MOCK = [newEnrollment, ...ENROLLMENTS_MOCK];
+},
 };

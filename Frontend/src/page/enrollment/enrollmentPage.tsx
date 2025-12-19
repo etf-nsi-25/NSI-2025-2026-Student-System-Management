@@ -7,8 +7,6 @@ import {
   CCardHeader,
   CCol,
   CForm,
-  CFormLabel,
-  CFormSelect,
   CRow,
   CSpinner,
   CTable,
@@ -18,22 +16,27 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from "@coreui/react";
-import type {
-  Enrollment,
-  Faculty,
-} from "../../models/enrollment/Enrollment.types";
+import type { Enrollment } from "../../models/enrollment/Enrollment.types";
 import { studentEnrollmentService } from "../../service/enrollment/studentEnrollmentService";
 
-const CURRENT_ACADEMIC_YEAR = "2025/2026";
+const getCurrentAcademicYear = (date = new Date()): string => {
+  const year = date.getFullYear();
+  const month = date.getMonth(); // 0=Jan ... 8=Sep
+
+  const startYear = month >= 8 ? year : year - 1;
+  return `${startYear}/${startYear + 1}`;
+};
 
 export const EnrollmentStudentPage: React.FC = () => {
-  const [faculties, setFaculties] = useState<Faculty[]>([]);
+
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
-  const [selectedFacultyId, setSelectedFacultyId] = useState<string>("");
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const CURRENT_ACADEMIC_YEAR = useMemo(() => getCurrentAcademicYear(), []);
 
   const { activeEnrollments, previousEnrollments } = useMemo(() => {
     const active = enrollments.filter((e) => e.status !== "Done");
@@ -44,11 +47,9 @@ export const EnrollmentStudentPage: React.FC = () => {
   const loadData = async () => {
     try {
       setIsLoading(true);
-      const [facultiesRes, enrollmentsRes] = await Promise.all([
-        studentEnrollmentService.getFaculties(),
-        studentEnrollmentService.getEnrollments(),
-      ]);
-      setFaculties(facultiesRes);
+
+      const enrollmentsRes = await studentEnrollmentService.getEnrollments();
+
       setEnrollments(enrollmentsRes);
     } catch (e) {
       console.error(e);
@@ -62,31 +63,19 @@ export const EnrollmentStudentPage: React.FC = () => {
     loadData();
   }, []);
 
-  const handleCancel = () => {
-    setSelectedFacultyId("");
-    setSuccessMessage(null);
-    setErrorMessage(null);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedFacultyId) {
-      setErrorMessage("Please choose your faculty.");
-      return;
-    }
 
     try {
       setIsSubmitting(true);
       setErrorMessage(null);
       setSuccessMessage(null);
 
-      await studentEnrollmentService.createEnrollment(
-        selectedFacultyId,
-        CURRENT_ACADEMIC_YEAR
-      );
+      await studentEnrollmentService.createEnrollment(CURRENT_ACADEMIC_YEAR);
 
-      setSuccessMessage("Your enrollment request has been submitted.");
-      setSelectedFacultyId("");
+      setSuccessMessage(
+        `Your enrollment request for ${CURRENT_ACADEMIC_YEAR} has been submitted.`
+      );
 
       await loadData();
     } catch (e) {
@@ -106,7 +95,7 @@ export const EnrollmentStudentPage: React.FC = () => {
   }
 
   return (
-    <div className="student-enrollment-page  px-4 py-3">
+    <div className="student-enrollment-page px-4 py-3">
       <h2 style={{ color: "#1e4d8b" }} className="mb-4 fw-semibold">
         Welcome back, Jane!
       </h2>
@@ -117,6 +106,7 @@ export const EnrollmentStudentPage: React.FC = () => {
             Enrollment for Academic Year {CURRENT_ACADEMIC_YEAR}
           </h5>
         </CCardHeader>
+
         <CCardBody>
           {successMessage && (
             <CAlert color="success" className="mb-3">
@@ -131,32 +121,7 @@ export const EnrollmentStudentPage: React.FC = () => {
 
           <CForm onSubmit={handleSubmit}>
             <CRow className="align-items-end">
-              <CCol md={4}>
-                <CFormLabel className="fw-semibold">Faculty</CFormLabel>
-                <CFormSelect
-                  value={selectedFacultyId}
-                  onChange={(e) => setSelectedFacultyId(e.target.value)}
-                >
-                  <option value="">Choose your faculty</option>
-                  {faculties.map((f) => (
-                    <option key={f.id} value={f.id}>
-                      {f.name}
-                    </option>
-                  ))}
-                </CFormSelect>
-              </CCol>
-
               <CCol className="text-end">
-                <CButton
-                  type="button"
-                  color="secondary"
-                  variant="outline"
-                  className="me-2 px-4"
-                  onClick={handleCancel}
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </CButton>
                 <CButton
                   type="submit"
                   style={{
@@ -194,10 +159,7 @@ export const EnrollmentStudentPage: React.FC = () => {
             <CTableBody>
               {activeEnrollments.length === 0 ? (
                 <CTableRow>
-                  <CTableDataCell
-                    colSpan={4}
-                    className="text-center text-muted"
-                  >
+                  <CTableDataCell colSpan={4} className="text-center text-muted">
                     No active enrollments.
                   </CTableDataCell>
                 </CTableRow>
@@ -237,10 +199,7 @@ export const EnrollmentStudentPage: React.FC = () => {
             <CTableBody>
               {previousEnrollments.length === 0 ? (
                 <CTableRow>
-                  <CTableDataCell
-                    colSpan={4}
-                    className="text-center text-muted"
-                  >
+                  <CTableDataCell colSpan={4} className="text-center text-muted">
                     No previous enrollments.
                   </CTableDataCell>
                 </CTableRow>
