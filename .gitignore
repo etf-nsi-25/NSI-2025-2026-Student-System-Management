@@ -137,3 +137,5 @@ Deployment/local/.pgdata/
 
 # SSL certificates
 Frontend/certs/
+
+.env

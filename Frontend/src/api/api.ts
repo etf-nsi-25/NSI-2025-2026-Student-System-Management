@@ -1,8 +1,8 @@
 import type { RestClient } from './rest';
 
 import type {
-  TwoFASetupResponse,
-  TwoFAConfirmResponse,
+    TwoFASetupResponse,
+    TwoFAConfirmResponse,
 } from '../models/2fa/TwoFA.types';
 
 export class API {
@@ -34,7 +34,6 @@ export class API {
     }
 
     async enableTwoFactor(): Promise<TwoFASetupResponse> {
-        // nema body-a, userId je za sada hardcodan u backendu ("demo")
         return this.#restClient.post('/api/auth/enable-2fa');
     }
 

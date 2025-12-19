@@ -25,6 +25,7 @@ import AppLayout from '../component/AppLayout/AppLayout.tsx';
 import DefaultLayout from '../component/UniversityDashboardLayout/DefaultLayout.tsx';
 import UniversityDashboard from "../page/university-dashboard/UniversityDashboard.tsx";
 
+import UserManagement from '../page/userManagement/index.tsx';
 
 export function Router(): React.ReactNode {
   return (
@@ -56,6 +57,9 @@ export function Router(): React.ReactNode {
         <Route path="analytics" element={<StudentAnalytics />} />
         <Route path="request-management" element={<RequestManagement />} />
         <Route path="enrollment" element={<EnrollmentPage />} />
+  
+        <Route path="user-management" element={<UserManagement/>}/>
+        
         <Route path="profile-settings" element={<ProfileSettings />} />
         <Route path="support" element={<StudentSupport />} />
         <Route index element={<StudentDashboardPage />} />

@@ -45,7 +45,7 @@ public class AuthService : IAuthService
         // Find user by email
         var user = await _userRepository.GetByEmailAsync(email, cancellationToken);
 
-        if (user == null) 
+        if (user == null)
         {
             _logger.LogWarning("Authentication failed: User not found or inactive - {Email}", email);
             throw new UnauthorizedAccessException("Invalid email or password");
