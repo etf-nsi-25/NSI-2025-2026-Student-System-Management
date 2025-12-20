@@ -1,4 +1,4 @@
-﻿namespace Identity.Infrastructure.Configuration;
+﻿namespace Identity.Core.Configuration;
 
 public class JwtSettings
 {

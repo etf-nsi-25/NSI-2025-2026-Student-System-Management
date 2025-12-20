@@ -9,7 +9,6 @@ namespace University.API.Controllers
 {
     [ApiController]
     [Route("api/university/faculties")]
-    //[Authorize(Roles = "Superadmin")]
     public class FacultyController : ControllerBase
     {
         private readonly IFacultyService _facultyService;
@@ -106,8 +105,6 @@ namespace University.API.Controllers
         {
             try
             {
-                // TODO: When real db is implemented, this should throw a conflict exception
-                // For now, we just check if the faculty exists and return true/false
                 var result = await _facultyService.DeleteFacultyAsync(id);
                 if (!result)
                 {
@@ -117,8 +114,6 @@ namespace University.API.Controllers
             }
             catch (Exception)
             {
-                // This is where we would handle the conflict exception
-                // For now, we just return a 500
                 return StatusCode(500, $"An error occurred while deleting the faculty with id {id}.");
             }
         }

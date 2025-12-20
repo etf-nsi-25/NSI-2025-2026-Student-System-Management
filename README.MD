@@ -61,6 +61,52 @@ To connect to the database locally you should set an environment variable such a
 5. *Open Swagger UI*
    https://localhost:7229/index.html
 
+## Database Migrations
+
+All migrations are applied automatically on application startup. You can disable this by setting the applyMigrations variable in Program.cs to false.
+
+Note: FacultyDbContext depends on HTTP context, so migrations for this module cannot run automatically on startup. They must be run manually in the 
+Package Manager Console and Set Default Project to Faculty.Infrastructure after that run "Update-Database"
+
+### Adding a New Migration
+
+If you add or modify an entity in a module:
+
+Open Package Manager Console.
+
+Set Default Project to the infrastructure project of the modified module.
+
+Run:
+
+Add-Migration <MIGRATION_NAME> -Context <ModuleDbContext> -OutputDir Migrations
+
+
+This will create a new migration in the Migrations folder of the modified module.
+
+To apply it to the database, run:
+
+Update-Database
+
+### Removing an Incorrect Migration
+
+If a migration was created by mistake run:
+
+Remove-Migration
+
+
+Make sure the Default Project is set to the module where the migration was created.
+
+### Downgrading / Reverting a Migration
+
+To revert to a previous migration:
+
+Update-Database -Migration <PREVIOUS_MIGRATION_NAME>
+
+
+This will roll back the database to the specified migration.
+
+Always ensure you are in the correct Default Project corresponding to the DbContext.
+
 
 ## Frontend 
 The frontend is a React 19 application. To install it you will need to install Node 20.

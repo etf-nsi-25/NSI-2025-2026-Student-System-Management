@@ -367,8 +367,6 @@ html, body {
   margin-top: 26px;
 }
 
-
-/* Staro faculty-role poravnanje (ako ti zatreba negdje drugo) */
 .faculty-role-row {
   display: flex;
   flex-direction: row;
@@ -383,4 +381,62 @@ html, body {
   display: flex;
   flex-direction: column;
   padding-top: 0 !important;
+}
+
+/* 1. STILIZACIJA SIDEBARA I NAVIGACIJE */
+
+/* Glavna Sidebar pozadina */
+.c-sidebar.sidebar-custom-blue {
+    background-color: var(--color-sidebar-dark);
+    color: rgba(255, 255, 255, 0.85); /* Svijetli tekst */
+}
+
+/* Stil za navigacijske stavke unutar Sidebar-a */
+.c-sidebar .nav-item .nav-link {
+    color: rgba(255, 255, 255, 0.85);
+    padding: 10px 16px;
+    border-radius: 0;
+    transition: background-color 0.2s;
+}
+
+/* Aktivna stavka: Bijela pozadina, Plavi tekst (kao na slici) */
+.c-sidebar .nav-item .nav-link.active {
+    background-color: var(--color-card-background); /* Bijela pozadina */
+    color: var(--color-text-active); /* Tamno plavi tekst */
+    font-weight: bold;
+    /* Da se proteže do ruba */
+    border-left: 5px solid var(--color-text-active); 
+    padding-left: 11px; /* 16px - 5px */
+}
+
+/* Aktivne ikone (moraju biti plave) */
+.c-sidebar .nav-item .nav-link.active .nav-icon {
+    color: var(--color-text-active);
+}
+
+/* Sidebar Footer (Jane Smith) */
+.c-sidebar .sidebar-footer-item {
+    padding: 12px 16px;
+    background-color: var(--color-sidebar-dark);
+    /* Fiksira ga na dno, koristi se na wrapper divu s mt-auto */
+    border-top: 1px solid rgba(255, 255, 255, 0.1); 
+}
+.c-sidebar .sidebar-footer-item span,
+.c-sidebar .sidebar-footer-item svg {
+    color: #ffffff; /* Bijela boja teksta i ikona */
+}
+
+
+/* 2. STILIZACIJA GLAVNOG SADRŽAJA I HEADERA */
+
+/* Pozadina glavnog sadržaja */
+.main-content-custom-light-blue {
+    background-color: var(--color-content-light); /* Svijetlo plava */
+}
+
+/* Header Naslov */
+.header-title-custom {
+    color: #000000; /* Crni tekst */
+    font-weight: bold;
+    font-size: 1.5rem; /* Povećaj font za naslov */
 }
