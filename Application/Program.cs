@@ -10,6 +10,7 @@ using Support.Infrastructure.Db;
 using University.Infrastructure.Db;
 using Identity.Infrastructure.Db;
 using Faculty.Infrastructure.Db;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 const string CorsPolicyName = "ReactDevClient";
@@ -39,6 +40,10 @@ foreach (var asm in moduleControllers)
 {
     mvcBuilder.PartManager.ApplicationParts.Add(new Microsoft.AspNetCore.Mvc.ApplicationParts.AssemblyPart(asm));
 }
+
+// Add FluentValidation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
 
 builder.Services.AddCors(options =>
 {

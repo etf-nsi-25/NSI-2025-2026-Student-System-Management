@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Faculty.Infrastructure.Repositories;
 using Faculty.Application.Services;
 using Faculty.Application.Interfaces;
+using FluentValidation;
+using Faculty.Application.Validators;
 
 namespace Faculty.Infrastructure.DependencyInjection
 {
@@ -16,10 +18,16 @@ namespace Faculty.Infrastructure.DependencyInjection
         {
             services.AddScoped<ICourseRepository, CourseRepository>();
             services.AddScoped<ICourseService, CourseService>();
+            services.AddScoped<IExamRepository, ExamRepository>();
+            services.AddScoped<IExamService, ExamService>();
+            services.AddScoped<ITeacherRepository, TeacherRepository>();
             services.AddHttpContextAccessor();
             services.AddScoped<ITenantService, HttpTenantService>();
             services.AddDbContext<FacultyDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("Database")));
+
+            // Add FluentValidation
+            services.AddValidatorsFromAssemblyContaining<CreateExamRequestValidator>();
 
             return services;
         }
