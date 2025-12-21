@@ -1,9 +1,4 @@
 ﻿using Faculty.Core.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Faculty.Core.Interfaces
 {
@@ -12,6 +7,7 @@ namespace Faculty.Core.Interfaces
         Task<Course> AddAsync(Course course);
         Task<Course?> GetByIdAsync(Guid id);
         Task<List<Course>> GetAllAsync();
+        Task<List<Course>> GetByTeacherUserIdAsync(string userId);
         Task<Course?> UpdateAsync(Course course);
         Task<bool> DeleteAsync(Guid id);
     }

@@ -2,7 +2,6 @@ using Faculty.Application.DTOs;
 using Faculty.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Faculty.API.Controllers;
 
@@ -11,6 +10,7 @@ namespace Faculty.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/faculty/attendance")]
+[Authorize]
 
 public class AttendanceController : ControllerBase
 {
@@ -155,7 +155,7 @@ public class AttendanceController : ControllerBase
         {
             var userId = GetCurrentUserId();
             var reportBytes = await _attendanceService.ExportAttendanceReportAsync(courseId, date, userId);
-            
+
             var fileName = $"attendance_{courseId}_{date:yyyy-MM-dd}.csv";
             return File(reportBytes, "text/csv", fileName);
         }

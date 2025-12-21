@@ -8,6 +8,8 @@ using Faculty.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Faculty.Infrastructure.Repositories;
+using Faculty.Infrastructure.Http;
 
 namespace Faculty.Infrastructure.DependencyInjection
 {
@@ -16,8 +18,8 @@ namespace Faculty.Infrastructure.DependencyInjection
         public static IServiceCollection AddFacultyModule(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<ICourseRepository, CourseRepository>();
-            services.AddScoped<ICourseService, CourseService>();
             services.AddScoped<IAttendanceRepository, AttendanceRepository>();
+            services.AddScoped<ICourseService, CourseService>();
             services.AddScoped<IAttendanceService, AttendanceService>();
             services.AddScoped<IStudentExamRegistrationRepository, StudentExamRegistrationRepository>();
             services.AddScoped<IStudentExamRegistrationService, StudentExamRegistrationService>();
