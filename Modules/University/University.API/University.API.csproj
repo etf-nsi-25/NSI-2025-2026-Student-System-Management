@@ -9,12 +9,17 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
+	 <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	 </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\University.Core\University.Core.csproj" />
     <ProjectReference Include="..\University.Application\University.Application.csproj" />
+    <ProjectReference Include="..\University.Infrastructure\University.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

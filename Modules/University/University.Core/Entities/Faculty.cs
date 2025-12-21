@@ -4,12 +4,12 @@ namespace University.Core.Entities
 {
     public class Faculty
     {
-        [Key]
         public int Id { get; set; }
-        [Required]
-        public string Name { get; set; } = string.Empty;
-        public string? Address { get; set; }
-        [Required]
-        public string Code { get; set; } = string.Empty;
+        public string Name { get; set; } = default!;
+        public string Address { get; set; } = default!;
+        public string Code { get; set; } = default!;
+        public string? Description { get; set; }
+        public DateTime EstablishedDate { get; set; }
+        public Guid DeanId { get; set; }
     }
 }

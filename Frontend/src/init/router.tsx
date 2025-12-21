@@ -21,6 +21,10 @@ import { DocumentCenter, ProfileSettings, RequestManagement, StudentAnalytics, S
 import EnrollmentPage from "../page/enrollment/enrollment.tsx";
 import StudentDashboardPage from '../page/student dashboard/dashboard.tsx';
 import DocumentCenterDashboard from '../page/document-center/documentCenter.tsx';
+import AppLayout from '../component/AppLayout/AppLayout.tsx';
+import DefaultLayout from '../component/UniversityDashboardLayout/DefaultLayout.tsx';
+import UniversityDashboard from "../page/university-dashboard/UniversityDashboard.tsx";
+
 
 export function Router(): React.ReactNode {
   return (
@@ -64,14 +68,25 @@ export function Router(): React.ReactNode {
       } />
 
       {/* feature/PBI_258 routes */}
-      <Route path="/page1" element={<Page1 />} />
-      <Route path="/users" element={<UserManagementPage />} />
-      <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="/course-management" element={<CourseManagementPage />} />
-      <Route path="/tenant-management" element={<TenantManagementPage />} />
-      <Route path="/student-support" element={<StudentSupportPage />} />
-      <Route path="/settings" element={<SettingsPage />} />
-      <Route path="/help" element={<HelpPage />} />
+      <Route path="/page1" element={<AppLayout><Page1 /></AppLayout>} />
+      <Route path="/users" element={<AppLayout><UserManagementPage /></AppLayout>} />
+      <Route path="/dashboard" element={<AppLayout><DashboardPage /></AppLayout>} />
+      <Route path="/course-management" element={<AppLayout><CourseManagementPage /></AppLayout>} />
+      <Route path="/tenant-management" element={<AppLayout><TenantManagementPage /></AppLayout>} />
+      <Route path="/student-support" element={<AppLayout><StudentSupportPage /></AppLayout>} />
+      <Route path="/settings" element={<AppLayout><SettingsPage /></AppLayout>} />
+      <Route path="/help" element={<AppLayout><HelpPage /></AppLayout>} />
+
+      {/*University dashboard*/}
+
+          <Route path="/university-dashboard" element={<DefaultLayout><UniversityDashboard /></DefaultLayout>} />
+          <Route path="/documents" element={<DefaultLayout><DocumentCenter /></DefaultLayout>} />
+          <Route path="/analytics" element={<DefaultLayout><StudentAnalytics /></DefaultLayout>} />
+          <Route path="/requests" element={<DefaultLayout><RequestManagement /></DefaultLayout>} />
+          <Route path="/profile" element={<DefaultLayout><SettingsPage /></DefaultLayout>} />
+          <Route path="/support" element={<DefaultLayout><StudentSupport /></DefaultLayout>} />
+          <Route path="/help" element={<DefaultLayout><HelpPage /></DefaultLayout>} />
+
 
       {/* error pages */}
       <Route path="/unauthorized" element={

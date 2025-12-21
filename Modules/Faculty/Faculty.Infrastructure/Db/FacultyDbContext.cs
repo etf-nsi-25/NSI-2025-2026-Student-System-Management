@@ -42,8 +42,8 @@ public class FacultyDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Set default schema to "faculty"
-        modelBuilder.HasDefaultSchema("faculty");
+        // Set default schema to "public"
+        modelBuilder.HasDefaultSchema("public");
 
         // Configure entities with Fluent API
         ConfigureTeacher(modelBuilder);

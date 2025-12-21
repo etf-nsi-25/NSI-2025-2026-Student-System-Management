@@ -5,14 +5,13 @@ using Identity.Core.Interfaces.Repositories;
 using Identity.Core.Interfaces.Services;
 using Identity.Core.Repositories;
 using Identity.Core.Services;
-using Identity.Infrastructure.Configuration;
 using Identity.Infrastructure.Db;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
-
+using Identity.Core.Configuration;
 
 
 var builder = WebApplication.CreateBuilder(args);
