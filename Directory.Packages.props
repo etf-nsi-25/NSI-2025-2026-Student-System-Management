@@ -1,14 +1,14 @@
 ﻿<Project>
   <ItemGroup>
     <!-- EF Core -->
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.10" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="7.0.12" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.12" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.12" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.10" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.2" />
 
     <!-- Dependency Injection -->
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
 
     <!-- ASP.NET Core MVC -->
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Core" Version="7.0.12" />
