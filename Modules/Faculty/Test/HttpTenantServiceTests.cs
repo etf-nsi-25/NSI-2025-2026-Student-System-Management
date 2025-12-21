@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Http;
 using Microsoft.AspNetCore.Http;
 using Moq;
