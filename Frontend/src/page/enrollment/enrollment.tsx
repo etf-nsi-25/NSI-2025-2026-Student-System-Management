@@ -22,15 +22,7 @@ import { cilSearch, cilCheckCircle } from "@coreui/icons"
 import "@coreui/coreui/dist/css/coreui.min.css"
 import "./enrollment.css"
 import { enrollInCourse, getCourses } from "../../service/enrollment/api"
-
-interface Course {
-  id: string
-  name: string
-  code: string
-  professor: string
-  ects: number
-  status: "required" | "elective" | "enrolled"
-}
+import type { Course } from "../../service/enrollment/types"
 
 export default function EnrollmentPage() {
   const [courses, setCourses] = useState<Course[]>([])
@@ -48,39 +40,34 @@ export default function EnrollmentPage() {
   const observerRef = useRef<IntersectionObserver | null>(null)
   const loadMoreRef = useRef<HTMLDivElement | null>(null)
 
-  const fetchCourses = useCallback(
-    async (pageNum: number, search: string, filter: string) => {
-      if (isLoading) return
+const fetchCourses = useCallback(
+  async (pageNum: number, search: string, filter: string) => {
+    setIsLoading(true)
+    try {
+      const data = await getCourses(pageNum, 6, search, filter)
 
-      setIsLoading(true)
-      try {
-        const data = await getCourses(pageNum, 6, search, filter)
-
-        if (data.courses.length === 0) {
-          setHasMore(false)
-        } else {
-          if (pageNum === 1) {
-            setCourses(data.courses)
-          } else {
-            setCourses((prev) => [...prev, ...data.courses])
-          }
-          setHasMore(data.hasMore)
-        }
-      } catch (error) {
-        console.error("Error fetching courses:", error)
-      } finally {
-        setIsLoading(false)
+      if (pageNum === 1) {
+        setCourses(data.courses)
+      } else {
+        setCourses((prev) => [...prev, ...data.courses])
       }
-    },
-    [isLoading],
-  )
+
+      setHasMore(data.hasMore)
+    } catch (error) {
+      console.error("Error fetching courses:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  },
+  [],
+)
 
   useEffect(() => {
     setCourses([])
     setPage(1)
     setHasMore(true)
     fetchCourses(1, searchQuery, selectedSemester)
-  }, [searchQuery, selectedSemester])
+  }, [searchQuery, selectedSemester, fetchCourses])
 
   useEffect(() => {
     if (isLoading || !hasMore) return
@@ -189,9 +176,8 @@ export default function EnrollmentPage() {
                 className="semester-select"
               >
                 <option value="all">Semester: All</option>
-                <option value="required">Required</option>
+                <option value="mandatory">Mandatory</option>
                 <option value="elective">Elective</option>
-                <option value="enrolled">Enrolled</option>
               </CFormSelect>
             </CCol>
           </CRow>
@@ -200,7 +186,7 @@ export default function EnrollmentPage() {
         <CRow className="g-5">
           {courses.map((course) => (
             <CCol key={course.id} lg={4} md={6}>
-              <CCard className={`course-card ${course.status === "required" ? "required-card" : "regular-card"}`}>
+              <CCard className={`course-card ${course.type.toLowerCase() === "mandatory" ? "mandatory-card" : "regular-card"}`}>
                 <CCardBody className="course-card-body">
                   <h5 className="course-name">{course.name}</h5>
                   <p className="course-code">{course.code}</p>
@@ -208,21 +194,16 @@ export default function EnrollmentPage() {
 
                   <div className="course-footer">
                     <span className="course-ects">{course.ects} ECTS</span>
-                    <CBadge className={`status-badge status-${course.status}`}>
-                      {course.status === "required"
-                        ? "Required"
-                        : course.status === "elective"
-                          ? "Elective"
-                          : "Enrolled"}
+                    <CBadge className={`status-badge status-${course.type.toLowerCase()}`}>
+                      {course.type}
                     </CBadge>
                   </div>
 
                   <CButton
-                    className={`enroll-button ${course.status === "enrolled" ? "enrolled-button" : "active-button"}`}
+                    className={`enroll-button active-button`}
                     onClick={() => handleEnrollClick(course)}
-                    disabled={course.status === "enrolled"}
                   >
-                    {course.status === "enrolled" ? "Enrolled" : "Enroll"}
+                    {"Enroll"}
                   </CButton>
                 </CCardBody>
               </CCard>
@@ -237,7 +218,7 @@ export default function EnrollmentPage() {
         )}
       </CContainer>
 
-      <CModal visible={showModal} onClose={() => setShowModal(false)} alignment="center" size="lg">
+      <CModal visible={showModal} onClose={() => setShowModal(false)} alignment="center" size="lg" z-index="10000">
         <CModalHeader className="modal-header-custom">
           <CModalTitle className="modal-title-custom">Course Details</CModalTitle>
         </CModalHeader>
@@ -247,7 +228,7 @@ export default function EnrollmentPage() {
               <h2 className="modal-course-name">{selectedCourse.name}</h2>
               <p className="modal-course-code">{selectedCourse.code}</p>
               <p className="modal-professor">
-                <span className="professor-label">Professor:</span> {selectedCourse.professor.replace("Prof. ", "")}
+                <span className="professor-label">Professor:</span> {selectedCourse.professor ? selectedCourse.professor.replace("Prof. ", "") : "Professor"}
               </p>
             </div>
           )}

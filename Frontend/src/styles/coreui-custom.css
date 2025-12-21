@@ -18,7 +18,6 @@ html, body {
 }
 
 .modal-backdrop {
-  z-index: 199999 !important;
   background-color: rgba(8, 24, 48, 0.55) !important; /* slightly darker overlay */
 }
 
