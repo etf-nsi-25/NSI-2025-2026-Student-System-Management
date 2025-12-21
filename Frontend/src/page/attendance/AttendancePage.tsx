@@ -443,6 +443,75 @@ export default function AttendancePage() {
                     </CCardBody>
                 </CCard>
             )}
+
+            {/* Statistics Section - Bottom of Page */}
+            <CCard className="mt-4">
+                <CCardHeader>
+                    <strong>Attendance Statistics</strong>
+                </CCardHeader>
+                <CCardBody>
+                    <CRow className="mt-4">
+                        <CCol md={4}>
+                            <CFormSelect
+                                label="Course for Stats"
+                                value={chartCourse}
+                                onChange={(e) => setChartCourse(e.target.value)}
+                                disabled={!selectedProgram || courses.length === 0}
+                            >
+                                <option value="">Select Course</option>
+                                {courseOptions}
+                            </CFormSelect>
+                        </CCol>
+                        <CCol md={4}>
+                            <CFormInput
+                                type="month"
+                                label="Month"
+                                value={chartMonth}
+                                onChange={(e) => setChartMonth(e.target.value)}
+                                disabled={!selectedProgram || courses.length === 0}
+                            />
+                        </CCol>
+                    </CRow>
+
+                    <CRow className="justify-content-center">
+                        <CCol md={6} lg={4}>
+                            {!selectedProgram ? (
+                                <div className="text-center text-muted p-5">
+                                    Please select a faculty and program first
+                                </div>
+                            ) : courses.length === 0 ? (
+                                <div className="text-center text-muted p-5">
+                                    No courses available for the selected program
+                                </div>
+                            ) : loadingStats ? (
+                                <div className="text-center p-5">
+                                    <CSpinner />
+                                </div>
+                            ) : attendanceStats ? (
+                                <div style={doughnutContainerStyle}>
+                                    <CChart
+                                        type="doughnut"
+                                        customTooltips={false}
+                                        height={DOUGHNUT_CANVAS_SIZE}
+                                        width={DOUGHNUT_CANVAS_SIZE}
+                                        style={{ height: `${DOUGHNUT_CANVAS_SIZE}px`, width: `${DOUGHNUT_CANVAS_SIZE}px` }}
+                                        data={doughnutData ?? { labels: [], datasets: [] }}
+                                        options={doughnutOptions}
+                                    />
+                                </div>
+                            ) : chartCourse && chartMonth ? (
+                                <div className="text-center text-muted p-5">
+                                    No attendance data found for the selected course and month
+                                </div>
+                            ) : (
+                                <div className="text-center text-muted p-5">
+                                    Select a course and month to view statistics
+                                </div>
+                            )}
+                        </CCol>
+                    </CRow>
+                </CCardBody>
+            </CCard>
         </div>
     );
 }

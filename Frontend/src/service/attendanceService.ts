@@ -62,8 +62,22 @@ export const getAttendance = async (courseId: string, date: string): Promise<Att
 };
 
 export const saveAttendance = async (attendanceData: AttendanceRecord[]): Promise<boolean> => {
-    await delay(1000);
-    console.log('Saving attendance data:', attendanceData);
+    const filtered = attendanceData.filter(r => r.status !== null);
+    if (filtered.length === 0) return true;
+    const courseId = filtered[0].courseId;
+    const date = filtered[0].lectureDate;
+
+    const request: SaveAttendanceRequestDTO = {
+        courseId,
+        date,
+        records: filtered.map(r => ({
+            studentId: r.studentId,
+            status: r.status,
+            note: r.note ?? undefined,
+        })),
+    };
+
+    await api.post<void>("/api/faculty/attendance", request);
     return true;
 };
 
