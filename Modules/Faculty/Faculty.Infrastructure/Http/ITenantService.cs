@@ -1,4 +1,4 @@
-namespace Faculty.Core.Interfaces;
+namespace Faculty.Infrastructure.Http;
 
 /// <summary>
 /// Service for resolving the current tenant ID from the authenticated user context.

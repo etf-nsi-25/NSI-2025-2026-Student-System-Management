@@ -1,4 +1,3 @@
-using Faculty.Core.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace Faculty.Infrastructure.Http;
