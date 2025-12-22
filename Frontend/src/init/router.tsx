@@ -1,8 +1,7 @@
 import React from 'react';
 import { Route, Routes } from 'react-router';
-
-//////////// VERSION FROM feature/PBI_258 ////////////
 import { Home } from '../page/home/home.tsx';
+
 import { Page1 } from '../page/page1/page1.tsx';
 import UserManagementPage from '../page/user-management/UserManagementPage.tsx';
 import DashboardPage from '../page/dashboard/DashboardPage.tsx';
@@ -11,12 +10,11 @@ import TenantManagementPage from '../page/tenant-management/TenantManagementPage
 import StudentSupportPage from '../page/student-support/StudentSupportPage.tsx';
 import SettingsPage from '../page/settings/SettingsPage.tsx';
 import HelpPage from '../page/help/HelpPage.tsx';
-
-//////////// VERSION FROM master ////////////
 import CourseListPage from '../page/university/courses/CourseListPage';
 import TwoFASetupPage from "../page/identity/2FASetupPage";
 import { Login } from '../page/login/login.tsx';
 import { ProtectedRoute } from '../component/ProtectedRoute.tsx';
+import AvailableExamsPage from '../page/university/exams/ExamRegistrationPage.tsx';
 import { DocumentCenter, ProfileSettings, RequestManagement, StudentAnalytics, StudentLayout, StudentSupport } from '../features/student/index.ts';
 import EnrollmentPage from "../page/enrollment/enrollment.tsx";
 import { EnrollmentStudentPage } from '../page/enrollment/enrollmentPage.tsx';
@@ -39,6 +37,7 @@ export function Router(): React.ReactNode {
           <Home />
         </ProtectedRoute>
       } />
+      <Route path="/2fa/setup" element={
 
       <Route path="/2fa/setup" element={
         <ProtectedRoute>
@@ -111,6 +110,11 @@ export function Router(): React.ReactNode {
         <ProtectedRoute>
           <CourseListPage />
         </ProtectedRoute>
+      } />
+      <Route path="/student/exams" element={
+              <ProtectedRoute>
+        <AvailableExamsPage />
+                 </ProtectedRoute>
       } />
 
     </Routes>

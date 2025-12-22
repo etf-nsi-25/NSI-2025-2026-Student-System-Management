@@ -188,7 +188,7 @@ body {
     align-items: center;
     padding: 4px 10px;
     border-radius: 999px;
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     border: 1px solid transparent;
@@ -376,7 +376,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.16);
     background: rgba(3, 3, 10, 0.8);
     color: var(--ui-text-main);
-    font-size: 14px;
+    font-size: 16px;
     outline: none;
     transition:
       border-color 0.15s ease,
@@ -387,6 +387,7 @@ body {
   
   .ui-input-base::placeholder {
     color: rgba(255, 255, 255, 0.26);
+    font-size: 16px;
   }
   
   .ui-input-base:focus {
@@ -395,4 +396,70 @@ body {
     box-shadow: 0 0 0 1px rgba(79, 156, 255, 0.45);
     transform: translateY(-1px);
   }
-  
+
+    /* ==========================================================================
+     10. UI info pill
+     ========================================================================== */
+
+     .ui-info-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 14px;
+    
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    
+      color: var(--ui-text-main);
+      font-size: 16px;
+      font-weight: 400;
+    
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+    
+    .ui-info-pill:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
+    }
+    
+    .ui-info-icon {
+      opacity: 0.85;
+      color: var(--ui-accent);
+    }
+    
+      /* ==========================================================================
+     11. UI Tabs - more windows to manage more pages in one page by sliding between them
+     ========================================================================== */
+
+    /* Modern glassy tab buttons */
+.ui-tab-btn {
+  padding: 10px 24px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px);
+  transition: 0.25s ease;
+}
+
+.ui-tab-btn:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.18);
+}
+
+.ui-tab-btn.active {
+  color: #fff;
+  background: linear-gradient(135deg, #3a86ff, #6ea8ff);
+  border: none;
+  box-shadow: 0 0 18px rgba(58,134,255,0.45);
+}
+
+/* Smooth animated tab panels */
+.ui-tab-panel {
+  position: absolute;
+  width: 100%;
+  transition: all 0.45s cubic-bezier(.4,0,.2,1);
+}
