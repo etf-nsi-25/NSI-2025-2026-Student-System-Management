@@ -232,6 +232,78 @@ body {
     border-color: rgba(58, 217, 159, 0.45);
     color: var(--ui-success);
   }
+
+  /* ========================================================================
+     Toasts (error / success)
+     - Lightweight app-wide toasts (no external lib)
+     ======================================================================== */
+
+  .ui-toast-container {
+    position: fixed;
+    top: 1.2rem;
+    right: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    z-index: 9999;
+  }
+
+  .ui-toast {
+    min-width: 300px;
+    max-width: 420px;
+    background: var(--ui-surface-glass);
+    border-radius: 12px;
+    padding: 0;
+    border: 1px solid var(--ui-border-strong);
+    border-left: 6px solid transparent;
+    overflow: hidden;
+    box-shadow: var(--ui-shadow-soft);
+    backdrop-filter: blur(var(--ui-glass-blur));
+    color: var(--ui-text-main) !important;
+  }
+
+  .ui-toast-success {
+    border-left-color: var(--ui-success);
+  }
+
+  .ui-toast-error {
+    border-left-color: var(--ui-error);
+  }
+
+  .ui-toast-header,
+  .ui-toast .toast-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.7rem 0.9rem;
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: var(--ui-text-main) !important;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .ui-toast-body,
+  .ui-toast .toast-body {
+    padding: 0.9rem 1rem;
+    line-height: 1.4;
+    font-size: 0.9rem;
+    color: rgba(245, 245, 247, 0.9) !important;
+  }
+
+  .ui-toast-close,
+  .ui-toast .btn-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1;
+    color: rgba(245, 245, 247, 0.75);
+  }
+
+  .ui-toast-close:hover,
+  .ui-toast .btn-close:hover {
+    color: rgba(245, 245, 247, 1);
+  }
   
   
   /* ==========================================================================
@@ -346,6 +418,11 @@ body {
   .ui-text-caption {
     font-size: 11px;
     color: var(--ui-text-muted);
+  }
+
+  .ui-validation-text {
+    font-size: 12px;
+    color: var(--ui-error);
   }
   
   

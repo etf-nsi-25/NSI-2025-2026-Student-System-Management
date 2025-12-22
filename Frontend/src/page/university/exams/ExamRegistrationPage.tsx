@@ -3,6 +3,8 @@ import { CFormInput, CRow, CCol } from "@coreui/react";
 import { ExamCard } from "../../../component/exams/ExamCard";
 import { examService } from "../../../service/examService";
 import { ExamEmptyState } from "../../../component/exams/ExamEmptyState";
+import { useToast } from "../../../context/toast";
+import { extractApiErrorMessage } from "../../../utils/apiError";
 
 const delay = (ms: number) =>
   new Promise(resolve => setTimeout(resolve, ms));
@@ -24,8 +26,16 @@ const mockAvailable: ExamItem[] = [
     courseName: "Algorithms and Data Structures",
     courseCode: "ADS101",
     examDate: "2026-02-10T09:00:00Z",
-    regDeadline: "2026-02-06T23:59:00Z",
+    regDeadline: "2025-02-06T23:59:00Z",
     location: "Room 301 - ETF",
+  },
+  {
+    id: 999,
+    courseName: "MOCK: Already registered (4xx)",
+    courseCode: "MOCK400",
+    examDate: "2026-02-09T09:00:00Z",
+    regDeadline: "2026-02-08T23:59:00Z",
+    location: "Virtual",
   },
   {
     id: 2,
@@ -186,8 +196,7 @@ const mockRegistered: ExamItem[] = [
 ];
 
 export default function ExamRegistrationPage() {
-
-  const [error, setError] = useState<string | null>(null);
+  const { pushToast } = useToast();
   const [success, setSuccess] = useState<string | null>(null);
   const [tab, setTab] = useState<"available" | "registered">("available");
   const [search, setSearch] = useState("");
@@ -219,7 +228,6 @@ export default function ExamRegistrationPage() {
     );
 
     const handleRegister = async (id: number) => {
-      setError(null);
       setSuccess(null);
       setLoadingId(id);
     
@@ -228,7 +236,7 @@ export default function ExamRegistrationPage() {
         if (!exam) return;
     
         if (new Date(exam.regDeadline) < new Date()) {
-          setError("Registration deadline has passed.");
+          pushToast("error", "Cannot register", "Registration deadline has passed.");
           return;
         }
     
@@ -246,12 +254,12 @@ export default function ExamRegistrationPage() {
     
         setSuccess("Successfully registered for the exam.");
       } catch (e: any) {
-        if (e?.status === 400) {
-          setError("You are already registered for this exam.");
-        } else if (e?.status === 401 || e?.status === 403) {
-          setError("You are not authorized to perform this action.");
+        const status = e?.status as number | undefined;
+        if (!status || status >= 500) {
+          pushToast("error", "Something went wrong", "Please try again later.");
         } else {
-          setError("Something went wrong. Please try again later.");
+          const msg = extractApiErrorMessage(e);
+          pushToast("error", "Registration failed", msg);
         }
       } finally {
         setLoadingId(null);
@@ -259,7 +267,6 @@ export default function ExamRegistrationPage() {
     };
     
     const handleUnregister = async (id: number) => {
-      setError(null);
       setSuccess(null);
       setLoadingId(id);
     
@@ -280,8 +287,14 @@ export default function ExamRegistrationPage() {
         setRegistered(prev => prev.filter(x => x.id !== id));
     
         setSuccess("Successfully unregistered from the exam.");
-      } catch {
-        setError("Unable to unregister from the exam.");
+      } catch (e: any) {
+        const status = e?.status as number | undefined;
+        if (!status || status >= 500) {
+          pushToast("error", "Something went wrong", "Please try again later.");
+        } else {
+          const msg = extractApiErrorMessage(e);
+          pushToast("error", "Unregister failed", msg);
+        }
       } finally {
         setLoadingId(null);
       }
@@ -320,7 +333,6 @@ export default function ExamRegistrationPage() {
             className={`ui-tab-btn ${tab === "available" ? "active" : ""}`}
             onClick={() => {
               setTab("available");
-              setError(null);
               setSuccess(null);
             }}
           >
@@ -331,7 +343,6 @@ export default function ExamRegistrationPage() {
             className={`ui-tab-btn ${tab === "registered" ? "active" : ""}`}
             onClick={() => {
               setTab("registered");
-              setError(null);
               setSuccess(null);
             }}
           >
@@ -357,12 +368,6 @@ export default function ExamRegistrationPage() {
             )}
           </div>
         </div>
-        {error && (
-          <div className="d-flex justify-content-center mb-3">
-            <div className="ui-alert ui-alert-error">{error}</div>
-          </div>
-        )}
-
         {success && (
           <div className="d-flex justify-content-center mb-3">
             <div className="ui-alert ui-alert-success">{success}</div>

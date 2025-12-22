@@ -17,7 +17,6 @@ import {
   CListGroup,
   CListGroupItem,
 } from "@coreui/react";
-import "@coreui/coreui/dist/css/coreui.min.css";
 import {
   Search,
   ArrowRight,

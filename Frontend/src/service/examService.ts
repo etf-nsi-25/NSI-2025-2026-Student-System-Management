@@ -19,6 +19,7 @@ export const examService = {
   },
 
   async unregisterExam(examId: number): Promise<void> {
+    void examId;
     return;
   }
 };

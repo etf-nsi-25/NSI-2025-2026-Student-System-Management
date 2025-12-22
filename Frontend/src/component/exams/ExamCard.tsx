@@ -137,7 +137,7 @@ export function ExamCard({
               justifyContent: "center",
               gap: 8,
             }}
-            disabled={loading}
+            disabled={loading || (!isRegistered && deadlinePassed)}
             onClick={handleClick}
           >
             {loading ? (
@@ -151,6 +151,10 @@ export function ExamCard({
               buttonLabel.toUpperCase()
             )}
           </CButton>
+
+          {!isRegistered && deadlinePassed && (
+            <span className="ui-validation-text">Registration deadline has passed.</span>
+          )}
 
 
           {exam.registrationDate && (

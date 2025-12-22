@@ -15,6 +15,7 @@ import {
     cilFile,
     cilChartLine,
     cilClipboard,
+    cilCalendar,
     cilEducation,
     cilUser,
     cilLifeRing,
@@ -95,6 +96,13 @@ export function StudentLayout() {
                         <NavLink to="/student/enrollment" className="nav-link">
                             <CIcon customClassName="nav-icon" icon={cilEducation} />
                             Enrollment
+                        </NavLink>
+                    </CNavItem>
+
+                    <CNavItem>
+                        <NavLink to="/student/exams" className="nav-link">
+                            <CIcon customClassName="nav-icon" icon={cilCalendar} />
+                            Exams registration
                         </NavLink>
                     </CNavItem>
 

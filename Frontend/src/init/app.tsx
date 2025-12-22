@@ -4,6 +4,7 @@ import { ServiceContextProvider } from '../context/services.tsx';
 import { Authentication } from './auth.tsx';
 import { Router } from './router.tsx';
 import AppLayout from '../component/AppLayout/AppLayout.tsx';
+import { ToastProvider } from '../context/toast.tsx';
 
 
 export function App() {
@@ -12,11 +13,13 @@ export function App() {
             <BrowserRouter>
                 <Authentication>
                     <ServiceContextProvider>
-                        <DummyContextProvider>
-                            <AppLayout> 
-                                <Router />
-                            </AppLayout>
-                        </DummyContextProvider>
+                        <ToastProvider>
+                            <DummyContextProvider>
+                                <AppLayout>
+                                    <Router />
+                                </AppLayout>
+                            </DummyContextProvider>
+                        </ToastProvider>
                     </ServiceContextProvider>
                 </Authentication>
             </BrowserRouter>
