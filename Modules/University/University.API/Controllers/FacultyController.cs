@@ -8,8 +8,8 @@ using University.Application.Interfaces;
 namespace University.API.Controllers
 {
     [ApiController]
-    [Route("api/university/faculties")]
-    //[Route("api/university/faculty-management")] //conflicting routes with faculites controller, if you want swagger to work, use an unused one such as faculty-management    
+   // [Route("api/university/faculties")]
+    [Route("api/university/faculty-management")] //conflicting routes with faculites controller, if you want swagger to work, use an unused one such as faculty-management    
     //[Authorize(Roles = "Superadmin")]
     public class FacultyController : ControllerBase
     {

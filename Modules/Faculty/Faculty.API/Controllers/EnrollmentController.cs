@@ -11,8 +11,7 @@ namespace Faculty.API.Controllers
 {
     [ApiController]
     [Route("api/faculty/enrollments")]
-    //[Authorize] // JWT required
-    [AllowAnonymous]  //FOR TEMPORARY TESTING ONLY SINCE LOGIN IS NOT WORKING
+    [Authorize] // JWT required
 
     public class EnrollmentsController : ControllerBase
     {

@@ -25,7 +25,7 @@ namespace Faculty.Application.Services
                 _http = http;
             }
 
-        /* private int GetStudentIdFromJwt()
+         private int GetStudentIdFromJwt()
          {
              var user = _http.HttpContext?.User;
              if (user is null) throw new UnauthorizedAccessException("No user context.");
@@ -39,12 +39,8 @@ namespace Faculty.Application.Services
                  throw new UnauthorizedAccessException("StudentId claim missing/invalid in JWT.");
 
              return studentId;
-         }  */
-        private int GetStudentIdFromJwt()
-        {
-            return 1; //FOR TESTING PIRPOSES SINCE LOGIN IS NOT WORKING
-        }
-
+         }  
+        
 
 
         public async Task<List<EnrollmentListItemDto>> GetMyEnrollmentsAsync()
@@ -58,7 +54,7 @@ namespace Faculty.Application.Services
                     {
                         EnrollmentId = e.Id,
                         CourseId = e.CourseId,
-                        CourseName = e.Course.Name,   // koristi navigation property
+                        CourseName = e.Course.Name,   
                         Status = e.Status,
                         Grade = e.Grade
                     })
@@ -86,24 +82,14 @@ namespace Faculty.Application.Services
 
            
 
-            /* var enrollment = new Faculty.Core.Entities.Enrollment
+             var enrollment = new Faculty.Core.Entities.Enrollment
              {
                  StudentId = studentId,
                  CourseId = dto.CourseId,
                  Status = "Enrolled",
                  Grade = null,
                  CreatedAt = DateTime.UtcNow
-             };*/
-
-            var enrollment = new Faculty.Core.Entities.Enrollment
-            {
-                FacultyId = Guid.Parse("d02e30bd-0b3a-4342-8b33-cff097f5f9c1"),
-                StudentId = 1,
-                CourseId = dto.CourseId,
-                Status = "Enrolled",
-                Grade = null,
-                CreatedAt = DateTime.UtcNow
-            };  //DODANO ZA TESTIRANJE JER LOGIN NE RADI
+             };
 
 
             _db.Enrollments.Add(enrollment);

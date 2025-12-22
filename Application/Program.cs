@@ -9,17 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Support.Infrastructure.Db;
 using University.Infrastructure.Db;
 using Identity.Infrastructure.Db;
-
-using Faculty.Application.Interfaces;
-using Faculty.Application.Services;
-
-using University.Application.Interfaces.Services;
-using University.Application.Services;
-using Faculty.API;
-using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Db;
-
-
 
 var builder = WebApplication.CreateBuilder(args);
 const string CorsPolicyName = "ReactDevClient";
@@ -31,25 +21,6 @@ builder.Services.AddFacultyModule(builder.Configuration);
 builder.Services.AddSupportModule(builder.Configuration);
 builder.Services.AddNotificationsModule();
 builder.Services.AddAnalyticsModule();
-
-
-// Faculty application services
-builder.Services.AddScoped<ICourseService, CourseService>();
-builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
-
-// University application services
-//builder.Services.AddScoped<IFacultyService, FacultyService>();
-
-
-//ZBOG JWT, JER NE RADI LOGIN
-/*if (builder.Environment.IsDevelopment())
-{
-    builder.Services.AddScoped<ITenantService, DevTenantServiceFAKE>();
-}*/
-builder.Services.AddScoped<ITenantService, DevTenantServiceFAKE>();
-
-
-
 
 // Add controllers and module API assemblies
 var mvcBuilder = builder.Services.AddControllers();

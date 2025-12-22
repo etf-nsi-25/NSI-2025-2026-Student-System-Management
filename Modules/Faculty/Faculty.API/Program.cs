@@ -30,23 +30,11 @@ builder.Services.AddDbContext<FacultyDbContext>(options =>
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 
-
-//builder.Services.AddScoped<ITenantService, HttpTenantService>();
+builder.Services.AddScoped<ITenantService, HttpTenantService>();
 
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddFacultyModule(builder.Configuration);
 
-///DODANO ZBOG JWT JER LOGIN NE RADI SAMO ZA TESTIRANJE
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services.AddScoped<ITenantService, DevTenantServiceFAKE>();
-}
-else
-{
-    builder.Services.AddScoped<ITenantService, HttpTenantService>();
-}
-
-///
 
 
 var app = builder.Build();
