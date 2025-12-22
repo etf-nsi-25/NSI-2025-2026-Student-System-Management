@@ -18,6 +18,7 @@ namespace Faculty.Infrastructure.DependencyInjection
             services.AddScoped<ICourseService, CourseService>();
             services.AddHttpContextAccessor();
             services.AddScoped<ITenantService, HttpTenantService>();
+            services.AddScoped<IFacultyMetricsRepository, FacultyMetricsRepository>();
             services.AddDbContext<FacultyDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("Database")));
 

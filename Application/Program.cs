@@ -10,6 +10,7 @@ using Support.Infrastructure.Db;
 using University.Infrastructure.Db;
 using Identity.Infrastructure.Db;
 using Faculty.Infrastructure.Db;
+using Analytics.Infrastructure.Db;
 
 var builder = WebApplication.CreateBuilder(args);
 const string CorsPolicyName = "ReactDevClient";
@@ -20,7 +21,7 @@ builder.Services.AddUniversityModule(builder.Configuration);
 builder.Services.AddFacultyModule(builder.Configuration);
 builder.Services.AddSupportModule(builder.Configuration);
 builder.Services.AddNotificationsModule();
-builder.Services.AddAnalyticsModule();
+builder.Services.AddAnalyticsModule(builder.Configuration);
 
 // Add controllers and module API assemblies
 var mvcBuilder = builder.Services.AddControllers();
@@ -147,15 +148,15 @@ if (applyMigrations)
     //}
 
     // Analytics module - still no migrations present so commenting this code for now
-    //try
-    //{
-    // var analyticsDb = services.GetRequiredService<AnalyticsDbContext>();
-    // analyticsDb.Database.Migrate();
-    //}
-    //catch (Exception ex)
-    //{
-    // Console.WriteLine($"Error migrating AnalyticsDbContext: {ex.Message}");
-    //}
+    try
+    {
+     var analyticsDb = services.GetRequiredService<AnalyticsDbContext>();
+     analyticsDb.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+     Console.WriteLine($"Error migrating AnalyticsDbContext: {ex.Message}");
+    }
     }
 
 }

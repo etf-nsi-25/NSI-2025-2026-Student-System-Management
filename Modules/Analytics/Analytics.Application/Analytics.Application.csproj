@@ -1,10 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Analytics.Core\Analytics.Core.csproj" />
+    <PackageReference Include="MediatR" Version="12.1.1" />
   </ItemGroup>
 
-  <PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Analytics.Core\Analytics.Core.csproj" />
+		<ProjectReference Include="..\..\Faculty\Faculty.Core\Faculty.Core.csproj" />
+		<ProjectReference Include="..\Analytics.Infrastructure\Analytics.Infrastructure.csproj" />
+
+
+	</ItemGroup>
+
+
+
+	<PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
