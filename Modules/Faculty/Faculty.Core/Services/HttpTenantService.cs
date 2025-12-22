@@ -30,6 +30,14 @@ public class HttpTenantService : ITenantService
             throw new UnauthorizedAccessException("HttpContext is not available. Ensure the service is used within an HTTP request context.");
         }
 
+        var path = httpContext.Request.Path.Value;
+
+        // Ako je endpoint statistike univerziteta, vrati dummy ID
+        if (path != null && path.StartsWith("/api/statistics", StringComparison.OrdinalIgnoreCase))
+        {
+            return Guid.Empty; // univerzitetska statistika – ne filtrira po fakultetu
+        }
+
         var user = httpContext.User;
         if (user?.Identity?.IsAuthenticated != true)
         {
