@@ -1,6 +1,3 @@
-/* RequestDetailsModal.css */
-
-/* High z-index to ensure modal is above everything */
 .request-details-modal {
     z-index: 100000 !important;
 }
@@ -9,7 +6,6 @@
     background-color: rgba(8, 24, 48, 0.55) !important;
 }
 
-/* Ensure modal is above backdrop */
 .request-details-modal .modal-dialog {
     z-index: 100001 !important;
 }
@@ -18,14 +14,12 @@
     z-index: 100002 !important;
 }
 
-/* Backdrop styling for click-through prevention */
 .modal-backdrop.show {
     opacity: 1 !important;
     background-color: rgba(8, 24, 48, 0.55) !important;
     z-index: 99999 !important;
 }
 
-/* Modal positioning */
 .request-details-modal {
     position: fixed !important;
     inset: 0 !important;
@@ -44,7 +38,6 @@
     z-index: 100001 !important;
 }
 
-/* Modal content styling */
 .request-details-modal .modal-content {
     background-color: #ffffff !important;
     border-radius: 16px !important;
@@ -56,7 +49,6 @@
     z-index: 100002 !important;
 }
 
-/* Header with gradient */
 .request-details-modal-header {
     background-image: linear-gradient(135deg, #4f6e91 0%, #0b4fa3 100%) !important;
     border-radius: 16px 16px 0 0 !important;
@@ -70,14 +62,12 @@
     font-weight: 600 !important;
 }
 
-/* Body styling */
 .request-details-modal .modal-body {
     padding: 1.5rem !important;
     max-height: 70vh !important;
     overflow-y: auto !important;
 }
 
-/* Details box */
 .request-details-box {
     background-color: #f8f9fa !important;
     border: 1px solid #e1e6ea !important;
@@ -89,7 +79,6 @@
     white-space: pre-wrap !important;
 }
 
-/* Button styling */
 .request-details-close-btn {
     min-width: 100px !important;
     height: 38px !important;
@@ -110,7 +99,6 @@
     color: white !important;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
     .request-details-modal .modal-dialog {
         margin: 1rem !important;
@@ -133,12 +121,10 @@
     }
 }
 
-/* Hide close (X) button */
 .request-details-modal .btn-close {
     display: none !important;
 }
 
-/* Label styling */
 .request-details-modal strong {
     color: #1e293b !important;
     font-weight: 600 !important;
@@ -153,7 +139,6 @@
     margin-bottom: 0 !important;
 }
 
-/* Ensure modal is clickable */
 .request-details-modal * {
     pointer-events: auto !important;
 }

@@ -6,6 +6,7 @@ using Support.Application.DTOs;
 using Support.Core.Entities;
 using Support.Infrastructure.Db;
 using University.Infrastructure.Db;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Support.API.Controllers
 {
@@ -55,6 +56,7 @@ namespace Support.API.Controllers
 
 			_dbContext.DocumentRequests.Add(request);
 			await _dbContext.SaveChangesAsync();
+    
 
 			return Ok(request);
 		}
@@ -191,5 +193,51 @@ namespace Support.API.Controllers
 			await _dbContext.SaveChangesAsync();
 			return Ok(req);
 		}
-	}
+
+        [HttpGet("requests")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllRequests()
+        {
+            try
+            {
+                var requests = await _dbContext.DocumentRequests
+                    .OrderByDescending(r => r.CreatedAt)
+                    .ToListAsync();
+
+                var response = requests.Select(r => new 
+                {
+                    Id = r.Id.ToString(),
+                    Date = r.CreatedAt,
+                    StudentIndex = r.UserId,
+                    RequestType = r.DocumentType,
+                    RequestDetails = $"Request for {r.DocumentType}",
+                    Status = r.Status
+                });
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpPatch("requests/{id}/status")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusDto dto)
+        {
+            var request = await _dbContext.DocumentRequests.FindAsync(id);
+            
+            if (request == null) 
+                return NotFound(new { message = $"Request with ID {id} not found." });
+
+            request.Status = dto.Status;
+            
+            if (dto.Status == "Approved") 
+                request.CompletedAt = DateTime.UtcNow;
+
+            await _dbContext.SaveChangesAsync();
+            return Ok(new { message = "Status updated successfully" });
+        }
+    }
 }

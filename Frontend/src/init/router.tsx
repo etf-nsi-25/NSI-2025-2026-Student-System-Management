@@ -23,14 +23,10 @@ import EnrollmentPage from "../page/enrollment/enrollment.tsx";
 import { EnrollmentStudentPage } from '../page/enrollment/enrollmentPage.tsx';
 import StudentDashboardPage from '../page/student dashboard/dashboard.tsx';
 import DocumentCenterDashboard from '../page/document-center/documentCenter.tsx';
-<<<<<<< HEAD
 import AppLayout from '../component/AppLayout/AppLayout.tsx';
 import DefaultLayout from '../component/UniversityDashboardLayout/DefaultLayout.tsx';
 import UniversityDashboard from "../page/university-dashboard/UniversityDashboard.tsx";
-
-=======
 import RequestManagement from '../page/requests/RequestManagement';
->>>>>>> 020f3e0 (Request Management Screen Implementation)
 
 export function Router(): React.ReactNode {
   return (
@@ -96,7 +92,6 @@ export function Router(): React.ReactNode {
       <Route path="/help" element={<DefaultLayout><HelpPage /></DefaultLayout>} />
 
 
-      {/* REQUEST MANAGEMENT*/}
       <Route path="/student/request-management" element={
         <ProtectedRoute>
           <RequestManagement />

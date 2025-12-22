@@ -1,4 +1,3 @@
-// RequestDetailsModal.tsx
 import React from 'react';
 import {
     CModal,
@@ -7,47 +6,11 @@ import {
     CModalBody,
     CModalFooter,
     CButton,
-    CBadge,
 } from '@coreui/react';
 import type { StudentRequestDto } from './RequestTypes'; 
 import './RequestDetailsModal.css';
-
-// Helper function to safely parse date
-const parseDate = (dateValue: any): Date => {
-    if (dateValue instanceof Date) {
-        return dateValue;
-    }
-    if (typeof dateValue === 'string') {
-        return new Date(dateValue);
-    }
-    if (typeof dateValue === 'number') {
-        return new Date(dateValue);
-    }
-    return new Date();
-};
-
-// Status rendering helper function
-const renderStatus = (status: StudentRequestDto['status']) => {
-    let color: 'success' | 'danger' | 'info' | 'warning' = 'info'; 
-    switch (status) {
-        case 'Completed':
-            color = 'success';
-            break; 
-        case 'Rejected':
-            color = 'danger';
-            break; 
-        default:
-            color = 'warning'; // 'Pending'
-    }
-    return (
-        <CBadge 
-            color={color} 
-            className="text-white py-2 px-3 rounded-pill" 
-        >
-            {status}
-        </CBadge>
-    );
-};
+import { parseDate } from '../../utils/requestUtils'; 
+import StatusBadge from '../../component/StatusBadge'; 
 
 interface RequestDetailsModalProps {
     visible: boolean;
@@ -69,7 +32,7 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
             visible={visible} 
             onClose={onClose}
             backdrop={true}
-            keyboard={true} // Enable ESC key to close
+            keyboard={true}
             size="lg"
             alignment="center"
             className="request-details-modal"
@@ -100,7 +63,7 @@ const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
                     <div className="col-12 mb-3">
                         <strong>Status:</strong>
                         <div className="mt-1 d-inline-block">
-                            {renderStatus(request.status)}
+                            <StatusBadge status={request.status} />
                         </div>
                     </div>
                 </div>

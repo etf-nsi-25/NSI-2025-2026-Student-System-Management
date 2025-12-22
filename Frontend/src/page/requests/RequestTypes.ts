@@ -1,10 +1,10 @@
 export interface StudentRequestDto {
-    id: string; 
+    id: string;
     date: string; 
     studentIndex: string;
     requestType: string;
     requestDetails: string;
-    status: 'Pending' | 'Completed' | 'Rejected';
+    status: 'Pending' | 'Approved' | 'Rejected'; 
 }
 
 export interface ConfirmationData {
@@ -15,8 +15,9 @@ export interface ConfirmationData {
 export interface CreateConfirmationRequest {
     studentIndex: string;
     requestType: string;
-    statusRequest: 'Approved' | 'Rejected';
+    statusRequest: 'Approved' | 'Rejected'; 
     shouldPrint: boolean;
+    markStatus: boolean;
 }
 
 export interface ConfirmationModalProps {
@@ -24,4 +25,11 @@ export interface ConfirmationModalProps {
     onClose: () => void;
     request: StudentRequestDto;
     onSuccess: () => void;
+}
+
+export interface ConfirmationFormData {
+    studentIndex: string;
+    requestType: string;
+    requestDetails: string;
+    statusRequest: 'Approved' | 'Rejected' | '';
 }
