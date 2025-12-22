@@ -21,8 +21,8 @@ import {
 } from '@coreui/react';
 
 import '../../styles/coreui-custom.css';
+// import { deleteExam, fetchExams } from '../../service/examsApi';
 
-// ✅ zamijeni svojim realnim tipom ako imaš
 type Exam = {
   id: string;
   courseName: string;
