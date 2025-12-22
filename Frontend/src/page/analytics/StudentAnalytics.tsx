@@ -638,7 +638,7 @@ export function StudentAnalytics() {
               <CCard className="student-analytics-card student-analytics-stat-card h-100">
                 <CCardBody className="text-center">
                   <CCardTitle className="student-analytics-stat-value">{data.gpa}</CCardTitle>
-                  <CCardText className="student-analytics-stat-label">GAP</CCardText>
+                  <CCardText className="student-analytics-stat-label">GPA</CCardText>
                 </CCardBody>
               </CCard>
             </CCol>
