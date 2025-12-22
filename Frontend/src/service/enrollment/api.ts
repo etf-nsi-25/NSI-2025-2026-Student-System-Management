@@ -2,7 +2,7 @@ import { api } from "../../api/rest"
 import type { Course } from "./types";
 
 async function fetchCoursesFromAPI(): Promise<Course[]> {
-  const response = api.get<Course[]>("/api/faculty/courses");
+  const response = await api.get<Course[]>("/api/faculty/courses");
   return response;
 }
 
