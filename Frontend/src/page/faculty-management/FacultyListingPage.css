@@ -144,6 +144,7 @@
   justify-content: center;
   align-items: center;
   z-index: 2000;
+}
 
 .modal {
   background: white;
@@ -292,5 +293,4 @@
     opacity: 1;
     transform: translateX(0);
   }
-}
 }
