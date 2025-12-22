@@ -1,6 +1,6 @@
 using Support.Core.Entities;
 using Support.Core.Interfaces.Repositories;
-using Support.Infrastructure.Db;
+using Common.Infrastructure.Repositories;
 
 namespace Support.Infrastructure.Db.Repositories
 {
