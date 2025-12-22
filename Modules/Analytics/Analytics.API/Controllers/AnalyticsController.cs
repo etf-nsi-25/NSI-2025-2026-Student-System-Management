@@ -2,44 +2,44 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using Faculty.Core.Interfaces;
+using Faculty.Core.Services;
+
+
 namespace Analytics.API.Controllers
 {
-	// [Authorize] // 1. Isključeno da izbjegnemo 404 preusmjeravanje
-	[ApiController]
-	[Route("api/Analytics")]
-	public class AnalyticsController : ControllerBase
-	{
-		private readonly IStudentAnalyticsService _analyticsService;
+    [ApiController]
+    [Route("api/Analytics")]
+    public class AnalyticsController : ControllerBase
+    {
+        private readonly IStudentAnalyticsService _analyticsService;
+        private readonly ITenantService _tenantService; 
 
-		public AnalyticsController(IStudentAnalyticsService analyticsService)
-		{
-			_analyticsService = analyticsService;
-		}
+        public AnalyticsController(IStudentAnalyticsService analyticsService, ITenantService tenantService)
+        {
+            _analyticsService = analyticsService;
+            _tenantService = tenantService;
+        }
 
-		[HttpGet("student-stats")]
-		public async Task<IActionResult> GetStudentStats()
-		{
-			// 2. PODACI DIREKTNO IZ TVOJE BAZE (Red 3 u AcademicRecords)
-			// StudentId '1' ima položen ispit sa ocjenom 9
-			var userId = "user123";
+        [HttpGet("student-performance")]
+        public async Task<IActionResult> GetStudentStats()
+        {
+            var facultyId = _tenantService.GetCurrentFacultyId().ToString();
 
-			// FacultyId iz kolone u tvojoj bazi za taj isti red
-			var facultyId = "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a02";
+            var userId = "user123"; // hardcoded 
 
-			try
-			{
-				// Poziv servisa sa tvojim podacima
-				var stats = await _analyticsService.GetStudentStatsAsync(userId, facultyId);
+            try
+            {
+                var stats = await _analyticsService.GetStudentStatsAsync(userId, facultyId);
 
-				if (stats == null) return NotFound("Podaci nisu pronađeni.");
+                if (stats == null) return NotFound("Data not found.");
 
-				return Ok(stats);
-			}
-			catch (Exception ex)
-			{
-				// Ovo će nam reći ako TenantService i dalje pravi problem
-				return StatusCode(500, $"Greška: {ex.Message}");
-			}
-		}
-	}
+                return Ok(stats);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error: {ex.Message}");
+            }
+        }
+    }
 }

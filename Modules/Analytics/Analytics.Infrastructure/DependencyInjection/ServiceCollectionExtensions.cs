@@ -9,10 +9,8 @@ namespace Analytics.Infrastructure
     {
         public static IServiceCollection AddAnalyticsModule(this IServiceCollection services)
         {
-			// Registracija Repozitorija - Infrastructure sloj
 			services.AddScoped<IStudentAnalyticsRepository, StudentAnalyticsRepository>();
 
-			// Registracija Servisa - Application sloj
 			services.AddScoped<IStudentAnalyticsService, StudentAnalyticsService>();
 
 			return services;
