@@ -28,7 +28,12 @@ export function CreateExamPage() {
 
       try {
         const data = await courseService.getAll();
-        setCourses((data ?? []) as Course[]);
+        const list = (data ?? []) as Course[];
+        setCourses(list);
+
+        if (list.length === 0) {
+          setCoursesError('No courses available.');
+        }
       } catch (e) {
         console.error('Failed to load courses for CreateExamPage', e);
         setCourses([]);

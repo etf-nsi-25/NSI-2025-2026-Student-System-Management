@@ -74,6 +74,9 @@ export function ExamPage() {
     if (toast === 'created') {
       setSuccessMsg('Exam created successfully.');
       sessionStorage.removeItem('exams.toast');
+    } else if (toast === 'updated') {
+      setSuccessMsg('Exam updated successfully.');
+      sessionStorage.removeItem('exams.toast');
     }
 
     loadExams();

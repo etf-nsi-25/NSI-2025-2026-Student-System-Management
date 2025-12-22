@@ -18,6 +18,8 @@ type Props = {
   onCancel: () => void;
   submitting?: boolean;
 
+  initialValues?: Partial<ExamFormValues>;
+
   courses?: Course[];
   coursesLoading?: boolean;
 };
@@ -26,6 +28,7 @@ export function ExamForm({
   onSubmit,
   onCancel,
   submitting = false,
+  initialValues,
   courses = [],
   coursesLoading = false,
 }: Props) {
@@ -44,23 +47,76 @@ export function ExamForm({
     location: '',
   });
 
+  type FieldKey = 'courseId' | 'dateTime' | 'location';
+  const [errors, setErrors] = useState<Partial<Record<FieldKey, string>>>({});
+  const [initialized, setInitialized] = useState(false);
+
+  const validate = (v: ExamFormValues) => {
+    const nextErrors: Partial<Record<FieldKey, string>> = {};
+
+    if (!v.courseId || v.courseId.trim().length === 0) {
+      nextErrors.courseId = 'Course is required.';
+    }
+
+    if (!v.location || v.location.trim().length === 0) {
+      nextErrors.location = 'Location is required.';
+    }
+
+    if (!v.dateTime || v.dateTime.trim().length === 0) {
+      nextErrors.dateTime = 'Date & time is required.';
+    } else {
+      const parsed = new Date(v.dateTime);
+      if (Number.isNaN(parsed.getTime())) {
+        nextErrors.dateTime = 'Date & time is invalid.';
+      } else if (parsed.getTime() <= Date.now()) {
+        nextErrors.dateTime = 'Date & time must be in the future.';
+      }
+    }
+
+    return nextErrors;
+  };
+
+  const currentValidation = validate(values);
+
   // if courses loaded and nothing selected, keep it empty (force user choice)
   useEffect(() => {
     // no auto-select: user must pick (safer)
   }, [courses]);
 
+  useEffect(() => {
+    if (initialized) return;
+    if (!initialValues) return;
+
+    setValues((prev) => ({
+      ...prev,
+      ...initialValues,
+      courseId: initialValues.courseId ?? prev.courseId,
+      dateTime: initialValues.dateTime ?? prev.dateTime,
+      location: initialValues.location ?? prev.location,
+      courseName: initialValues.courseName ?? prev.courseName,
+    }));
+
+    setInitialized(true);
+  }, [initialized, initialValues]);
+
   const update = (key: keyof ExamFormValues, value: string) => {
     setValues((prev) => ({ ...prev, [key]: value }));
+
+    if (key === 'courseId' || key === 'dateTime' || key === 'location') {
+      setErrors((prev) => ({ ...prev, [key]: undefined }));
+    }
   };
 
   const canSubmit =
-    values.courseId.trim().length > 0 &&
-    values.dateTime.trim().length > 0 &&
-    values.location.trim().length > 0 &&
-    !submitting;
+    Object.keys(currentValidation).length === 0 && !submitting;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const nextErrors = validate(values);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
+
     onSubmit(values);
   };
 
@@ -83,6 +139,7 @@ export function ExamForm({
               </option>
             ))}
           </CFormSelect>
+          {errors.courseId && <div className="text-danger small mt-1">{errors.courseId}</div>}
         </CCol>
 
         <CCol md={6}>
@@ -93,6 +150,7 @@ export function ExamForm({
             onChange={(e) => update('dateTime', e.target.value)}
             disabled={submitting}
           />
+          {errors.dateTime && <div className="text-danger small mt-1">{errors.dateTime}</div>}
         </CCol>
 
         <CCol md={12}>
@@ -103,6 +161,7 @@ export function ExamForm({
             onChange={(e) => update('location', e.target.value)}
             disabled={submitting}
           />
+          {errors.location && <div className="text-danger small mt-1">{errors.location}</div>}
         </CCol>
 
         <CCol xs={12} className="d-flex justify-content-center gap-2 mt-2">
