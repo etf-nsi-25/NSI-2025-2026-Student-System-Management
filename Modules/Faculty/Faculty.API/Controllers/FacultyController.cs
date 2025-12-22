@@ -2,6 +2,9 @@
 using Faculty.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using Faculty.Application.Interfaces;
+using System.Collections.Generic;   
+
+
 
 namespace Faculty.API.Controllers
 {
@@ -51,8 +54,9 @@ namespace Faculty.API.Controllers
             bool ok = await _service.DeleteAsync(id);
             return ok ? Ok(new { success = true }) : NotFound();
         }
+    }
 
     }
-}
+
 
 

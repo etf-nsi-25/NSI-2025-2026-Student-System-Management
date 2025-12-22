@@ -11,6 +11,12 @@ using University.Infrastructure.Db;
 using Identity.Infrastructure.Db;
 using Faculty.Infrastructure.Db;
 
+using Faculty.Application.Interfaces; 
+using Faculty.Application.Services;
+
+using System.Reflection;
+using System.IO;
+
 var builder = WebApplication.CreateBuilder(args);
 const string CorsPolicyName = "ReactDevClient";
 
