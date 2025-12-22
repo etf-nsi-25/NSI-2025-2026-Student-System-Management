@@ -7,13 +7,11 @@
     padding: 0 !important;
 }
 
-/* Dialog positioning */
 .ui-modal-custom-wrapper.modal .modal-dialog {
     margin: 1.75rem auto !important;
     z-index: 100002 !important;
 }
 
-/* Header with dark gradient */
 .ui-modal-custom-wrapper.modal .modal-content .modal-header.ui-modal-header-custom {
     background-image: linear-gradient(135deg, #4f6e91 0%, #0b4fa3 100%) !important;
     background-color: #0b4fa3 !important;
@@ -28,19 +26,16 @@
     font-weight: 600 !important;
 }
 
-/* Hide close button */
 .ui-modal-custom-wrapper .btn-close {
     display: none !important;
 }
 
-/* Modal body */
 .ui-modal-custom-wrapper.modal .modal-body {
     padding: 1.5rem !important;
     max-height: 60vh !important;
     overflow-y: auto !important;
 }
 
-/* Form labels */
 .ui-modal-custom-wrapper .ui-field-label {
     color: #1e293b !important;
     font-weight: 600 !important;
@@ -48,7 +43,6 @@
     margin-bottom: 4px !important;
 }
 
-/* Input fields */
 .ui-modal-custom-wrapper .ui-input-base {
     border-radius: 8px !important;
     padding: 0.65rem 1rem !important;
@@ -58,7 +52,6 @@
     background-color: white !important;
 }
 
-/* Read-only fields */
 .ui-modal-custom-wrapper .ui-input-base[readonly],
 .ui-modal-custom-wrapper textarea.ui-input-base[readonly] {
     background-color: #f3f4f6 !important;
@@ -67,13 +60,11 @@
     resize: none !important;
 }
 
-/* Select options */
 .ui-modal-custom-wrapper .form-select option {
     background: white !important;
     color: black !important;
 }
 
-/* Footer */
 .ui-modal-custom-wrapper.modal .modal-footer {
     padding: 1.5rem !important;
     border-top: none !important;
@@ -81,7 +72,6 @@
     border-radius: 0 0 16px 16px !important;
 }
 
-/* Button base styles */
 .ui-modal-custom-wrapper .ui-btn-confirmation {
     font-weight: 600 !important;
     padding: 0.6rem 1.2rem !important;
@@ -92,14 +82,12 @@
     height: 38px !important;
 }
 
-/* Primary button */
 .ui-modal-custom-wrapper .ui-btn-primary-custom {
     background-color: #0b5ed7 !important;
     border-color: #0b5ed7 !important;
     color: white !important;
 }
 
-/* Secondary button */
 .ui-modal-custom-wrapper .ui-btn-secondary-custom {
     background-color: #e6e9ee !important;
     border-color: #d1d6db !important;

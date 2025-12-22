@@ -1,6 +1,3 @@
-// ConfirmationModal.tsx
-
-import './ConfirmationModal.css';
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
     CModal, 
@@ -12,30 +9,32 @@ import {
     CFormInput,
     CFormSelect,
     CFormLabel,
-    CFormFeedback,
     CFormTextarea,
 } from '@coreui/react';
-import type { StudentRequestDto } from './RequestTypes'; 
+import type { StudentRequestDto } from './RequestTypes';
+import './ConfirmationModal.css';
 
 interface ConfirmationModalProps {
     visible: boolean;
     onClose: () => void;
     request: StudentRequestDto | null;
-    onSuccess: (updatedStatus: 'Approved' | 'Rejected', requestId: string) => void;
+    onSuccess: (updatedStatus: 'Approved' | 'Rejected', requestId: string, formData: any) => Promise<void>;
+    isProcessing: boolean;
 }
 
 interface ConfirmationFormData {
     studentIndex: string;
     requestType: string;
     requestDetails: string;
-    statusRequest: 'Approved' | 'Rejected' | ''; 
+    statusRequest: 'Approved' | 'Rejected' | '';
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({ 
     visible, 
     onClose, 
     request, 
-    onSuccess 
+    onSuccess,
+    isProcessing
 }) => {
     
     const [formData, setFormData] = useState<ConfirmationFormData>({
@@ -46,9 +45,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     });
     
     const [validated, setValidated] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
     
-    // Initialize form with request data when modal opens
     useEffect(() => {
         if (visible && request) {
             setFormData({
@@ -58,7 +55,6 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                 statusRequest: '', 
             });
             setValidated(false);
-            setIsSubmitting(false);
         }
     }, [visible, request]);
 
@@ -66,7 +62,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         const { name, value } = e.target;
         setFormData((prev) => ({
             ...prev,
-            [name]: value,
+            [name]: value as 'Approved' | 'Rejected' | '',
         }));
     };
     
@@ -78,60 +74,17 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             return;
         }
 
-        setIsSubmitting(true);
-
-        const confirmationData = {
-            studentIndex: formData.studentIndex,   
-            requestType: formData.requestType,     
-            requestDetails: formData.requestDetails,
-            statusRequest: formData.statusRequest,
-            shouldPrint: printAction, 
-            markStatus: true, 
-        };
-        
-        setValidated(true);
-
         try {
-            const requestId = request.id; 
-            const apiUrl = `/api/faculty/requests/${requestId}/confirm`;
-
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(confirmationData),
+            await onSuccess(formData.statusRequest, request.id, {
+                ...formData,
+                shouldPrint: printAction,
+                markStatus: true,
             });
             
-            if (!response.ok) {
-                const errorBody = await response.text();
-                let errorMessage = `Failed to create confirmation (Status: ${response.status}).`;
-                try {
-                    const errorJson = JSON.parse(errorBody);
-                    if (errorJson.errors) {
-                        const validationFields = Object.keys(errorJson.errors).join(', ');
-                        errorMessage = `Confirmation failed. Missing required fields: ${validationFields}.`;
-                    } else if (errorJson.title) {
-                        errorMessage = errorJson.title;
-                    }
-                } catch (e) {
-                    // Fallback to generic message if parsing fails
-                }
-                console.error(`HTTP Error ${response.status}:`, errorBody);
-                throw new Error(errorMessage);
-            }
-            
-            onSuccess(formData.statusRequest, requestId);
-            
-            setTimeout(() => {
-                setIsSubmitting(false);
-                onClose();
-            }, 500);
-            
         } catch (error) {
-            console.error('Confirmation API error:', error);
-            alert(`Failed to process confirmation: ${error instanceof Error ? error.message : String(error)}`);
-            setIsSubmitting(false);
+            console.error('Confirmation error:', error);
         }
-    }, [formData, request, onSuccess, onClose]);
+    }, [formData, request, onSuccess]);
     
     const isFormValid = formData.statusRequest !== '';
 
@@ -152,7 +105,6 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             <form onSubmit={(e) => handleConfirmation(e, false)} noValidate className={validated && !isFormValid ? 'needs-validation' : ''}>
                 <CModalBody className="p-4">
                     
-                    {/* Student Index - Read only */}
                     <div className="ui-form-field mb-3">
                         <CFormLabel htmlFor="studentIndex" className="ui-field-label">Student Index</CFormLabel>
                         <CFormInput 
@@ -164,7 +116,6 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                         />
                     </div>
                     
-                    {/* Request Type - Read only */}
                     <div className="ui-form-field mb-3">
                         <CFormLabel htmlFor="requestType" className="ui-field-label">Request Type</CFormLabel>
                         <CFormInput
@@ -177,7 +128,6 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                         />
                     </div>
 
-                    {/* Request Details - Read only textarea */}
                     <div className="ui-form-field mb-3">
                         <CFormLabel htmlFor="requestDetails" className="ui-field-label">Request Details</CFormLabel>
                         <CFormTextarea
@@ -195,49 +145,60 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                         />
                     </div>
 
-                    {/* Status Request Dropdown (Approved/Rejected) */}
                     <div className="ui-form-field mb-3">
                         <CFormLabel htmlFor="statusRequest" className="ui-field-label">Status Request (Approval)</CFormLabel>
                         <CFormSelect
                             id="statusRequest"
                             name="statusRequest"
                             value={formData.statusRequest}
-                            onChange={(e) => handleChange(e as React.ChangeEvent<HTMLSelectElement>)}
+                            onChange={handleChange}
                             className="form-select bg-white text-dark" 
                             aria-label="Select approval status"
                             required
-                            disabled={isSubmitting}
+                            disabled={isProcessing}
+                            invalid={validated && !formData.statusRequest}
                         >
                             <option value="">Select Status</option>
                             <option value="Approved">Approved</option>
                             <option value="Rejected">Rejected</option>
                         </CFormSelect>
-                        <CFormFeedback invalid>Please select an approval status.</CFormFeedback>
+                        {validated && !formData.statusRequest && (
+                            <div className="invalid-feedback d-block">
+                                Please select an approval status.
+                            </div>
+                        )}
                     </div>
 
                 </CModalBody>
                 
-                {/* Footer with action buttons */}
                 <CModalFooter className="justify-content-center border-0 p-4 pt-3">
-                    {/* Create Confirmation button */}
+                    <CButton 
+                        color="secondary" 
+                        type="button" 
+                        onClick={onClose}
+                        disabled={isProcessing}
+                        className="ui-btn-confirmation ui-btn-secondary-custom me-3"
+                    >
+                        Cancel
+                    </CButton>
+                    
                     <CButton 
                         color="primary" 
                         type="submit" 
-                        disabled={!isFormValid || isSubmitting}
+                        disabled={!isFormValid || isProcessing}
                         className="ui-btn-confirmation ui-btn-primary-custom me-3"
                     >
-                        {isSubmitting ? 'Processing...' : 'Create Confirmation'}
+                        {isProcessing ? 'Processing...' : 'Create Confirmation'}
                     </CButton>
                     
-                    {/* Create & Print button */}
                     <CButton 
                         color="secondary"
                         type="button" 
                         onClick={(e) => handleConfirmation(e, true)} 
-                        disabled={!isFormValid || isSubmitting}
+                        disabled={!isFormValid || isProcessing}
                         className="ui-btn-confirmation ui-btn-secondary-custom"
                     >
-                        {isSubmitting ? 'Processing...' : 'Create & Print'}
+                        {isProcessing ? 'Processing...' : 'Create & Print'}
                     </CButton>
                 </CModalFooter>
             </form>

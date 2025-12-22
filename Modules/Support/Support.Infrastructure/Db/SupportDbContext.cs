@@ -10,11 +10,12 @@ namespace Support.Infrastructure.Db
 		public DbSet<Issue> Issues { get; set; } = null!;
 		public DbSet<IssueCategory> IssueCategories { get; set; } = null!;
 
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
-		{
-			modelBuilder.ApplyConfigurationsFromAssembly(typeof(SupportDbContext).Assembly);
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
 
-			base.OnModelCreating(modelBuilder);
-		}
-	}
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(SupportDbContext).Assembly);
+
+            base.OnModelCreating(modelBuilder);
+        }
+    }
 }

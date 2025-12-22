@@ -1,7 +1,3 @@
-/* ========================================= */
-/* GLOBAL STYLES */
-/* ========================================= */
-
 .page-container {
     width: 100%;
 }
@@ -37,24 +33,17 @@
     color: #64748b;
 }
 
-/* Custom CoreUI table spacing */
 .ui-table-custom {
     border-collapse: separate;
     border-spacing: 0 4px;
 }
 
-
-/* ========================================= */
-/* REQUEST MANAGEMENT UI STYLES */
-/* ========================================= */
-
-/* Card header customization */
 .ui-card-custom .card-header {
     background-color: transparent !important;
     border-bottom: none !important;
 }
 
-/* Status badge styling */
+
 .c-badge {
     font-size: 11px;
     font-weight: 600;
@@ -66,9 +55,6 @@
     padding: 0.35em 0.65em !important;
     color: white !important;
 }
-
-
-/* === CUSTOM SEARCH BAR === */
 
 .ui-search-input-group {
     max-width: 400px;
@@ -100,8 +86,6 @@
     color: #ced4da;
 }
 
-/* === ACTION BUTTONS IN TABLE === */
-
 .ui-btn-action {
     padding: 6px !important;
     border: none !important;
@@ -117,17 +101,14 @@
     opacity: 1;
 }
 
-/* Plus button (Create Confirmation) */
 .ui-btn-plus {
     color: var(--cui-success, #47b255) !important;
 }
 
-/* View details button */
 .ui-btn-view {
     color: #4f9cff !important;
 }
 
-/* Input/select fields */
 .ui-input-base {
     border-radius: 8px !important;
     padding: 0.75rem 1rem !important;
@@ -135,13 +116,12 @@
     border: 1px solid #d1d5db !important;
 }
 
-/* Read-only fields */
 .ui-input-base[readonly] {
     background-color: #f3f4f6 !important;
 }
 
-/* Fix select options in dark themes */
 .form-select option {
     background: white !important;
     color: black !important;
 }
+
