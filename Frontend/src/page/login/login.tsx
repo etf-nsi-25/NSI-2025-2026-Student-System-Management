@@ -35,7 +35,6 @@ export function Login() {
     }
 
     setError(null);
-    console.log("Login attempt:", { email, password });
 
     try {
 

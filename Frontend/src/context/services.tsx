@@ -21,8 +21,9 @@ export function ServiceContextProvider({ children }: PropsWithChildren<object>) 
     const refreshToken = useCallback(async () => {
         try {
             const newAuthInfo = await attemptSilentRefresh();
-          
             authContextData.setAuthInfo(newAuthInfo);
+
+            return newAuthInfo;
         } catch (error) {
             resetAuthInfo(authContextData.setAuthInfo);
         }

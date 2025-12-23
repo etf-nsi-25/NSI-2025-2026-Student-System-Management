@@ -1,10 +1,10 @@
 using Faculty.Core.Entities;
-using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Db;
+using Faculty.Infrastructure.Http;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace Faculty.Test;
+namespace Faculty.Tests;
 
 public class FacultyDbContextMultiTenancyTests : IDisposable
 {

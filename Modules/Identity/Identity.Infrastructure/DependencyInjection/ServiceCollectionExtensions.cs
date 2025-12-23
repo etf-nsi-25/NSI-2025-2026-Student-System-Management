@@ -1,5 +1,5 @@
 using Identity.Application.Services;
-using Identity.Core.Entities;
+using Identity.Core.Configuration;
 using Identity.Core.Interfaces.Repositories;
 using Identity.Core.Interfaces.Services;
 using Identity.Core.Repositories;
@@ -7,10 +7,12 @@ using Identity.Core.Services;
 using Identity.Infrastructure.Db;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Identity.Infrastructure.DependencyInjection
 {
@@ -20,7 +22,9 @@ namespace Identity.Infrastructure.DependencyInjection
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            // Entity Framework   
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+
+            // Entity Framework
             services.AddDbContext<AuthDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("Database"))
             );
@@ -30,7 +34,6 @@ namespace Identity.Infrastructure.DependencyInjection
                 .AddEntityFrameworkStores<AuthDbContext>();
 
             // Register services
-            
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IIdentityHasherService, IdentityHasherService>();
@@ -39,8 +42,29 @@ namespace Identity.Infrastructure.DependencyInjection
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-            
 
+            JwtSettings jwtSettings = new JwtSettings();
+            configuration.Bind("JwtSettings", jwtSettings);
+
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(jwtSettings.SigningKey)),
+                        ValidateAudience = true,
+                        ValidAudience = jwtSettings.Audience,
+                        ValidateIssuer = true,
+                        ValidIssuer = jwtSettings.Issuer,
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
 
             return services;
         }

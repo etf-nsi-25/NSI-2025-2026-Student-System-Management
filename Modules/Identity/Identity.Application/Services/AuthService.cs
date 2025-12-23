@@ -1,7 +1,4 @@
-﻿
-using Identity.Core.Entities;
-using Identity.Core.Enums;
-using Identity.Core.Interfaces.Repositories;
+﻿using Identity.Core.Interfaces.Repositories;
 using Identity.Core.Interfaces.Services;
 using Identity.Core.Models;
 using Identity.Core.Repositories;
@@ -158,11 +155,5 @@ public class AuthService : IAuthService
 
 
         _logger.LogInformation("Logout successful");
-    }
-
-    public Task<PublicKeyInfo> GetPublicKeyInfoAsync()
-    {
-        PublicKeyInfo publicKeyInfo = _jwtTokenService.GetPublicKey();
-        return Task.FromResult(publicKeyInfo);
     }
 }

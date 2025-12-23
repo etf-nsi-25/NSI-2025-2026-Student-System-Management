@@ -1,40 +1,32 @@
-﻿using System.Security.Claims;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
-using Microsoft.IdentityModel.Tokens;
-using Identity.Core.Entities;
-using Identity.Core.Models;
-using Identity.Core.Interfaces.Services;
-using Microsoft.Extensions.Options;
-using System.IdentityModel.Tokens.Jwt;
 using Identity.Core.Configuration;
-
+using Identity.Core.Entities;
+using Identity.Core.Interfaces.Services;
+using Identity.Core.Models;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Identity.Application.Services;
 
 public class JwtTokenService : IJwtTokenService
 {
     private readonly JwtSettings _jwtSettings;
-    private readonly RSA _rsa;
-    private readonly RsaSecurityKey _privateKey;
-    private readonly RsaSecurityKey _publicKey;
-    private readonly string _keyId;
+    private readonly SymmetricSecurityKey _signingKey;
 
     public JwtTokenService(IOptions<JwtSettings> jwtSettings)
     {
         _jwtSettings = jwtSettings.Value;
 
-        // Initialize RSA keys
-        _rsa = RSA.Create(2048);
-        _keyId = Guid.NewGuid().ToString();
+        var keyBytes = Convert.FromBase64String(_jwtSettings.SigningKey);
 
-        // Load keys from configuration or generate new ones
-        if (!string.IsNullOrEmpty(_jwtSettings.PrivateKey))
+        if (keyBytes.Length < 32)
         {
-            _rsa.ImportRSAPrivateKey(Convert.FromBase64String(_jwtSettings.PrivateKey), out _);
+            throw new ArgumentException("Signing key too short. Pleese use at least 128bits.");
         }
 
-        _privateKey = new RsaSecurityKey(_rsa) { KeyId = _keyId };
-        _publicKey = new RsaSecurityKey(_rsa.ExportParameters(false)) { KeyId = _keyId };
+        _signingKey = new SymmetricSecurityKey(keyBytes);
     }
 
     public string GenerateAccessToken(TokenClaims claims)
@@ -58,7 +50,7 @@ public class JwtTokenService : IJwtTokenService
             Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpirationMinutes),
             Issuer = _jwtSettings.Issuer,
             Audience = _jwtSettings.Audience,
-            SigningCredentials = new SigningCredentials(_privateKey, SecurityAlgorithms.RsaSha256)
+            SigningCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256)
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -88,17 +80,6 @@ public class JwtTokenService : IJwtTokenService
         };
     }
 
-    public PublicKeyInfo GetPublicKey()
-    {
-        var publicKeyBytes = _rsa.ExportRSAPublicKey();
-        return new PublicKeyInfo
-        {
-            PublicKey = Convert.ToBase64String(publicKeyBytes),
-            Algorithm = "RS256",
-            KeyId = _keyId
-        };
-    }
-
     public ClaimsPrincipal? ValidateAccessToken(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -108,7 +89,7 @@ public class JwtTokenService : IJwtTokenService
             var validationParameters = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = _publicKey,
+                IssuerSigningKey = _signingKey,
                 ValidateIssuer = true,
                 ValidIssuer = _jwtSettings.Issuer,
                 ValidateAudience = true,
@@ -117,7 +98,7 @@ public class JwtTokenService : IJwtTokenService
                 ClockSkew = TimeSpan.Zero
             };
 
-            var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
+            var principal = tokenHandler.ValidateToken(token, validationParameters, out _);
             return principal;
         }
         catch

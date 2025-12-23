@@ -1,5 +1,4 @@
 using Faculty.Core.Interfaces;
-using Faculty.Core.Services;
 using Faculty.Infrastructure.Db;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -7,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Faculty.Infrastructure.Repositories;
 using Faculty.Application.Services;
 using Faculty.Application.Interfaces;
+using Faculty.Infrastructure.Http;
 
 namespace Faculty.Infrastructure.DependencyInjection
 {
