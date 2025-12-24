@@ -1,7 +1,6 @@
-import { useAPI } from '../../context/services.tsx';
+import type { API } from '../../api/api.ts';
 
-const api = useAPI()
-export async function getCourses(page = 1, limit = 6, searchQuery = "", filterStatus = "all") {
+export async function getCourses(api: API, page = 1, limit = 6, searchQuery = "", filterStatus = "all") {
   try {
     let allCourses = await api.getAllCourses()
 
