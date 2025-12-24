@@ -22,7 +22,7 @@ import { cilSearch, cilCheckCircle } from "@coreui/icons"
 import "@coreui/coreui/dist/css/coreui.min.css"
 import "./enrollment.css"
 import { enrollInCourse, getCourses } from "../../service/enrollment/api"
-import type { Course } from "../../service/enrollment/types"
+import type { Course } from "../../component/faculty/courses/types/Course"
 
 export default function EnrollmentPage() {
   const [courses, setCourses] = useState<Course[]>([])
