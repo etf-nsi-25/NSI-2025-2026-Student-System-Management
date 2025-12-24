@@ -32,6 +32,7 @@ import {
   CSpinner,
 } from '@coreui/react';
 import './documentCenter.css';
+import { useAPI } from '../../context/services.tsx';
 
 export default function DocumentCenterDashboard() {
   const [requestType, setRequestType] = useState('');
@@ -45,6 +46,8 @@ export default function DocumentCenterDashboard() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [submitSuccess, setSubmitSuccess] = useState('');
+
+  const api = useAPI();
 
   const validate = (): ValidationErrors => {
     const newErrors: ValidationErrors = {};
@@ -81,31 +84,14 @@ export default function DocumentCenterDashboard() {
     try {
       setSubmitting(true);
 
-      const response = await fetch(
-        `/api/Support/document-request`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (!response.ok) {
-        const text = await response.text().catch(() => '');
-        throw new Error(
-          `Request failed (${response.status}): ${text || 'Unknown error'}`
-        );
-      }
-
-      const data = await response.json();
-      console.log('Created request:', data);
-
-      setSubmitSuccess('Request successfully submitted.');
-      setRequestType('');
-      setStatus('');
-      setDetails('');
+      api.post('/api/Support/document-request', payload)
+          .then(response => {
+            console.log('Created request: ', response);
+            setSubmitSuccess('Request successfully submitted.');
+            setRequestType('');
+            setStatus('');
+            setDetails('');
+          });
     } catch (err) {
       const error = err as Error;
       setSubmitError(error.message || 'Error while submitting request.');

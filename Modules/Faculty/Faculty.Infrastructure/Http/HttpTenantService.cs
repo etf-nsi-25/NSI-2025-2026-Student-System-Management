@@ -1,8 +1,6 @@
-using System.Security.Claims;
-using Faculty.Core.Interfaces;
 using Microsoft.AspNetCore.Http;
 
-namespace Faculty.Core.Services;
+namespace Faculty.Infrastructure.Http;
 
 /// <summary>
 /// HTTP-based implementation of ITenantService that extracts TenantId from authenticated user claims.
@@ -39,7 +37,7 @@ public class HttpTenantService : ITenantService
         var tenantIdClaim = user.FindFirst(TenantIdClaimType);
         if (tenantIdClaim == null)
         {
-            throw new UnauthorizedAccessException($"TenantId claim not found in user claims. Available claims: {string.Join(", ", user.Claims.Select(c => c.Type))}");
+            throw new UnauthorizedAccessException($"TenantId claim not found in user claims.");
         }
 
         if (!Guid.TryParse(tenantIdClaim.Value, out var tenantId))

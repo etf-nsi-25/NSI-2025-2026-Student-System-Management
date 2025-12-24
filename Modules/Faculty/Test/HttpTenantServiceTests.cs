@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using Faculty.Core.Services;
+using Faculty.Infrastructure.Http;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;

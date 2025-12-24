@@ -1,5 +1,6 @@
 using Analytics.API.Controllers;
 using Analytics.Infrastructure;
+using Faculty.Infrastructure.Db;
 using Faculty.Infrastructure.DependencyInjection;
 using Identity.API.Controllers;
 using Identity.Infrastructure.Db;
@@ -15,7 +16,6 @@ using University.API.Controllers;
 using University.Infrastructure;
 using University.Infrastructure.Db;
 using FacultyController = Faculty.API.Controllers.FacultyController;
-using Faculty.Infrastructure.Db;
 
 var builder = WebApplication.CreateBuilder(args);
 
