@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Faculty.Infrastructure.Repositories;
 using Faculty.Application.Services;
 using Faculty.Application.Interfaces;
+using Faculty.Infrastructure.EventHandler;
 using Faculty.Infrastructure.Http;
 
 namespace Faculty.Infrastructure.DependencyInjection
@@ -16,8 +17,17 @@ namespace Faculty.Infrastructure.DependencyInjection
         {
             services.AddScoped<ICourseRepository, CourseRepository>();
             services.AddScoped<ICourseService, CourseService>();
+
             services.AddHttpContextAccessor();
+            services.AddScoped<ITenantContext, ThreadLocalTenantContext>();
             services.AddScoped<ITenantService, HttpTenantService>();
+            
+            services.AddScoped<StudentService>();
+            services.AddScoped<IStudentRepository, StudentRepository>();
+            
+            // Event handlers
+            services.AddScoped<UserCreatedEventHandler>();
+
             services.AddDbContext<FacultyDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("Database")));
 

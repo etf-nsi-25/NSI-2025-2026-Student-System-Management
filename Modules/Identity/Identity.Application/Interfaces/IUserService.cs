@@ -1,9 +1,7 @@
-using Identity.Core.Entities;
-using Identity.Core.Enums;
 using Identity.Core.DTO;
+using Identity.Core.Enums;
 
-
-namespace Identity.Application.Services;
+namespace Identity.Application.Interfaces;
 
 public interface IUserService
 {

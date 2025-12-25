@@ -1,4 +1,5 @@
-﻿using Identity.Application.Services;
+﻿using Identity.Application.Interfaces;
+using Identity.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using Identity.Core.DTO;
 using Identity.Core.Enums;
