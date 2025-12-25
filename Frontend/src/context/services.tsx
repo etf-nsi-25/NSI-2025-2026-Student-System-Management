@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import { createContext, useContext, useCallback } from 'react';
+import { createContext, useContext, useCallback, useMemo } from 'react';
 import { useAuthContext } from '../init/auth.tsx';
 import { API } from '../api/api.ts';
 import { RestClient } from '../api/rest.ts';
@@ -24,16 +24,16 @@ export function ServiceContextProvider({ children }: PropsWithChildren<object>) 
             authContextData.setAuthInfo(newAuthInfo);
 
             return newAuthInfo;
-        } catch (error) {
+        } catch {
             resetAuthInfo(authContextData.setAuthInfo);
         }
-    }, [authContextData]);
+    }, [authContextData.setAuthInfo]);
 
-    const value: Services = {
-        // Since login API call is done without using API service, and all pages require login,
+    const value: Services = useMemo(() => ({
+        // Since login API call is done without using API service, and all other pages require login,
         // we can be sure auth info is initialized
         api: new API(new RestClient(authContextData.authInfo!, refreshToken))
-    }
+    }), [authContextData.authInfo, refreshToken]);
 
     return (
         <ServiceContext.Provider value={ value }>

@@ -61,7 +61,7 @@ const fetchCourses = useCallback(
       setIsLoading(false)
     }
   },
-  [],
+  [api],
 )
 
   useEffect(() => {

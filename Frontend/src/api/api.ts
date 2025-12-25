@@ -15,11 +15,11 @@ export class API {
         return this.#restClient.get<T>(url);
     }
 
-    post<T>(url: string, body?: any) {
+    post<T>(url: string, body?: unknown) {
         return this.#restClient.post<T>(url, body);
     }
 
-    put<T>(url: string, body?: any) {
+    put<T>(url: string, body?: unknown) {
         return this.#restClient.put<T>(url, body);
     }
 

@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { attemptSilentRefresh } from '../utils/authUtils.ts';
 import { resetAuthInfo } from '../utils/authUtils.ts';
@@ -43,8 +43,6 @@ const getInitialAuthInfo = (): AuthInfo | undefined => {
     return undefined;
 };
 
-// TODO: use this to import this auth context into /login page, and use setAuthInfo after fetching from backend
-// Then the initial data (default-token) should be removed
 export function useAuthContext() {
     return useContext(AuthContext);
 }
@@ -81,8 +79,10 @@ export function Authentication({ children }: PropsWithChildren<object>) {
         }
     }, [authInfo, refreshToken]);
 
+    const contextValue: AuthContextData = useMemo(() => ({ authInfo, setAuthInfo }), [authInfo, setAuthInfo]);
+
     return (
-        <AuthContext.Provider value={{ authInfo, setAuthInfo }}>
+        <AuthContext.Provider value={ contextValue }>
             { children }
         </AuthContext.Provider>
     )
