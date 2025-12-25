@@ -1,4 +1,5 @@
 ﻿using Faculty.Core.Entities;
+using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,20 +11,14 @@ namespace Faculty.Infrastructure.Db;
 public class FacultyDbContext : DbContext
 {
     private readonly ITenantService _tenantService;
-    private readonly Guid _currentFacultyId;
 
     public FacultyDbContext(DbContextOptions<FacultyDbContext> options, ITenantService tenantService)
         : base(options)
     {
         _tenantService = tenantService ?? throw new ArgumentNullException(nameof(tenantService));
-        _currentFacultyId = _tenantService.GetCurrentFacultyId();
     }
 
-	/// <summary>
-	/// Gets the current Faculty ID that was resolved during context instantiation.
-	/// This value is used in query filters and can be properly translated to SQL.
-	/// </summary>
-	private Guid CurrentFacultyId => _currentFacultyId;
+    private Guid CurrentFacultyId => _tenantService.GetCurrentFacultyId();
 
     // DbSets
     public DbSet<Teacher> Teachers { get; set; } = null!;
@@ -57,6 +52,20 @@ public class FacultyDbContext : DbContext
         ConfigureExamRegistration(modelBuilder);
         ConfigureStudentExamGrade(modelBuilder);
         ConfigureAttendance(modelBuilder);
+    }
+
+    public override Task<int> SaveChangesAsync(
+        CancellationToken cancellationToken = default)
+    {
+        foreach (var entry in ChangeTracker.Entries<ITenantAware>())
+        {
+            if (entry.State == EntityState.Added)
+            {
+                entry.Entity.FacultyId = CurrentFacultyId;
+            }
+        }
+
+        return base.SaveChangesAsync(cancellationToken);
     }
 
     private void ConfigureTeacher(ModelBuilder modelBuilder)

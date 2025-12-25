@@ -1,6 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Common\Common.Infrastructure\Common.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\EventBus\EventBus.MediatR\EventBus.MediatR.csproj" />
+    <ProjectReference Include="..\..\Identity\Identity.Core\Identity.Core.csproj" />
     <ProjectReference Include="..\Faculty.Core\Faculty.Core.csproj" />
     <ProjectReference Include="..\Faculty.Application\Faculty.Application.csproj" />
   </ItemGroup>
