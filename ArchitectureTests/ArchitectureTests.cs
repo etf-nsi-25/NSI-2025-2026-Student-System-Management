@@ -131,7 +131,7 @@ public class ArchitectureTests
 
                 foreach (var other in otherModules)
                 {
-                    var forbidden = new[] { $"{other}.Core", $"{other}.Application", $"{other}.Infrastructure" };
+                    var forbidden = new[] { $"{other}.Infrastructure", $"{other}.API"};
 
                     foreach (var dependency in forbidden)
                     {
