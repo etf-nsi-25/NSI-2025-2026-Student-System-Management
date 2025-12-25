@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
-namespace Faculty.Test
+namespace Faculty.Tests
 {
     /// <summary>
     /// Unit tests for HttpTenantService to verify correct TenantId resolution from claims.
@@ -13,11 +13,12 @@ namespace Faculty.Test
     {
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor;
         private readonly HttpTenantService _tenantService;
+        private readonly ITenantContext _tenantContext = new MockTenantContext();
 
         public HttpTenantServiceTests()
         {
             _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
-            _tenantService = new HttpTenantService(_mockHttpContextAccessor.Object);
+            _tenantService = new HttpTenantService(_mockHttpContextAccessor.Object, _tenantContext);
         }
 
         #region Successful Resolution Tests
@@ -47,6 +48,15 @@ namespace Faculty.Test
 
             // Assert
             Assert.Equal(expectedTenantId, result);
+        }
+
+        [Fact]
+        public void GetCurrentFacultyId_ShouldReturnTenantId_WhenTenantContextIsPopulated()
+        {
+            var expectedTenantId = Guid.NewGuid();
+            _tenantContext.CurrentFacultyId = expectedTenantId;
+            
+            Assert.Equal(expectedTenantId, _tenantService.GetCurrentFacultyId());
         }
 
         #endregion
@@ -195,15 +205,14 @@ namespace Faculty.Test
 
         #endregion
 
-        #region Constructor Tests
-
-        [Fact]
-        public void Constructor_ShouldThrowArgumentNullException_WhenHttpContextAccessorIsNull()
+        private class MockTenantContext : ITenantContext
         {
-            // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => new HttpTenantService(null!));
-        }
+            public Guid? CurrentFacultyId { get; set; }
 
-        #endregion
+            public IDisposable Use(Guid _)
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }

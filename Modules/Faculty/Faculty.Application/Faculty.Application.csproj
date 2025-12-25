@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Identity\Identity.Core\Identity.Core.csproj" />
     <ProjectReference Include="..\Faculty.Core\Faculty.Core.csproj" />
   </ItemGroup>
 

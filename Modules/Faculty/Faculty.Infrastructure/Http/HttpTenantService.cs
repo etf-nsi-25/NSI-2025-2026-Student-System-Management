@@ -5,15 +5,10 @@ namespace Faculty.Infrastructure.Http;
 /// <summary>
 /// HTTP-based implementation of ITenantService that extracts TenantId from authenticated user claims.
 /// </summary>
-public class HttpTenantService : ITenantService
+public class HttpTenantService(IHttpContextAccessor httpContextAccessor, ITenantContext tenantContext)
+    : ITenantService
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private const string TenantIdClaimType = "tenantId";
-
-    public HttpTenantService(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-    }
 
     /// <summary>
     /// Gets the current Tenant ID from the authenticated user's claims.
@@ -22,7 +17,12 @@ public class HttpTenantService : ITenantService
     /// <exception cref="UnauthorizedAccessException">Thrown when TenantId claim is missing or user is not authenticated.</exception>
     public Guid GetCurrentFacultyId()
     {
-        var httpContext = _httpContextAccessor.HttpContext;
+        if (tenantContext.CurrentFacultyId != null && tenantContext.CurrentFacultyId.Value != Guid.Empty)
+        {
+            return tenantContext.CurrentFacultyId.Value;
+        }
+
+        var httpContext = httpContextAccessor.HttpContext;
         if (httpContext == null)
         {
             throw new UnauthorizedAccessException("HttpContext is not available. Ensure the service is used within an HTTP request context.");

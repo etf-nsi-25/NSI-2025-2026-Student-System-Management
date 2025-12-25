@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -6,7 +7,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Common\Common.Core\Common.Core.csproj" />
-		<ProjectReference Include="..\..\EventBus\EventBus.Core\EventBus.Core.csproj" />
+		<PackageReference Include="MediatR" Version="13.1.0" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\EventBus.Core\EventBus.Core.csproj" />
+	</ItemGroup>
+
 </Project>

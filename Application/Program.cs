@@ -1,5 +1,6 @@
 using Analytics.API.Controllers;
 using Analytics.Infrastructure;
+using EventBus.Infrastructure;
 using Faculty.Infrastructure.Db;
 using Faculty.Infrastructure.DependencyInjection;
 using Identity.API.Controllers;
@@ -26,6 +27,7 @@ builder.Services.AddFacultyModule(builder.Configuration);
 builder.Services.AddSupportModule(builder.Configuration);
 builder.Services.AddNotificationsModule();
 builder.Services.AddAnalyticsModule();
+builder.Services.AddEventBus();
 
 // Add controllers and module API assemblies
 var mvcBuilder = builder.Services.AddControllers();

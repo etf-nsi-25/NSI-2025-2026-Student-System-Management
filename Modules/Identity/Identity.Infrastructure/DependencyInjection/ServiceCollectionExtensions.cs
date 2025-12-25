@@ -1,3 +1,4 @@
+using Identity.Application.Interfaces;
 using Identity.Application.Services;
 using Identity.Core.Configuration;
 using Identity.Core.Interfaces.Repositories;
@@ -37,7 +38,6 @@ namespace Identity.Infrastructure.DependencyInjection
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IIdentityHasherService, IdentityHasherService>();
-            services.AddScoped<IEventPublisher, EventPublisher>();
             services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
             services.AddScoped<IUserRepository, UserRepository>();
