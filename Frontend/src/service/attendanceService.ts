@@ -1,4 +1,16 @@
 import type { Faculty, Program, Course, AttendanceRecord, AttendanceStats } from "../models/attendance/Attendance.types";
+import type { API } from "../api/api";
+
+type SaveAttendanceRequestDTO = {
+    courseId: string;
+    date: string;
+    records: Array<{
+        studentId: number;
+        status: NonNullable<AttendanceRecord["status"]>;
+        note?: string;
+    }>;
+
+};
 
 // Mock Data
 const MOCK_FACULTIES: Faculty[] = [
@@ -61,7 +73,7 @@ export const getAttendance = async (courseId: string, date: string): Promise<Att
     }));
 };
 
-export const saveAttendance = async (attendanceData: AttendanceRecord[]): Promise<boolean> => {
+export const saveAttendance = async (api: API, attendanceData: AttendanceRecord[]): Promise<boolean> => {
     const filtered = attendanceData.filter(r => r.status !== null);
     if (filtered.length === 0) return true;
     const courseId = filtered[0].courseId;
@@ -72,7 +84,7 @@ export const saveAttendance = async (attendanceData: AttendanceRecord[]): Promis
         date,
         records: filtered.map(r => ({
             studentId: r.studentId,
-            status: r.status,
+            status: r.status!,
             note: r.note ?? undefined,
         })),
     };

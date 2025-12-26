@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
-namespace Faculty.Test
+namespace Faculty.Tests
 {
     /// <summary>
     /// Unit tests for HttpTenantService to verify correct TenantId resolution from claims.
@@ -23,7 +23,7 @@ namespace Faculty.Test
 
         #region Successful Resolution Tests
 
-        [Fact(Skip = "Temporarily skipped due to hardcoded TenantId in HttpTenantService.")]
+        [Fact]
         public void GetCurrentFacultyId_ShouldReturnTenantId_WhenValidGuidClaimExists()
         {
             // Arrange
@@ -54,7 +54,7 @@ namespace Faculty.Test
 
         #region HttpContext Null Tests
 
-        [Fact(Skip = "Temporarily skipped due to hardcoded TenantId in HttpTenantService.")]
+        [Fact]
         public void GetCurrentFacultyId_ShouldThrowUnauthorizedAccessException_WhenHttpContextIsNull()
         {
             // Arrange
@@ -69,7 +69,7 @@ namespace Faculty.Test
 
         #region Authentication Tests
 
-        [Fact(Skip = "Temporarily skipped due to hardcoded TenantId in HttpTenantService.")]
+        [Fact]
         public void GetCurrentFacultyId_ShouldThrowUnauthorizedAccessException_WhenUserIsNull()
         {
             // Arrange
@@ -85,7 +85,7 @@ namespace Faculty.Test
             Assert.Contains("User is not authenticated", exception.Message);
         }
 
-        [Fact(Skip = "Temporarily skipped due to hardcoded TenantId in HttpTenantService.")]
+        [Fact]
         public void GetCurrentFacultyId_ShouldThrowUnauthorizedAccessException_WhenIdentityIsNull()
         {
             // Arrange
@@ -102,7 +102,7 @@ namespace Faculty.Test
             Assert.Contains("User is not authenticated", exception.Message);
         }
 
-        [Fact(Skip = "Temporarily skipped due to hardcoded TenantId in HttpTenantService.")]
+        [Fact]
         public void GetCurrentFacultyId_ShouldThrowUnauthorizedAccessException_WhenNotAuthenticated()
         {
             // Arrange
@@ -124,7 +124,7 @@ namespace Faculty.Test
 
         #region Invalid Guid Tests
 
-        [Fact(Skip = "Temporarily skipped due to hardcoded TenantId in HttpTenantService.")]
+        [Fact]
         public void GetCurrentFacultyId_ShouldThrowUnauthorizedAccessException_WhenTenantIdClaimIsMissing()
         {
             // Arrange
@@ -147,7 +147,7 @@ namespace Faculty.Test
             Assert.Contains("TenantId claim not found in user claims.", exception.Message);
         }
 
-        [Fact(Skip = "Temporarily skipped due to hardcoded TenantId in HttpTenantService.")]
+        [Fact]
         public void GetCurrentFacultyId_ShouldThrowUnauthorizedAccessException_WhenTenantIdClaimIsEmpty()
         {
             // Arrange
@@ -170,7 +170,7 @@ namespace Faculty.Test
             Assert.Contains("Invalid TenantId format", exception.Message);
         }
 
-        [Fact(Skip = "Temporarily skipped due to hardcoded TenantId in HttpTenantService.")]
+        [Fact]
         public void GetCurrentFacultyId_ShouldThrowUnauthorizedAccessException_WhenTenantIdClaimIsInvalidGuid()
         {
             // Arrange
@@ -198,7 +198,7 @@ namespace Faculty.Test
 
         #region Constructor Tests
 
-        [Fact(Skip = "Temporarily skipped due to hardcoded TenantId in HttpTenantService.")]
+        [Fact]
         public void Constructor_ShouldThrowArgumentNullException_WhenHttpContextAccessorIsNull()
         {
             // Act & Assert

@@ -7,7 +7,7 @@ using Moq;
 using System.Security.Claims;
 using Xunit;
 
-namespace Faculty.Test;
+namespace Faculty.Tests;
 
 /// <summary>
 /// Unit tests for AttendanceController covering happy paths, validation errors, and authorization scenarios.

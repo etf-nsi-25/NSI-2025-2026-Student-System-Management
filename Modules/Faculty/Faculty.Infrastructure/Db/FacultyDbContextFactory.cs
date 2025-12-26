@@ -1,5 +1,4 @@
-﻿using Faculty.Core.Interfaces;
-using Faculty.Infrastructure.Http;
+﻿using Faculty.Infrastructure.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;

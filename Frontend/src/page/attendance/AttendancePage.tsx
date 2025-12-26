@@ -36,12 +36,14 @@ import type {
     AttendanceStatus,
     AttendanceStats
 } from '../../models/attendance/Attendance.types';
+import { useAPI } from '../../context/services.tsx';
 
 const DOUGHNUT_CANVAS_SIZE = 300;
 const DOUGHNUT_CONTAINER_SIZE = 320;
 const DOUGHNUT_COLORS = ['#2eb85c', '#e55353', '#f9b115'] as const;
 
 export default function AttendancePage() {
+    const api = useAPI();
     const [faculties, setFaculties] = useState<Faculty[]>([]);
     const [programs, setPrograms] = useState<Program[]>([]);
     const [courses, setCourses] = useState<Course[]>([]);
@@ -232,7 +234,7 @@ export default function AttendancePage() {
     const handleSave = useCallback(async () => {
         setSaving(true);
         try {
-            await saveAttendance(attendanceRecords);
+            await saveAttendance(api, attendanceRecords);
             alert('Attendance saved successfully!');
         } catch (error) {
             console.error('Failed to save attendance', error);
@@ -240,7 +242,7 @@ export default function AttendancePage() {
         } finally {
             setSaving(false);
         }
-    }, [attendanceRecords]);
+    }, [api, attendanceRecords]);
 
     const handleExport = useCallback(async () => {
         if (!selectedCourse || !selectedDate) return;

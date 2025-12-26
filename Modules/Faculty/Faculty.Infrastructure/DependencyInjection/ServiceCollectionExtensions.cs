@@ -21,7 +21,9 @@ namespace Faculty.Infrastructure.DependencyInjection
             services.AddScoped<IStudentExamRegistrationRepository, StudentExamRegistrationRepository>();
             services.AddScoped<IStudentExamRegistrationService, StudentExamRegistrationService>();
             services.AddHttpContextAccessor();
-            services.AddScoped<ITenantService, HttpTenantService>();
+            services.AddScoped<Infrastructure.Http.ITenantService, HttpTenantService>();
+
+
             services.AddDbContext<FacultyDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("Database")));
 
