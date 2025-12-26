@@ -1,4 +1,5 @@
 ﻿using Faculty.Core.Entities;
+using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Http;
 using Microsoft.EntityFrameworkCore;
 

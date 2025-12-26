@@ -4,6 +4,7 @@ using Faculty.Application.Services;
 using Faculty.Core.Entities;
 using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Db;
+using Faculty.Infrastructure.Http;
 using Faculty.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
