@@ -2,6 +2,7 @@
 using Faculty.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using Faculty.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Faculty.API.Controllers
 {
@@ -17,6 +18,7 @@ namespace Faculty.API.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll()
             => Ok(await _service.GetAllAsync());
 
