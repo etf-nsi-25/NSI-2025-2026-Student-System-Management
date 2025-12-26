@@ -196,8 +196,6 @@ namespace Identity.Infrastructure.Migrations
                     RevokedReason = table.Column<string>(type: "text", nullable: true),
                     RevokedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     ReplacedByToken = table.Column<string>(type: "text", nullable: true),
-                    IpAddress = table.Column<string>(type: "text", nullable: false),
-                    UserAgent = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
