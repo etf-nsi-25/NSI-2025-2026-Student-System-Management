@@ -15,9 +15,11 @@ using Support.Infrastructure.Db;
 using University.API.Controllers;
 using University.Infrastructure;
 using University.Infrastructure.Db;
+using FluentValidation.AspNetCore;
 using FacultyController = Faculty.API.Controllers.FacultyController;
 
 var builder = WebApplication.CreateBuilder(args);
+const string CorsPolicyName = "ReactDevClient";
 
 // Add services from modules
 builder.Services.AddIdentityModule(builder.Configuration);
@@ -44,6 +46,10 @@ foreach (var asm in moduleControllers)
 {
     mvcBuilder.PartManager.ApplicationParts.Add(new AssemblyPart(asm));
 }
+
+// Add FluentValidation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
 
 // Add Swagger
 builder.Services.AddEndpointsApiExplorer();
