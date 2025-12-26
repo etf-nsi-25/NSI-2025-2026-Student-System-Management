@@ -1,6 +1,6 @@
 using Faculty.Core.Entities;
-using Faculty.Infrastructure.Db;
 using Faculty.Infrastructure.Http;
+using Faculty.Infrastructure.Db;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 

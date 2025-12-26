@@ -1,10 +1,11 @@
 using System.Security.Claims;
+using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Http;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
-namespace Faculty.Test
+namespace Faculty.Tests
 {
     /// <summary>
     /// Unit tests for HttpTenantService to verify correct TenantId resolution from claims.

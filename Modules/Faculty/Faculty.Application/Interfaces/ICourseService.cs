@@ -1,10 +1,4 @@
 ﻿using Faculty.Application.DTOs;
-using Faculty.Core.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Faculty.Application.Interfaces
 {
@@ -13,6 +7,7 @@ namespace Faculty.Application.Interfaces
         Task<CourseDTO> AddAsync(CourseDTO course);
         Task<CourseDTO?> GetByIdAsync(Guid id);
         Task<List<CourseDTO>> GetAllAsync();
+        Task<List<CourseDTO>> GetByTeacherAsync(string userId);
         Task<CourseDTO?> UpdateAsync(Guid id, CourseDTO course);
         Task<bool> DeleteAsync(Guid id);
     }

@@ -1,4 +1,4 @@
-namespace Faculty.Infrastructure.Http;
+﻿namespace Faculty.Infrastructure.Http;
 
 /// <summary>
 /// Service for resolving the current tenant ID from the authenticated user context.
@@ -12,4 +12,3 @@ public interface ITenantService
     /// <exception cref="UnauthorizedAccessException">Thrown when TenantId claim is missing or user is not authenticated.</exception>
     Guid GetCurrentFacultyId();
 }
-

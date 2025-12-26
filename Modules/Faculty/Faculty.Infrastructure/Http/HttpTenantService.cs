@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Faculty.Infrastructure.Http;
 
 namespace Faculty.Infrastructure.Http;
 
