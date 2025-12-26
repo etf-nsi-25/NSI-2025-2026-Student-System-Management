@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Faculty\Faculty.Infrastructure\Faculty.Infrastructure.csproj" />
     <ProjectReference Include="..\Analytics.Core\Analytics.Core.csproj" />
     <ProjectReference Include="..\Analytics.Application\Analytics.Application.csproj" />
   </ItemGroup>
