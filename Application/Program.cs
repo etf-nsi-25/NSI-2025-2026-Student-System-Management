@@ -137,4 +137,5 @@ app.UseSwaggerUI();
 
 // Map controllers
 app.MapControllers();
+
 app.Run();
