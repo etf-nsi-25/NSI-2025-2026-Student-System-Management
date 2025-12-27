@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Support.Core.Entities;
 
 namespace Support.Core.Interfaces
