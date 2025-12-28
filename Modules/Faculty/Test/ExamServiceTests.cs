@@ -11,18 +11,15 @@ namespace Faculty.Test;
 public class ExamServiceTests
 {
     private readonly Mock<IExamRepository> _examRepositoryMock;
-    private readonly Mock<ITenantService> _tenantServiceMock;
     private readonly Mock<ILogger<ExamService>> _loggerMock;
     private readonly ExamService _examService;
 
     public ExamServiceTests()
     {
         _examRepositoryMock = new Mock<IExamRepository>();
-        _tenantServiceMock = new Mock<ITenantService>();
         _loggerMock = new Mock<ILogger<ExamService>>();
         _examService = new ExamService(
             _examRepositoryMock.Object,
-            _tenantServiceMock.Object,
             _loggerMock.Object);
     }
 
@@ -43,7 +40,6 @@ public class ExamServiceTests
             RegDeadline = DateTime.UtcNow.AddDays(5)
         };
 
-        _tenantServiceMock.Setup(x => x.GetCurrentFacultyId()).Returns(facultyId);
         _examRepositoryMock.Setup(x => x.IsTeacherAssignedToCourseAsync(teacherId, courseId))
             .ReturnsAsync(true);
 
@@ -62,7 +58,7 @@ public class ExamServiceTests
             .ReturnsAsync(createdExam);
 
         // Act
-        var result = await _examService.CreateExamAsync(request, teacherId);
+        var result = await _examService.CreateExamAsync(request, teacherId, facultyId);
 
         // Assert
         Assert.NotNull(result);
@@ -77,6 +73,7 @@ public class ExamServiceTests
         // Arrange
         var teacherId = 1;
         var courseId = Guid.NewGuid();
+        var facultyId = Guid.NewGuid();
         var request = new CreateExamRequestDTO
         {
             CourseId = courseId,
@@ -92,7 +89,7 @@ public class ExamServiceTests
 
         // Act & Assert
         await Assert.ThrowsAsync<UnauthorizedAccessException>(
-            () => _examService.CreateExamAsync(request, teacherId));
+            () => _examService.CreateExamAsync(request, teacherId, facultyId));
     }
 
     [Fact]
@@ -296,7 +293,6 @@ public class ExamServiceTests
             RegDeadline = DateTime.UtcNow.AddDays(5)
         };
 
-        _tenantServiceMock.Setup(x => x.GetCurrentFacultyId()).Returns(facultyId);
             _examRepositoryMock.Setup(x => x.IsTeacherAssignedToCourseAsync(teacherId, courseId))
             .ReturnsAsync(true);
         _examRepositoryMock.Setup(x => x.HasDateConflictAsync(courseId, null, examDate, location))
@@ -304,7 +300,7 @@ public class ExamServiceTests
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(
-            () => _examService.CreateExamAsync(request, teacherId));
+            () => _examService.CreateExamAsync(request, teacherId, facultyId));
     }
 
     [Fact]

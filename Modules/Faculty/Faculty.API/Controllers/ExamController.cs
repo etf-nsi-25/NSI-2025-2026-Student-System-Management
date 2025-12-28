@@ -1,5 +1,6 @@
 using Faculty.Application.DTOs;
 using Faculty.Application.Interfaces;
+using Faculty.Core.Entities;
 using Faculty.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +27,7 @@ namespace Faculty.API.Controllers
             _logger = logger;
         }
 
-        private async Task<int> GetCurrentTeacherIdAsync()
+        private async Task<Teacher> GetCurrentTeacherAsync()
         {
             // Check if user has Teacher role
             var role = User.FindFirst(ClaimTypes.Role)?.Value;
@@ -47,7 +48,7 @@ namespace Faculty.API.Controllers
                 throw new UnauthorizedAccessException("Teacher not found for the current user.");
             }
 
-            return teacher.Id;
+            return teacher;
         }
 
         [HttpPost]
@@ -62,8 +63,8 @@ namespace Faculty.API.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                var teacherId = await GetCurrentTeacherIdAsync();
-                var result = await _examService.CreateExamAsync(request, teacherId);
+                var teacher = await GetCurrentTeacherAsync();
+                var result = await _examService.CreateExamAsync(request, teacher.Id, teacher.FacultyId);
 
                 return CreatedAtAction(nameof(GetExamById), new { id = result.Id }, result);
             }
@@ -86,8 +87,8 @@ namespace Faculty.API.Controllers
         {
             try
             {
-                var teacherId = await GetCurrentTeacherIdAsync();
-                var exams = await _examService.GetExamsByTeacherAsync(teacherId);
+                var teacher = await GetCurrentTeacherAsync();
+                var exams = await _examService.GetExamsByTeacherAsync(teacher.Id);
                 return Ok(exams);
             }
             catch (UnauthorizedAccessException ex)
@@ -111,8 +112,8 @@ namespace Faculty.API.Controllers
         {
             try
             {
-                var teacherId = await GetCurrentTeacherIdAsync();
-                var exam = await _examService.GetExamByIdAsync(id, teacherId);
+                var teacher = await GetCurrentTeacherAsync();
+                var exam = await _examService.GetExamByIdAsync(id, teacher.Id);
 
                 if (exam == null)
                     return NotFound();
@@ -144,8 +145,8 @@ namespace Faculty.API.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                var teacherId = await GetCurrentTeacherIdAsync();
-                var result = await _examService.UpdateExamAsync(id, request, teacherId);
+                var teacher = await GetCurrentTeacherAsync();
+                var result = await _examService.UpdateExamAsync(id, request, teacher.Id);
 
                 if (result == null)
                     return NotFound();
@@ -173,8 +174,8 @@ namespace Faculty.API.Controllers
         {
             try
             {
-                var teacherId = await GetCurrentTeacherIdAsync();
-                var result = await _examService.DeleteExamAsync(id, teacherId);
+                var teacher = await GetCurrentTeacherAsync();
+                var result = await _examService.DeleteExamAsync(id, teacher.Id);
 
                 if (!result)
                     return NotFound();

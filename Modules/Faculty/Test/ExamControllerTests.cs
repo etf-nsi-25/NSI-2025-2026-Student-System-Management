@@ -48,6 +48,7 @@ public class ExamControllerTests
     {
         // Arrange
         var teacherId = 1;
+        var facultyId = Guid.NewGuid();
         var request = new CreateExamRequestDTO
         {
             CourseId = Guid.NewGuid(),
@@ -69,10 +70,10 @@ public class ExamControllerTests
             RegDeadline = request.RegDeadline
         };
 
-        var teacher = new Teacher { Id = teacherId, UserId = "user123" };
+        var teacher = new Teacher { Id = teacherId, UserId = "user123", FacultyId = facultyId };
 
         _teacherRepositoryMock.Setup(x => x.GetByUserIdAsync("user123")).ReturnsAsync(teacher);
-        _examServiceMock.Setup(x => x.CreateExamAsync(request, teacherId)).ReturnsAsync(response);
+        _examServiceMock.Setup(x => x.CreateExamAsync(request, teacherId, facultyId)).ReturnsAsync(response);
 
         // Act
         var result = await _controller.CreateExam(request);
@@ -132,16 +133,17 @@ public class ExamControllerTests
     {
         // Arrange
         var teacherId = 1;
+        var facultyId = Guid.NewGuid();
         var request = new CreateExamRequestDTO
         {
             CourseId = Guid.NewGuid(),
             Name = "Final Exam"
         };
 
-        var teacher = new Teacher { Id = teacherId, UserId = "user123" };
+        var teacher = new Teacher { Id = teacherId, UserId = "user123", FacultyId = facultyId };
 
         _teacherRepositoryMock.Setup(x => x.GetByUserIdAsync("user123")).ReturnsAsync(teacher);
-        _examServiceMock.Setup(x => x.CreateExamAsync(request, teacherId))
+        _examServiceMock.Setup(x => x.CreateExamAsync(request, teacherId, facultyId))
             .ThrowsAsync(new UnauthorizedAccessException("Not authorized"));
 
         // Act
@@ -156,16 +158,17 @@ public class ExamControllerTests
     {
         // Arrange
         var teacherId = 1;
+        var facultyId = Guid.NewGuid();
         var request = new CreateExamRequestDTO
         {
             CourseId = Guid.NewGuid(),
             Name = "Final Exam"
         };
 
-        var teacher = new Teacher { Id = teacherId, UserId = "user123" };
+        var teacher = new Teacher { Id = teacherId, UserId = "user123", FacultyId = facultyId };
 
         _teacherRepositoryMock.Setup(x => x.GetByUserIdAsync("user123")).ReturnsAsync(teacher);
-        _examServiceMock.Setup(x => x.CreateExamAsync(request, teacherId))
+        _examServiceMock.Setup(x => x.CreateExamAsync(request, teacherId, facultyId))
             .ThrowsAsync(new Exception("Database error"));
 
         // Act

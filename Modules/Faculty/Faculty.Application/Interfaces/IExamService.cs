@@ -10,7 +10,7 @@ namespace Faculty.Application.Interfaces
 {
     public interface IExamService
     {
-        Task<ExamResponseDTO> CreateExamAsync(CreateExamRequestDTO request, int teacherId);
+        Task<ExamResponseDTO> CreateExamAsync(CreateExamRequestDTO request, int teacherId, Guid facultyId);
         Task<ExamResponseDTO?> GetExamByIdAsync(int id, int teacherId);
         Task<List<ExamResponseDTO>> GetExamsByTeacherAsync(int teacherId);
         Task<ExamResponseDTO?> UpdateExamAsync(int id, UpdateExamRequestDTO request, int teacherId);

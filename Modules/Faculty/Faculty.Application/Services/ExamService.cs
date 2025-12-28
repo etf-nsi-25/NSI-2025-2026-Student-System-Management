@@ -9,20 +9,17 @@ namespace Faculty.Application.Services
     public class ExamService : IExamService
     {
         private readonly IExamRepository _examRepository;
-        private readonly ITenantService _tenantService;
         private readonly ILogger<ExamService> _logger;
 
         public ExamService(
             IExamRepository examRepository,
-            ITenantService tenantService,
             ILogger<ExamService> _logger)
         {
             _examRepository = examRepository;
-            _tenantService = tenantService;
             this._logger = _logger;
         }
 
-        public async Task<ExamResponseDTO> CreateExamAsync(CreateExamRequestDTO request, int teacherId)
+        public async Task<ExamResponseDTO> CreateExamAsync(CreateExamRequestDTO request, int teacherId, Guid facultyId)
         {
             _logger.LogInformation("Creating exam for course {CourseId} by teacher {TeacherId}", request.CourseId, teacherId);
 
@@ -44,7 +41,7 @@ namespace Faculty.Application.Services
 
             var exam = new Exam
             {
-                FacultyId = _tenantService.GetCurrentFacultyId(),
+                FacultyId = facultyId,
                 CourseId = request.CourseId,
                 Name = request.Name,
                 Location = request.Location,
