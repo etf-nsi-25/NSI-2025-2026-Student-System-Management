@@ -9,7 +9,7 @@ namespace Support.Application.DTOs
 	public class CreateEnrollmentRequestDTO
 	{
 		public string UserId { get; set; }
-		public int FacultyId { get; set; }
+		public Guid FacultyId { get; set; }
 		public string AcademicYear { get; set; } = default!;
 		public int Semester { get; set; } 
 	}

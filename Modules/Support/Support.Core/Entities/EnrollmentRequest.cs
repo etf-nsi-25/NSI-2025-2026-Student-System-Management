@@ -11,7 +11,7 @@ namespace Support.Core.Entities
 		public Guid Id { get; set; }
 
 		public string UserId { get; set; }          
-		public int FacultyId { get; set; }
+		public Guid FacultyId { get; set; }
 
 		public string AcademicYear { get; set; } = default!;  
 		public int Semester { get; set; }                     

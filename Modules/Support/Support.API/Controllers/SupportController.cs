@@ -9,56 +9,55 @@ using University.Infrastructure.Db;
 
 namespace Support.API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class SupportController : ControllerBase
-    {
-        private readonly SupportDbContext _dbContext;
-        private readonly UniversityDbContext _universityDbContext;
-        private readonly FacultyDbContext _facultyDbContext;
-        public SupportController(SupportDbContext dbContext, UniversityDbContext universityDbContext, FacultyDbContext facultyDbContext)
-        {
-            _dbContext = dbContext;
-            _universityDbContext = universityDbContext;
-            _facultyDbContext = facultyDbContext;
-        }
+	[ApiController]
+	[Route("api/[controller]")]
+	public class SupportController : ControllerBase
+	{
+		private readonly SupportDbContext _dbContext;
+		private readonly UniversityDbContext _universityDbContext;
+		private readonly FacultyDbContext _facultyDbContext;
 
-        [HttpPost("document-request")]
-        [Authorize]
-        public async Task<IActionResult> CreateDocumentRequest([FromBody] CreateDocumentRequestDTO dto)
-        {
+		public SupportController(
+			SupportDbContext dbContext,
+			UniversityDbContext universityDbContext,
+			FacultyDbContext facultyDbContext)
+		{
+			_dbContext = dbContext;
+			_universityDbContext = universityDbContext;
+			_facultyDbContext = facultyDbContext;
+		}
 
-            var studentExists = await _facultyDbContext.Students
-                .AnyAsync(s => s.UserId == dto.UserId);
+		[HttpPost("document-request")]
+		[Authorize]
+		public async Task<IActionResult> CreateDocumentRequest([FromBody] CreateDocumentRequestDTO dto)
+		{
+			var studentExists = await _facultyDbContext.Students
+				.AnyAsync(s => s.UserId == dto.UserId);
 
-            if (!studentExists)
-            {
-                return BadRequest($"User/Student with ID '{dto.UserId}' does not exist.");
-            }
+			if (!studentExists)
+				return BadRequest($"User/Student with ID '{dto.UserId}' does not exist.");
 
-            var facultyExists = await _universityDbContext.Faculties
-                .AnyAsync(f => f.Id == dto.FacultyId);
+			var facultyExists = await _universityDbContext.Faculties
+				.AnyAsync(f => f.Id == dto.FacultyId);
 
-            if (!facultyExists)
-            {
-                return BadRequest($"Faculty with ID '{dto.FacultyId}' does not exist.");
-            }
+			if (!facultyExists)
+				return BadRequest($"Faculty with ID '{dto.FacultyId}' does not exist.");
 
-            var request = new DocumentRequest
-            {
-                UserId = dto.UserId,
-                FacultyId = dto.FacultyId,
-                DocumentType = dto.DocumentType,
-                Status = dto.Status,
-                CreatedAt = DateTime.UtcNow,
-                CompletedAt = null
-            };
+			var request = new DocumentRequest
+			{
+				UserId = dto.UserId,
+				FacultyId = dto.FacultyId,
+				DocumentType = dto.DocumentType,
+				Status = dto.Status,
+				CreatedAt = DateTime.UtcNow,
+				CompletedAt = null
+			};
 
-            _dbContext.DocumentRequests.Add(request);
-            await _dbContext.SaveChangesAsync();
+			_dbContext.DocumentRequests.Add(request);
+			await _dbContext.SaveChangesAsync();
 
-            return Ok(request);
-        }
+			return Ok(request);
+		}
 
 		[HttpPost("enrollment-requests")]
 		public async Task<IActionResult> CreateEnrollmentRequest([FromBody] CreateEnrollmentRequestDTO dto)
@@ -75,17 +74,17 @@ namespace Support.API.Controllers
 			if (!studentExists)
 				return BadRequest($"Student with UserId '{dto.UserId}' does not exist.");
 
-			var facultyExists = await _universityDbContext.Faculties
-				.AnyAsync(f => f.Id == dto.FacultyId);
+			/*var facultyExists = await _universityDbContext.Faculties
+				.AnyAsync(f => f.Id.Equals(dto.FacultyId));
 
 			if (!facultyExists)
-				return BadRequest($"Faculty with ID '{dto.FacultyId}' does not exist.");
+				return BadRequest($"Faculty with ID '{dto.FacultyId}' does not exist.");*/
 
 			var duplicate = await _dbContext.EnrollmentRequests.AnyAsync(r =>
 				r.UserId == dto.UserId &&
 				r.AcademicYear == dto.AcademicYear &&
 				r.Semester == dto.Semester &&
-				r.Status != "Rejected" 
+				r.Status != "Rejected"
 			);
 
 			if (duplicate)
@@ -129,7 +128,7 @@ namespace Support.API.Controllers
 				.Select(r => new
 				{
 					r.Id,
-					r.CreatedAt,        
+					r.CreatedAt,
 					r.AcademicYear,
 					r.Semester,
 					r.Status
@@ -143,7 +142,7 @@ namespace Support.API.Controllers
 		public async Task<IActionResult> GetPendingEnrollmentRequestsForFaculty([FromQuery] int facultyId)
 		{
 			var items = await _dbContext.EnrollmentRequests.AsNoTracking()
-				.Where(r => r.FacultyId == facultyId && r.Status == "Pending")
+				.Where(r => r.FacultyId.Equals(facultyId) && r.Status == "Pending")
 				.OrderBy(r => r.CreatedAt)
 				.ToListAsync();
 
@@ -189,6 +188,5 @@ namespace Support.API.Controllers
 			await _dbContext.SaveChangesAsync();
 			return Ok(req);
 		}
-
 	}
 }
