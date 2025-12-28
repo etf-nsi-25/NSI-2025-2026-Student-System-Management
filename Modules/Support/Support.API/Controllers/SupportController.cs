@@ -138,6 +138,7 @@ namespace Support.API.Controllers
 			return Ok(items);
 		}
 
+		[Authorize(Roles = "Admin")]
 		[HttpGet("enrollment-requests/pending")]
 		public async Task<IActionResult> GetPendingEnrollmentRequestsForFaculty([FromQuery] int facultyId)
 		{
@@ -149,6 +150,7 @@ namespace Support.API.Controllers
 			return Ok(items);
 		}
 
+		[Authorize(Roles = "Admin")]
 		[HttpPut("enrollment-requests/{id:guid}/approve")]
 		public async Task<IActionResult> ApproveEnrollmentRequest([FromRoute] Guid id, [FromBody] DecideEnrollmentRequestDTO? dto)
 		{
@@ -169,6 +171,7 @@ namespace Support.API.Controllers
 			return Ok(req);
 		}
 
+		[Authorize(Roles = "Admin")]
 		[HttpPut("enrollment-requests/{id:guid}/reject")]
 		public async Task<IActionResult> RejectEnrollmentRequest([FromRoute] Guid id, [FromBody] DecideEnrollmentRequestDTO? dto)
 		{
