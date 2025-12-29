@@ -1,46 +1,56 @@
-import React, { useState, useEffect, type PropsWithChildren } from "react";
-import logoImage from "../../assets/logo-unsa-sms.png";
+import React, { useEffect, useMemo, useState, type PropsWithChildren } from "react";
 import { Link, useLocation } from "react-router-dom";
+import type { CSSProperties } from "react";
+import logoImage from "../../assets/logo-unsa-sms.png";
 
-const Defaultayout: React.FC<PropsWithChildren<object>> = ({ children }) => {
+const DefaultLayout: React.FC<PropsWithChildren<object>> = ({ children }) => {
+  const location = useLocation();
+
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile only
-  const location=useLocation();
+
+  const showText = useMemo(() => {
+    // Na mobile uvijek prikazuj tekst (jer sidebar je drawer)
+    if (isMobile) return true;
+    // Na desktop sakrij tekst kad je collapsed
+    return !isCollapsed;
+  }, [isCollapsed, isMobile]);
 
   const handleLinkClick = () => {
-if (isMobile) {
-setSidebarOpen(false);
-}
-};
+    if (isMobile) setSidebarOpen(false);
+  };
 
- const getLinkStyle = (path: string) => {
-  const isActive = location.pathname === path;
+  const getLinkStyle = (path: string): CSSProperties => {
+    const isActive = location.pathname === path;
 
-   // Kada je sidebar sklopljen (collapsed), ukloni aktivni stil
-  if (isCollapsed && !isMobile) {
+    // Kada je collapsed (desktop), ne prikazuj "active" highlight (kako si htjela)
+    if (!isMobile && isCollapsed) {
+      return {
+        padding: "10px 20px",
+        color: "white",
+        textDecoration: "none",
+        backgroundColor: "transparent",
+        borderLeft: "4px solid transparent",
+        fontWeight: 400,
+        transition: "0.2s",
+        display: "block",
+        whiteSpace: "nowrap",
+      };
+    }
+
     return {
       padding: "10px 20px",
       color: "white",
       textDecoration: "none",
-      backgroundColor: "transparent",
-      borderLeft: "4px solid transparent",
-      fontWeight: "normal",
+      backgroundColor: isActive ? "#005bb5" : "transparent",
+      borderLeft: isActive ? "4px solid #ffffff" : "4px solid transparent",
+      fontWeight: isActive ? 700 : 400,
       transition: "0.2s",
+      display: "block",
+      whiteSpace: "nowrap",
     };
-  }
-
-  // Normalno stanje (sidebar otvoren)
-  return {
-    padding: "10px 20px",
-    color: "white",
-    textDecoration: "none",
-    backgroundColor: isActive ? "#005bb5" : "transparent",
-    borderLeft: isActive ? "4px solid #ffffff" : "4px solid transparent",
-    fontWeight: isActive ? "bold" : "normal",
-    transition: "0.2s",
   };
-};
 
   useEffect(() => {
     const handleResize = () => {
@@ -48,15 +58,15 @@ setSidebarOpen(false);
       setIsMobile(mobile);
       if (!mobile) setSidebarOpen(false);
     };
+
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-const sidebarWidth = isCollapsed ? "70px" : "300px";
+  const sidebarWidth = !isMobile && isCollapsed ? "70px" : isMobile ? "250px" : "300px";
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#d9e7f5", overflowX: "hidden" }}>
-
       {/* TOP BLUE HEADER */}
       <div
         style={{
@@ -66,18 +76,17 @@ const sidebarWidth = isCollapsed ? "70px" : "300px";
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          paddingLeft: "0px",
           paddingRight: "10px",
         }}
       >
-        {/* LEFT: Logo + Collapse button */}
+        {/* LEFT: Logo + Collapse button + Title */}
         <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
           <img src={logoImage} alt="logo" style={{ height: "42px", paddingLeft: "50px" }} />
 
           <button
             onClick={() => {
-              if (isMobile) setSidebarOpen(!sidebarOpen);
-              else setIsCollapsed(!isCollapsed);
+              if (isMobile) setSidebarOpen((v) => !v);
+              else setIsCollapsed((v) => !v);
             }}
             style={{
               background: "transparent",
@@ -86,22 +95,22 @@ const sidebarWidth = isCollapsed ? "70px" : "300px";
               fontSize: "24px",
               cursor: "pointer",
             }}
+            aria-label="Toggle sidebar"
           >
             ☰
           </button>
 
-                  <span
-                      style={{
-                          color: "white",
-                          fontSize: "20px",
-                          fontWeight: 600,
-                          whiteSpace: "nowrap",
-                           marginLeft: "25px",
-                      }}
-                  >
-                      University Dashboard
-                  </span>
-
+          <span
+            style={{
+              color: "white",
+              fontSize: "20px",
+              fontWeight: 600,
+              whiteSpace: "nowrap",
+              marginLeft: "25px",
+            }}
+          >
+            University Dashboard
+          </span>
         </div>
 
         <span style={{ color: "white", fontSize: "16px", fontWeight: 500, paddingRight: "40px" }}>
@@ -109,10 +118,8 @@ const sidebarWidth = isCollapsed ? "70px" : "300px";
         </span>
       </div>
 
-
       {/* LAYOUT WRAPPER */}
       <div style={{ display: "flex", flexDirection: "row" }}>
-
         {/* MOBILE OVERLAY */}
         {isMobile && sidebarOpen && (
           <div
@@ -123,13 +130,13 @@ const sidebarWidth = isCollapsed ? "70px" : "300px";
               backgroundColor: "rgba(0,0,0,0.3)",
               zIndex: 9,
             }}
-          ></div>
+          />
         )}
 
         {/* SIDEBAR */}
         <div
           style={{
-            width: isMobile ? "250px" : sidebarWidth,
+            width: sidebarWidth,
             backgroundColor: "#003b82",
             minHeight: "calc(100vh - 60px)",
             paddingTop: "20px",
@@ -142,61 +149,60 @@ const sidebarWidth = isCollapsed ? "70px" : "300px";
             position: isMobile ? "fixed" : "relative",
             zIndex: 10,
             inset: 0,
-            transform: isMobile
-              ? sidebarOpen
-                ? "translateX(0)"
-                : "translateX(-100%)"
-              : "none",
+            transform: isMobile ? (sidebarOpen ? "translateX(0)" : "translateX(-100%)") : "none",
           }}
         >
           {/* GENERAL */}
-          <div style={{ padding: "8px 24px", fontSize: "12px", opacity: 0.7 }}>
-            General
-          </div>
+          {showText && (
+            <div style={{ padding: "8px 24px", fontSize: "12px", opacity: 0.7 }}>
+              General
+            </div>
+          )}
 
           <Link to="/university-dashboard" style={getLinkStyle("/university-dashboard")} onClick={handleLinkClick}>
-            University dashboard
+            {showText ? "University dashboard" : "\u00A0"}
           </Link>
 
           <Link to="/documents" style={getLinkStyle("/documents")} onClick={handleLinkClick}>
-            Document center
+            {showText ? "Document center" : "\u00A0"}
           </Link>
 
           <Link to="/analytics" style={getLinkStyle("/analytics")} onClick={handleLinkClick}>
-            Analytics
+            {showText ? "Analytics" : "\u00A0"}
           </Link>
 
           <Link to="/requests" style={getLinkStyle("/requests")} onClick={handleLinkClick}>
-            Request management
+            {showText ? "Request management" : "\u00A0"}
           </Link>
 
           {/* SETTINGS */}
-          <div style={{ padding: "16px 24px 8px", fontSize: "12px", opacity: 0.7 }}>
-            Settings
-          </div>
+          {showText && (
+            <div style={{ padding: "16px 24px 8px", fontSize: "12px", opacity: 0.7 }}>
+              Settings
+            </div>
+          )}
 
           <Link to="/profile" style={getLinkStyle("/profile")} onClick={handleLinkClick}>
-            Profile settings
+            {showText ? "Profile settings" : "\u00A0"}
           </Link>
 
           {/* HELP */}
-          <div style={{ padding: "16px 24px 8px", fontSize: "12px", opacity: 0.7 }}>
-            Help
-          </div>
+          {showText && (
+            <div style={{ padding: "16px 24px 8px", fontSize: "12px", opacity: 0.7 }}>
+              Help
+            </div>
+          )}
 
           <Link to="/support" style={getLinkStyle("/support")} onClick={handleLinkClick}>
-            Support
+            {showText ? "Support" : "\u00A0"}
           </Link>
         </div>
 
-        {/* ===== CONTENT ===== */}
-        <div style={{ padding: "24px", width: "100%" }}>
-          {children}
-
-        </div>
+        {/* CONTENT */}
+        <div style={{ padding: "24px", width: "100%" }}>{children}</div>
       </div>
     </div>
   );
 };
 
-export default Defaultayout;
+export default DefaultLayout;
