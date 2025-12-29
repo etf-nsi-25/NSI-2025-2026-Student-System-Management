@@ -140,7 +140,7 @@ namespace Support.API.Controllers
 
 		[Authorize(Roles = "Admin")]
 		[HttpGet("enrollment-requests/pending")]
-		public async Task<IActionResult> GetPendingEnrollmentRequestsForFaculty([FromQuery] int facultyId)
+		public async Task<IActionResult> GetPendingEnrollmentRequestsForFaculty([FromQuery] Guid facultyId)
 		{
 			var items = await _dbContext.EnrollmentRequests.AsNoTracking()
 				.Where(r => r.FacultyId.Equals(facultyId) && r.Status == "Pending")
