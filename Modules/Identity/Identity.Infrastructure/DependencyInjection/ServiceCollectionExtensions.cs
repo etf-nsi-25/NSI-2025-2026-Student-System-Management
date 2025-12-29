@@ -22,6 +22,13 @@ namespace Identity.Infrastructure.DependencyInjection
             this IServiceCollection services,
             IConfiguration configuration)
         {
+            // Load environment variables
+            var env = DotNetEnv.Env.TraversePath().Load();
+            if (env == null || !env.Any())
+            {
+                DotNetEnv.Env.TraversePath().Load(".env.example");
+            }
+            
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 
             // Entity Framework
@@ -42,6 +49,8 @@ namespace Identity.Infrastructure.DependencyInjection
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
+            services.AddHostedService<IdentityStartupService>();
 
             JwtSettings jwtSettings = new JwtSettings();
             configuration.Bind("JwtSettings", jwtSettings);

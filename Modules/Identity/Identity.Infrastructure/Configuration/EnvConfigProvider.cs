@@ -1,5 +1,4 @@
 using Identity.Core.Configuration;
-using System;
 
 namespace Identity.Infrastructure.Configuration;
 
@@ -10,10 +9,11 @@ public static class EnvConfigProvider
         // TODO: TEAM KILO MIGRATION - Ensure variable names match future naming conventions
         var settings = new SuperAdminSettings
         {
+            Username = Environment.GetEnvironmentVariable("SUPERADMIN_USERNAME") ?? string.Empty,
             Email = Environment.GetEnvironmentVariable("SUPERADMIN_EMAIL") ?? string.Empty,
             Password = Environment.GetEnvironmentVariable("SUPERADMIN_PASSWORD") ?? string.Empty,
-            FirstName = Environment.GetEnvironmentVariable("SUPERADMIN_FIRSTNAME") ?? "System",
-            LastName = Environment.GetEnvironmentVariable("SUPERADMIN_LASTNAME") ?? "SuperAdmin",
+            FirstName = Environment.GetEnvironmentVariable("SUPERADMIN_FIRSTNAME") ?? string.Empty,
+            LastName = Environment.GetEnvironmentVariable("SUPERADMIN_LASTNAME") ?? string.Empty,
         };
 
         // Optional: Parse FacultyId if provided in .env, otherwise keep Guid.Empty
