@@ -25,7 +25,7 @@ builder.Services.AddUniversityModule(builder.Configuration);
 builder.Services.AddFacultyModule(builder.Configuration);
 builder.Services.AddSupportModule(builder.Configuration);
 builder.Services.AddNotificationsModule();
-builder.Services.AddAnalyticsModule();
+builder.Services.AddAnalyticsModule(builder.Configuration);
 
 // Add controllers and module API assemblies
 var mvcBuilder = builder.Services.AddControllers();
