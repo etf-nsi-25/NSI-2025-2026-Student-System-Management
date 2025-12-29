@@ -5,58 +5,27 @@ namespace Faculty.Infrastructure.Db;
 
 public static class FacultyDbContextSeed
 {
-    public static async Task SeedAsync(FacultyDbContext context)
+    public static async Task SeedAsync(
+        FacultyDbContext context,
+        Guid facultyId,
+        Guid teacherUserId,
+        Guid studentUserId)
     {
-
-        var facultyId = await context.Teachers
-            .IgnoreQueryFilters()
-            .Select(t => t.FacultyId)
-            .FirstOrDefaultAsync();
-
-        if (facultyId == Guid.Empty)
-        {
-            facultyId = Guid.Parse("11111111-1111-1111-1111-111111111111");
-        }
-
         if (!await context.Teachers
                 .IgnoreQueryFilters()
                 .AnyAsync(t => t.FacultyId == facultyId))
         {
-            context.Teachers.AddRange(
-                new Teacher
-                {
-                    FacultyId = facultyId,
-                    UserId = "teacher1",
-                    Title = "Dr",
-                    FirstName = "Emir",
-                    LastName = "Buza",
-                    Email = "emir.buza@unsa.ba",
-                    Office = "A-203",
-                    CreatedAt = DateTime.UtcNow
-                },
-                new Teacher
-                {
-                    FacultyId = facultyId,
-                    UserId = "teacher2",
-                    Title = "Prof",
-                    FirstName = "Samir",
-                    LastName = "Omanovic",
-                    Email = "samir.omanovic@unsa.ba",
-                    Office = "B-105",
-                    CreatedAt = DateTime.UtcNow
-                },
-                new Teacher
-                {
-                    FacultyId = facultyId,
-                    UserId = "teacher3",
-                    Title = "Prof",
-                    FirstName = "Ingmar",
-                    LastName = "Besic",
-                    Email = "ingmar.besic@unsa.ba",
-                    Office = "C-307",
-                    CreatedAt = DateTime.UtcNow
-                }
-            );
+            context.Teachers.Add(new Teacher
+            {
+                FacultyId = facultyId,
+                UserId = teacherUserId.ToString(),
+                Title = "Dr",
+                FirstName = "Emir",
+                LastName = "Buza",
+                Email = "emir.buza@unsa.ba",
+                Office = "A-203",
+                CreatedAt = DateTime.UtcNow
+            });
 
             await context.SaveChangesAsync();
         }
@@ -65,48 +34,16 @@ public static class FacultyDbContextSeed
                 .IgnoreQueryFilters()
                 .AnyAsync(s => s.FacultyId == facultyId))
         {
-            context.Students.AddRange(
-                new Student
-                {
-                    FacultyId = facultyId,
-                    UserId = "student1",
-                    IndexNumber = "IB20001",
-                    FirstName = "Niko",
-                    LastName = "Nikic",
-                    EnrollmentDate = DateTime.UtcNow.AddYears(-2),
-                    CreatedAt = DateTime.UtcNow
-                },
-                new Student
-                {
-                    FacultyId = facultyId,
-                    UserId = "student2",
-                    IndexNumber = "IB20002",
-                    FirstName = "Marko",
-                    LastName = "Markovic",
-                    EnrollmentDate = DateTime.UtcNow.AddYears(-1),
-                    CreatedAt = DateTime.UtcNow
-                },
-                new Student
-                {
-                    FacultyId = facultyId,
-                    UserId = "student3",
-                    IndexNumber = "IB20003",
-                    FirstName = "Sara",
-                    LastName = "Saric",
-                    EnrollmentDate = DateTime.UtcNow.AddYears(-1),
-                    CreatedAt = DateTime.UtcNow
-                },
-                new Student
-                {
-                    FacultyId = facultyId,
-                    UserId = "student4",
-                    IndexNumber = "IB20004",
-                    FirstName = "Maja",
-                    LastName = "Majic",
-                    EnrollmentDate = DateTime.UtcNow.AddYears(-1),
-                    CreatedAt = DateTime.UtcNow
-                }
-            );
+            context.Students.Add(new Student
+            {
+                FacultyId = facultyId,
+                UserId = studentUserId.ToString(),
+                IndexNumber = "IB20001",
+                FirstName = "Niko",
+                LastName = "Nikic",
+                EnrollmentDate = DateTime.UtcNow.AddYears(-2),
+                CreatedAt = DateTime.UtcNow
+            });
 
             await context.SaveChangesAsync();
         }
@@ -134,16 +71,6 @@ public static class FacultyDbContextSeed
                     Code = "DB202",
                     ECTS = 5,
                     Type = CourseType.Mandatory,
-                    CreatedAt = DateTime.UtcNow
-                },
-                new Course
-                {
-                    Id = Guid.NewGuid(),
-                    FacultyId = facultyId,
-                    Name = "Fundamentals of programming",
-                    Code = "FP512",
-                    ECTS = 5,
-                    Type = CourseType.Elective,
                     CreatedAt = DateTime.UtcNow
                 }
             );
