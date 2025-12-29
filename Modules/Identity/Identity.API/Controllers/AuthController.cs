@@ -63,7 +63,7 @@ public class AuthController : ControllerBase
         catch (UnauthorizedAccessException ex)
         {
             _logger.LogWarning(ex, "Login failed for email: {Email}", request.Email);
-            return Unauthorized(new { message = "Invalid email or password" });
+            return Unauthorized(new { message = ex.Message });
         }
         catch (Exception ex)
         {

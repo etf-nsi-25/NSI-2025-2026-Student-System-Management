@@ -27,8 +27,10 @@ export function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const emailError = validateEmail(email);
     const passwordError = validatePassword(password);
+    
     if (emailError || passwordError) {
       setError(emailError ?? passwordError);
       return;
