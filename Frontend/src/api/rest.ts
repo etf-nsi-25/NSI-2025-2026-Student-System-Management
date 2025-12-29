@@ -16,7 +16,7 @@ type APIResponse<T> = {
 
 export class RestClient {
     #authInfo: AuthInfo;
-    #authFailCallback: () => void;
+    #authFailCallback: () => Promise<AuthInfo | undefined>;
 
     /**
      * Instantiates a new {@link API} service.
@@ -24,7 +24,7 @@ export class RestClient {
      * @param authInfo auth info necessary to construct auth headers
      * @param authFailCallback in case of 401 or 403, allows us to attempt silent refresh of token
      */
-    constructor(authInfo: AuthInfo, authFailCallback: () => void) {
+    constructor(authInfo: AuthInfo, authFailCallback: () => Promise<AuthInfo | undefined>) {
         this.#authInfo = authInfo;
         this.#authFailCallback = authFailCallback;
     }
@@ -58,12 +58,20 @@ export class RestClient {
                 }
 
                 const errorResponse = await apiResponse.errorResponse!;
-                if (errorResponse.status === 401 || errorResponse.status === 403) {
+                if (errorResponse.status === 401) {
                     // Attempt to fetch one more time after token refresh
-                    this.#authFailCallback();
+                    const newToken = await this.#authFailCallback();
+                    if (!newToken) {
+                        // TODO: this could have problems in high concurrency. Implement aborting in-flight requests if needed.
+                        throw {
+                            message: errorResponse.message,
+                            status: errorResponse.status
+                        }
+                    }
+
+                    this.#authInfo = newToken;
 
                     const result = await this.#submitRequest<T>(url, method, body);
-
                     if (!result.ok) {
                         throw {
                             message: await apiResponse.errorResponse?.message,
@@ -89,7 +97,7 @@ export class RestClient {
                 method: method,
                 body: JSON.stringify(body),
                 headers: {
-                    'Authorization': `${ this.#authInfo.accessToken }`,
+                    'Authorization': `Bearer ${ this.#authInfo.accessToken }`,
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },

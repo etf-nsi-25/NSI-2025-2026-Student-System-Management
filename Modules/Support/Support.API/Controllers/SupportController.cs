@@ -1,4 +1,5 @@
 ﻿using Faculty.Infrastructure.Db;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Support.Application.DTOs;
@@ -22,10 +23,8 @@ namespace Support.API.Controllers
             _facultyDbContext = facultyDbContext;
         }
 
-        [HttpGet]
-        public IActionResult Get() => Ok("Hello from Support API!");
-
         [HttpPost("document-request")]
+        [Authorize]
         public async Task<IActionResult> CreateDocumentRequest([FromBody] CreateDocumentRequestDTO dto)
         {
 

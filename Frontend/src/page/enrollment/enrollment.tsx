@@ -21,10 +21,12 @@ import CIcon from "@coreui/icons-react"
 import { cilSearch, cilCheckCircle } from "@coreui/icons"
 import "@coreui/coreui/dist/css/coreui.min.css"
 import "./enrollment.css"
+import { useAPI } from '../../context/services.tsx';
 import { enrollInCourse, getCourses } from "../../service/enrollment/api"
-import type { Course } from "../../service/enrollment/types"
+import type { Course } from "../../component/faculty/courses/types/Course"
 
 export default function EnrollmentPage() {
+  const api = useAPI()
   const [courses, setCourses] = useState<Course[]>([])
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
@@ -44,7 +46,7 @@ const fetchCourses = useCallback(
   async (pageNum: number, search: string, filter: string) => {
     setIsLoading(true)
     try {
-      const data = await getCourses(pageNum, 6, search, filter)
+      const data = await getCourses(api, pageNum, 6, search, filter)
 
       if (pageNum === 1) {
         setCourses(data.courses)

@@ -1,14 +1,8 @@
-import { api } from "../../api/rest"
-import type { Course } from "./types";
+import type { API } from '../../api/api.ts';
 
-async function fetchCoursesFromAPI(): Promise<Course[]> {
-  const response = await api.get<Course[]>("/api/faculty/courses");
-  return response;
-}
-
-export async function getCourses(page = 1, limit = 6, searchQuery = "", filterStatus = "all") {
+export async function getCourses(api: API, page = 1, limit = 6, searchQuery = "", filterStatus = "all") {
   try {
-    let allCourses = await fetchCoursesFromAPI()
+    let allCourses = await api.getAllCourses()
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
