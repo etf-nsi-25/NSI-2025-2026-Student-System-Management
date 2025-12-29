@@ -1,4 +1,5 @@
 ﻿using Faculty.Core.Entities;
+using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,6 +39,18 @@ public class FacultyDbContext : DbContext
     public DbSet<StudentExamGrade> StudentExamGrades { get; set; } = null!;
     public DbSet<Attendance> Attendances { get; set; } = null!;
 
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        ApplyTenantInformation();
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    {
+        ApplyTenantInformation();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -57,6 +70,17 @@ public class FacultyDbContext : DbContext
         ConfigureExamRegistration(modelBuilder);
         ConfigureStudentExamGrade(modelBuilder);
         ConfigureAttendance(modelBuilder);
+    }
+
+    private void ApplyTenantInformation()
+    {
+        foreach (var entry in ChangeTracker.Entries<ITenantAware>())
+        {
+            if (entry.State == EntityState.Added && entry.Entity.FacultyId == Guid.Empty)
+            {
+                entry.Entity.FacultyId = CurrentFacultyId;
+            }
+        }
     }
 
     private void ConfigureTeacher(ModelBuilder modelBuilder)
