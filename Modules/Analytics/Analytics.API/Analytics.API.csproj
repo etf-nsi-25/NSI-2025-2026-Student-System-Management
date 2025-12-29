@@ -16,8 +16,6 @@
     <ProjectReference Include="..\Analytics.Core\Analytics.Core.csproj" />
     <ProjectReference Include="..\Analytics.Application\Analytics.Application.csproj" />
     <ProjectReference Include="..\Analytics.Infrastructure\Analytics.Infrastructure.csproj" />
-	  <ProjectReference Include="..\..\Faculty\Faculty.Core\Faculty.Core.csproj" />
-	  <ProjectReference Include="..\..\Faculty\Faculty.Infrastructure\Faculty.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

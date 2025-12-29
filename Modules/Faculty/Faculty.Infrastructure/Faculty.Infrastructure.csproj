@@ -3,6 +3,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Faculty.Core\Faculty.Core.csproj" />
     <ProjectReference Include="..\Faculty.Application\Faculty.Application.csproj" />
+	<ProjectReference Include="..\..\Common\Common.Infrastructure\Common.Infrastructure.csproj" />
+
   </ItemGroup>
 
   <ItemGroup>
@@ -16,6 +18,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+
+	<PackageReference Include="MediatR" Version="12.2.0" />
+	  
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
@@ -33,4 +38,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-</Project>
+</Project> 

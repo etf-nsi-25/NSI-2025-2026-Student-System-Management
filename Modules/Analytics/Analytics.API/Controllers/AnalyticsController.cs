@@ -1,8 +1,11 @@
-﻿using Analytics.Application.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Faculty.Infrastructure.Http;
+﻿using Microsoft.AspNetCore.Mvc;
+using MediatR;
 using System.Security.Claims;
+using Analytics.Application.Services;
+using Analytics.Application.Handlers;
+using Analytics.Application.Queries;
+
+using Microsoft.AspNetCore.Authorization;
 
 namespace Analytics.API.Controllers;
 
@@ -11,45 +14,22 @@ namespace Analytics.API.Controllers;
 [Authorize]
 public class AnalyticsController : ControllerBase
 {
-    private readonly IStudentAnalyticsService _analyticsService;
-    private readonly ITenantService _tenantService;
+    private readonly IMediator _mediator;
 
-    public AnalyticsController(IStudentAnalyticsService analyticsService, ITenantService tenantService)
+    public AnalyticsController(IMediator mediator)
     {
-        _analyticsService = analyticsService;
-        _tenantService = tenantService;
+        _mediator = mediator;
     }
 
     [HttpGet("student-performance")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetStudentStats()
+    [Authorize] 
+    public async Task<IActionResult> GetMyAcademicAnalytics()
     {
-        try
-        {
-            var facultyId = _tenantService.GetCurrentFacultyId().ToString();
+        var userId = User.FindFirst("userId")?.Value;
 
-            var userId = User.FindFirst("userId")?.Value;
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized("User identity could not be verified from the provided token.");
-            }
-
-            var stats = await _analyticsService.GetStudentStatsAsync(userId, facultyId);
-
-            return stats is null
-                ? NotFound($"Statistics not found for student {userId} at faculty {facultyId}.")
-                : Ok(stats);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Unauthorized(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An internal error occurred: {ex.Message}");
-        }
+        var result = await _mediator.Send(new GetStudentAnalyticsQuery(userId));
+        return Ok(result);
     }
 }

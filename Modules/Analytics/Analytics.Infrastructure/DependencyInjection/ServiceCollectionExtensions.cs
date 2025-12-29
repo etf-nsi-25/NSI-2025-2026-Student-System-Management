@@ -1,19 +1,17 @@
-﻿using Analytics.Application.Services;
-using Analytics.Core.Interfaces;
-using Analytics.Infrastructure.Repositories;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using MediatR;
+using Analytics.Application.Handlers;
 
-namespace Analytics.Infrastructure
+namespace Analytics.Infrastructure;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static IServiceCollection AddAnalyticsModule(this IServiceCollection services)
     {
-        public static IServiceCollection AddAnalyticsModule(this IServiceCollection services)
-        {
-			services.AddScoped<IStudentAnalyticsRepository, StudentAnalyticsRepository>();
+        services.AddMediatR(cfg => {
+            cfg.RegisterServicesFromAssembly(typeof(GetStudentAnalyticsHandler).Assembly);
+        });
 
-			services.AddScoped<IStudentAnalyticsService, StudentAnalyticsService>();
-
-			return services;
-        }
+        return services;
     }
 }

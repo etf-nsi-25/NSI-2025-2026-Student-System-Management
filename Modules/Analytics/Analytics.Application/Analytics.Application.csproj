@@ -1,7 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+	<ItemGroup>
+		<ProjectReference Include="..\..\Common\Common.Core\Common.Core.csproj" />
+		<ProjectReference Include="..\..\Common\Common.Application\Common.Application.csproj" />
+		<ProjectReference Include="..\Analytics.Core\Analytics.Core.csproj" />
+	</ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\Analytics.Core\Analytics.Core.csproj" />
+    <PackageReference Include="MediatR" Version="12.2.0" />
   </ItemGroup>
 
   <PropertyGroup>
