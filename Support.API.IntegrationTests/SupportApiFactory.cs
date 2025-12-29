@@ -1,12 +1,16 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication;
-using System.Linq;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Support.Infrastructure.Db;
 using University.Infrastructure.Db;
 using Faculty.Infrastructure.Db;
+using Faculty.Infrastructure.Http;
+
+namespace Support.API.IntegrationTests;
 
 public class SupportApiFactory : WebApplicationFactory<global::Support.API.Controllers.SupportController>
 {
@@ -18,22 +22,25 @@ public class SupportApiFactory : WebApplicationFactory<global::Support.API.Contr
 			RemoveDbContext<UniversityDbContext>(services);
 			RemoveDbContext<FacultyDbContext>(services);
 
-			services.AddDbContext<SupportDbContext>(options => options.UseInMemoryDatabase("SupportTestDb"));
-			services.AddDbContext<UniversityDbContext>(options => options.UseInMemoryDatabase("UniversityTestDb"));
-			services.AddDbContext<FacultyDbContext>(options => options.UseInMemoryDatabase("FacultyTestDb"));
+			services.RemoveAll<ITenantService>();
+			services.AddScoped<ITenantService, TestTenantService>();
+
+			services.AddDbContext<SupportDbContext>(o => o.UseInMemoryDatabase("SupportTestDb"));
+			services.AddDbContext<UniversityDbContext>(o => o.UseInMemoryDatabase("UniversityTestDb"));
+			services.AddDbContext<FacultyDbContext>(o => o.UseInMemoryDatabase("FacultyTestDb"));
 
 			services.AddAuthentication(options =>
 			{
 				options.DefaultAuthenticateScheme = "TestScheme";
 				options.DefaultChallengeScheme = "TestScheme";
 			})
-			.AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("TestScheme", options => { });
+			.AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("TestScheme", _ => { });
 		});
 	}
 
-	private void RemoveDbContext<T>(IServiceCollection services) where T : DbContext
+	private static void RemoveDbContext<T>(IServiceCollection services) where T : DbContext
 	{
-		var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<T>));
-		if (descriptor != null) services.Remove(descriptor);
+		services.RemoveAll<DbContextOptions<T>>();
+		services.RemoveAll<T>();
 	}
 }

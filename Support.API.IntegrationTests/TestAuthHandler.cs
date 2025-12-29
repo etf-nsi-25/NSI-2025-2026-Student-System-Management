@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Support.API.IntegrationTests;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
@@ -15,7 +16,8 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
 		var claims = new[] {
 			new Claim(ClaimTypes.Name, "TestUser"),
 			new Claim(ClaimTypes.Role, "Admin"), 
-            new Claim(ClaimTypes.NameIdentifier, "test-user-id")
+            new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+			new Claim("tenantId", TestTenantService.FacultyId.ToString())
 		};
 
 		var identity = new ClaimsIdentity(claims, "Test");
