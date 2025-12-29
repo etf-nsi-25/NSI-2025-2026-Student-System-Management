@@ -42,14 +42,14 @@ public class AuthService : IAuthService
         if (user == null) 
         {
             _logger.LogWarning("Authentication failed: User not found or inactive - {Email}", email);
-            throw new UnauthorizedAccessException("Invalid username");
+            throw new UnauthorizedAccessException("Invalid email or password");
         }
 
         // Verify password
         if (!_passwordHasher.VerifyPassword(user, password, user.PasswordHash))
         {
             _logger.LogWarning("Authentication failed: Invalid password - {Email}", email);
-            throw new UnauthorizedAccessException("Incorrect password");
+            throw new UnauthorizedAccessException("Invalid email or password");
         }
 
         // Generate tokens using domain model
