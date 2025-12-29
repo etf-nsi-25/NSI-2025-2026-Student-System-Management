@@ -49,7 +49,6 @@ export default function StudentSupportPage() {
 
           <section className="ss-content">
             <div className="ss-twoCol">
-              {/* Lijevo: 4 kartice (2x2 grid) */}
               <div className="ss-categories">
                 <CategoryCard
                   title="Academic support"
@@ -73,13 +72,11 @@ export default function StudentSupportPage() {
                 />
               </div>
 
-              {/* Desno: prostor za formu */}
               <div className="ss-formSpace">
                 <SupportRequestForm selectedCategoryId={selectedCategoryId} />
               </div>
             </div>
 
-            {/* Ispod: prazan kontejner */}
             <div className="ss-belowEmpty">
               <section className="ss-faq">
                 <h3 className="ss-faqTitle">Frequently Asked Questions</h3>
@@ -91,15 +88,12 @@ export default function StudentSupportPage() {
                   <CAccordion>
                     {faqs.map((faq) => (
                       <CAccordionItem key={faq.id} itemKey={faq.id}>
-
                         <CAccordionHeader>
                           {faq.question}
                         </CAccordionHeader>
-
                         <CAccordionBody>
                           {faq.answer}
                         </CAccordionBody>
-
                       </CAccordionItem>
                     ))}
                   </CAccordion>

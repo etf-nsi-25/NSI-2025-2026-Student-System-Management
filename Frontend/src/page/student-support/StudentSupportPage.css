@@ -4,20 +4,17 @@
   --ss-bg: #d7e6f2;
   --ss-text: #0b1b3a;
   --ss-muted: rgba(11, 27, 58, 0.72);
-
   --ss-white: #ffffff;
   --ss-white-80: rgba(255, 255, 255, 0.8);
   --ss-white-65: rgba(255, 255, 255, 0.65);
 }
 
-/* layout: sidebar ~20%, content ostatak */
 .ss-page {
   min-height: 100vh;
   display: flex;
   background: var(--ss-bg);
 }
 
-/* CoreUI sidebar -> natjeramo da bude u layoutu (ne overlay) */
 .ss-sidebar {
   position: relative !important;
   flex: 0 0 20%;
@@ -31,7 +28,6 @@
   overflow-y: auto;
 }
 
-/* Sidebar brand container */
 .ss-brand {
   padding: 12px !important;
   display: flex !important;
@@ -39,15 +35,13 @@
   justify-content: center;
 }
 
-/* Logo zauzima cijelu širinu kao stari custom logo */
 .ss-brandLogoFull {
   width: 100%;
   height: auto;
-  max-height: 56px;     /* prilagodi ako treba */
+  max-height: 56px;
   object-fit: contain;
   display: block;
 }
-
 
 /* nav */
 .ss-nav {
@@ -115,9 +109,21 @@
   color: var(--ss-white);
 }
 
-.ss-userMeta { line-height: 1.1; }
-.ss-userName { font-weight: 750; font-size: 14px; color: var(--ss-white); }
-.ss-userRole { font-size: 12px; color: var(--ss-white-65); margin-top: 4px; }
+.ss-userMeta {
+  line-height: 1.1;
+}
+
+.ss-userName {
+  font-weight: 750;
+  font-size: 14px;
+  color: var(--ss-white);
+}
+
+.ss-userRole {
+  font-size: 12px;
+  color: var(--ss-white-65);
+  margin-top: 4px;
+}
 
 .ss-logout {
   width: 40px !important;
@@ -130,6 +136,7 @@
   background: rgba(255, 255, 255, 0.10) !important;
   text-decoration: none !important;
 }
+
 .ss-logout:hover {
   background: rgba(255, 255, 255, 0.16) !important;
   color: var(--ss-white) !important;
@@ -195,7 +202,7 @@
 }
 
 .accordion-button {
-  color: #000;              
+  color: #000;
   font-weight: 600;
   background-color: transparent !important;
   box-shadow: none;
@@ -206,8 +213,6 @@
   background-color: transparent !important;
   box-shadow: none;
 }
-
-
 
 /* responsive */
 @media (max-width: 980px) {
@@ -236,43 +241,39 @@
   }
 }
 
-.ss-content{
+.ss-content {
   margin-top: 18px;
 }
 
-.ss-twoCol{
+.ss-twoCol {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
   align-items: start;
 }
 
-.ss-categories{
+.ss-categories {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
 
-.ss-formSpace{
+.ss-formSpace {
   min-height: 220px;
   padding: 8px;
-
 }
 
-
-.ss-belowEmpty{
+.ss-belowEmpty {
   margin-top: 28px;
   min-height: 120px;
-  
 }
 
-
-@media (max-width: 900px){
-  .ss-twoCol{
+@media (max-width: 900px) {
+  .ss-twoCol {
     grid-template-columns: 1fr;
   }
 
-  .ss-categories{
+  .ss-categories {
     grid-template-columns: 1fr;
   }
 }
@@ -280,7 +281,7 @@
 .ss-formSpace .ui-surface-glass-card {
   background-color: #fff !important;
   color: #0b1b3a;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* Labels, inputs, textarea, selects inside the form */
@@ -288,10 +289,10 @@
 .ss-formSpace .ui-surface-glass-card input,
 .ss-formSpace .ui-surface-glass-card textarea,
 .ss-formSpace .ui-surface-glass-card select {
-  color: #0b1b3a !important; /* dark text */
+  color: #0b1b3a !important;
 }
 
 .ss-formSpace .ui-surface-glass-card input::placeholder,
 .ss-formSpace .ui-surface-glass-card textarea::placeholder {
-  color: rgba(0, 0, 0, 0.5); /* gray placeholder */
+  color: rgba(0, 0, 0, 0.5);
 }
