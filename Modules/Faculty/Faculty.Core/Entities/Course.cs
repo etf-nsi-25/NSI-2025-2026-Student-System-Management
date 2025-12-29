@@ -30,9 +30,7 @@ public class Course : ITenantAware
 /// </summary>
 public enum CourseType
 {
-    //Mandatory = 1,
-    Obavezni = 1,
-
+    Mandatory = 1,
     Elective = 2
 }
 
