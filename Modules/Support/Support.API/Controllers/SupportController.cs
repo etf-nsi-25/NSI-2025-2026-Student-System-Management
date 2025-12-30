@@ -6,7 +6,6 @@ using Support.Application.DTOs;
 using Support.Core.Entities;
 using Support.Infrastructure.Db;
 using University.Infrastructure.Db;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Support.API.Controllers
 {
@@ -15,30 +14,32 @@ namespace Support.API.Controllers
 	public class SupportController : ControllerBase
 	{
 		private readonly SupportDbContext _dbContext;
-		private readonly UniversityDbContext _universityDbContext;
-		private readonly FacultyDbContext _facultyDbContext;
+		//private readonly UniversityDbContext _universityDbContext;
+		//private readonly FacultyDbContext _facultyDbContext;
 
-		public SupportController(
-			SupportDbContext dbContext,
-			UniversityDbContext universityDbContext,
-			FacultyDbContext facultyDbContext)
+		public SupportController(SupportDbContext dbContext)
+			//UniversityDbContext universityDbContext,
+			//FacultyDbContext facultyDbContext)
 		{
 			_dbContext = dbContext;
-			_universityDbContext = universityDbContext;
-			_facultyDbContext = facultyDbContext;
+			//_universityDbContext = universityDbContext;
+			//_facultyDbContext = facultyDbContext;
 		}
 
 		[HttpPost("document-request")]
 		[Authorize]
-		public async Task<IActionResult> CreateDocumentRequest([FromBody] CreateDocumentRequestDTO dto)
+		public async Task<IActionResult> CreateDocumentRequest(
+			[FromBody] CreateDocumentRequestDTO dto,
+            [FromServices] FacultyDbContext facultyDbContext, 
+            [FromServices] UniversityDbContext universityDbContext)
 		{
-			var studentExists = await _facultyDbContext.Students
+			var studentExists = await facultyDbContext.Students
 				.AnyAsync(s => s.UserId == dto.UserId);
 
 			if (!studentExists)
 				return BadRequest($"User/Student with ID '{dto.UserId}' does not exist.");
 
-			var facultyExists = await _universityDbContext.Faculties
+			var facultyExists = await universityDbContext.Faculties
 				.AnyAsync(f => f.Id == dto.FacultyId);
 
 			if (!facultyExists)
@@ -62,7 +63,9 @@ namespace Support.API.Controllers
 		}
 
 		[HttpPost("enrollment-requests")]
-		public async Task<IActionResult> CreateEnrollmentRequest([FromBody] CreateEnrollmentRequestDTO dto)
+		public async Task<IActionResult> CreateEnrollmentRequest(
+			[FromBody] CreateEnrollmentRequestDTO dto,
+			[FromServices] FacultyDbContext facultyDbContext)
 		{
 			if (dto.Semester is not (1 or 2))
 				return BadRequest("Semester must be 1 or 2.");
@@ -70,7 +73,7 @@ namespace Support.API.Controllers
 			if (string.IsNullOrWhiteSpace(dto.AcademicYear))
 				return BadRequest("AcademicYear is required.");
 
-			var studentExists = await _facultyDbContext.Students
+			var studentExists = await facultyDbContext.Students
 				.AnyAsync(s => s.UserId == dto.UserId);
 
 			if (!studentExists)
