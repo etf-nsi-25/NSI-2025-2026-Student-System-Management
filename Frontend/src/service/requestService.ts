@@ -1,8 +1,7 @@
 const API_BASE = '/api/Support'; 
 
-// Pomoćna funkcija za dobijanje headera sa tokenom
 const getAuthHeaders = () => {
-    const token = localStorage.getItem("token"); // Provjeri kako se tvoj ključ tačno zove (npr. 'jwt' ili 'token')
+    const token = localStorage.getItem("token"); 
     const headers: HeadersInit = {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -17,11 +16,11 @@ export const requestService = {
     getAllRequests: async () => {
         const response = await fetch(`${API_BASE}/requests`, {
             method: 'GET',
-            headers: getAuthHeaders() // Koristi funkciju za headere
+            headers: getAuthHeaders()
         });
 
         if (!response.ok) {
-            throw new Error(`Greška: ${response.status}`);
+            throw new Error(`Error: ${response.status}`);
         }
         return await response.json();
     },
@@ -29,13 +28,13 @@ export const requestService = {
     updateStatus: async (requestId: string, status: 'Approved' | 'Rejected'): Promise<any> => {
         const response = await fetch(`${API_BASE}/requests/${requestId}/status`, {
             method: 'PATCH', 
-            headers: getAuthHeaders(), // Koristi funkciju za headere
+            headers: getAuthHeaders(), 
             body: JSON.stringify({ Status: status })
         });
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || `Greška pri ažuriranju: ${response.status}`);
+            throw new Error(errorData.message || `Update errror: ${response.status}`);
         }
         return await response.json();
     }

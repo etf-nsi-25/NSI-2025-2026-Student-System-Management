@@ -40,7 +40,7 @@ export function RequestManagement() {
             const data = await requestService.getAllRequests();
             setRequests(data);
         } catch (err) {
-            console.error('Greška pri dohvaćanju zahtjeva:', err);
+            console.error('Error fetching requests:', err);
         } finally {
             setIsLoading(false);
         }
@@ -61,7 +61,7 @@ export function RequestManagement() {
     };
 
     const handleMoreActions = (request: StudentRequestDto) => {
-        console.log(`Akcije za: ${request.id}`);
+        console.log(`Actions for: ${request.id}`);
     };
 
     const handleConfirmationSuccess = useCallback(async (
@@ -75,7 +75,7 @@ export function RequestManagement() {
             setIsConfirmationModalOpen(false);
             await fetchRequests(); 
         } catch (err) {
-            console.error('Greška pri ažuriranju statusa:', err);
+            console.error('Error fetching requests:', err);
         } finally {
             setIsProcessing(false);
         }
