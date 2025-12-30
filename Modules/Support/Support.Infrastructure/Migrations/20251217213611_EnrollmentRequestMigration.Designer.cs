@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Support.Infrastructure.Db;
@@ -11,9 +12,11 @@ using Support.Infrastructure.Db;
 namespace Support.Infrastructure.Migrations
 {
     [DbContext(typeof(SupportDbContext))]
-    partial class SupportDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251217213611_EnrollmentRequestMigration")]
+    partial class EnrollmentRequestMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -78,8 +81,8 @@ namespace Support.Infrastructure.Migrations
                     b.Property<string>("DecisionNote")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("FacultyId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("FacultyId")
+                        .HasColumnType("integer");
 
                     b.Property<int>("Semester")
                         .HasColumnType("integer");

@@ -6,6 +6,8 @@ namespace Support.Infrastructure.Db
 	public class SupportDbContext(DbContextOptions<SupportDbContext> options) : DbContext(options)
 	{
 		public DbSet<DocumentRequest> DocumentRequests { get; set; } = null!;
+		public DbSet<EnrollmentRequest> EnrollmentRequests { get; set; } = null!;
+
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
