@@ -47,7 +47,7 @@ public class IdentityStartupService : IHostedService
                 LastName = settings.LastName,
                 EmailConfirmed = true,
                 Role = UserRole.Superadmin,
-                FacultyId = settings.FacultyId,
+                FacultyId = Guid.Empty,
                 Status = UserStatus.Active
             };
 
