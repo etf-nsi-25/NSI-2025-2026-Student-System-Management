@@ -12,4 +12,3 @@ public interface ITenantService
     /// <exception cref="UnauthorizedAccessException">Thrown when TenantId claim is missing or user is not authenticated.</exception>
     Guid GetCurrentFacultyId();
 }
-

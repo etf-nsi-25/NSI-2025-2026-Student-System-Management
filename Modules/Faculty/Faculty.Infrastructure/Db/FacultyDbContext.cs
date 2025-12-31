@@ -423,6 +423,7 @@ public class FacultyDbContext : DbContext
             entity.Property(e => e.CourseId).IsRequired();
             entity.Property(e => e.LectureDate).IsRequired();
             entity.Property(e => e.Status).HasMaxLength(50);
+            entity.Property(e => e.Note).HasMaxLength(500);
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.UpdatedAt);
 
