@@ -7,6 +7,10 @@ using Faculty.Infrastructure.Repositories;
 using Faculty.Application.Services;
 using Faculty.Application.Interfaces;
 using Faculty.Infrastructure.Http;
+using Faculty.Application.Handlers;
+using Common.Core.Interfaces.Repsitories;
+using Common.Infrastructure.Repositories;
+using MediatR;
 
 namespace Faculty.Infrastructure.DependencyInjection
 {
@@ -14,6 +18,11 @@ namespace Faculty.Infrastructure.DependencyInjection
     {
         public static IServiceCollection AddFacultyModule(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddDbContext<FacultyDbContext>(options =>
+                options.UseNpgsql(configuration.GetConnectionString("Database")));
+
+            services.AddScoped<DbContext>(sp => sp.GetRequiredService<FacultyDbContext>());
+            services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
             services.AddScoped<ICourseRepository, CourseRepository>();
             services.AddScoped<ICourseService, CourseService>();
             services.AddScoped<IStudentExamRegistrationRepository, StudentExamRegistrationRepository>();
@@ -22,6 +31,10 @@ namespace Faculty.Infrastructure.DependencyInjection
             services.AddScoped<ITenantService, HttpTenantService>();
             services.AddDbContext<FacultyDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("Database")));
+
+            services.AddMediatR(cfg => {
+                cfg.RegisterServicesFromAssembly(typeof(GetStudentAcademicDataHandler).Assembly);
+            });
 
             return services;
         }
