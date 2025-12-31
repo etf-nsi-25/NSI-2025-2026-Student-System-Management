@@ -1,5 +1,6 @@
 using Analytics.API.Controllers;
 using Analytics.Infrastructure;
+using Common.Infrastructure.DependencyInjection;
 using EventBus.Infrastructure;
 using Faculty.Infrastructure.Db;
 using Faculty.Infrastructure.DependencyInjection;
@@ -21,6 +22,7 @@ using FacultyController = Faculty.API.Controllers.FacultyController;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services from modules
+builder.Services.AddCommonModule();
 builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddUniversityModule(builder.Configuration);
 builder.Services.AddFacultyModule(builder.Configuration);

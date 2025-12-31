@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Common.Core.Tenant;
 using Faculty.Infrastructure.Http;
 using Microsoft.AspNetCore.Http;
 using Moq;
@@ -13,12 +14,12 @@ namespace Faculty.Tests
     {
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor;
         private readonly HttpTenantService _tenantService;
-        private readonly ITenantContext _tenantContext = new MockTenantContext();
+        private readonly IScopedTenantContext _scopedTenantContext = new MockScopedTenantContext();
 
         public HttpTenantServiceTests()
         {
             _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
-            _tenantService = new HttpTenantService(_mockHttpContextAccessor.Object, _tenantContext);
+            _tenantService = new HttpTenantService(_mockHttpContextAccessor.Object, _scopedTenantContext);
         }
 
         #region Successful Resolution Tests
@@ -54,9 +55,10 @@ namespace Faculty.Tests
         public void GetCurrentFacultyId_ShouldReturnTenantId_WhenTenantContextIsPopulated()
         {
             var expectedTenantId = Guid.NewGuid();
-            _tenantContext.CurrentFacultyId = expectedTenantId;
-            
-            Assert.Equal(expectedTenantId, _tenantService.GetCurrentFacultyId());
+            using (_scopedTenantContext.Use(expectedTenantId))
+            {
+                Assert.Equal(expectedTenantId, _tenantService.GetCurrentFacultyId());
+            }
         }
 
         #endregion
@@ -205,13 +207,24 @@ namespace Faculty.Tests
 
         #endregion
 
-        private class MockTenantContext : ITenantContext
+        private class MockScopedTenantContext : IScopedTenantContext
         {
-            public Guid? CurrentFacultyId { get; set; }
+            private static Guid? _tenantId;
+            
+            public Guid? CurrentTenantId() => _tenantId;
 
-            public IDisposable Use(Guid _)
+            public IDisposable Use(Guid tenantId)
             {
-                throw new NotImplementedException();
+                _tenantId =  tenantId;
+                return new DummyDisposable();
+            }
+
+            private sealed class DummyDisposable : IDisposable
+            {
+                public void Dispose()
+                {
+                    _tenantId = null;
+                }
             }
         }
     }

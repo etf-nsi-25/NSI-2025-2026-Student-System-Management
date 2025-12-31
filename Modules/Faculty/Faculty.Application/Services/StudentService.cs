@@ -7,11 +7,11 @@ namespace Faculty.Application.Services;
 
 public class StudentService(IStudentRepository repository)
 {
-    public Task HandleStudentCreated(UserCreatedEvent userCreatedEvent, CancellationToken ct)
+    public async Task HandleStudentCreated(UserCreatedEvent userCreatedEvent, CancellationToken ct)
     {
         if (userCreatedEvent.Role == UserRole.Student)
         {
-            repository.AddAsync(new Student
+            await repository.AddAsync(new Student
                 {
                     UserId = userCreatedEvent.UserId.ToString(),
                     IndexNumber = userCreatedEvent.IndexNumber!,
@@ -23,7 +23,5 @@ public class StudentService(IStudentRepository repository)
                 ct
             );
         }
-
-        return Task.CompletedTask;
     }
 }

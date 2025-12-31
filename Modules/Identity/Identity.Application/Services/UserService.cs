@@ -63,7 +63,8 @@ internal class UserService(
             newUser.IndexNumber
         );
 
-        await eventBus.Dispatch(userCreatedEvent);
+        // TODO: this should not use this variant of dispatch, but for now this endpoint has no auth so we must.
+        await eventBus.Dispatch(userCreatedEvent, facultyId);
 
         return newUser.Id;
     }

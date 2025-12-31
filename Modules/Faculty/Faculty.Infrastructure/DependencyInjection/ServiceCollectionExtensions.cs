@@ -1,13 +1,13 @@
+using Faculty.Application.Interfaces;
+using Faculty.Application.Services;
 using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Db;
+using Faculty.Infrastructure.EventHandler;
+using Faculty.Infrastructure.Http;
+using Faculty.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Faculty.Infrastructure.Repositories;
-using Faculty.Application.Services;
-using Faculty.Application.Interfaces;
-using Faculty.Infrastructure.EventHandler;
-using Faculty.Infrastructure.Http;
 
 namespace Faculty.Infrastructure.DependencyInjection
 {
@@ -23,7 +23,6 @@ namespace Faculty.Infrastructure.DependencyInjection
             services.AddScoped<IStudentRepository, StudentRepository>();
 
             services.AddHttpContextAccessor();
-            services.AddScoped<ITenantContext, ThreadLocalTenantContext>();
             services.AddScoped<ITenantService, HttpTenantService>();
             
             // Event handlers
