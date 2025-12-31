@@ -41,7 +41,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 
     // Add JWT Authentication
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+   /* options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token.",
         Name = "Authorization",
@@ -63,7 +63,7 @@ builder.Services.AddSwaggerGen(options =>
             },
             Array.Empty<string>()
         }
-    });
+    });  */
 
     // Include XML comments
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";

@@ -14,6 +14,9 @@ namespace Faculty.Infrastructure.DependencyInjection
     {
         public static IServiceCollection AddFacultyModule(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+            services.AddScoped<IEnrollmentService, EnrollmentService>();
+
             services.AddScoped<ICourseRepository, CourseRepository>();
             services.AddScoped<ICourseService, CourseService>();
             services.AddScoped<IStudentExamRegistrationRepository, StudentExamRegistrationRepository>();

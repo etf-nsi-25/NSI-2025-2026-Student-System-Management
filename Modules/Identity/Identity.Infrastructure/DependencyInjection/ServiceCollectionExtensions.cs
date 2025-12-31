@@ -30,8 +30,19 @@ namespace Identity.Infrastructure.DependencyInjection
             );
 
             // Identity Framework
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<AuthDbContext>();
+            /*services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<AuthDbContext>(); */
+
+            services.AddIdentityCore<ApplicationUser>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+            })
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<AuthDbContext>();
+
 
             // Register services
             services.AddScoped<IUserService, UserService>();
@@ -43,7 +54,7 @@ namespace Identity.Infrastructure.DependencyInjection
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
-            JwtSettings jwtSettings = new JwtSettings();
+          /*  JwtSettings jwtSettings = new JwtSettings();
             configuration.Bind("JwtSettings", jwtSettings);
 
             services.AddAuthentication(options =>
@@ -64,7 +75,7 @@ namespace Identity.Infrastructure.DependencyInjection
                         ValidateLifetime = true,
                         ClockSkew = TimeSpan.Zero
                     };
-                });
+                });    */
 
             return services;
         }
