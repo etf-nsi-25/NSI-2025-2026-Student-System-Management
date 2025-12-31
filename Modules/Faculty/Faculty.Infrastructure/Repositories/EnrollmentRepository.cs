@@ -9,6 +9,8 @@ using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Db;
 using Microsoft.EntityFrameworkCore;
 
+
+
 namespace Faculty.Infrastructure.Repositories;
 
 public class EnrollmentRepository : IEnrollmentRepository

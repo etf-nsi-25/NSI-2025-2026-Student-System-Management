@@ -24,12 +24,14 @@ using System.Text;
 using FacultyController = Faculty.API.Controllers.FacultyController;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
+
+
+using System.Net;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
-
-
-
-
 var jwt = builder.Configuration.GetSection("JwtSettings");
 var signingKey = jwt["SigningKey"]!;
 
@@ -63,13 +65,6 @@ builder.Services
     });
 
 builder.Services.AddAuthorization(); // dodaj ovo (dobro je imati)
-
-
-
-
-
-
-
 
 
 // Add services from modules
@@ -139,6 +134,34 @@ builder.Services.AddSwaggerGen(c =>
 
 
 var app = builder.Build();
+
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (OperationCanceledException) // request cancelled / timeout
+    {
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        await context.Response.WriteAsJsonAsync(new { error = "The request was cancelled or the database operation timed out." });
+    }
+    catch (NpgsqlException) // connection issues, network, etc.
+    {
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        await context.Response.WriteAsJsonAsync(new { error = "Database connection error." });
+    }
+    catch (DbUpdateConcurrencyException) // optimistic concurrency
+    {
+        context.Response.StatusCode = StatusCodes.Status409Conflict;
+        await context.Response.WriteAsJsonAsync(new { error = "A concurrency error occurred. Please retry." });
+    }
+    catch (DbUpdateException) // constraint violations etc.
+    {
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        await context.Response.WriteAsJsonAsync(new { error = "Database update error." });
+    }
+});
 
 
 // Put false if you dont want to apply migrations on start
