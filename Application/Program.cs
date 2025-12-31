@@ -1,10 +1,12 @@
 using Analytics.API.Controllers;
 using Analytics.Infrastructure;
+using Application.Seed;
 using Faculty.Infrastructure.Db;
 using Faculty.Infrastructure.DependencyInjection;
 using Identity.API.Controllers;
 using Identity.Infrastructure.Db;
 using Identity.Infrastructure.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.EntityFrameworkCore;
 using Notifications.API.Controllers;
@@ -68,42 +70,31 @@ if (applyMigrations)
 
     using (var scope = app.Services.CreateScope())
     {
-    var services = scope.ServiceProvider;
+        var services = scope.ServiceProvider;
 
-    // Identity module
-    try
-    {
-        var identityDb = services.GetRequiredService<AuthDbContext>();
-        identityDb.Database.Migrate();
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error migrating IdentityDbContext: {ex.Message}");
-    }
+        // Identity module
+        try
+        {
+            var identityDb = services.GetRequiredService<AuthDbContext>();
+            identityDb.Database.Migrate();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error migrating IdentityDbContext: {ex.Message}");
+        }
 
-    // University module
-    try
-    {
-        var universityDb = services.GetRequiredService<UniversityDbContext>();
-        universityDb.Database.Migrate();
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error migrating UniversityDbContext: {ex.Message}");
-    }
+        // University module
+        try
+        {
+            var universityDb = services.GetRequiredService<UniversityDbContext>();
+            universityDb.Database.Migrate();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error migrating UniversityDbContext: {ex.Message}");
+        }
 
-    // Faculty module
-    try
-    {
-        var facultyDb = services.GetRequiredService<FacultyDbContext>();
-        facultyDb.Database.Migrate();
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error migrating FacultyDbContext: {ex.Message}");
-    }
-
-    // Support module
+        // Support module
         try
         {
             var supportDb = services.GetRequiredService<SupportDbContext>();
@@ -113,8 +104,45 @@ if (applyMigrations)
         {
             Console.WriteLine($"Error migrating SupportDbContext: {ex.Message}");
         }
-    }
 
+        // Faculty module
+        try
+        {
+            var facultyDb = services.GetRequiredService<FacultyDbContext>();
+            facultyDb.Database.Migrate();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error migrating FacultyDbContext: {ex.Message}");
+        }
+
+        if (app.Environment.IsDevelopment())
+        {
+            var facultyId = SeedConstants.FacultyId;
+
+            var identityDb = services.GetRequiredService<AuthDbContext>();
+            var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+
+            await IdentityDbContextSeed.SeedAsync(
+                identityDb,
+                userManager,
+                facultyId,
+                SeedConstants.SuperAdminUserId,
+                SeedConstants.AdminUserId,
+                SeedConstants.TeacherUserId,
+                SeedConstants.StudentUserId
+            );
+
+            var facultyDb = services.GetRequiredService<FacultyDbContext>();
+            await FacultyDbContextSeed.SeedAsync(
+                facultyDb,
+                facultyId,
+                SeedConstants.TeacherUserId,
+                SeedConstants.StudentUserId
+            );
+        }
+
+    }
 }
 
 // Middleware
