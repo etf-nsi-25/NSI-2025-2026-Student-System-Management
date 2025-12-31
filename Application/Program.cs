@@ -17,6 +17,12 @@ using University.Infrastructure;
 using University.Infrastructure.Db;
 using FacultyController = Faculty.API.Controllers.FacultyController;
 
+//dodala 
+using Application.PdfPoc;
+
+builder.Services.AddScoped<PdfPocService>();
+builder.Services.AddSingleton<LocalPdfStorage>();
+//dodala
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services from modules
