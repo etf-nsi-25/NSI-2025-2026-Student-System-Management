@@ -1,5 +1,4 @@
 using Identity.API.Filters;
-using Identity.Application.Interfaces;
 using Identity.Application.Services;
 using Identity.Core.Interfaces.Repositories;
 using Identity.Core.Interfaces.Services;
@@ -12,10 +11,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using Identity.Core.Configuration;
-
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 // Add services to the container
 builder.Services.AddControllers(options =>
@@ -80,6 +78,16 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
         builder.Configuration.GetConnectionString("Database"),
         b => b.MigrationsAssembly("Identity.Infrastructure")));
 
+// --- ADDED: Register Data Protection (Required for Token Providers) ---
+builder.Services.AddDataProtection();
+// ---------------------------------------------------------------------
+
+// --- ADDED: Register Identity Core Services (Fixes Dependency Injection Error) ---
+builder.Services.AddIdentityCore<ApplicationUser>()
+    .AddEntityFrameworkStores<AuthDbContext>()
+    .AddDefaultTokenProviders();
+// --------------------------------------------------------------------------------
+
 // JWT Settings
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
@@ -92,6 +100,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 // Register Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
+// Register Startup Services
+builder.Services.AddHostedService<IdentityStartupService>();
 
 
 // Health Checks
