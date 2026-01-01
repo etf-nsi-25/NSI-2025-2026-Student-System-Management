@@ -35,7 +35,7 @@ namespace Faculty.Application.Services
             Id = dto.Id,
             Name = dto.Name,
             Code = dto.Code,
-            Type = Enum.Parse<CourseType>(dto.Type,true),
+            Type = Enum.Parse<CourseType>(dto.Type, true),
             ProgramId = dto.ProgramId,
             ECTS = dto.ECTS
         };
