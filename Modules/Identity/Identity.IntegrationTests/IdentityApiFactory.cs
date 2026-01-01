@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using EventBus.Core;
 
 namespace Identity.IntegrationTests
 {
@@ -63,6 +64,8 @@ namespace Identity.IntegrationTests
                     options.UseInternalServiceProvider(_efServiceProvider);
                 });
 
+                services.AddScoped<IEventBus, TestEventBus>();
+
                 var sp = services.BuildServiceProvider();
 
                 using (var scope = sp.CreateScope())
@@ -76,6 +79,20 @@ namespace Identity.IntegrationTests
                     .AddEntityFrameworkStores<AuthDbContext>()
                     .AddDefaultTokenProviders();
             });
+        }
+
+        // A simple test event bus that does nothing, sufficient for integration tests
+        public class TestEventBus : IEventBus
+        {
+            public Task Dispatch(IEvent domainEvent, CancellationToken ct = default)
+            {
+                return Task.CompletedTask;
+            }
+
+            public Task Dispatch(IEvent domainEvent, Guid tenantId, CancellationToken ct = default)
+            {
+                return Task.CompletedTask;
+            }
         }
     }
 }
