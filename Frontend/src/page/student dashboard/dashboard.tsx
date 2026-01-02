@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import {
     CCard,
@@ -22,9 +20,6 @@ import {
     Search,
     ArrowRight,
     Calendar as CalendarIcon,
-    FileText,
-    Award,
-    MoreHorizontal,
 } from "lucide-react";
 import {
     format,
@@ -39,6 +34,8 @@ import { useAPI } from "../../context/services";
 import { getMyEnrollments } from "../../service/enrollment/api";
 
 import "./dashboard.css";
+
+/* -------------------- TYPES -------------------- */
 
 interface DashboardData {
     user: {
@@ -55,7 +52,7 @@ interface DashboardData {
         };
     };
     courses: Array<{
-        id: string; // <-- changed to string (Guid)
+        id: string;
         title: string;
         professor: string;
     }>;
@@ -77,14 +74,28 @@ interface DashboardData {
     }>;
 }
 
+type DemoDashboardCourse = {
+    id: number | string;
+    title: string;
+    professor: string;
+};
+
+type MyEnrollmentItem = {
+    enrollmentId: string;
+    courseId: string;
+    courseName: string;
+    status: string;
+    grade?: number | null;
+};
+
+/* -------------------- COMPONENT -------------------- */
+
 export default function DashboardPage() {
     const api = useAPI();
 
     const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
-    // optional: if enrollments fail, we won't break the page
     const [enrollmentsError, setEnrollmentsError] = useState<string | null>(null);
 
     const [currentDate] = useState(new Date(2025, 10, 1)); // November 2025
@@ -96,31 +107,42 @@ export default function DashboardPage() {
                 setError(null);
                 setEnrollmentsError(null);
 
-                // 1) load mock dashboard
                 const result = await getDashboardData();
 
-                // 2) try to load real enrollments (do not fail whole page if this fails)
+                // normalize demo courses ids to string
+                const normalizedResult: DashboardData = {
+                    ...result,
+                    courses: result.courses.map((c: DemoDashboardCourse) => ({
+                        ...c,
+                        id: String(c.id),
+                    })),
+                };
+
                 try {
-                    const enrollments = await getMyEnrollments(api);
+                    const enrollments = (await getMyEnrollments(
+                        api,
+                    )) as MyEnrollmentItem[];
 
                     const mappedCourses = enrollments.map((e) => ({
-                        id: e.courseId, // Guid string
+                        id: e.courseId,
                         title: e.courseName,
-                        professor: "—", // backend enrollments DTO doesn't include professor
+                        professor: "—",
                     }));
 
                     setData({
-                        ...result,
+                        ...normalizedResult,
                         courses: mappedCourses,
                         stats: {
-                            ...result.stats,
+                            ...normalizedResult.stats,
                             enrolledCourses: enrollments.length,
                         },
                     });
                 } catch (e) {
                     console.error("Failed to load enrollments:", e);
-                    setEnrollmentsError("Could not load your enrollments (showing demo courses).");
-                    setData(result);
+                    setEnrollmentsError(
+                        "Could not load your enrollments (showing demo courses).",
+                    );
+                    setData(normalizedResult);
                 }
             } catch (err) {
                 setError(err instanceof Error ? err.message : "An error occurred");
@@ -132,15 +154,12 @@ export default function DashboardPage() {
         fetchDashboardData();
     }, [api]);
 
-    // Generate calendar days
+    /* -------------------- CALENDAR -------------------- */
+
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
     const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
-
-    // Get day of week for first day (0 = Sunday, 1 = Monday, etc.)
     const firstDayOfWeek = monthStart.getDay();
-
-    // Generate array to include empty cells for days before month starts
     const calendarDays = Array(firstDayOfWeek).fill(null).concat(daysInMonth);
 
     const getDateColor = (date: Date | null) => {
@@ -148,13 +167,14 @@ export default function DashboardPage() {
         const day = date.getDate();
 
         if (data.calendar.highlightedDates.includes(day)) {
-            // Cycle through colors for different dates
-            const colors = ["#a78bfa", "#60a5fa", "#34d399"]; // purple, blue, green
+            const colors = ["#a78bfa", "#60a5fa", "#34d399"];
             const index = data.calendar.highlightedDates.indexOf(day) % colors.length;
             return colors[index];
         }
         return "";
     };
+
+    /* -------------------- STATES -------------------- */
 
     if (loading) {
         return (
@@ -175,9 +195,9 @@ export default function DashboardPage() {
         );
     }
 
-    if (!data) {
-        return null;
-    }
+    if (!data) return null;
+
+    /* -------------------- RENDER -------------------- */
 
     return (
         <div className="dashboard-page">
@@ -198,7 +218,7 @@ export default function DashboardPage() {
                 </CCol>
             </CRow>
 
-            {/* Stats Cards */}
+            {/* Stats */}
             <CRow className="mb-4 g-3">
                 <CCol xs={6} md={3}>
                     <CCard className="dashboard-stats-card">
@@ -252,9 +272,8 @@ export default function DashboardPage() {
             </CRow>
 
             <CRow className="g-3">
-                {/* LEFT SIDE */}
+                {/* LEFT */}
                 <CCol xs={12} lg={8}>
-                    {/* My Courses */}
                     <h2 className="mb-3 dashboard-section-title">My courses</h2>
 
                     {enrollmentsError && (
@@ -285,119 +304,51 @@ export default function DashboardPage() {
                         ))}
                     </CRow>
 
-                    {/* Upcoming this week */}
                     <h2 className="mb-3 dashboard-section-title">Upcoming this week</h2>
                     <CListGroup>
                         {data.upcomingTasks.map((task) => (
-                            <CListGroupItem key={task.id} className="dashboard-upcoming-item">
+                            <CListGroupItem key={task.id}>
                                 <div className="d-flex justify-content-between align-items-center">
-                                    <div className="d-flex align-items-start gap-3">
-                                        <CalendarIcon size={20} className="dashboard-upcoming-icon" />
+                                    <div className="d-flex gap-3">
+                                        <CalendarIcon size={20} />
                                         <div>
-                                            <div className="dashboard-upcoming-title">
-                                                {task.course} - {task.task}
-                                            </div>
-                                            <div className="dashboard-upcoming-day">{task.day}</div>
+                                            <div>{task.course} - {task.task}</div>
+                                            <div>{task.day}</div>
                                         </div>
                                     </div>
-                                    <CButton
-                                        color="primary"
-                                        size="sm"
-                                        className="dashboard-upcoming-button"
-                                    >
-                                        Submit
-                                    </CButton>
+                                    <CButton size="sm">Submit</CButton>
                                 </div>
                             </CListGroupItem>
                         ))}
                     </CListGroup>
                 </CCol>
 
-                {/* RIGHT SIDE */}
-                <CCol xs={12} lg={4} className="dashboard-right-col">
-                    <CCard className="dashboard-right-card">
+                {/* RIGHT */}
+                <CCol xs={12} lg={4}>
+                    <CCard>
                         <CCardBody>
-                            {/* Calendar */}
-                            <div className="mb-4">
-                                <div className="d-flex justify-content-center mb-3">
-                                    <h3 className="dashboard-calendar-title">
-                                        {format(currentDate, "MMMM yyyy")}
-                                    </h3>
-                                </div>
+                            <h3 className="text-center mb-3">
+                                {format(currentDate, "MMMM yyyy")}
+                            </h3>
 
-                                <div className="dashboard-calendar-grid">
-                                    {/* Weekday headers */}
-                                    {["S", "M", "T", "W", "T", "F", "S"].map((day, idx) => (
-                                        <div key={idx} className="dashboard-calendar-weekday">
-                                            {day}
+                            <div className="dashboard-calendar-grid">
+                                {["S", "M", "T", "W", "T", "F", "S"].map((d) => (
+                                    <div key={d}>{d}</div>
+                                ))}
+                                {calendarDays.map((date, idx) => {
+                                    const bg = getDateColor(date);
+                                    return (
+                                        <div
+                                            key={idx}
+                                            style={{
+                                                backgroundColor: bg || "transparent",
+                                                fontWeight: bg || (date && isToday(date)) ? 600 : 400,
+                                            }}
+                                        >
+                                            {date ? format(date, "d") : ""}
                                         </div>
-                                    ))}
-
-                                    {/* Calendar days */}
-                                    {calendarDays.map((date, idx) => {
-                                        const bgColor = date ? getDateColor(date) : "";
-                                        const textColor = bgColor ? "white" : "#1f2937";
-                                        const isCurrentDay = date && isToday(date);
-
-                                        return (
-                                            <div
-                                                key={idx}
-                                                className="dashboard-calendar-day"
-                                                style={{
-                                                    backgroundColor: bgColor || "transparent",
-                                                    color: date ? textColor : "transparent",
-                                                    fontWeight: bgColor || isCurrentDay ? 600 : 400,
-                                                    border: isCurrentDay ? "2px solid #3b82f6" : "none",
-                                                }}
-                                            >
-                                                {date ? format(date, "d") : ""}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-
-                            {/* Quick Actions */}
-                            <div>
-                                <h3 className="mb-3 dashboard-quick-title">Quick Actions</h3>
-                                <div className="d-flex flex-column gap-2">
-                                    {data.quickActions.map((action) => {
-                                        const iconMap: Record<string, any> = {
-                                            assignment: FileText,
-                                            document: FileText,
-                                            certificate: Award,
-                                        };
-                                        const Icon = iconMap[action.icon] || FileText;
-
-                                        const colorMap: Record<string, string> = {
-                                            purple: "#a78bfa",
-                                            blue: "#60a5fa",
-                                            green: "#34d399",
-                                        };
-
-                                        return (
-                                            <div key={action.id} className="dashboard-quick-action">
-                                                <div className="d-flex align-items-center gap-3">
-                                                    <div
-                                                        className="dashboard-quick-action-icon"
-                                                        style={{
-                                                            backgroundColor: colorMap[action.color],
-                                                        }}
-                                                    >
-                                                        <Icon size={20} />
-                                                    </div>
-                                                    <span className="dashboard-quick-action-label">
-                                                        {action.label}
-                                                    </span>
-                                                </div>
-                                                <MoreHorizontal
-                                                    size={20}
-                                                    className="dashboard-quick-action-more"
-                                                />
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                    );
+                                })}
                             </div>
                         </CCardBody>
                     </CCard>
