@@ -9,6 +9,7 @@ using Identity.Infrastructure.Db;
 using Identity.Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Notifications.API.Controllers;
 using Notifications.Infrastructure;
 using Support.API.Controllers;
@@ -17,9 +18,56 @@ using Support.Infrastructure.Db;
 using University.API.Controllers;
 using University.Infrastructure;
 using University.Infrastructure.Db;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 using FacultyController = Faculty.API.Controllers.FacultyController;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Npgsql;
+
+
+using System.Net;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
+var jwt = builder.Configuration.GetSection("JwtSettings");
+var signingKey = jwt["SigningKey"]!;
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwt["Issuer"],
+
+            ValidateAudience = true,
+            ValidAudience = jwt["Audience"],
+
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(signingKey)),
+
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromMinutes(1)
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = ctx =>
+            {
+                Console.WriteLine("JWT AUTH FAILED: " + ctx.Exception);
+                return Task.CompletedTask;
+            }
+        };
+    });
+
+builder.Services.AddAuthorization(); 
+
 
 // Add services from modules
 builder.Services.AddCommonModule();
@@ -51,18 +99,74 @@ foreach (var asm in moduleControllers)
 
 // Add Swagger
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(c =>
 {
-    // Load all XML documentation files (e.g. Application.xml, Identity.API.xml)
+    // xml docs
     var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml");
-
     foreach (var xmlPath in xmlFiles)
     {
         c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
     }
+
+    // bearer jwt - adds the lock + authorize button
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter: Bearer {your JWT token}"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
 
+
 var app = builder.Build();
+
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (OperationCanceledException) // request cancelled / timeout
+    {
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        await context.Response.WriteAsJsonAsync(new { error = "The request was cancelled or the database operation timed out." });
+    }
+    catch (NpgsqlException) // connection issues, network, etc.
+    {
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        await context.Response.WriteAsJsonAsync(new { error = "Database connection error." });
+    }
+    catch (DbUpdateConcurrencyException) // optimistic concurrency
+    {
+        context.Response.StatusCode = StatusCodes.Status409Conflict;
+        await context.Response.WriteAsJsonAsync(new { error = "A concurrency error occurred. Please retry." });
+    }
+    catch (DbUpdateException) // constraint violations etc.
+    {
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        await context.Response.WriteAsJsonAsync(new { error = "Database update error." });
+    }
+});
+
 
 // Put false if you dont want to apply migrations on start
 var applyMigrations = true;
@@ -135,5 +239,42 @@ app.UseSwaggerUI();
 
 // Map controllers
 app.MapControllers();
+
+
+
+app.Use(async (ctx, next) =>
+{
+    await next();
+
+    var ep = ctx.GetEndpoint();
+    Console.WriteLine($"REQ {ctx.Request.Method} {ctx.Request.Path} -> {ctx.Response.StatusCode} | endpoint={(ep?.DisplayName ?? "NULL")}");
+});
+
+
+
+app.MapGet("/__routes", (Microsoft.AspNetCore.Routing.EndpointDataSource ds) =>
+{
+    var routes = ds.Endpoints
+        .OfType<RouteEndpoint>()
+        .Select(e =>
+        {
+            var methods = e.Metadata
+                .OfType<Microsoft.AspNetCore.Routing.HttpMethodMetadata>()
+                .FirstOrDefault()?.HttpMethods;
+
+            return new
+            {
+                pattern = e.RoutePattern.RawText,
+                methods = methods == null ? Array.Empty<string>() : methods.ToArray(),
+                displayName = e.DisplayName
+            };
+        })
+        .OrderBy(r => r.pattern)
+        .ToList();
+
+    return Results.Ok(routes);
+});
+
+
 
 app.Run();

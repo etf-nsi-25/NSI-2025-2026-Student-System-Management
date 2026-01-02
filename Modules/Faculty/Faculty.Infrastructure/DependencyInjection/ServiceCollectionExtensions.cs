@@ -1,13 +1,13 @@
-using Faculty.Application.Interfaces;
-using Faculty.Application.Services;
 using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Db;
-using Faculty.Infrastructure.EventHandler;
-using Faculty.Infrastructure.Http;
-using Faculty.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Faculty.Infrastructure.Repositories;
+using Faculty.Application.Services;
+using Faculty.Application.Interfaces;
+using Faculty.Infrastructure.Http;
+using Faculty.Core.Interfaces.Faculty.Core.Interfaces;
 
 namespace Faculty.Infrastructure.DependencyInjection
 {
@@ -15,19 +15,15 @@ namespace Faculty.Infrastructure.DependencyInjection
     {
         public static IServiceCollection AddFacultyModule(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+            services.AddScoped<IEnrollmentService, EnrollmentService>();
             services.AddScoped<ICourseRepository, CourseRepository>();
+            services.AddScoped<ICourseAssignmentRepository, CourseAssignmentRepository>();
             services.AddScoped<ICourseService, CourseService>();
             services.AddScoped<IStudentExamRegistrationRepository, StudentExamRegistrationRepository>();
             services.AddScoped<IStudentExamRegistrationService, StudentExamRegistrationService>();
-            services.AddScoped<StudentService>();
-            services.AddScoped<IStudentRepository, StudentRepository>();
-
             services.AddHttpContextAccessor();
             services.AddScoped<ITenantService, HttpTenantService>();
-            
-            // Event handlers
-            services.AddScoped<UserCreatedEventHandler>();
-
             services.AddDbContext<FacultyDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("Database")));
 
