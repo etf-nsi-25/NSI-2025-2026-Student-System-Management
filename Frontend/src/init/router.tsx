@@ -25,7 +25,7 @@ import DocumentCenterDashboard from '../page/document-center/documentCenter.tsx'
 import AppLayout from '../component/AppLayout/AppLayout.tsx';
 import DefaultLayout from '../component/UniversityDashboardLayout/DefaultLayout.tsx';
 import UniversityDashboard from "../page/university-dashboard/UniversityDashboard.tsx";
-
+import GradeManagementPage from "../page/teacher/GradeManagementPage.tsx"
 
 export function Router(): React.ReactNode {
   return (
@@ -89,6 +89,16 @@ export function Router(): React.ReactNode {
       <Route path="/support" element={<DefaultLayout><StudentSupport /></DefaultLayout>} />
       <Route path="/help" element={<DefaultLayout><HelpPage /></DefaultLayout>} />
 
+      {/*Teacher area*/}
+
+      <Route path="/teacher" element={
+        <ProtectedRoute>
+          <StudentLayout />
+        </ProtectedRoute>
+      }>
+        <Route path="/grades" element={<GradeManagementPage />} />
+
+      </Route>
 
       {/* error pages */}
       <Route path="/unauthorized" element={
