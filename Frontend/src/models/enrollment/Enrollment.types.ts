@@ -6,18 +6,19 @@ export interface Course {
   ects: number;
   status: "required" | "elective" | "enrolled";
 }
-export type EnrollmentStatus = "Pending" | "Done" | "Rejected";
 
 export interface Faculty {
   id: string;
   name: string;
 }
 
-export interface Enrollment {
+export type EnrollmentRequestStatus = "Pending" | "Approved" | "Rejected";
+
+export interface EnrollmentRequest {
   id: string;
-  facultyId: string;
-  facultyName: string;
-  date: string;
+  createdAt: string;      
   academicYear: string;
-  status: EnrollmentStatus;
+  semester: number;
+  status: EnrollmentRequestStatus;
 }
+
