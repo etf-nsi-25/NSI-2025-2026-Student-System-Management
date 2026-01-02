@@ -32,7 +32,8 @@ public class NotificationEventFlowIntegrationTests : IAsyncLifetime
         // Add DbContext with In-Memory database
         var dbName = Guid.NewGuid().ToString();
         services.AddDbContext<NotificationsDbContext>(options =>
-            options.UseInMemoryDatabase(dbName));
+            options.UseInMemoryDatabase(dbName)
+        );
 
         // Add repositories
         services.AddScoped<INotificationRepository, NotificationRepository>();
@@ -106,7 +107,7 @@ public class NotificationEventFlowIntegrationTests : IAsyncLifetime
         {
             new GradePostedEvent(studentId, "Physics", 7.5, tenantId),
             new GradePostedEvent(studentId, "Chemistry", 8.0, tenantId),
-            new GradePostedEvent(studentId, "Biology", 9.0, tenantId)
+            new GradePostedEvent(studentId, "Biology", 9.0, tenantId),
         };
 
         // Act
@@ -118,8 +119,7 @@ public class NotificationEventFlowIntegrationTests : IAsyncLifetime
         // Assert
         var notifications = await _repository.GetByUserIdAsync(studentId.ToString());
         notifications.Should().HaveCount(3);
-        notifications.Should().AllSatisfy(n => 
-            n.UserId.Should().Be(studentId.ToString()));
+        notifications.Should().AllSatisfy(n => n.UserId.Should().Be(studentId.ToString()));
     }
 
     [Fact]
@@ -132,8 +132,8 @@ public class NotificationEventFlowIntegrationTests : IAsyncLifetime
         await _eventBus.Dispatch(gradeEvent);
 
         // Assert
-        var dbNotifications = await _dbContext.NotificationLogs
-            .Where(n => n.UserId == "789")
+        var dbNotifications = await _dbContext
+            .NotificationLogs.Where(n => n.UserId == "789")
             .ToListAsync();
 
         dbNotifications.Should().HaveCount(1);
@@ -162,8 +162,8 @@ public class NotificationEventFlowIntegrationTests : IAsyncLifetime
         await _eventBus.Dispatch(examEvent, tenantId);
 
         // Assert
-        var notifications = await _dbContext.NotificationLogs
-            .Where(n => n.Message.Contains(courseId.ToString()))
+        var notifications = await _dbContext
+            .NotificationLogs.Where(n => n.Message.Contains(courseId.ToString()))
             .ToListAsync();
 
         notifications.Should().NotBeEmpty();
@@ -185,8 +185,9 @@ public class NotificationEventFlowIntegrationTests : IAsyncLifetime
         await _eventBus.Dispatch(examEvent, tenantId);
 
         // Assert
-        var notification = await _dbContext.NotificationLogs
-            .FirstAsync(n => n.Message.Contains(courseId.ToString()));
+        var notification = await _dbContext.NotificationLogs.FirstAsync(n =>
+            n.Message.Contains(courseId.ToString())
+        );
 
         notification.Message.Should().Contain("exam");
         notification.Message.Should().Contain("2026-04-20 14:00");
@@ -207,7 +208,13 @@ public class NotificationEventFlowIntegrationTests : IAsyncLifetime
         var requestType = "Transcript";
         var tenantId = Guid.NewGuid();
 
-        var requestEvent = new RequestApprovalEvent(requestId, requesterId, requestType, "approved", tenantId);
+        var requestEvent = new RequestApprovalEvent(
+            requestId,
+            requesterId,
+            requestType,
+            "approved",
+            tenantId
+        );
 
         // Act
         await _eventBus.Dispatch(requestEvent, tenantId);
@@ -232,7 +239,13 @@ public class NotificationEventFlowIntegrationTests : IAsyncLifetime
         // Act
         for (int i = 0; i < statuses.Length; i++)
         {
-            var requestEvent = new RequestApprovalEvent(100 + i, requesterId, "Certificate", statuses[i], tenantId);
+            var requestEvent = new RequestApprovalEvent(
+                100 + i,
+                requesterId,
+                "Certificate",
+                statuses[i],
+                tenantId
+            );
             await _eventBus.Dispatch(requestEvent, tenantId);
         }
 
@@ -261,7 +274,13 @@ public class NotificationEventFlowIntegrationTests : IAsyncLifetime
 
         var gradeEvent = new GradePostedEvent(111, "Math", 8.0, tenantId);
         var examEvent = new ExamCreatedEvent(Guid.NewGuid(), DateTime.UtcNow.AddDays(5), tenantId);
-        var requestEvent = new RequestApprovalEvent(222, "user222", "Transcript", "approved", tenantId);
+        var requestEvent = new RequestApprovalEvent(
+            222,
+            "user222",
+            "Transcript",
+            "approved",
+            tenantId
+        );
 
         // Act
         await _eventBus.Dispatch(gradeEvent, tenantId);
@@ -272,18 +291,18 @@ public class NotificationEventFlowIntegrationTests : IAsyncLifetime
         var totalNotifications = await _dbContext.NotificationLogs.CountAsync();
         totalNotifications.Should().Be(3);
 
-        var gradeNotifs = await _dbContext.NotificationLogs
-            .Where(n => n.Message.Contains("Math"))
+        var gradeNotifs = await _dbContext
+            .NotificationLogs.Where(n => n.Message.Contains("Math"))
             .ToListAsync();
         gradeNotifs.Should().HaveCount(1);
 
-        var examNotifs = await _dbContext.NotificationLogs
-            .Where(n => n.Message.Contains("exam"))
+        var examNotifs = await _dbContext
+            .NotificationLogs.Where(n => n.Message.Contains("exam"))
             .ToListAsync();
         examNotifs.Should().HaveCount(1);
 
-        var requestNotifs = await _dbContext.NotificationLogs
-            .Where(n => n.Message.Contains("Transcript"))
+        var requestNotifs = await _dbContext
+            .NotificationLogs.Where(n => n.Message.Contains("Transcript"))
             .ToListAsync();
         requestNotifs.Should().HaveCount(1);
     }
@@ -327,8 +346,8 @@ public class NotificationEventFlowIntegrationTests : IAsyncLifetime
         await _eventBus.Dispatch(gradeEvent);
 
         // Assert - Query database directly
-        var dbEntry = await _dbContext.NotificationLogs
-            .AsNoTracking()
+        var dbEntry = await _dbContext
+            .NotificationLogs.AsNoTracking()
             .FirstOrDefaultAsync(n => n.UserId == "333");
 
         dbEntry.Should().NotBeNull();
@@ -347,8 +366,7 @@ public class NotificationEventFlowIntegrationTests : IAsyncLifetime
         await _eventBus.Dispatch(gradeEvent);
 
         // Assert
-        var notification = await _dbContext.NotificationLogs
-            .FirstAsync(n => n.UserId == "444");
+        var notification = await _dbContext.NotificationLogs.FirstAsync(n => n.UserId == "444");
 
         notification.Id.Should().BeGreaterThan(0);
         notification.UserId.Should().NotBeNullOrEmpty();
@@ -378,8 +396,8 @@ public class NotificationEventFlowIntegrationTests : IAsyncLifetime
         await _eventBus.Dispatch(event2, tenant2);
 
         // Assert
-        var notifications = await _dbContext.NotificationLogs
-            .Where(n => n.UserId == "555")
+        var notifications = await _dbContext
+            .NotificationLogs.Where(n => n.UserId == "555")
             .ToListAsync();
 
         notifications.Should().HaveCount(2);

@@ -39,7 +39,7 @@ public class NotificationRepositoryTests : IAsyncLifetime
             Destination = "user@example.com",
             Message = "Test message",
             SentAt = DateTime.UtcNow,
-            Status = "Sent"
+            Status = "Sent",
         };
 
         // Act
@@ -50,8 +50,9 @@ public class NotificationRepositoryTests : IAsyncLifetime
         result.UserId.Should().Be("user123");
         result.Message.Should().Be("Test message");
 
-        var savedFromDb = await _context.NotificationLogs
-            .FirstOrDefaultAsync(n => n.Id == result.Id);
+        var savedFromDb = await _context.NotificationLogs.FirstOrDefaultAsync(n =>
+            n.Id == result.Id
+        );
         savedFromDb.Should().NotBeNull();
         savedFromDb!.Message.Should().Be("Test message");
     }
@@ -82,7 +83,7 @@ public class NotificationRepositoryTests : IAsyncLifetime
             CreateNotificationLog("user1"),
             CreateNotificationLog("user2"),
             CreateNotificationLog("user3"),
-            CreateNotificationLog("user4")
+            CreateNotificationLog("user4"),
         };
 
         // Act
@@ -96,7 +97,7 @@ public class NotificationRepositoryTests : IAsyncLifetime
         // Assert
         results.Should().HaveCount(4);
         results.Select(r => r.Id).Should().AllSatisfy(id => id.Should().BeGreaterThan(0));
-        
+
         var dbCount = await _context.NotificationLogs.CountAsync();
         dbCount.Should().Be(4);
     }
@@ -113,7 +114,7 @@ public class NotificationRepositoryTests : IAsyncLifetime
             Destination = "+1234567890",
             Message = "This is a test SMS notification",
             SentAt = sentAt,
-            Status = "Pending"
+            Status = "Pending",
         };
 
         // Act
@@ -141,7 +142,7 @@ public class NotificationRepositoryTests : IAsyncLifetime
         {
             CreateNotificationLog(userId, "Notification 1"),
             CreateNotificationLog(userId, "Notification 2"),
-            CreateNotificationLog(userId, "Notification 3")
+            CreateNotificationLog(userId, "Notification 3"),
         };
 
         foreach (var notification in notifications)
@@ -181,7 +182,7 @@ public class NotificationRepositoryTests : IAsyncLifetime
         {
             CreateNotificationLog(userId, "First", baseDate.AddHours(1)),
             CreateNotificationLog(userId, "Third", baseDate.AddHours(3)),
-            CreateNotificationLog(userId, "Second", baseDate.AddHours(2))
+            CreateNotificationLog(userId, "Second", baseDate.AddHours(2)),
         };
 
         foreach (var notification in notifications)
@@ -193,9 +194,9 @@ public class NotificationRepositoryTests : IAsyncLifetime
         var results = await _repository.GetByUserIdAsync(userId);
 
         // Assert
-        results.ToList()[0].Message.Should().Be("Third");   // Most recent
+        results.ToList()[0].Message.Should().Be("Third"); // Most recent
         results.ToList()[1].Message.Should().Be("Second");
-        results.ToList()[2].Message.Should().Be("First");   // Oldest
+        results.ToList()[2].Message.Should().Be("First"); // Oldest
     }
 
     [Fact]
@@ -231,8 +232,9 @@ public class NotificationRepositoryTests : IAsyncLifetime
         cts.Cancel();
 
         // Act & Assert
-        await Assert.ThrowsAsync<OperationCanceledException>(
-            async () => await _repository.GetByUserIdAsync(userId, cts.Token));
+        await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await _repository.GetByUserIdAsync(userId, cts.Token)
+        );
     }
 
     #endregion
@@ -271,7 +273,7 @@ public class NotificationRepositoryTests : IAsyncLifetime
         // Arrange
         var notification1 = CreateNotificationLog("user1", "Message 1");
         var notification2 = CreateNotificationLog("user2", "Message 2");
-        
+
         var saved1 = await _repository.SaveAsync(notification1);
         var saved2 = await _repository.SaveAsync(notification2);
 
@@ -303,14 +305,16 @@ public class NotificationRepositoryTests : IAsyncLifetime
         var newContext = new NotificationsDbContext(
             new DbContextOptionsBuilder<NotificationsDbContext>()
                 .UseInMemoryDatabase(dbName)
-                .Options);
+                .Options
+        );
 
         // First save to the new context's database
         newContext.NotificationLogs.Add(saved);
         await newContext.SaveChangesAsync();
 
-        var retrieved = await newContext.NotificationLogs
-            .FirstOrDefaultAsync(n => n.Id == saved.Id);
+        var retrieved = await newContext.NotificationLogs.FirstOrDefaultAsync(n =>
+            n.Id == saved.Id
+        );
 
         // Assert
         retrieved.Should().NotBeNull();
@@ -323,7 +327,9 @@ public class NotificationRepositoryTests : IAsyncLifetime
     public async Task SaveAsync_WithLongMessage_HandlesProperly()
     {
         // Arrange
-        var longMessage = string.Concat(Enumerable.Repeat("This is a very long notification message. ", 50));
+        var longMessage = string.Concat(
+            Enumerable.Repeat("This is a very long notification message. ", 50)
+        );
         var notification = new NotificationLog
         {
             UserId = "user123",
@@ -331,7 +337,7 @@ public class NotificationRepositoryTests : IAsyncLifetime
             Destination = "user@example.com",
             Message = longMessage,
             SentAt = DateTime.UtcNow,
-            Status = "Sent"
+            Status = "Sent",
         };
 
         // Act
@@ -348,9 +354,10 @@ public class NotificationRepositoryTests : IAsyncLifetime
     #region Helper Methods
 
     private NotificationLog CreateNotificationLog(
-        string userId, 
+        string userId,
         string? message = null,
-        DateTime? sentAt = null)
+        DateTime? sentAt = null
+    )
     {
         return new NotificationLog
         {
@@ -359,7 +366,7 @@ public class NotificationRepositoryTests : IAsyncLifetime
             Destination = $"{userId}@unsa.ba",
             Message = message ?? $"Test notification for {userId}",
             SentAt = sentAt ?? DateTime.UtcNow,
-            Status = "Sent"
+            Status = "Sent",
         };
     }
 

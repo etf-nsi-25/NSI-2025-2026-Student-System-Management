@@ -36,13 +36,16 @@ public class GradePostedConsumerTests
 
         // Assert
         _mockService.Verify(
-            s => s.ProcessGradeNotificationAsync(
-                123,
-                "Mathematics",
-                8.5,
-                gradeEvent.TenantId,
-                It.IsAny<CancellationToken>()),
-            Times.Once);
+            s =>
+                s.ProcessGradeNotificationAsync(
+                    123,
+                    "Mathematics",
+                    8.5,
+                    gradeEvent.TenantId,
+                    It.IsAny<CancellationToken>()
+                ),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -62,8 +65,16 @@ public class GradePostedConsumerTests
 
         // Assert
         _mockService.Verify(
-            s => s.ProcessGradeNotificationAsync(studentId, courseName, grade, tenantId, It.IsAny<CancellationToken>()),
-            Times.Once);
+            s =>
+                s.ProcessGradeNotificationAsync(
+                    studentId,
+                    courseName,
+                    grade,
+                    tenantId,
+                    It.IsAny<CancellationToken>()
+                ),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -79,13 +90,16 @@ public class GradePostedConsumerTests
 
         // Assert
         _mockService.Verify(
-            s => s.ProcessGradeNotificationAsync(
-                It.IsAny<int>(),
-                It.IsAny<string>(),
-                It.IsAny<double>(),
-                It.IsAny<Guid>(),
-                cts.Token),
-            Times.Once);
+            s =>
+                s.ProcessGradeNotificationAsync(
+                    It.IsAny<int>(),
+                    It.IsAny<string>(),
+                    It.IsAny<double>(),
+                    It.IsAny<Guid>(),
+                    cts.Token
+                ),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -97,17 +111,21 @@ public class GradePostedConsumerTests
         var exception = new InvalidOperationException("Service error");
 
         _mockService
-            .Setup(s => s.ProcessGradeNotificationAsync(
-                It.IsAny<int>(),
-                It.IsAny<string>(),
-                It.IsAny<double>(),
-                It.IsAny<Guid>(),
-                It.IsAny<CancellationToken>()))
+            .Setup(s =>
+                s.ProcessGradeNotificationAsync(
+                    It.IsAny<int>(),
+                    It.IsAny<string>(),
+                    It.IsAny<double>(),
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()
+                )
+            )
             .ThrowsAsync(exception);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(
-            async () => await _consumer.Handle(notification, CancellationToken.None));
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await _consumer.Handle(notification, CancellationToken.None)
+        );
     }
 }
 
@@ -138,12 +156,15 @@ public class ExamCreatedConsumerTests
 
         // Assert
         _mockService.Verify(
-            s => s.ProcessExamNotificationAsync(
-                courseId,
-                examDate,
-                tenantId,
-                It.IsAny<CancellationToken>()),
-            Times.Once);
+            s =>
+                s.ProcessExamNotificationAsync(
+                    courseId,
+                    examDate,
+                    tenantId,
+                    It.IsAny<CancellationToken>()
+                ),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -162,8 +183,15 @@ public class ExamCreatedConsumerTests
 
         // Assert
         _mockService.Verify(
-            s => s.ProcessExamNotificationAsync(courseId, examDate, tenantId, It.IsAny<CancellationToken>()),
-            Times.Once);
+            s =>
+                s.ProcessExamNotificationAsync(
+                    courseId,
+                    examDate,
+                    tenantId,
+                    It.IsAny<CancellationToken>()
+                ),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -176,7 +204,7 @@ public class ExamCreatedConsumerTests
         {
             DateTime.UtcNow.AddDays(1),
             DateTime.UtcNow.AddDays(30),
-            DateTime.UtcNow.AddMonths(3)
+            DateTime.UtcNow.AddMonths(3),
         };
 
         // Act & Assert
@@ -189,8 +217,15 @@ public class ExamCreatedConsumerTests
         }
 
         _mockService.Verify(
-            s => s.ProcessExamNotificationAsync(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
-            Times.Exactly(3));
+            s =>
+                s.ProcessExamNotificationAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<DateTime>(),
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()
+                ),
+            Times.Exactly(3)
+        );
     }
 }
 
@@ -215,7 +250,13 @@ public class RequestApprovalConsumerTests
         var status = "approved";
         var tenantId = Guid.NewGuid();
 
-        var requestEvent = new RequestApprovalEvent(requestId, requesterId, requestType, status, tenantId);
+        var requestEvent = new RequestApprovalEvent(
+            requestId,
+            requesterId,
+            requestType,
+            status,
+            tenantId
+        );
         var notification = new DomainEventNotification<RequestApprovalEvent>(requestEvent);
 
         // Act
@@ -223,14 +264,17 @@ public class RequestApprovalConsumerTests
 
         // Assert
         _mockService.Verify(
-            s => s.ProcessRequestApprovalNotificationAsync(
-                requestId,
-                requesterId,
-                requestType,
-                status,
-                tenantId,
-                It.IsAny<CancellationToken>()),
-            Times.Once);
+            s =>
+                s.ProcessRequestApprovalNotificationAsync(
+                    requestId,
+                    requesterId,
+                    requestType,
+                    status,
+                    tenantId,
+                    It.IsAny<CancellationToken>()
+                ),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -243,7 +287,13 @@ public class RequestApprovalConsumerTests
         var status = "rejected";
         var tenantId = Guid.NewGuid();
 
-        var requestEvent = new RequestApprovalEvent(requestId, requesterId, requestType, status, tenantId);
+        var requestEvent = new RequestApprovalEvent(
+            requestId,
+            requesterId,
+            requestType,
+            status,
+            tenantId
+        );
         var notification = new DomainEventNotification<RequestApprovalEvent>(requestEvent);
 
         // Act
@@ -251,9 +301,17 @@ public class RequestApprovalConsumerTests
 
         // Assert
         _mockService.Verify(
-            s => s.ProcessRequestApprovalNotificationAsync(
-                requestId, requesterId, requestType, status, tenantId, It.IsAny<CancellationToken>()),
-            Times.Once);
+            s =>
+                s.ProcessRequestApprovalNotificationAsync(
+                    requestId,
+                    requesterId,
+                    requestType,
+                    status,
+                    tenantId,
+                    It.IsAny<CancellationToken>()
+                ),
+            Times.Once
+        );
     }
 
     [Theory]
@@ -264,7 +322,13 @@ public class RequestApprovalConsumerTests
     public async Task Handle_WithDifferentStatuses_PassesCorrectly(string status)
     {
         // Arrange
-        var requestEvent = new RequestApprovalEvent(1, "user1", "Transcript", status, Guid.NewGuid());
+        var requestEvent = new RequestApprovalEvent(
+            1,
+            "user1",
+            "Transcript",
+            status,
+            Guid.NewGuid()
+        );
         var notification = new DomainEventNotification<RequestApprovalEvent>(requestEvent);
 
         // Act
@@ -272,9 +336,17 @@ public class RequestApprovalConsumerTests
 
         // Assert
         _mockService.Verify(
-            s => s.ProcessRequestApprovalNotificationAsync(
-                1, "user1", "Transcript", status, It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
-            Times.Once);
+            s =>
+                s.ProcessRequestApprovalNotificationAsync(
+                    1,
+                    "user1",
+                    "Transcript",
+                    status,
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()
+                ),
+            Times.Once
+        );
     }
 
     [Theory]
@@ -284,7 +356,13 @@ public class RequestApprovalConsumerTests
     public async Task Handle_WithDifferentRequestTypes_PassesCorrectly(string requestType)
     {
         // Arrange
-        var requestEvent = new RequestApprovalEvent(1, "user1", requestType, "approved", Guid.NewGuid());
+        var requestEvent = new RequestApprovalEvent(
+            1,
+            "user1",
+            requestType,
+            "approved",
+            Guid.NewGuid()
+        );
         var notification = new DomainEventNotification<RequestApprovalEvent>(requestEvent);
 
         // Act
@@ -292,31 +370,49 @@ public class RequestApprovalConsumerTests
 
         // Assert
         _mockService.Verify(
-            s => s.ProcessRequestApprovalNotificationAsync(
-                1, "user1", requestType, "approved", It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
-            Times.Once);
+            s =>
+                s.ProcessRequestApprovalNotificationAsync(
+                    1,
+                    "user1",
+                    requestType,
+                    "approved",
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()
+                ),
+            Times.Once
+        );
     }
 
     [Fact]
     public async Task Handle_WhenServiceThrows_PropagatesException()
     {
         // Arrange
-        var requestEvent = new RequestApprovalEvent(1, "user1", "Transcript", "approved", Guid.NewGuid());
+        var requestEvent = new RequestApprovalEvent(
+            1,
+            "user1",
+            "Transcript",
+            "approved",
+            Guid.NewGuid()
+        );
         var notification = new DomainEventNotification<RequestApprovalEvent>(requestEvent);
         var exception = new InvalidOperationException("Service error");
 
         _mockService
-            .Setup(s => s.ProcessRequestApprovalNotificationAsync(
-                It.IsAny<int>(),
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<Guid>(),
-                It.IsAny<CancellationToken>()))
+            .Setup(s =>
+                s.ProcessRequestApprovalNotificationAsync(
+                    It.IsAny<int>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<Guid>(),
+                    It.IsAny<CancellationToken>()
+                )
+            )
             .ThrowsAsync(exception);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(
-            async () => await _consumer.Handle(notification, CancellationToken.None));
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await _consumer.Handle(notification, CancellationToken.None)
+        );
     }
 }

@@ -30,15 +30,17 @@ public class NotificationServiceTests
         var courseName = "Mathematics";
         var grade = 8.5;
         var tenantId = Guid.NewGuid();
-        
+
         var savedNotification = new NotificationLog();
         _mockRepository
             .Setup(r => r.SaveAsync(It.IsAny<NotificationLog>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((NotificationLog n, CancellationToken ct) => n)
-            .Callback<NotificationLog, CancellationToken>((n, _) =>
-            {
-                savedNotification = n;
-            });
+            .Callback<NotificationLog, CancellationToken>(
+                (n, _) =>
+                {
+                    savedNotification = n;
+                }
+            );
 
         // Act
         await _service.ProcessGradeNotificationAsync(studentId, courseName, grade, tenantId);
@@ -46,7 +48,8 @@ public class NotificationServiceTests
         // Assert
         _mockRepository.Verify(
             r => r.SaveAsync(It.IsAny<NotificationLog>(), It.IsAny<CancellationToken>()),
-            Times.Once);
+            Times.Once
+        );
 
         savedNotification.UserId.Should().Be(studentId.ToString());
         savedNotification.ChannelType.Should().Be("Email");
@@ -87,7 +90,7 @@ public class NotificationServiceTests
         // Arrange
         var studentId = 456;
         var savedNotification = new NotificationLog();
-        
+
         _mockRepository
             .Setup(r => r.SaveAsync(It.IsAny<NotificationLog>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((NotificationLog n, CancellationToken ct) => n)
@@ -107,7 +110,7 @@ public class NotificationServiceTests
         // Arrange
         var beforeExecution = DateTime.UtcNow;
         var savedNotification = new NotificationLog();
-        
+
         _mockRepository
             .Setup(r => r.SaveAsync(It.IsAny<NotificationLog>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((NotificationLog n, CancellationToken ct) => n)
@@ -132,8 +135,9 @@ public class NotificationServiceTests
             .ThrowsAsync(exception);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(
-            async () => await _service.ProcessGradeNotificationAsync(1, "Math", 8.0, Guid.NewGuid()));
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await _service.ProcessGradeNotificationAsync(1, "Math", 8.0, Guid.NewGuid())
+        );
     }
 
     #endregion
@@ -147,7 +151,7 @@ public class NotificationServiceTests
         var courseId = Guid.NewGuid();
         var examDate = DateTime.UtcNow.AddDays(7);
         var tenantId = Guid.NewGuid();
-        
+
         var savedNotification = new NotificationLog();
         _mockRepository
             .Setup(r => r.SaveAsync(It.IsAny<NotificationLog>(), It.IsAny<CancellationToken>()))
@@ -160,7 +164,8 @@ public class NotificationServiceTests
         // Assert
         _mockRepository.Verify(
             r => r.SaveAsync(It.IsAny<NotificationLog>(), It.IsAny<CancellationToken>()),
-            Times.Once);
+            Times.Once
+        );
 
         savedNotification.ChannelType.Should().Be("Email");
         savedNotification.Message.Should().Contain(courseId.ToString());
@@ -176,7 +181,7 @@ public class NotificationServiceTests
         {
             new DateTime(2026, 01, 15, 10, 30, 0, DateTimeKind.Utc),
             new DateTime(2026, 02, 20, 14, 45, 0, DateTimeKind.Utc),
-            new DateTime(2026, 06, 10, 09, 00, 0, DateTimeKind.Utc)
+            new DateTime(2026, 06, 10, 09, 00, 0, DateTimeKind.Utc),
         };
 
         var savedNotifications = new List<NotificationLog>();
@@ -209,7 +214,11 @@ public class NotificationServiceTests
             .Callback<NotificationLog, CancellationToken>((n, _) => savedNotification = n);
 
         // Act
-        await _service.ProcessExamNotificationAsync(Guid.NewGuid(), DateTime.UtcNow.AddDays(5), Guid.NewGuid());
+        await _service.ProcessExamNotificationAsync(
+            Guid.NewGuid(),
+            DateTime.UtcNow.AddDays(5),
+            Guid.NewGuid()
+        );
 
         // Assert
         savedNotification.Message.Should().Contain("register");
@@ -228,7 +237,7 @@ public class NotificationServiceTests
         var requesterId = "user123";
         var requestType = "Transcript";
         var tenantId = Guid.NewGuid();
-        
+
         var savedNotification = new NotificationLog();
         _mockRepository
             .Setup(r => r.SaveAsync(It.IsAny<NotificationLog>(), It.IsAny<CancellationToken>()))
@@ -237,7 +246,12 @@ public class NotificationServiceTests
 
         // Act
         await _service.ProcessRequestApprovalNotificationAsync(
-            requestId, requesterId, requestType, "approved", tenantId);
+            requestId,
+            requesterId,
+            requestType,
+            "approved",
+            tenantId
+        );
 
         // Assert
         savedNotification.UserId.Should().Be(requesterId);
@@ -258,7 +272,12 @@ public class NotificationServiceTests
 
         // Act
         await _service.ProcessRequestApprovalNotificationAsync(
-            100, "user456", "Certificate", "rejected", Guid.NewGuid());
+            100,
+            "user456",
+            "Certificate",
+            "rejected",
+            Guid.NewGuid()
+        );
 
         // Assert
         savedNotification.Message.Should().Contain("rejected");
@@ -276,7 +295,12 @@ public class NotificationServiceTests
 
         // Act
         await _service.ProcessRequestApprovalNotificationAsync(
-            101, "user789", "Enrollment", "pending", Guid.NewGuid());
+            101,
+            "user789",
+            "Enrollment",
+            "pending",
+            Guid.NewGuid()
+        );
 
         // Assert
         savedNotification.Message.Should().Contain("pending");
@@ -294,7 +318,12 @@ public class NotificationServiceTests
 
         // Act
         await _service.ProcessRequestApprovalNotificationAsync(
-            102, "user000", "Other", "in_review", Guid.NewGuid());
+            102,
+            "user000",
+            "Other",
+            "in_review",
+            Guid.NewGuid()
+        );
 
         // Assert
         savedNotification.Message.Should().Contain("status has been updated to");
@@ -307,7 +336,7 @@ public class NotificationServiceTests
         // Arrange
         var requesterId = "john.doe";
         var savedNotification = new NotificationLog();
-        
+
         _mockRepository
             .Setup(r => r.SaveAsync(It.IsAny<NotificationLog>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((NotificationLog n, CancellationToken ct) => n)
@@ -315,7 +344,12 @@ public class NotificationServiceTests
 
         // Act
         await _service.ProcessRequestApprovalNotificationAsync(
-            50, requesterId, "Transcript", "approved", Guid.NewGuid());
+            50,
+            requesterId,
+            "Transcript",
+            "approved",
+            Guid.NewGuid()
+        );
 
         // Assert
         savedNotification.Destination.Should().Contain(requesterId);
@@ -350,8 +384,9 @@ public class NotificationServiceTests
             .ThrowsAsync(new Exception("Test error"));
 
         // Act & Assert
-        await Assert.ThrowsAsync<Exception>(
-            async () => await _service.ProcessGradeNotificationAsync(1, "Math", 8.0, Guid.NewGuid()));
+        await Assert.ThrowsAsync<Exception>(async () =>
+            await _service.ProcessGradeNotificationAsync(1, "Math", 8.0, Guid.NewGuid())
+        );
 
         _mockLogger.VerifyLog(LogLevel.Error, "Failed to process grade notification");
     }
@@ -364,15 +399,22 @@ public class NotificationServiceTests
 /// </summary>
 internal static class LoggerExtensions
 {
-    public static void VerifyLog(this Mock<ILogger<NotificationService>> logger, LogLevel level, string message)
+    public static void VerifyLog(
+        this Mock<ILogger<NotificationService>> logger,
+        LogLevel level,
+        string message
+    )
     {
         logger.Verify(
-            x => x.Log(
-                level,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(message)),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-            Times.Once);
+            x =>
+                x.Log(
+                    level,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(message)),
+                    It.IsAny<Exception>(),
+                    It.IsAny<Func<It.IsAnyType, Exception, string>>()
+                ),
+            Times.Once
+        );
     }
 }

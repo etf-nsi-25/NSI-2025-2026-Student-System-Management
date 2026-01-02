@@ -45,7 +45,7 @@ public class NotificationsDbContextTests : IAsyncLifetime
             Destination = "user@example.com",
             Message = "Test message",
             SentAt = DateTime.UtcNow,
-            Status = "Sent"
+            Status = "Sent",
         };
 
         // Act
@@ -53,8 +53,9 @@ public class NotificationsDbContextTests : IAsyncLifetime
         await _context.SaveChangesAsync();
 
         // Assert
-        var savedNotification = await _context.NotificationLogs
-            .FirstOrDefaultAsync(n => n.UserId == "user123");
+        var savedNotification = await _context.NotificationLogs.FirstOrDefaultAsync(n =>
+            n.UserId == "user123"
+        );
 
         savedNotification.Should().NotBeNull();
         savedNotification!.Message.Should().Be("Test message");
@@ -75,16 +76,14 @@ public class NotificationsDbContextTests : IAsyncLifetime
             Destination = "test@test.com",
             Message = "Test",
             SentAt = DateTime.UtcNow,
-            Status = "Sent"
+            Status = "Sent",
         };
 
         _context.NotificationLogs.Add(notification);
         await _context.SaveChangesAsync();
 
         // Act
-        var tableName = _context.Model
-            .FindEntityType(typeof(NotificationLog))?
-            .GetTableName();
+        var tableName = _context.Model.FindEntityType(typeof(NotificationLog))?.GetTableName();
 
         // Assert
         tableName.Should().Be("NotificationLog");
@@ -101,7 +100,7 @@ public class NotificationsDbContextTests : IAsyncLifetime
             Destination = "user1@test.com",
             Message = "Message1",
             SentAt = DateTime.UtcNow,
-            Status = "Sent"
+            Status = "Sent",
         };
 
         var notification2 = new NotificationLog
@@ -111,7 +110,7 @@ public class NotificationsDbContextTests : IAsyncLifetime
             Destination = "user2@test.com",
             Message = "Message2",
             SentAt = DateTime.UtcNow,
-            Status = "Sent"
+            Status = "Sent",
         };
 
         // Act
@@ -137,15 +136,16 @@ public class NotificationsDbContextTests : IAsyncLifetime
             Destination = "+1234567890",
             Message = "SMS notification content",
             SentAt = sentAt,
-            Status = "Pending"
+            Status = "Pending",
         };
 
         // Act
         _context.NotificationLogs.Add(notification);
         await _context.SaveChangesAsync();
 
-        var retrieved = await _context.NotificationLogs
-            .FirstOrDefaultAsync(n => n.UserId == "user456");
+        var retrieved = await _context.NotificationLogs.FirstOrDefaultAsync(n =>
+            n.UserId == "user456"
+        );
 
         // Assert
         retrieved.Should().NotBeNull();
@@ -170,8 +170,7 @@ public class NotificationsDbContextTests : IAsyncLifetime
 
         // Assert
         indexes.Should().NotBeNull();
-        var userIdIndex = indexes?.FirstOrDefault(i => 
-            i.Properties.Any(p => p.Name == "UserId"));
+        var userIdIndex = indexes?.FirstOrDefault(i => i.Properties.Any(p => p.Name == "UserId"));
         userIdIndex.Should().NotBeNull();
     }
 
@@ -183,8 +182,7 @@ public class NotificationsDbContextTests : IAsyncLifetime
         var indexes = entityType?.GetIndexes();
 
         // Assert
-        var statusIndex = indexes?.FirstOrDefault(i => 
-            i.Properties.Any(p => p.Name == "Status"));
+        var statusIndex = indexes?.FirstOrDefault(i => i.Properties.Any(p => p.Name == "Status"));
         statusIndex.Should().NotBeNull();
     }
 
@@ -196,8 +194,7 @@ public class NotificationsDbContextTests : IAsyncLifetime
         var indexes = entityType?.GetIndexes();
 
         // Assert
-        var sentAtIndex = indexes?.FirstOrDefault(i => 
-            i.Properties.Any(p => p.Name == "SentAt"));
+        var sentAtIndex = indexes?.FirstOrDefault(i => i.Properties.Any(p => p.Name == "SentAt"));
         sentAtIndex.Should().NotBeNull();
     }
 
@@ -216,14 +213,13 @@ public class NotificationsDbContextTests : IAsyncLifetime
             Destination = "test@test.com",
             Message = "Test",
             SentAt = DateTime.UtcNow,
-            Status = "Sent"
+            Status = "Sent",
         };
 
         _context.NotificationLogs.Add(notification);
 
         // Act & Assert
-        await Assert.ThrowsAsync<DbUpdateException>(
-            async () => await _context.SaveChangesAsync());
+        await Assert.ThrowsAsync<DbUpdateException>(async () => await _context.SaveChangesAsync());
     }
 
     [Fact]
@@ -238,15 +234,14 @@ public class NotificationsDbContextTests : IAsyncLifetime
             Destination = "user@test.com",
             Message = longMessage,
             SentAt = DateTime.UtcNow,
-            Status = "Sent"
+            Status = "Sent",
         };
 
         // Act
         _context.NotificationLogs.Add(notification);
         await _context.SaveChangesAsync();
 
-        var retrieved = await _context.NotificationLogs
-            .FirstAsync(n => n.UserId == "user789");
+        var retrieved = await _context.NotificationLogs.FirstAsync(n => n.UserId == "user789");
 
         // Assert
         retrieved.Message.Should().Be(longMessage);
@@ -263,15 +258,16 @@ public class NotificationsDbContextTests : IAsyncLifetime
             Destination = new string('c', 500), // Max length
             Message = "Test message",
             SentAt = DateTime.UtcNow,
-            Status = new string('d', 50) // Max length
+            Status = new string('d', 50), // Max length
         };
 
         // Act
         _context.NotificationLogs.Add(notification);
         await _context.SaveChangesAsync();
 
-        var retrieved = await _context.NotificationLogs
-            .FirstAsync(n => n.Message == "Test message");
+        var retrieved = await _context.NotificationLogs.FirstAsync(n =>
+            n.Message == "Test message"
+        );
 
         // Assert
         retrieved.UserId.Length.Should().Be(450);
@@ -291,22 +287,22 @@ public class NotificationsDbContextTests : IAsyncLifetime
         var userId = "perf_test_user";
         for (int i = 0; i < 100; i++)
         {
-            _context.NotificationLogs.Add(new NotificationLog
-            {
-                UserId = i == 50 ? userId : $"user_{i}",
-                ChannelType = "Email",
-                Destination = $"user{i}@test.com",
-                Message = $"Message {i}",
-                SentAt = DateTime.UtcNow,
-                Status = "Sent"
-            });
+            _context.NotificationLogs.Add(
+                new NotificationLog
+                {
+                    UserId = i == 50 ? userId : $"user_{i}",
+                    ChannelType = "Email",
+                    Destination = $"user{i}@test.com",
+                    Message = $"Message {i}",
+                    SentAt = DateTime.UtcNow,
+                    Status = "Sent",
+                }
+            );
         }
         await _context.SaveChangesAsync();
 
         // Act - Query should use index
-        var results = await _context.NotificationLogs
-            .Where(n => n.UserId == userId)
-            .ToListAsync();
+        var results = await _context.NotificationLogs.Where(n => n.UserId == userId).ToListAsync();
 
         // Assert
         results.Should().HaveCount(1);
@@ -319,25 +315,27 @@ public class NotificationsDbContextTests : IAsyncLifetime
         // Arrange
         for (int i = 0; i < 50; i++)
         {
-            _context.NotificationLogs.Add(new NotificationLog
-            {
-                UserId = $"user_{i}",
-                ChannelType = "Email",
-                Destination = $"user{i}@test.com",
-                Message = $"Message {i}",
-                SentAt = DateTime.UtcNow,
-                Status = i % 2 == 0 ? "Sent" : "Pending"
-            });
+            _context.NotificationLogs.Add(
+                new NotificationLog
+                {
+                    UserId = $"user_{i}",
+                    ChannelType = "Email",
+                    Destination = $"user{i}@test.com",
+                    Message = $"Message {i}",
+                    SentAt = DateTime.UtcNow,
+                    Status = i % 2 == 0 ? "Sent" : "Pending",
+                }
+            );
         }
         await _context.SaveChangesAsync();
 
         // Act
-        var sentNotifications = await _context.NotificationLogs
-            .Where(n => n.Status == "Sent")
+        var sentNotifications = await _context
+            .NotificationLogs.Where(n => n.Status == "Sent")
             .ToListAsync();
 
-        var pendingNotifications = await _context.NotificationLogs
-            .Where(n => n.Status == "Pending")
+        var pendingNotifications = await _context
+            .NotificationLogs.Where(n => n.Status == "Pending")
             .ToListAsync();
 
         // Assert
