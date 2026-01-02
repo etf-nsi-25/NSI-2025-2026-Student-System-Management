@@ -1,13 +1,13 @@
-﻿using System.Reflection;
-using System;
+﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Moq;
-using Xunit;
 using Identity.Application.Services;
 using Identity.Core.DomainServices;
 using Identity.Core.Entities;
 using Identity.Core.Repositories;
+using Moq;
+using Xunit;
 
 namespace Identity.Tests.TwoFactor
 {
@@ -25,10 +25,7 @@ namespace Identity.Tests.TwoFactor
 
             _domainService = new TwoFactorDomainService(_totpProviderMock.Object);
 
-            _service = new TwoFactorAuthService(
-                _userRepositoryMock.Object,
-                _domainService
-            );
+            _service = new TwoFactorAuthService(_userRepositoryMock.Object, _domainService);
         }
 
         [Fact]
@@ -40,23 +37,21 @@ namespace Identity.Tests.TwoFactor
 
             var usernameProp = typeof(User).GetProperty(
                 "Username",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+            );
 
             usernameProp!.SetValue(user, "testuser");
 
             var idProp = typeof(User).GetProperty(
                 "Id",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+            );
 
             idProp!.SetValue(user, userId);
 
-            _userRepositoryMock
-                .Setup(r => r.GetByIdAsync(userId))
-                .ReturnsAsync(user);
+            _userRepositoryMock.Setup(r => r.GetByIdAsync(userId)).ReturnsAsync(user);
 
-            _totpProviderMock
-                .Setup(p => p.GenerateSecret())
-                .Returns("SECRET-XYZ");
+            _totpProviderMock.Setup(p => p.GenerateSecret()).Returns("SECRET-XYZ");
 
             _totpProviderMock
                 .Setup(p => p.GenerateQrCode("testuser", "SECRET-XYZ"))
@@ -76,13 +71,10 @@ namespace Identity.Tests.TwoFactor
             // Arrange
             var userId = Guid.NewGuid();
 
-            _userRepositoryMock
-                .Setup(r => r.GetByIdAsync(userId))
-                .ReturnsAsync((User?)null);
+            _userRepositoryMock.Setup(r => r.GetByIdAsync(userId)).ReturnsAsync((User?)null);
 
             // Act
-            Func<Task> act = async () =>
-                await _service.EnableTwoFactorAsync(userId.ToString());
+            Func<Task> act = async () => await _service.EnableTwoFactorAsync(userId.ToString());
 
             // Assert
             await act.Should().ThrowAsync<InvalidOperationException>();

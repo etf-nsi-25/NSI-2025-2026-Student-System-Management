@@ -20,7 +20,8 @@ public class AuthService : IAuthService
         IIdentityHasherService passwordHasher,
         IRefreshTokenRepository refreshTokenRepository,
         IUserRepository userRepository,
-        ILogger<AuthService> logger)
+        ILogger<AuthService> logger
+    )
     {
         _jwtTokenService = jwtTokenService;
         _passwordHasher = passwordHasher;
@@ -32,16 +33,20 @@ public class AuthService : IAuthService
     public async Task<AuthResult> AuthenticateAsync(
         string email,
         string password,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         _logger.LogInformation("Authentication attempt for email: {Email}", email);
 
-         // Find user by email
+        // Find user by email
         var user = await _userRepository.GetByEmailAsync(email, cancellationToken);
 
-        if (user == null) 
+        if (user == null)
         {
-            _logger.LogWarning("Authentication failed: User not found or inactive - {Email}", email);
+            _logger.LogWarning(
+                "Authentication failed: User not found or inactive - {Email}",
+                email
+            );
             throw new UnauthorizedAccessException("Invalid email or password");
         }
 
@@ -59,7 +64,7 @@ public class AuthService : IAuthService
             Email = user.Email,
             Role = user.Role,
             TenantId = user.FacultyId.ToString(),
-            FullName = user.FirstName + " " + user.LastName
+            FullName = user.FirstName + " " + user.LastName,
         };
 
         var accessToken = _jwtTokenService.GenerateAccessToken(tokenClaims);
@@ -68,20 +73,20 @@ public class AuthService : IAuthService
         // Save refresh token to repository
         await _refreshTokenRepository.AddAsync(refreshToken, cancellationToken);
 
-
         _logger.LogInformation("Authentication successful for user: {UserId}", user.Id);
 
         return new AuthResult
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken.Token,
-            ExpiresAt = refreshToken.ExpiresAt
+            ExpiresAt = refreshToken.ExpiresAt,
         };
     }
 
     public async Task<AuthResult> RefreshAuthenticationAsync(
         string refreshToken,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         _logger.LogInformation("Token refresh attempt");
 
@@ -99,7 +104,10 @@ public class AuthService : IAuthService
 
         if (user == null)
         {
-            _logger.LogWarning("Token refresh failed: User not found or inactive - {UserId}", token.UserId);
+            _logger.LogWarning(
+                "Token refresh failed: User not found or inactive - {UserId}",
+                token.UserId
+            );
             throw new UnauthorizedAccessException("User not found or inactive");
         }
 
@@ -115,7 +123,7 @@ public class AuthService : IAuthService
             Email = user.Email,
             Role = user.Role,
             TenantId = user.FacultyId.ToString(),
-            FullName = user.FirstName + " " + user.LastName
+            FullName = user.FirstName + " " + user.LastName,
         };
 
         var accessToken = _jwtTokenService.GenerateAccessToken(tokenClaims);
@@ -131,11 +139,14 @@ public class AuthService : IAuthService
         {
             AccessToken = accessToken,
             RefreshToken = newRefreshToken.Token,
-            ExpiresAt = newRefreshToken.ExpiresAt
+            ExpiresAt = newRefreshToken.ExpiresAt,
         };
     }
 
-    public async Task RevokeAuthenticationAsync(string refreshToken, CancellationToken cancellationToken = default)
+    public async Task RevokeAuthenticationAsync(
+        string refreshToken,
+        CancellationToken cancellationToken = default
+    )
     {
         _logger.LogInformation("Logout attempt");
 
@@ -148,7 +159,6 @@ public class AuthService : IAuthService
             token.RevokedReason = "User logout";
             await _refreshTokenRepository.UpdateAsync(token, cancellationToken);
         }
-
 
         _logger.LogInformation("Logout successful");
     }

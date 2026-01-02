@@ -10,7 +10,7 @@ using Identity.Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.EntityFrameworkCore;
 using Notifications.API.Controllers;
-using Notifications.Infrastructure;
+using Notifications.Infrastructure.DependencyInjection;
 using Support.API.Controllers;
 using Support.Infrastructure;
 using Support.Infrastructure.Db;
@@ -27,7 +27,7 @@ builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddUniversityModule(builder.Configuration);
 builder.Services.AddFacultyModule(builder.Configuration);
 builder.Services.AddSupportModule(builder.Configuration);
-builder.Services.AddNotificationsModule();
+builder.Services.AddNotificationsModule(builder.Configuration);
 builder.Services.AddAnalyticsModule();
 builder.Services.AddEventBus();
 
@@ -41,7 +41,7 @@ var moduleControllers = new[]
     typeof(FacultyController).Assembly,
     typeof(SupportController).Assembly,
     typeof(NotificationsController).Assembly,
-    typeof(AnalyticsController).Assembly
+    typeof(AnalyticsController).Assembly,
 };
 
 foreach (var asm in moduleControllers)
@@ -69,45 +69,44 @@ var applyMigrations = true;
 
 if (applyMigrations)
 {
-
     using (var scope = app.Services.CreateScope())
     {
-    var services = scope.ServiceProvider;
+        var services = scope.ServiceProvider;
 
-    // Identity module
-    try
-    {
-        var identityDb = services.GetRequiredService<AuthDbContext>();
-        identityDb.Database.Migrate();
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error migrating IdentityDbContext: {ex.Message}");
-    }
+        // Identity module
+        try
+        {
+            var identityDb = services.GetRequiredService<AuthDbContext>();
+            identityDb.Database.Migrate();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error migrating IdentityDbContext: {ex.Message}");
+        }
 
-    // University module
-    try
-    {
-        var universityDb = services.GetRequiredService<UniversityDbContext>();
-        universityDb.Database.Migrate();
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error migrating UniversityDbContext: {ex.Message}");
-    }
+        // University module
+        try
+        {
+            var universityDb = services.GetRequiredService<UniversityDbContext>();
+            universityDb.Database.Migrate();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error migrating UniversityDbContext: {ex.Message}");
+        }
 
-    // Faculty module
-    try
-    {
-        var facultyDb = services.GetRequiredService<FacultyDbContext>();
-        facultyDb.Database.Migrate();
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error migrating FacultyDbContext: {ex.Message}");
-    }
+        // Faculty module
+        try
+        {
+            var facultyDb = services.GetRequiredService<FacultyDbContext>();
+            facultyDb.Database.Migrate();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error migrating FacultyDbContext: {ex.Message}");
+        }
 
-    // Support module
+        // Support module
         try
         {
             var supportDb = services.GetRequiredService<SupportDbContext>();
@@ -117,8 +116,19 @@ if (applyMigrations)
         {
             Console.WriteLine($"Error migrating SupportDbContext: {ex.Message}");
         }
-    }
 
+        // Notifications module
+        try
+        {
+            var notificationsDb =
+                services.GetRequiredService<Notifications.Infrastructure.Db.NotificationsDbContext>();
+            notificationsDb.Database.Migrate();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error migrating NotificationsDbContext: {ex.Message}");
+        }
+    }
 }
 
 // Middleware
