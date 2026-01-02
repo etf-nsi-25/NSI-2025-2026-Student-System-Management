@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Faculty.Core.Interfaces.Faculty.Core.Interfaces;
 
 namespace Faculty.Application.Services
 {
@@ -15,9 +15,12 @@ namespace Faculty.Application.Services
     {
         private readonly ICourseRepository _repo;
 
-        public CourseService(ICourseRepository repo)
+        private readonly ICourseAssignmentRepository _courseAssignmentRepo;
+
+        public CourseService(ICourseRepository repo, ICourseAssignmentRepository courseAssignmentRepo)
         {
             _repo = repo;
+            _courseAssignmentRepo = courseAssignmentRepo;
         }
 
         private CourseDTO ToDto(Course c) => new()
@@ -68,5 +71,17 @@ namespace Faculty.Application.Services
 
         public async Task<bool> DeleteAsync(Guid id)
             => await _repo.DeleteAsync(id);
+
+        public async Task<TeacherDto?> GetTeacherForCourseAsync(Guid courseId)
+        {
+            var teacher = await _courseAssignmentRepo.GetTeacherForCourseAsync(courseId);
+            if (teacher == null) return null;
+
+            return new TeacherDto
+            {
+                Id = teacher.Id,
+                FullName = $"{teacher.FirstName} {teacher.LastName}"
+            };
+        }
     }
 }

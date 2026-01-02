@@ -16,26 +16,19 @@ import {
     CListGroupItem,
 } from "@coreui/react";
 import "@coreui/coreui/dist/css/coreui.min.css";
-import {
-    Search,
-    ArrowRight,
-    Calendar as CalendarIcon,
-} from "lucide-react";
-import {
-    format,
-    startOfMonth,
-    endOfMonth,
-    eachDayOfInterval,
-    isToday,
-} from "date-fns";
+import { Search, ArrowRight, Calendar as CalendarIcon } from "lucide-react";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isToday } from "date-fns";
 
 import { getDashboardData } from "../../service/dashboard/api";
 import { useAPI } from "../../context/services";
-import { getMyEnrollments } from "../../service/enrollment/api";
+import {
+    getMyEnrollments,
+    getTeacherForCourse,
+    type StudentEnrollmentItemDto,
+    type TeacherDto,
+} from "../../service/enrollment/api";
 
 import "./dashboard.css";
-
-/* -------------------- TYPES -------------------- */
 
 interface DashboardData {
     user: {
@@ -80,16 +73,6 @@ type DemoDashboardCourse = {
     professor: string;
 };
 
-type MyEnrollmentItem = {
-    enrollmentId: string;
-    courseId: string;
-    courseName: string;
-    status: string;
-    grade?: number | null;
-};
-
-/* -------------------- COMPONENT -------------------- */
-
 export default function DashboardPage() {
     const api = useAPI();
 
@@ -98,7 +81,7 @@ export default function DashboardPage() {
     const [error, setError] = useState<string | null>(null);
     const [enrollmentsError, setEnrollmentsError] = useState<string | null>(null);
 
-    const [currentDate] = useState(new Date(2025, 10, 1)); // November 2025
+    const [currentDate] = useState(new Date(2025, 10, 1));
 
     useEffect(() => {
         async function fetchDashboardData() {
@@ -109,7 +92,6 @@ export default function DashboardPage() {
 
                 const result = await getDashboardData();
 
-                // normalize demo courses ids to string
                 const normalizedResult: DashboardData = {
                     ...result,
                     courses: result.courses.map((c: DemoDashboardCourse) => ({
@@ -119,14 +101,23 @@ export default function DashboardPage() {
                 };
 
                 try {
-                    const enrollments = (await getMyEnrollments(
-                        api,
-                    )) as MyEnrollmentItem[];
+                    const enrollments = (await getMyEnrollments(api)) as StudentEnrollmentItemDto[];
 
-                    const mappedCourses = enrollments.map((e) => ({
+                    const teacherNames = await Promise.all(
+                        enrollments.map(async (e) => {
+                            try {
+                                const t = (await getTeacherForCourse(api, e.courseId)) as TeacherDto;
+                                return t?.fullName ?? "—";
+                            } catch {
+                                return "—";
+                            }
+                        }),
+                    );
+
+                    const mappedCourses = enrollments.map((e, idx) => ({
                         id: e.courseId,
                         title: e.courseName,
-                        professor: "—",
+                        professor: teacherNames[idx] ?? "—",
                     }));
 
                     setData({
@@ -139,9 +130,7 @@ export default function DashboardPage() {
                     });
                 } catch (e) {
                     console.error("Failed to load enrollments:", e);
-                    setEnrollmentsError(
-                        "Could not load your enrollments (showing demo courses).",
-                    );
+                    setEnrollmentsError("Could not load your enrollments (showing demo courses).");
                     setData(normalizedResult);
                 }
             } catch (err) {
@@ -153,8 +142,6 @@ export default function DashboardPage() {
 
         fetchDashboardData();
     }, [api]);
-
-    /* -------------------- CALENDAR -------------------- */
 
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
@@ -173,8 +160,6 @@ export default function DashboardPage() {
         }
         return "";
     };
-
-    /* -------------------- STATES -------------------- */
 
     if (loading) {
         return (
@@ -197,16 +182,11 @@ export default function DashboardPage() {
 
     if (!data) return null;
 
-    /* -------------------- RENDER -------------------- */
-
     return (
         <div className="dashboard-page">
-            {/* Header */}
             <CRow className="mb-4 align-items-center">
                 <CCol xs={12} lg={8}>
-                    <h1 className="mb-3 dashboard-header-title">
-                        Welcome back, {data.user.name}!
-                    </h1>
+                    <h1 className="mb-3 dashboard-header-title">Welcome back, {data.user.name}!</h1>
                 </CCol>
                 <CCol xs={12} lg={4}>
                     <CInputGroup className="dashboard-search-input">
@@ -218,14 +198,11 @@ export default function DashboardPage() {
                 </CCol>
             </CRow>
 
-            {/* Stats */}
             <CRow className="mb-4 g-3">
                 <CCol xs={6} md={3}>
                     <CCard className="dashboard-stats-card">
                         <CCardBody className="text-center">
-                            <CCardTitle className="dashboard-stats-value">
-                                {data.stats.gpa}
-                            </CCardTitle>
+                            <CCardTitle className="dashboard-stats-value">{data.stats.gpa}</CCardTitle>
                             <CCardText className="dashboard-stats-label">GAP</CCardText>
                         </CCardBody>
                     </CCard>
@@ -234,12 +211,8 @@ export default function DashboardPage() {
                 <CCol xs={6} md={3}>
                     <CCard className="dashboard-stats-card">
                         <CCardBody className="text-center">
-                            <CCardTitle className="dashboard-stats-value">
-                                {data.stats.enrolledCourses}
-                            </CCardTitle>
-                            <CCardText className="dashboard-stats-label">
-                                Enrolled courses
-                            </CCardText>
+                            <CCardTitle className="dashboard-stats-value">{data.stats.enrolledCourses}</CCardTitle>
+                            <CCardText className="dashboard-stats-label">Enrolled courses</CCardText>
                         </CCardBody>
                     </CCard>
                 </CCol>
@@ -247,12 +220,8 @@ export default function DashboardPage() {
                 <CCol xs={6} md={3}>
                     <CCard className="dashboard-stats-card">
                         <CCardBody className="text-center">
-                            <CCardTitle className="dashboard-stats-value">
-                                {data.stats.attendanceRate}%
-                            </CCardTitle>
-                            <CCardText className="dashboard-stats-label">
-                                Attendance rate
-                            </CCardText>
+                            <CCardTitle className="dashboard-stats-value">{data.stats.attendanceRate}%</CCardTitle>
+                            <CCardText className="dashboard-stats-label">Attendance rate</CCardText>
                         </CCardBody>
                     </CCard>
                 </CCol>
@@ -263,16 +232,13 @@ export default function DashboardPage() {
                             <CCardTitle className="dashboard-stats-value">
                                 {data.stats.deadlines.count} deadlines
                             </CCardTitle>
-                            <CCardText className="dashboard-stats-label">
-                                {data.stats.deadlines.period}
-                            </CCardText>
+                            <CCardText className="dashboard-stats-label">{data.stats.deadlines.period}</CCardText>
                         </CCardBody>
                     </CCard>
                 </CCol>
             </CRow>
 
             <CRow className="g-3">
-                {/* LEFT */}
                 <CCol xs={12} lg={8}>
                     <h2 className="mb-3 dashboard-section-title">My courses</h2>
 
@@ -283,21 +249,17 @@ export default function DashboardPage() {
                     )}
 
                     <CRow className="mb-4 g-3">
-                        {data.courses.map((course) => (
-                            <CCol key={course.id} xs={12} md={6} lg={4}>
+                        {data.courses.map((course, idx) => (
+                            <CCol key={`${course.id}-${idx}`} xs={12} md={6} lg={4}>
                                 <CCard className="dashboard-course-card h-100">
                                     <CCardBody className="d-flex flex-column justify-content-between">
                                         <div>
                                             <div className="d-flex justify-content-end mb-2">
                                                 <ArrowRight size={20} />
                                             </div>
-                                            <CCardTitle className="dashboard-course-title">
-                                                {course.title}
-                                            </CCardTitle>
+                                            <CCardTitle className="dashboard-course-title">{course.title}</CCardTitle>
                                         </div>
-                                        <CCardText className="dashboard-course-professor">
-                                            {course.professor}
-                                        </CCardText>
+                                        <CCardText className="dashboard-course-professor">{course.professor}</CCardText>
                                     </CCardBody>
                                 </CCard>
                             </CCol>
@@ -312,7 +274,9 @@ export default function DashboardPage() {
                                     <div className="d-flex gap-3">
                                         <CalendarIcon size={20} />
                                         <div>
-                                            <div>{task.course} - {task.task}</div>
+                                            <div>
+                                                {task.course} - {task.task}
+                                            </div>
                                             <div>{task.day}</div>
                                         </div>
                                     </div>
@@ -323,13 +287,10 @@ export default function DashboardPage() {
                     </CListGroup>
                 </CCol>
 
-                {/* RIGHT */}
                 <CCol xs={12} lg={4}>
                     <CCard>
                         <CCardBody>
-                            <h3 className="text-center mb-3">
-                                {format(currentDate, "MMMM yyyy")}
-                            </h3>
+                            <h3 className="text-center mb-3">{format(currentDate, "MMMM yyyy")}</h3>
 
                             <div className="dashboard-calendar-grid">
                                 {["S", "M", "T", "W", "T", "F", "S"].map((d) => (

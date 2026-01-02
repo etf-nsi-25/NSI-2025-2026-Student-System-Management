@@ -7,6 +7,7 @@ using Faculty.Infrastructure.Repositories;
 using Faculty.Application.Services;
 using Faculty.Application.Interfaces;
 using Faculty.Infrastructure.Http;
+using Faculty.Core.Interfaces.Faculty.Core.Interfaces;
 
 namespace Faculty.Infrastructure.DependencyInjection
 {
@@ -16,8 +17,8 @@ namespace Faculty.Infrastructure.DependencyInjection
         {
             services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
             services.AddScoped<IEnrollmentService, EnrollmentService>();
-
             services.AddScoped<ICourseRepository, CourseRepository>();
+            services.AddScoped<ICourseAssignmentRepository, CourseAssignmentRepository>();
             services.AddScoped<ICourseService, CourseService>();
             services.AddScoped<IStudentExamRegistrationRepository, StudentExamRegistrationRepository>();
             services.AddScoped<IStudentExamRegistrationService, StudentExamRegistrationService>();
