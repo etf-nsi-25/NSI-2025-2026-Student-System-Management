@@ -28,11 +28,6 @@ import type { Course } from "../../component/faculty/courses/types/Course"
 export default function EnrollmentPage() {
     const api = useAPI()
 
-    console.log("useAPI() ->", api);
-    console.log("api.post type ->", typeof api.post);
-
-
-
     const [courses, setCourses] = useState<Course[]>([])
     const [page, setPage] = useState(1)
     const [hasMore, setHasMore] = useState(true)
@@ -48,7 +43,6 @@ export default function EnrollmentPage() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [isEnrolling, setIsEnrolling] = useState(false)
 
-    // teacher state for modal
     const [teacherName, setTeacherName] = useState<string>("Professor")
     const [teacherLoading, setTeacherLoading] = useState(false)
 
@@ -61,11 +55,8 @@ export default function EnrollmentPage() {
             try {
                 const data = await getCourses(api, pageNum, 6, search, filter)
 
-                if (pageNum === 1) {
-                    setCourses(data.courses)
-                } else {
-                    setCourses((prev) => [...prev, ...data.courses])
-                }
+                if (pageNum === 1) setCourses(data.courses)
+                else setCourses((prev) => [...prev, ...data.courses])
 
                 setHasMore(data.hasMore)
             } catch (error) {
@@ -87,6 +78,8 @@ export default function EnrollmentPage() {
     useEffect(() => {
         if (isLoading || !hasMore) return
 
+        if (observerRef.current) observerRef.current.disconnect()
+
         observerRef.current = new IntersectionObserver(
             (entries) => {
                 if (entries[0].isIntersecting && hasMore && !isLoading) {
@@ -96,9 +89,7 @@ export default function EnrollmentPage() {
             { threshold: 0.1 },
         )
 
-        if (loadMoreRef.current) {
-            observerRef.current.observe(loadMoreRef.current)
-        }
+        if (loadMoreRef.current) observerRef.current.observe(loadMoreRef.current)
 
         return () => {
             if (observerRef.current) observerRef.current.disconnect()
@@ -113,15 +104,13 @@ export default function EnrollmentPage() {
         setSelectedCourse(course)
         setShowModal(true)
 
-        // reset teacher ui then load
         setTeacherName("Professor")
         setTeacherLoading(true)
 
         try {
             const teacher = await getTeacherForCourse(api, course.id)
             setTeacherName(teacher?.fullName || "Professor")
-        } catch (e) {
-            // 404 or any error -> keep default
+        } catch {
             setTeacherName("Professor")
         } finally {
             setTeacherLoading(false)
@@ -132,7 +121,6 @@ export default function EnrollmentPage() {
         if (!selectedCourse) return
 
         setIsEnrolling(true)
-
         try {
             await enrollInCourse(api, selectedCourse.id)
 
@@ -144,13 +132,11 @@ export default function EnrollmentPage() {
 
             setSuccessMessage(`You have successfully enrolled in "${selectedCourse.name}"!`)
             setShowModal(false)
-
             setTimeout(() => setSuccessMessage(null), 5000)
         } catch (error) {
             console.error("Enrollment error:", error)
             setErrorMessage("Failed to enroll. Please try again.")
             setShowModal(false)
-
             setTimeout(() => setErrorMessage(null), 5000)
         } finally {
             setIsEnrolling(false)
