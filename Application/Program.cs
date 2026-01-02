@@ -266,7 +266,7 @@ app.MapGet("/__routes", (Microsoft.AspNetCore.Routing.EndpointDataSource ds) =>
             {
                 pattern = e.RoutePattern.RawText,
                 methods = methods == null ? Array.Empty<string>() : methods.ToArray(),
-             https://github.com/etf-nsi-25/NSI-2025-2026-Student-System-Management/pull/75/conflict?name=Application%252FProgram.cs&ancestor_oid=f538e5d56e96bcd6f03848e8b1e0320f87f52d4e&base_oid=fac1250e59ea14cf31fdcba42440cf925955224f&head_oid=14e5888de910bb095e050ee7c21fe2d16a936bc6   displayName = e.DisplayName
+                displayName = e.DisplayName
             };
         })
         .OrderBy(r => r.pattern)
