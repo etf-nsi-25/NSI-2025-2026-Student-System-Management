@@ -1,0 +1,50 @@
+using Faculty.Application.DTOs;
+using Faculty.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Faculty.API.Controllers;
+
+[ApiController]
+[Authorize(Roles = "Teacher")]
+[Route("api/grades")]
+public class StudentExamGradeController : ControllerBase
+{
+    private readonly IStudentExamGradeService _service;
+
+    public StudentExamGradeController(IStudentExamGradeService service)
+    {
+        _service = service;
+    }
+
+    private Guid FacultyId => Guid.Parse(User.FindFirst("tenantId")!.Value);
+    private int TeacherId => int.Parse(User.FindFirst("userId")!.Value);
+
+    [HttpGet("exams/{examId}")]
+    public async Task<IActionResult> GetAllGrades(int examId, CancellationToken ct)
+    {
+        var result = await _service.GetAllForExamAsync(examId, FacultyId, TeacherId, ct);
+        return Ok(result);
+    }
+
+    [HttpPost("exams/{examId}/students/{studentId}")]
+    public async Task<IActionResult> CreateOrUpdate(int examId, int studentId, [FromBody] GradeRequest request, CancellationToken ct)
+    {
+        var result = await _service.CreateOrUpdateAsync(request, FacultyId, TeacherId, ct);
+        return Ok(result);
+    }
+
+    [HttpPut("exams/{examId}/students/{studentId}")]
+    public async Task<IActionResult> Update(int examId, int studentId, [FromBody] GradeUpdateRequest request, CancellationToken ct)
+    {
+        var result = await _service.UpdateAsync(studentId, examId, request, FacultyId, TeacherId, ct);
+        return Ok(result);
+    }
+
+    [HttpDelete("exams/{examId}/students/{studentId}")]
+    public async Task<IActionResult> Delete(int examId, int studentId, CancellationToken ct)
+    {
+        await _service.DeleteAsync(studentId, examId, FacultyId, TeacherId, ct);
+        return NoContent();
+    }
+}
