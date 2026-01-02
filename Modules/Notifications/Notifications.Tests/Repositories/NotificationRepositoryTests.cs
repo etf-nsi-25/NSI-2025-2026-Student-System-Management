@@ -87,12 +87,9 @@ public class NotificationRepositoryTests : IAsyncLifetime
         };
 
         // Act
-        var results = new List<NotificationLog>();
-        foreach (var notification in notifications)
-        {
-            var result = await _repository.SaveAsync(notification);
-            results.Add(result);
-        }
+        var results = await Task.WhenAll(
+            notifications.Select(notification => _repository.SaveAsync(notification))
+        );
 
         // Assert
         results.Should().HaveCount(4);
@@ -228,7 +225,7 @@ public class NotificationRepositoryTests : IAsyncLifetime
         // Arrange
         var userId = "user123";
         await _repository.SaveAsync(CreateNotificationLog(userId));
-        var cts = new CancellationTokenSource();
+        using var cts = new CancellationTokenSource();
         cts.Cancel();
 
         // Act & Assert

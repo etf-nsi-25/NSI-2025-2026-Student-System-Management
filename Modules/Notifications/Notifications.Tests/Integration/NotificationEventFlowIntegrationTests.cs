@@ -315,7 +315,7 @@ public class NotificationEventFlowIntegrationTests : IAsyncLifetime
         var tasks = new List<Task>();
 
         // Create multiple events
-        for (int i = 0; i < 10; i++)
+        for (int i = 1; i <= 10; i++)
         {
             var gradeEvent = new GradePostedEvent(i, $"Course{i}", 5.0 + i * 0.5, tenantId);
             tasks.Add(_eventBus.Dispatch(gradeEvent, tenantId));
@@ -337,7 +337,7 @@ public class NotificationEventFlowIntegrationTests : IAsyncLifetime
     #region Database Persistence Tests
 
     [Fact]
-    public async Task NotificationLog_IsPersistsCorrectly()
+    public async Task NotificationLog_PersistsCorrectly()
     {
         // Arrange
         var gradeEvent = new GradePostedEvent(333, "History", 7.5, Guid.NewGuid());
@@ -405,15 +405,4 @@ public class NotificationEventFlowIntegrationTests : IAsyncLifetime
     }
 
     #endregion
-}
-
-/// <summary>
-/// Simple disposable stub for mocking tenant scope context
-/// </summary>
-internal sealed class DisposableStub : IDisposable
-{
-    public void Dispose()
-    {
-        // Stub implementation
-    }
 }
