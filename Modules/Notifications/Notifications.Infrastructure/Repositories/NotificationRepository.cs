@@ -32,6 +32,11 @@ public class NotificationRepository : INotificationRepository
         CancellationToken cancellationToken = default
     )
     {
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            throw new ArgumentException("userId cannot be null or whitespace.", nameof(userId));
+        }
+
         return await _context
             .NotificationLogs.Where(n => n.UserId == userId)
             .OrderByDescending(n => n.SentAt)

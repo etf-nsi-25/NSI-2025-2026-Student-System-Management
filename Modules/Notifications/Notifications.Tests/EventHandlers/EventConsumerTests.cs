@@ -83,7 +83,7 @@ public class GradePostedConsumerTests
         // Arrange
         var gradeEvent = new GradePostedEvent(1, "Chemistry", 7.0, Guid.NewGuid());
         var notification = new DomainEventNotification<GradePostedEvent>(gradeEvent);
-        var cts = new CancellationTokenSource();
+        using var cts = new CancellationTokenSource();
 
         // Act
         await _consumer.Handle(notification, cts.Token);

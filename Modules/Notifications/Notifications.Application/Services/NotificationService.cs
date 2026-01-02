@@ -30,6 +30,16 @@ public class NotificationService : INotificationService
         CancellationToken cancellationToken = default
     )
     {
+        if (studentId <= 0)
+        {
+            throw new ArgumentException("studentId must be a positive value.", nameof(studentId));
+        }
+
+        if (string.IsNullOrWhiteSpace(courseName))
+        {
+            throw new ArgumentException("courseName cannot be null or whitespace.", nameof(courseName));
+        }
+
         try
         {
             // Resolve user destination (mocked for now - in real scenario, query Identity service)
@@ -132,6 +142,11 @@ public class NotificationService : INotificationService
         CancellationToken cancellationToken = default
     )
     {
+        if (string.IsNullOrWhiteSpace(requestType))
+        {
+            throw new ArgumentException("requestType cannot be null or whitespace.", nameof(requestType));
+        }
+
         try
         {
             // Resolve user destination (mocked for now)
