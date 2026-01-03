@@ -52,4 +52,3 @@ public class HttpTenantService(IHttpContextAccessor httpContextAccessor, IScoped
         return tenantId;
     }
 }
-

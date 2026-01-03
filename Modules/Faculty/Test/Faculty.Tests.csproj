@@ -19,8 +19,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Faculty.Core\Faculty.Core.csproj" />
     <ProjectReference Include="..\Faculty.Infrastructure\Faculty.Infrastructure.csproj" />
+    <ProjectReference Include="..\Faculty.Application\Faculty.Application.csproj" />
+    <ProjectReference Include="..\Faculty.API\Faculty.API.csproj" />
   </ItemGroup>
 
 </Project>

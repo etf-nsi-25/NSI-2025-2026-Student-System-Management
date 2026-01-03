@@ -11,6 +11,7 @@ import TenantManagementPage from '../page/tenant-management/TenantManagementPage
 import StudentSupportPage from '../page/student-support/StudentSupportPage.tsx';
 import SettingsPage from '../page/settings/SettingsPage.tsx';
 import HelpPage from '../page/help/HelpPage.tsx';
+import AttendancePage from '../page/attendance/AttendancePage.tsx';
 
 //////////// VERSION FROM master ////////////
 import CourseListPage from '../page/university/courses/CourseListPage';
@@ -78,6 +79,7 @@ export function Router(): React.ReactNode {
       <Route path="/student-support" element={<AppLayout><StudentSupportPage /></AppLayout>} />
       <Route path="/settings" element={<AppLayout><SettingsPage /></AppLayout>} />
       <Route path="/help" element={<AppLayout><HelpPage /></AppLayout>} />
+      <Route path="/attendance" element={<AppLayout><AttendancePage /></AppLayout>} />
 
       {/*University dashboard*/}
 
