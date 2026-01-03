@@ -1,48 +1,40 @@
-import type { GradeResponse } from "../../dto/GradeDTO";
-import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    Tooltip,
-    ResponsiveContainer
-} from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 type Props = {
-    grades: GradeResponse[];
+    grades: { points: number | null; passed: boolean | null }[];
 };
 
 export default function GradeDistribution({ grades }: Props) {
-    const distribution = [
-        { range: "0–49", count: 0 },
-        { range: "50–64", count: 0 },
-        { range: "65–79", count: 0 },
-        { range: "80–100", count: 0 }
-    ];
-
-    grades.forEach(g => {
-        if (g.points === null) return;
-
-        if (g.points < 50) distribution[0].count++;
-        else if (g.points < 65) distribution[1].count++;
-        else if (g.points < 80) distribution[2].count++;
-        else distribution[3].count++;
-    });
+    // Bucket grades by 5–10
+    const buckets = [5, 6, 7, 8, 9, 10].map(grade => ({
+        grade: grade.toString(),
+        count: grades.filter(g => {
+            if (g.points === null) return false;
+            const p = g.points;
+            if (p < 55) return grade === 5;
+            if (p < 65) return grade === 6;
+            if (p < 75) return grade === 7;
+            if (p < 85) return grade === 8;
+            if (p < 95) return grade === 9;
+            return grade === 10;
+        }).length
+    }));
 
     return (
         <>
             <h3>Grade distribution</h3>
-
-            <div style={{ width: "100%", height: 250 }}>
-                <ResponsiveContainer>
-                    <BarChart data={distribution}>
-                        <XAxis dataKey="range" />
-                        <YAxis allowDecimals={false} />
-                        <Tooltip />
-                        <Bar dataKey="count" />
-                    </BarChart>
-                </ResponsiveContainer>
-            </div>
+            <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={buckets}>
+                    <XAxis dataKey="grade" />
+                    <YAxis allowDecimals={false} />
+                    <Tooltip />
+                    <Bar
+                        dataKey="count"
+                        className="bar"
+                        radius={[6, 6, 0, 0]} // rounded top edges
+                    />
+                </BarChart>
+            </ResponsiveContainer>
         </>
     );
 }
