@@ -1,0 +1,138 @@
+/* Add CSS variables for better maintainability */
+:root {
+  --sidebar-width: 250px;
+  --sidebar-collapsed-width: 70px;
+  --header-height: 60px;
+  --transition-duration: 0.3s;
+}
+
+/* Prevent horizontal scroll during transitions */
+html, body {
+  overflow-x: hidden;
+}
+
+.student-portal-wrapper {
+  display: flex;
+  min-height: 100vh;
+  min-height: -webkit-fill-available; /* Better mobile support */
+  background-color: #c5d5e4;
+}
+
+/* Sidebar styles with will-change for better performance */
+.student-sidebar {
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  height: calc(100vh - var(--header-height));
+  width: var(--sidebar-width);
+  background-color: #133E87;
+  z-index: 1030;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-duration) ease;
+  overflow: hidden;
+  padding-top: 0;
+  will-change: transform, width; /* Optimize for animations */
+  transform: translateZ(0); /* Force hardware acceleration */
+}
+
+/* Content area */
+.student-portal-content {
+  margin-left: var(--sidebar-width);
+  flex: 1;
+  padding-top: var(--header-height);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  transition: margin-left var(--transition-duration) ease, 
+              width var(--transition-duration) ease;
+  width: calc(100% - var(--sidebar-width));
+  position: relative;
+  z-index: 1;
+}
+
+/* Collapsed state */
+.student-sidebar.collapsed {
+  width: var(--sidebar-collapsed-width);
+}
+
+.student-sidebar.collapsed + .student-portal-content {
+  margin-left: var(--sidebar-collapsed-width);
+  width: calc(100% - var(--sidebar-collapsed-width));
+}
+
+/* Mobile styles */
+@media (max-width: 767.98px) {
+  .student-sidebar {
+    transform: translateX(-100%);
+    width: 280px;
+  }
+  
+  .student-sidebar.show {
+    transform: translateX(0);
+  }
+  
+  .student-portal-content {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* Header styles */
+.assistant-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-height);
+  background-color: #003b82;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 1040;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all var(--transition-duration) ease;
+}
+
+/* Optimize content rendering */
+.portal-body {
+  padding: 1.5rem;
+  min-height: calc(100vh - var(--header-height));
+  background-color: #f8f9fa;
+}
+
+/* Smooth scrolling for the entire app */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Optimize transitions */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #adb5bd #f8f9fa;
+}
+
+/* Webkit scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f8f9fa;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #adb5bd;
+  border-radius: 4px;
+}
+
+/* Performance optimizations */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

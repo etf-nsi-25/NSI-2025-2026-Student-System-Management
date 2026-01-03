@@ -1,49 +1,44 @@
-import React, { useState, useEffect, type PropsWithChildren } from "react";
+import { useState, useEffect } from "react";
 import logoImage from "../../assets/logo-unsa-sms.png";
-import {Link, useLocation} from "react-router-dom";
+import { Link, useLocation, Outlet } from "react-router-dom";
 
-
-const AppLayout: React.FC<PropsWithChildren<object>> = ({ children }) => {
+const AppLayout = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile only
-  const location=useLocation();
+  const location = useLocation();
 
   const handleLinkClick = () => {
-if (isMobile) {
-setSidebarOpen(false);
-}
-};
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
+  };
 
- const getLinkStyle = (path: string) => {
-  const isActive = location.pathname === path;
+  const getLinkStyle = (path: string) => {
+    const isActive = location.pathname === path;
 
-  // Kada je sidebar sklopljen (collapsed), ukloni aktivni stil
-  if (isCollapsed && !isMobile) {
+    if (isCollapsed && !isMobile) {
+      return {
+        padding: "10px 20px",
+        color: "white",
+        textDecoration: "none",
+        backgroundColor: "transparent",
+        borderLeft: "4px solid transparent",
+        fontWeight: "normal",
+        transition: "0.2s",
+      };
+    }
+
     return {
       padding: "10px 20px",
       color: "white",
       textDecoration: "none",
-      backgroundColor: "transparent",
-      borderLeft: "4px solid transparent",
-      fontWeight: "normal",
+      backgroundColor: isActive ? "#005bb5" : "transparent",
+      borderLeft: isActive ? "4px solid #ffffff" : "4px solid transparent",
+      fontWeight: isActive ? "bold" : "normal",
       transition: "0.2s",
     };
-  }
-
-  // Normalno stanje (sidebar otvoren)
-  return {
-    padding: "10px 20px",
-    color: "white",
-    textDecoration: "none",
-    backgroundColor: isActive ? "#005bb5" : "transparent",
-    borderLeft: isActive ? "4px solid #ffffff" : "4px solid transparent",
-    fontWeight: isActive ? "bold" : "normal",
-    transition: "0.2s",
   };
-};
-
-
 
   // LISTEN TO WINDOW RESIZE
   useEffect(() => {
@@ -64,8 +59,7 @@ setSidebarOpen(false);
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#d9e7f5", overflowX: "hidden" }}>
-
-      {/* TOP BLUE HEADER */}
+      {/* TOP HEADER */}
       <div
         style={{
           width: "100%",
@@ -74,11 +68,9 @@ setSidebarOpen(false);
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          paddingLeft: "0px",
           paddingRight: "10px",
         }}
       >
-        {/* LEFT: Logo + Collapse button */}
         <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
           <img src={logoImage} alt="logo" style={{ height: "42px", paddingLeft: "50px" }} />
 
@@ -104,10 +96,8 @@ setSidebarOpen(false);
         </span>
       </div>
 
-
-      {/* LAYOUT WRAPPER */}
-      <div style={{ display: "flex", flexDirection: "row" }}>
-
+      {/* LAYOUT */}
+      <div style={{ display: "flex" }}>
         {/* MOBILE OVERLAY */}
         {isMobile && sidebarOpen && (
           <div
@@ -118,7 +108,7 @@ setSidebarOpen(false);
               backgroundColor: "rgba(0,0,0,0.3)",
               zIndex: 9,
             }}
-          ></div>
+          />
         )}
 
         {/* SIDEBAR */}
@@ -136,7 +126,6 @@ setSidebarOpen(false);
             overflow: "hidden",
             position: isMobile ? "fixed" : "relative",
             zIndex: 10,
-            inset: 0,
             transform: isMobile
               ? sidebarOpen
                 ? "translateX(0)"
@@ -171,14 +160,12 @@ setSidebarOpen(false);
           <Link to="/help" style={getLinkStyle("/help")} onClick={handleLinkClick}>
             {(!isCollapsed || isMobile) && "Help"}
           </Link>
-
         </div>
 
         {/* CONTENT */}
         <div style={{ padding: "20px 25px 60px 25px", width: "100%" }}>
-          {children}
+          <Outlet />
 
-          {/* FOOTER */}
           <footer
             style={{
               marginTop: "40px",
@@ -190,7 +177,6 @@ setSidebarOpen(false);
             Faculty Admin – User Management (reference layout)
           </footer>
         </div>
-
       </div>
     </div>
   );

@@ -1,117 +1,152 @@
 import React from 'react';
-import { Route, Routes } from 'react-router';
+import { Route, Routes, Navigate } from 'react-router-dom';
 
-//////////// VERSION FROM feature/PBI_258 ////////////
-import { Home } from '../page/home/home.tsx';
-import { Page1 } from '../page/page1/page1.tsx';
-import UserManagementPage from '../page/user-management/UserManagementPage.tsx';
-import DashboardPage from '../page/dashboard/DashboardPage.tsx';
-import CourseManagementPage from '../page/course-management/CourseManagementPage.tsx';
-import TenantManagementPage from '../page/tenant-management/TenantManagementPage.tsx';
-import StudentSupportPage from '../page/student-support/StudentSupportPage.tsx';
-import SettingsPage from '../page/settings/SettingsPage.tsx';
-import HelpPage from '../page/help/HelpPage.tsx';
-
-//////////// VERSION FROM master ////////////
+//////////// FEATURE / PBI_258 ////////////
+import UserManagementPage from '../page/user-management/UserManagementPage';
+import DashboardPage from '../page/dashboard/DashboardPage';
+import CourseManagementPage from '../page/course-management/CourseManagementPage';
+import TenantManagementPage from '../page/tenant-management/TenantManagementPage';
+import { ProfileSettings as TeacherProfileSettings } from '../features/teacher';
+import { ProfessorSupport } from '../features/teacher';
+//////////// MASTER ////////////
 import CourseListPage from '../page/university/courses/CourseListPage';
-import TwoFASetupPage from "../page/identity/2FASetupPage";
-import { Login } from '../page/login/login.tsx';
-import { ProtectedRoute } from '../component/ProtectedRoute.tsx';
-import { DocumentCenter, ProfileSettings, RequestManagement, StudentAnalytics, StudentLayout, StudentSupport } from '../features/student/index.ts';
-import EnrollmentPage from "../page/enrollment/enrollment.tsx";
-import { EnrollmentStudentPage } from '../page/enrollment/enrollmentPage.tsx';
-import StudentDashboardPage from '../page/student dashboard/dashboard.tsx';
-import DocumentCenterDashboard from '../page/document-center/documentCenter.tsx';
-import AppLayout from '../component/AppLayout/AppLayout.tsx';
-import DefaultLayout from '../component/UniversityDashboardLayout/DefaultLayout.tsx';
-import UniversityDashboard from "../page/university-dashboard/UniversityDashboard.tsx";
-
+import TwoFASetupPage from '../page/identity/2FASetupPage';
+import { Login } from '../page/login/login';
+import { ProtectedRoute } from '../component/ProtectedRoute';
+import {
+  DocumentCenter,
+  ProfileSettings,
+  RequestManagement,
+  StudentAnalytics,
+  StudentLayout,
+  StudentSupport,
+} from '../features/student';
+import EnrollmentPage from '../page/enrollment/enrollment';
+import { EnrollmentStudentPage } from '../page/enrollment/enrollmentPage';
+import StudentDashboardPage from '../page/student dashboard/dashboard';
+import DocumentCenterDashboard from '../page/document-center/documentCenter';
+import UniversityDashboard from '../page/university-dashboard/UniversityDashboard';
+import { TeacherLayout } from '../features/teacher';
+import { AssistentLayout } from '../features/assistent';
+import { AssistentProfileSettings } from '../page/profile/AssistentProfileSettings';
+import { AssistentSupport } from '../page/support/AssistentSupport';
+import { AdminLayout } from '../features/admin';
+import { SuperadminLayout } from '../features/superadmin';
+import ProfessorDashboardPage from '../page/professor-dashboard/dashboard';
+import { FacultyProfileSettings } from '../features/admin';
+import UniversityProfileSettings from '../page/profile/UniversityProfileSettings';
+// layouts
+import PublicLayout from '../component/AppLayout/PublicLayout';
+import AssistantDashboardPage from '../page/assistant-dashboard/dashboard';
 
 export function Router(): React.ReactNode {
   return (
     <Routes>
 
-      {/* master routes */}
-      <Route path="/login" element={<Login />} />
-
-      <Route path="/" element={
-        <ProtectedRoute>
-          <Home />
-        </ProtectedRoute>
-      } />
-
-      <Route path="/2fa/setup" element={
-        <ProtectedRoute>
-          <TwoFASetupPage />
-        </ProtectedRoute>
-      } />
-
-      {/* Student area */}
-      <Route path="/student" element={
-        <ProtectedRoute>
-          <StudentLayout />
-        </ProtectedRoute>
-      }>
-        <Route path="dashboard" element={<StudentDashboardPage />} />
-        <Route path="document-center" element={<DocumentCenter />} />
-        <Route path="analytics" element={<StudentAnalytics />} />
-        <Route path="request-management" element={<RequestManagement />} />
-        <Route path="enrollment" element={<EnrollmentPage />} />
-        <Route path="profile-settings" element={<ProfileSettings />} />
-        <Route path="support" element={<StudentSupportPage />} />
-        <Route path="student-enrollment" element={<EnrollmentStudentPage />} />
-        <Route index element={<StudentDashboardPage />} />
+      {/* ================= PUBLIC ROUTES ================= */}
+      <Route element={<PublicLayout />}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route
+          path="/unauthorized"
+          element={
+            <div
+              className="d-flex flex-column justify-content-center align-items-center"
+              style={{ height: '100vh' }}
+            >
+              <h1>403 - Unauthorized</h1>
+              <p>You do not have permission to access this page.</p>
+              <a href="/login" className="btn btn-primary">
+                Return to Login
+              </a>
+            </div>
+          }
+        />
       </Route>
 
-      <Route path="/document-center" element={
-        <ProtectedRoute>
-          <DocumentCenterDashboard />
-        </ProtectedRoute>
-      } />
+      {/* ================= PROTECTED ROUTES ================= */}
+      <Route element={<ProtectedRoute />}>
 
-      {/* feature/PBI_258 routes */}
-      <Route path="/page1" element={<AppLayout><Page1 /></AppLayout>} />
-      <Route path="/users" element={<AppLayout><UserManagementPage /></AppLayout>} />
-      <Route path="/dashboard" element={<AppLayout><DashboardPage /></AppLayout>} />
-      <Route path="/course-management" element={<AppLayout><CourseManagementPage /></AppLayout>} />
-      <Route path="/tenant-management" element={<AppLayout><TenantManagementPage /></AppLayout>} />
-      <Route path="/student-support" element={<AppLayout><StudentSupportPage /></AppLayout>} />
-      <Route path="/settings" element={<AppLayout><SettingsPage /></AppLayout>} />
-      <Route path="/help" element={<AppLayout><HelpPage /></AppLayout>} />
+        
 
-      {/*University dashboard*/}
+        {/* ===== STUDENT AREA ===== */}
+        <Route path="/student" element={<StudentLayout />}>
+          <Route index element={<StudentDashboardPage />} />
+          <Route path="dashboard" element={<StudentDashboardPage />} />
+          <Route path="document-center" element={<DocumentCenter />} />
+          <Route path="analytics" element={<StudentAnalytics />} />
+          <Route path="request-management" element={<RequestManagement />} />
+          <Route path="enrollment" element={<EnrollmentPage />} />
+          <Route path="profile-settings" element={<ProfileSettings />} />
+          <Route path="support" element={<StudentSupport />} />
+          <Route path="student-enrollment" element={<EnrollmentStudentPage />} />
+        </Route>        
 
-      <Route path="/university-dashboard" element={<DefaultLayout><UniversityDashboard /></DefaultLayout>} />
-      <Route path="/documents" element={<DefaultLayout><DocumentCenter /></DefaultLayout>} />
-      <Route path="/analytics" element={<DefaultLayout><StudentAnalytics /></DefaultLayout>} />
-      <Route path="/requests" element={<DefaultLayout><RequestManagement /></DefaultLayout>} />
-      <Route path="/profile" element={<DefaultLayout><SettingsPage /></DefaultLayout>} />
-      <Route path="/support" element={<DefaultLayout><StudentSupport /></DefaultLayout>} />
-      <Route path="/help" element={<DefaultLayout><HelpPage /></DefaultLayout>} />
+          
+        {/* ===== TEACHER AREA ===== */}
+        <Route path="/teacher" element={<TeacherLayout />}>
+          <Route index element={<ProfessorDashboardPage />} />
+          <Route path="dashboard" element={<ProfessorDashboardPage />} />
+          <Route path="document-center" element={<DocumentCenter />} />
+          <Route path="analytics" element={<StudentAnalytics />} />
+          <Route path="request-management" element={<RequestManagement />} />
+          <Route path="profile-settings" element={<TeacherProfileSettings />} />
+          <Route path="support" element={<ProfessorSupport />} />
+        </Route>
 
+        {/* ===== ASSISTANT  AREA ===== */}
+        <Route path="/assistant" element={<AssistentLayout />}>
+          <Route index element={<AssistantDashboardPage />} />
+          <Route path="dashboard" element={<AssistantDashboardPage />} />
+          <Route path="document-center" element={<DocumentCenter />} />
+          <Route path="analytics" element={<StudentAnalytics />} />
+          <Route path="request-management" element={<RequestManagement />} />
+          <Route path="profile-settings" element={<AssistentProfileSettings />} />
+          <Route path="support" element={<AssistentSupport />} />
+        </Route>
 
-      {/* error pages */}
-      <Route path="/unauthorized" element={
-        <div className="d-flex flex-column justify-content-center align-items-center" style={{ height: '100vh' }}>
-          <h1>403 - Unauthorized</h1>
-          <p>You do not have permission to access this page.</p>
-          <a href="/login" className="btn btn-primary">Return to Login</a>
-        </div>
-      } />
+         {/* ===== ADMIN AREA ===== */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="user-management" element={<UserManagementPage />} />
+          <Route path="course-management" element={<CourseManagementPage />} />
+          <Route path="profile-settings" element={<FacultyProfileSettings />} />
+        </Route>
 
-      <Route path="*" element={
-        <div className="d-flex flex-column justify-content-center align-items-center" style={{ height: '100vh' }}>
-          <h1>404 - Not Found</h1>
-          <p>The page you are looking for does not exist.</p>
-          <a href="/login" className="btn btn-primary">Return to Login</a>
-        </div>
-      } />
+          {/* ===== SUPERADMIN AREA ===== */}
+        <Route path="/superadmin" element={<SuperadminLayout />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="dashboard" element={<UniversityDashboard />} />
+          <Route path="user-management" element={<UserManagementPage />} />
+          <Route path="course-management" element={<CourseManagementPage />} />
+          <Route path="tenant-management" element={<TenantManagementPage />} />
+          <Route path="profile-settings" element={<UniversityProfileSettings />} />
+        </Route>
 
-      <Route path="/faculty/courses" element={
-        <ProtectedRoute>
-          <CourseListPage />
-        </ProtectedRoute>
-      } />
+        {/* ===== OTHER PROTECTED ROUTES ===== */}
+        <Route path="/2fa/setup" element={<TwoFASetupPage />} />
+        <Route path="/document-center" element={<DocumentCenterDashboard />} />
+        <Route path="/faculty/courses" element={<CourseListPage />} />
+
+      </Route>
+
+      {/* ================= 404 ================= */}
+      <Route
+        path="*"
+        element={
+          <div
+            className="d-flex flex-column justify-content-center align-items-center"
+            style={{ height: '100vh' }}
+          >
+            <h1>404 - Not Found</h1>
+            <p>The page you are looking for does not exist.</p>
+            <a href="/login" className="btn btn-primary">
+              Return to Login
+            </a>
+          </div>
+        }
+      />
 
     </Routes>
   );
