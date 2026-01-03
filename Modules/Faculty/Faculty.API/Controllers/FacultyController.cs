@@ -1,7 +1,11 @@
 ﻿using Faculty.Application.DTOs;
 using Faculty.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Mvc;
+
+using System.Collections.Generic;   
+
 
 namespace Faculty.API.Controllers
 {
@@ -52,8 +56,9 @@ namespace Faculty.API.Controllers
             bool ok = await _service.DeleteAsync(id);
             return ok ? Ok(new { success = true }) : NotFound();
         }
+    }
 
     }
-}
+
 
 
