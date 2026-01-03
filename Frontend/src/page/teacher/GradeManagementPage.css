@@ -1,0 +1,106 @@
+.grades-page {
+  padding: 24px;
+  background: #f5f7fb;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.course-selector {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.course-selector label {
+  font-size: 12px;
+  color: #666;
+}
+
+.course-selector select {
+  padding: 6px;
+  min-width: 180px;
+}
+
+.primary {
+  background: #2563eb;
+  color: white;
+}
+
+button {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+}
+
+.grades-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.grades-table th,
+.grades-table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: white;
+  font-size: 12px;
+}
+
+.pass {
+  background: #22c55e;
+}
+
+.fail {
+  background: #ef4444;
+}
+
+.table-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.chart-placeholder {
+  height: 200px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
+
+.summary-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}

@@ -3,8 +3,8 @@ export type GradeResponse = {
     studentName: string;
     points: number | null;
     passed: boolean | null;
-    dateRecorded?: string;
-    url?: string;
+    dateRecorded: string | null;
+    url?: string | null;
 }
 
 export type StudentGradeListResponse = {

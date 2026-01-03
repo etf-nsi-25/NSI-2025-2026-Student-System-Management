@@ -91,13 +91,8 @@ export function Router(): React.ReactNode {
 
       {/*Teacher area*/}
 
-      <Route path="/teacher" element={
-        <ProtectedRoute>
-          <StudentLayout />
-        </ProtectedRoute>
-      }>
-        <Route path="/grades" element={<GradeManagementPage />} />
-
+      <Route path="/teacher">
+        <Route path="grades" element={<GradeManagementPage />} />
       </Route>
 
       {/* error pages */}
