@@ -27,10 +27,10 @@ internal class UserService(
        string? indexNumber,
        UserRole role)
     {
-        if (role == UserRole.Superadmin || role == UserRole.Admin)
-        {
-            throw new InvalidOperationException("Admin users are restricted from assigning Superadmin or Admin roles.");
-        }
+        // if (role == UserRole.Superadmin || role == UserRole.Admin)
+        // {
+        //     throw new InvalidOperationException("Admin users are restricted from assigning Superadmin or Admin roles.");
+        // }
 
         if (await userRepository.IsUsernameTakenAsync(username))
         {

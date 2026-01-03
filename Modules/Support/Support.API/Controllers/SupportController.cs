@@ -14,32 +14,30 @@ namespace Support.API.Controllers
 	public class SupportController : ControllerBase
 	{
 		private readonly SupportDbContext _dbContext;
-		//private readonly UniversityDbContext _universityDbContext;
-		//private readonly FacultyDbContext _facultyDbContext;
+		private readonly UniversityDbContext _universityDbContext;
+		private readonly FacultyDbContext _facultyDbContext;
 
-		public SupportController(SupportDbContext dbContext)
-			//UniversityDbContext universityDbContext,
-			//FacultyDbContext facultyDbContext)
+		public SupportController(
+			SupportDbContext dbContext,
+			UniversityDbContext universityDbContext,
+			FacultyDbContext facultyDbContext)
 		{
 			_dbContext = dbContext;
-			//_universityDbContext = universityDbContext;
-			//_facultyDbContext = facultyDbContext;
+			_universityDbContext = universityDbContext;
+			_facultyDbContext = facultyDbContext;
 		}
 
 		[HttpPost("document-request")]
 		[Authorize]
-		public async Task<IActionResult> CreateDocumentRequest(
-			[FromBody] CreateDocumentRequestDTO dto,
-            [FromServices] FacultyDbContext facultyDbContext, 
-            [FromServices] UniversityDbContext universityDbContext)
+		public async Task<IActionResult> CreateDocumentRequest([FromBody] CreateDocumentRequestDTO dto)
 		{
-			var studentExists = await facultyDbContext.Students
+			var studentExists = await _facultyDbContext.Students
 				.AnyAsync(s => s.UserId == dto.UserId);
 
 			if (!studentExists)
 				return BadRequest($"User/Student with ID '{dto.UserId}' does not exist.");
 
-			var facultyExists = await universityDbContext.Faculties
+			var facultyExists = await _universityDbContext.Faculties
 				.AnyAsync(f => f.Id == dto.FacultyId);
 
 			if (!facultyExists)
@@ -57,15 +55,12 @@ namespace Support.API.Controllers
 
 			_dbContext.DocumentRequests.Add(request);
 			await _dbContext.SaveChangesAsync();
-    
 
 			return Ok(request);
 		}
 
 		[HttpPost("enrollment-requests")]
-		public async Task<IActionResult> CreateEnrollmentRequest(
-			[FromBody] CreateEnrollmentRequestDTO dto,
-			[FromServices] FacultyDbContext facultyDbContext)
+		public async Task<IActionResult> CreateEnrollmentRequest([FromBody] CreateEnrollmentRequestDTO dto)
 		{
 			if (dto.Semester is not (1 or 2))
 				return BadRequest("Semester must be 1 or 2.");
@@ -73,7 +68,7 @@ namespace Support.API.Controllers
 			if (string.IsNullOrWhiteSpace(dto.AcademicYear))
 				return BadRequest("AcademicYear is required.");
 
-			var studentExists = await facultyDbContext.Students
+			var studentExists = await _facultyDbContext.Students
 				.AnyAsync(s => s.UserId == dto.UserId);
 
 			if (!studentExists)
@@ -198,7 +193,7 @@ namespace Support.API.Controllers
 		}
 
         [HttpGet("requests")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllRequests()
         {
             try
@@ -225,22 +220,22 @@ namespace Support.API.Controllers
             }
         }
 
-        [HttpPatch("requests/{id}/status")]
-        [AllowAnonymous]
-        public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusDto dto)
-        {
-            var request = await _dbContext.DocumentRequests.FindAsync(id);
-            
-            if (request == null) 
-                return NotFound(new { message = $"Request with ID {id} not found." });
+        [HttpPut("requests/{id}/status")] 
+		[Authorize(Roles = "Admin")]
+		public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusDto dto)
+		{
+			var request = await _dbContext.DocumentRequests.FindAsync(id);
+			
+			if (request == null) 
+				return NotFound(new { message = $"Request with ID {id} not found." });
 
-            request.Status = dto.Status;
-            
-            if (dto.Status == "Approved") 
-                request.CompletedAt = DateTime.UtcNow;
+			request.Status = dto.Status;
+			
+			if (dto.Status == "Approved") 
+				request.CompletedAt = DateTime.UtcNow;
 
-            await _dbContext.SaveChangesAsync();
-            return Ok(new { message = "Status updated successfully" });
-        }
+			await _dbContext.SaveChangesAsync();
+			return Ok(new { message = "Status updated successfully" });
+		}
     }
 }

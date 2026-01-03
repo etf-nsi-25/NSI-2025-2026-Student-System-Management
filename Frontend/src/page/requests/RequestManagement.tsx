@@ -23,9 +23,10 @@ import type { StudentRequestDto } from './RequestTypes';
 import './RequestManagement.css';
 import { parseDate } from '../../utils/requestUtils';
 import StatusBadge from '../../component/StatusBadge';
-import { requestService } from '../../service/requestService'; 
+import { useAPI } from '../../context/services';
 
 export function RequestManagement() {
+    const api = useAPI()
     const [requests, setRequests] = useState<StudentRequestDto[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState<boolean>(false);
@@ -37,14 +38,14 @@ export function RequestManagement() {
     const fetchRequests = useCallback(async () => {
         setIsLoading(true);
         try {
-            const data = await requestService.getAllRequests();
+            const data = await api.getAllRequests();
             setRequests(data);
         } catch (err) {
             console.error('Error fetching requests:', err);
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [api]);
 
     useEffect(() => {
         fetchRequests();
@@ -70,7 +71,7 @@ export function RequestManagement() {
     ) => {
         setIsProcessing(true);
         try {
-            await requestService.updateStatus(requestId, newStatus);
+            await api.updateStatus(requestId, newStatus);
             
             setIsConfirmationModalOpen(false);
             await fetchRequests(); 
@@ -79,7 +80,7 @@ export function RequestManagement() {
         } finally {
             setIsProcessing(false);
         }
-    }, [fetchRequests]);
+    }, [api, fetchRequests]);
 
     const filteredRequests = useMemo(() => {
         const lowerCaseSearchTerm = searchTerm.toLowerCase().trim();
