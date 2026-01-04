@@ -1,18 +1,10 @@
 using Identity.API.Filters;
-using Identity.Application.Services;
-using Identity.Core.Interfaces.Repositories;
-using Identity.Core.Interfaces.Services;
-using Identity.Core.Repositories;
-using Identity.Core.Services;
 using Identity.Infrastructure.Db;
-using Identity.Infrastructure.Repositories;
-using Identity.Infrastructure.Services;
 using Identity.Infrastructure.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using Identity.Core.Configuration;
-using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,8 +15,6 @@ builder.Services.AddControllers(options =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
-
-builder.Services.AddIdentityModule(builder.Configuration);
 
 // Configure Swagger/OpenAPI with JWT support
 builder.Services.AddSwaggerGen(options =>
@@ -74,6 +64,8 @@ builder.Services.AddSwaggerGen(options =>
         options.IncludeXmlComments(xmlPath);
     }
 });
+
+builder.Services.AddIdentityModule(builder.Configuration);
 
 // Health Checks
 //builder.Services.AddHealthChecks()

@@ -31,14 +31,20 @@ namespace Identity.Infrastructure.DependencyInjection
             
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 
-            // Entity Framework
-            services.AddDbContext<AuthDbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString("Database"))
-            );
+            // Entity Framework - only add if not already configured (for tests)
+            if (!services.Any(d => d.ServiceType == typeof(DbContextOptions<AuthDbContext>)))
+            {
+                services.AddDbContext<AuthDbContext>(options =>
+                    options.UseNpgsql(configuration.GetConnectionString("Database")));
+            }
 
-            // Identity Framework
+            // Identity Framework - only add if not already configured (for tests)
+            if (!services.Any(d => d.ServiceType == typeof(IUserStore<ApplicationUser>)))
+            {
             services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<AuthDbContext>();
+                .AddEntityFrameworkStores<AuthDbContext>()
+                .AddDefaultTokenProviders();
+            }
 
             // Register services
             services.AddScoped<IUserService, UserService>();
@@ -53,6 +59,12 @@ namespace Identity.Infrastructure.DependencyInjection
 
             JwtSettings jwtSettings = new JwtSettings();
             configuration.Bind("JwtSettings", jwtSettings);
+
+            // Fallback for test environment if signing key is not provided
+            if (string.IsNullOrEmpty(jwtSettings.SigningKey))
+            {
+                jwtSettings.SigningKey = Convert.ToBase64String(new byte[32]);
+            }
 
             services.AddAuthentication(options =>
                 {
