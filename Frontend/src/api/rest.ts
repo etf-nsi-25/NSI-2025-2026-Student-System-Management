@@ -1,103 +1,105 @@
-import { API_BASE_URL } from '../constants/constants.ts';
 import type { AuthInfo } from '../init/auth.tsx';
-import { API } from './api.ts';
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 export type ErrorResponse = {
-  message: Promise<string>;
-  status: number;
+    message: Promise<string>;
+    status: number;
 };
 
 type APIResponse<T> = {
-  successResponse?: Promise<T>;
-  errorResponse?: ErrorResponse;
-  ok: boolean;
+    successResponse?: Promise<T>;
+    errorResponse?: ErrorResponse;
+    ok: boolean;
 };
 
 export class RestClient {
-  #baseUrl: string;
-  #authInfo: AuthInfo;
-  #authFailCallback: () => void;
+    #authInfo: AuthInfo;
+    #authFailCallback: () => Promise<AuthInfo | undefined>;
 
-  /**
-   * Instantiates a new {@link API} service.
-   *
-   * @param authInfo auth info necessary to construct auth headers
-   * @param authFailCallback in case of 401 or 403, allows us to attempt silent refresh of token
-   * @param baseUrl base URL for the API endpoints
-   */
-  constructor(authInfo: AuthInfo, authFailCallback: () => void, baseUrl: string) {
-    this.#baseUrl = baseUrl;
-    this.#authInfo = authInfo;
-    this.#authFailCallback = authFailCallback;
-  }
+    /**
+     * Instantiates a new {@link RestClient} service.
+     *
+     * @param authInfo auth info necessary to construct auth headers
+     * @param authFailCallback in case of 401 or 403, allows us to attempt silent refresh of token
+     */
+    constructor(authInfo: AuthInfo, authFailCallback: () => Promise<AuthInfo | undefined>) {
+        this.#authInfo = authInfo;
+        this.#authFailCallback = authFailCallback;
+    }
 
     async get<T>(url: string): Promise<T> {
         return this.#submitRequestWithFallback<T>(url, 'GET');
     }
-    
-    async post<T>(url: string, body?: any): Promise<T> {
+
+    async post<T>(url: string, body?: unknown): Promise<T> {
         return this.#submitRequestWithFallback<T>(url, 'POST', body);
     }
-    
-    async put<T>(url: string, body?: any): Promise<T> {
+
+    async put<T>(url: string, body?: unknown): Promise<T> {
         return this.#submitRequestWithFallback<T>(url, 'PUT', body);
     }
-    
+
     async delete<T>(url: string): Promise<T> {
         return this.#submitRequestWithFallback<T>(url, 'DELETE');
     }
-    
-    
 
-  async #submitRequestWithFallback<T>(
-    url: string,
-    method: Method,
-    body?: unknown
-  ): Promise<T> {
-    return this.#submitRequest<T>(url, method, body).then(
-      async (apiResponse) => {
-        if (apiResponse.ok) {
-          return apiResponse.successResponse!;
-        }
 
-        const errorResponse = await apiResponse.errorResponse!;
-        if (errorResponse.status === 401 || errorResponse.status === 403) {
-          // Attempt to fetch one more time after token refresh
-          this.#authFailCallback();
+    async #submitRequestWithFallback<T>(
+        url: string,
+        method: Method,
+        body?: unknown
+    ): Promise<T> {
+        return this.#submitRequest<T>(url, method, body).then(
+            async (apiResponse) => {
+                if (apiResponse.ok) {
+                    return apiResponse.successResponse!;
+                }
 
-          const result = await this.#submitRequest<T>(url, method, body);
+                const errorResponse = await apiResponse.errorResponse!;
+                if (errorResponse.status === 401) {
+                    // Attempt to fetch one more time after token refresh
+                    const newToken = await this.#authFailCallback();
+                    if (!newToken) {
+                        throw {
+                            message: errorResponse.message,
+                            status: errorResponse.status
+                        }
+                    }
 
-          if (!result.ok) {
-            throw {
-              message: await apiResponse.errorResponse?.message,
-              status: apiResponse.errorResponse?.status,
-            };
-          } else {
-            return result.successResponse!;
-          }
-        } else {
-          throw {
-            message: await apiResponse.errorResponse?.message,
-            status: apiResponse.errorResponse?.status,
-          };
-        }
-      }
-    );
-  }
+                    this.#authInfo = newToken;
+
+                    const result = await this.#submitRequest<T>(url, method, body);
+                    if (!result.ok) {
+                        throw {
+                            message: await apiResponse.errorResponse?.message,
+                            status: apiResponse.errorResponse?.status
+                        };
+                    } else {
+                        return result.successResponse!;
+                    }
+                } else {
+                    throw {
+                        message: await apiResponse.errorResponse?.message,
+                        status: apiResponse.errorResponse?.status
+                    };
+                }
+            }
+        );
+    }
 
     async #submitRequest<T>(url: string, method: Method, body?: unknown): Promise<APIResponse<T>> {
         return fetch(
-            this.#baseUrl + url,
+            url,
             {
                 method: method,
                 body: JSON.stringify(body),
                 headers: {
-                    'Authorization': `${ this.#authInfo.accessToken }`,
+                    'Authorization': `Bearer ${ this.#authInfo.accessToken }`,
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
-                }
+                },
+                credentials: 'include'
             }
         ).then(async response => {
             if (!response.ok) {
@@ -114,17 +116,3 @@ export class RestClient {
         })
     }
 }
-
-const authInfo: AuthInfo = {
-    accessToken: 'mock-token-123',
-    expiresOn: Date.now() + 3600 * 1000,
-    userId: '12345',
-    email: 'mock.user@example.com',
-    role: 'Admin',
-    tenantId: 'tenant-001',
-    fullName: 'Mock User',
-};
-
-const restClient = new RestClient(authInfo, () => {}, API_BASE_URL);
-
-export const api = new API(restClient);

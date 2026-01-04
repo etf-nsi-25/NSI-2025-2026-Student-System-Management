@@ -27,15 +27,16 @@ export function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const emailError = validateEmail(email);
     const passwordError = validatePassword(password);
+    
     if (emailError || passwordError) {
       setError(emailError ?? passwordError);
       return;
     }
 
     setError(null);
-    console.log("Login attempt:", { email, password });
 
     try {
 
@@ -52,7 +53,8 @@ export function Login() {
       // result.requires2FASetup)
 
       if (!authInfoData.email) {
-        navigate("/2fa/setup");
+        // TODO: maybe first implement the 2fa with non-dummy data before actually putting it here?
+        // navigate("/2fa/setup");
       } else {
         const dashboardRoute = getDashboardRoute(authInfoData.role);
         navigate(dashboardRoute);

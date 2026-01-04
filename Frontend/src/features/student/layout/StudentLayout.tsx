@@ -95,6 +95,12 @@ export function StudentLayout() {
                     <CNavItem>
                         <NavLink to="/student/enrollment" className="nav-link">
                             <CIcon customClassName="nav-icon" icon={cilEducation} />
+                            Course Enrollment
+                        </NavLink>
+                    </CNavItem>
+                    <CNavItem>
+                        <NavLink to="/student/student-enrollment" className="nav-link">
+                            <CIcon customClassName="nav-icon" icon={cilEducation} />
                             Enrollment
                         </NavLink>
                     </CNavItem>

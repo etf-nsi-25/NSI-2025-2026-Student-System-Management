@@ -3,7 +3,7 @@
 .student-portal-wrapper {
   display: flex;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: #c5d5e4;
 }
 
 .student-sidebar {

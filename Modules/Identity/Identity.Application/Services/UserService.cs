@@ -1,4 +1,6 @@
 using System.Runtime.CompilerServices;
+using EventBus.Core;
+using Identity.Application.Interfaces;
 using Identity.Core.Entities;
 using Identity.Core.Repositories;
 using Identity.Core.Events;
@@ -13,7 +15,7 @@ namespace Identity.Application.Services;
 internal class UserService(
     IUserRepository userRepository,
     IIdentityHasherService identityHasherService,
-    IEventPublisher eventPublisher) : IUserService
+    IEventBus eventBus) : IUserService
 {
     public async Task<Guid> CreateUserAsync(
        string username,
@@ -32,8 +34,10 @@ internal class UserService(
 
         if (await userRepository.IsUsernameTakenAsync(username))
         {
+            // TODO: this should check for email instead ?? Thats what we login with
             throw new ArgumentException($"Username '{username}' is already taken.", nameof(username));
         }
+
         var passwordHash = identityHasherService.HashPassword(password);
         var newUser = User.Create(
             username,
@@ -59,7 +63,8 @@ internal class UserService(
             newUser.IndexNumber
         );
 
-        await eventPublisher.PublishAsync(userCreatedEvent);
+        // TODO: this should not use this variant of dispatch, but for now this endpoint has no auth so we must.
+        await eventBus.Dispatch(userCreatedEvent, facultyId);
 
         return newUser.Id;
     }
@@ -131,7 +136,7 @@ internal class UserService(
         await userRepository.DeleteAsync(user);
         await userRepository.SaveAsync();
 
-        await eventPublisher.PublishAsync(new UserDeletedEvent(userId));
+        await eventBus.Dispatch(new UserDeletedEvent(userId));
 
         return true;
     }
@@ -171,7 +176,7 @@ internal class UserService(
         if (previousRole != user.Role)
         {
             var roleAssignedEvent = new UserRoleAssignedEvent(userId, previousRole, user.Role);
-            await eventPublisher.PublishAsync(roleAssignedEvent);
+            await eventBus.Dispatch(roleAssignedEvent);
         }
 
         return true;

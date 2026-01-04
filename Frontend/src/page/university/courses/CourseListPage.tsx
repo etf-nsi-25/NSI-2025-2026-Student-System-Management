@@ -17,10 +17,11 @@ import type { Course } from "../../../component/faculty/courses/types/Course";
 import CourseTable from "../../../component/faculty/courses/CourseTable";
 import CreateCourseModal from "../../../component/faculty/courses/CreateCourseModal";
 import EditCourseModal from "../../../component/faculty/courses/EditCourseModal";
-import { courseService } from "../../../service/courseService";
+import { useAPI } from "../../../context/services";
 import type { CourseDTO } from "../../../dto/CourseDTO";
 
 const CourseListPage = () => {
+  const api = useAPI();
   const [search, setSearch] = useState("");
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +35,7 @@ const CourseListPage = () => {
   const loadCourses = async () => {
     try {
       setLoading(true);
-      const data = await courseService.getAll();
+      const data = await api.getAllCourses();
       setCourses(data ?? []);
     } catch (err) {
       setError("Failed to load courses.");
@@ -49,13 +50,13 @@ const CourseListPage = () => {
   }, []);
 
   const handleCreate = async (dto: CourseDTO) => {
-    await courseService.create(dto);
+    await api.createCourse(dto);
     loadCourses();
   };
 
   const handleSaveEdit = async (id: string, dto: CourseDTO) => {
     try {
-      await courseService.update(id, dto);
+      await api.updateCourse(id, dto);
       loadCourses();
       setEditingCourse(null);
     } catch (err) {
@@ -72,7 +73,7 @@ const CourseListPage = () => {
   const handleDeleteConfirmed = async () => {
     if (!courseToDelete) return;
 
-    await courseService.delete(courseToDelete.id);
+    await api.deleteCourse(courseToDelete.id);
     setShowConfirmDelete(false);
     setCourseToDelete(null);
 

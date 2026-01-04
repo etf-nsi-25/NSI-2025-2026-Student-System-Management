@@ -1,4 +1,6 @@
+using Identity.Core.Entities;
 using Identity.Core.Services;
+using Identity.Infrastructure.Mappers;
 using Microsoft.AspNetCore.Identity;
 
 namespace Identity.Infrastructure.Services;
@@ -18,9 +20,9 @@ public class IdentityHasherService : IIdentityHasherService
         return _passwordHasher.HashPassword(new ApplicationUser(), password);
     }
 
-    public bool VerifyPassword(string password, string hashedPassword)
+    public bool VerifyPassword(User user, string password, string hashedPassword)
     {
-        var result = _passwordHasher.VerifyHashedPassword(new ApplicationUser(), hashedPassword, password);
+        var result = _passwordHasher.VerifyHashedPassword(user.ToInfrastructure(), hashedPassword, password);
         return result == PasswordVerificationResult.Success;
     }
 }

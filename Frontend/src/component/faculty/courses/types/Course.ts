@@ -5,4 +5,5 @@ export type Course = {
   type: string;      
   programId: string;
   ects: number;
+  professor: string
 };

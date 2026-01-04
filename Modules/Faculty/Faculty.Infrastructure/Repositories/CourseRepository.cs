@@ -1,73 +1,80 @@
 ﻿using Faculty.Core.Entities;
 using Faculty.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Faculty.Infrastructure.Db;
+using Faculty.Infrastructure.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace Faculty.Infrastructure.Repositories
 {
     public class CourseRepository : ICourseRepository
     {
-        private static readonly List<Course> _data = new()
-        {
-            new Course
-            {
-                Id = Guid.NewGuid(),
-                Name = "Algorithms",
-                Code = "CS101",
-                Type = CourseType.Mandatory,
-                ProgramId = "CS",
-                ECTS = 6
-            },
-            new Course
-            {
-                Id = Guid.NewGuid(),
-                Name = "Databases",
-                Code = "CS202",
-                Type = CourseType.Mandatory,
-                ProgramId = "CS",
-                ECTS = 5
-            }
-        };
+        private readonly FacultyDbContext _context;
+        private readonly ITenantService _tenantService;
 
-        public Task<Course> AddAsync(Course course)
+        public CourseRepository(FacultyDbContext context, ITenantService tenantService)
+        {
+            _context = context;
+            _tenantService = tenantService;
+        }
+
+        public async Task<Course> AddAsync(Course course)
         {
             course.Id = Guid.NewGuid();
-            _data.Add(course);
-            return Task.FromResult(course);
+            course.FacultyId = _tenantService.GetCurrentFacultyId();
+            course.CreatedAt = DateTime.UtcNow;
+
+            _context.Courses.Add(course);
+            await _context.SaveChangesAsync();
+            return course;
         }
 
         public Task<Course?> GetByIdAsync(Guid id)
-            => Task.FromResult(_data.FirstOrDefault(x => x.Id == id));
+            => Task.FromResult(_context.Courses.FirstOrDefault(x => x.Id == id));
 
         public Task<List<Course>> GetAllAsync()
-            => Task.FromResult(_data.ToList());
+            => Task.FromResult(_context.Courses.ToList());
 
-        public Task<Course?> UpdateAsync(Course course)
+        public async Task<List<Course>> GetByTeacherUserIdAsync(string userId)
         {
-            var existing = _data.FirstOrDefault(x => x.Id == course.Id);
+            var teacher = await _context.Teachers.FirstOrDefaultAsync(t => t.UserId == userId);
+            if (teacher == null)
+            {
+                return new List<Course>();
+            }
+
+            return await _context.CourseAssignments
+                .Where(ca => ca.TeacherId == teacher.Id)
+                .Select(ca => ca.Course)
+                .Distinct()
+                .ToListAsync();
+        }
+
+        public async Task<Course?> UpdateAsync(Course course)
+        {
+            var existing = _context.Courses.FirstOrDefault(x => x.Id == course.Id);
             if (existing == null)
-                return Task.FromResult<Course?>(null);
+                return null;
 
             existing.Name = course.Name;
             existing.Code = course.Code;
             existing.Type = course.Type;
             existing.ProgramId = course.ProgramId;
             existing.ECTS = course.ECTS;
+            existing.UpdatedAt = DateTime.UtcNow;
 
-            return Task.FromResult(existing);
+            await _context.SaveChangesAsync();
+            return existing;
         }
 
-        public Task<bool> DeleteAsync(Guid id)
+        public async Task<bool> DeleteAsync(Guid id)
         {
-            var existing = _data.FirstOrDefault(x => x.Id == id);
+            var existing = _context.Courses.FirstOrDefault(x => x.Id == id);
             if (existing == null)
-                return Task.FromResult(false);
+                return false;
 
-            _data.Remove(existing);
-            return Task.FromResult(true);
+            _context.Courses.Remove(existing);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }
