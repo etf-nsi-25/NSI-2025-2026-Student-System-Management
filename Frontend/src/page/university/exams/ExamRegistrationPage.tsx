@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CFormInput, CRow, CCol } from "@coreui/react";
 import { ExamCard } from "../../../component/exams/ExamCard";
-import { examService } from "../../../service/examService";
 import { ExamEmptyState } from "../../../component/exams/ExamEmptyState";
 import { useToast } from "../../../context/toast";
 import { extractApiErrorMessage } from "../../../utils/apiError";
+import { useAPI } from "../../../context/services";
+import type {
+  AvailableStudentExamDto,
+  RegisteredStudentExamDto,
+} from "../../../dto/StudentExamsDTO";
 
 const delay = (ms: number) =>
   new Promise(resolve => setTimeout(resolve, ms));
@@ -15,199 +19,85 @@ type ExamItem = {
   courseName: string;
   courseCode: string;
   examDate: string;
-  regDeadline: string;
-  location: string;
+  regDeadline?: string;
+  location?: string;
+  registrationDate?: string;
 };
 
-// MOCK – Available
-const mockAvailable: ExamItem[] = [
-  {
-    id: 1,
-    courseName: "Algorithms and Data Structures",
-    courseCode: "ADS101",
-    examDate: "2026-02-10T09:00:00Z",
-    regDeadline: "2025-02-06T23:59:00Z",
-    location: "Room 301 - ETF",
-  },
-  {
-    id: 999,
-    courseName: "MOCK: Already registered (4xx)",
-    courseCode: "MOCK400",
-    examDate: "2026-02-09T09:00:00Z",
-    regDeadline: "2026-02-08T23:59:00Z",
-    location: "Virtual",
-  },
-  {
-    id: 2,
-    courseName: "Computer Networks",
-    courseCode: "CN201",
-    examDate: "2026-02-12T11:00:00Z",
-    regDeadline: "2026-02-07T23:59:00Z",
-    location: "Lab 2 - ETF",
-  },
-  {
-    id: 3,
-    courseName: "Operating Systems",
-    courseCode: "OS150",
-    examDate: "2026-02-14T08:00:00Z",
-    regDeadline: "2026-02-09T23:59:00Z",
-    location: "Room 207 - ETF",
-  },
-  {
-    id: 4,
-    courseName: "Database Systems",
-    courseCode: "DB265",
-    examDate: "2026-02-18T12:00:00Z",
-    regDeadline: "2026-02-11T23:59:00Z",
-    location: "Room 105 - ETF",
-  },
-  {
-    id: 5,
-    courseName: "Software Engineering",
-    courseCode: "SE310",
-    examDate: "2026-02-20T10:00:00Z",
-    regDeadline: "2026-02-13T23:59:00Z",
-    location: "Room 220 - ETF",
-  },
-  {
-    id: 6,
-    courseName: "Machine Learning Basics",
-    courseCode: "ML101",
-    examDate: "2026-02-22T13:00:00Z",
-    regDeadline: "2026-02-16T23:59:00Z",
-    location: "Room 112 - ETF",
-  },
-  {
-    id: 7,
-    courseName: "Digital Logic Design",
-    courseCode: "DLD140",
-    examDate: "2026-02-25T09:00:00Z",
-    regDeadline: "2026-02-18T23:59:00Z",
-    location: "Room 108 - ETF",
-  },
-  {
-    id: 8,
-    courseName: "Discrete Mathematics",
-    courseCode: "DM120",
-    examDate: "2026-02-27T11:00:00Z",
-    regDeadline: "2026-02-21T23:59:00Z",
-    location: "Room 115 - ETF",
-  },
-];
+function mapAvailableExam(dto: AvailableStudentExamDto): ExamItem | null {
+  if (!dto.examDate || !dto.registrationDeadline) return null;
 
-// MOCK – Registered
-const mockRegistered: ExamItem[] = [
-  {
-    id: 101,
-    courseName: "Software Engineering",
-    courseCode: "SE310",
-    examDate: "2025-02-20T10:00:00Z",
-    regDeadline: "2025-02-13T23:59:00Z",
-    location: "Room 220 - ETF",
-  },
-  {
-    id: 102,
-    courseName: "Database Systems",
-    courseCode: "DB265",
-    examDate: "2025-02-18T12:00:00Z",
-    regDeadline: "2025-02-11T23:59:00Z",
-    location: "Room 105 - ETF",
-  },
-  {
-    id: 103,
-    courseName: "Computer Architecture",
-    courseCode: "CA210",
-    examDate: "2025-03-01T09:00:00Z",
-    regDeadline: "2025-02-23T23:59:00Z",
-    location: "Room 204 - ETF",
-  },
-  {
-    id: 104,
-    courseName: "Web Development",
-    courseCode: "WD150",
-    examDate: "2025-03-02T14:00:00Z",
-    regDeadline: "2025-02-24T23:59:00Z",
-    location: "Lab 3 - ETF",
-  },
-  {
-    id: 105,
-    courseName: "Advanced Algorithms",
-    courseCode: "AA330",
-    examDate: "2025-03-04T11:00:00Z",
-    regDeadline: "2025-02-26T23:59:00Z",
-    location: "Room 302 - ETF",
-  },
-  {
-    id: 106,
-    courseName: "Linear Algebra",
-    courseCode: "LA110",
-    examDate: "2025-03-05T09:00:00Z",
-    regDeadline: "2025-02-27T23:59:00Z",
-    location: "Room 101 - ETF",
-  },
-  {
-    id: 107,
-    courseName: "Numerical Methods",
-    courseCode: "NM250",
-    examDate: "2025-03-06T13:00:00Z",
-    regDeadline: "2025-02-28T23:59:00Z",
-    location: "Room 218 - ETF",
-  },
-  {
-    id: 108,
-    courseName: "Applied Statistics",
-    courseCode: "AS215",
-    examDate: "2025-03-07T12:00:00Z",
-    regDeadline: "2025-03-01T23:59:00Z",
-    location: "Room 107 - ETF",
-  },
-  {
-    id: 109,
-    courseName: "Object-Oriented Programming",
-    courseCode: "OOP200",
-    examDate: "2025-03-09T10:00:00Z",
-    regDeadline: "2025-03-02T23:59:00Z",
-    location: "Room 206 - ETF",
-  },
-  {
-    id: 110,
-    courseName: "Signals and Systems",
-    courseCode: "SS220",
-    examDate: "2025-03-11T11:00:00Z",
-    regDeadline: "2025-03-03T23:59:00Z",
-    location: "Room 210 - ETF",
-  },
-  {
-    id: 111,
-    courseName: "Data Mining",
-    courseCode: "DM450",
-    examDate: "2025-03-13T14:00:00Z",
-    regDeadline: "2025-03-05T23:59:00Z",
-    location: "Room 115 - ETF",
-  },
-  {
-    id: 112,
-    courseName: "Parallel Computing",
-    courseCode: "PC480",
-    examDate: "2025-03-15T09:00:00Z",
-    regDeadline: "2025-03-07T23:59:00Z",
-    location: "Room 303 - ETF",
-  },
-];
+  return {
+    id: dto.examId,
+    courseName: dto.courseName,
+    courseCode: dto.courseCode,
+    examDate: dto.examDate,
+    regDeadline: dto.registrationDeadline,
+  };
+}
+
+function mapRegisteredExam(dto: RegisteredStudentExamDto): ExamItem | null {
+  if (!dto.examDate) return null;
+
+  return {
+    id: dto.examId,
+    courseName: dto.courseName,
+    courseCode: dto.courseCode,
+    examDate: dto.examDate,
+    registrationDate: dto.registrationDate,
+  };
+}
 
 export default function ExamRegistrationPage() {
+  const api = useAPI();
   const { pushToast } = useToast();
   const [success, setSuccess] = useState<string | null>(null);
   const [tab, setTab] = useState<"available" | "registered">("available");
   const [search, setSearch] = useState("");
   const [loadingId, setLoadingId] = useState<number | null>(null);
-  const [available, setAvailable] = useState<ExamItem[]>(mockAvailable);
-  const [registered, setRegistered] = useState<ExamItem[]>(mockRegistered);
+  const [available, setAvailable] = useState<ExamItem[] | null>(null);
+  const [registered, setRegistered] = useState<ExamItem[] | null>(null);
+
+  const loadData = useCallback(async () => {
+    try {
+      const [availableDtos, registeredDtos] = await Promise.all([
+        api.getAvailableStudentExams(),
+        api.getRegisteredStudentExams(),
+      ]);
+
+      setAvailable(
+        availableDtos
+          .map(mapAvailableExam)
+          .filter((x): x is ExamItem => x !== null)
+      );
+
+      setRegistered(
+        registeredDtos
+          .map(mapRegisteredExam)
+          .filter((x): x is ExamItem => x !== null)
+      );
+    } catch (e: any) {
+      const status = e?.status as number | undefined;
+      if (!status || status >= 500) {
+        pushToast("error", "Something went wrong", "Please try again later.");
+      } else {
+        const msg = extractApiErrorMessage(e);
+        pushToast("error", "Failed to load exams", msg);
+      }
+
+      setAvailable([]);
+      setRegistered([]);
+    }
+  }, [api, pushToast]);
+
+  useEffect(() => {
+    void loadData();
+  }, [loadData]);
 
   const now = new Date();
 
   // AVAILABLE – search + filter future + sort
-  const availableFiltered = available
+  const availableFiltered = (available ?? [])
     .filter((exam) =>
       exam.courseName.toLowerCase().includes(search.toLowerCase())
     )
@@ -218,7 +108,7 @@ export default function ExamRegistrationPage() {
     );
 
   // REGISTERED – search + sort
-  const registeredFiltered = registered
+  const registeredFiltered = (registered ?? [])
     .filter((exam) =>
       exam.courseName.toLowerCase().includes(search.toLowerCase())
     )
@@ -232,25 +122,20 @@ export default function ExamRegistrationPage() {
       setLoadingId(id);
     
       try {
-        const exam = available.find(x => x.id === id);
+        const exam = (available ?? []).find(x => x.id === id);
         if (!exam) return;
     
-        if (new Date(exam.regDeadline) < new Date()) {
+        if (!exam.regDeadline || new Date(exam.regDeadline) < new Date()) {
           pushToast("error", "Cannot register", "Registration deadline has passed.");
           return;
         }
     
         await Promise.all([
-          examService.registerForExam(id),
+          api.registerForStudentExam(id),
           delay(600), // UX delay – loading must be visible
         ]);
-    
-        setRegistered(prev => [
-          ...prev,
-          { ...exam, registrationDate: new Date().toISOString() },
-        ]);
-    
-        setAvailable(prev => prev.filter(x => x.id !== id));
+
+        await loadData();
     
         setSuccess("Successfully registered for the exam.");
       } catch (e: any) {
@@ -266,41 +151,6 @@ export default function ExamRegistrationPage() {
       }
     };
     
-    const handleUnregister = async (id: number) => {
-      setSuccess(null);
-      setLoadingId(id);
-    
-      try {
-        const exam = registered.find(x => x.id === id);
-        if (!exam) return;
-    
-        await Promise.all([
-          examService.unregisterExam(id),
-          delay(600), // UX delay – loading must be visible
-        ]);
-    
-        // vraćamo u available SAMO ako deadline nije prošao
-        if (new Date(exam.regDeadline) > new Date()) {
-          setAvailable(prev => [...prev, exam]);
-        }
-    
-        setRegistered(prev => prev.filter(x => x.id !== id));
-    
-        setSuccess("Successfully unregistered from the exam.");
-      } catch (e: any) {
-        const status = e?.status as number | undefined;
-        if (!status || status >= 500) {
-          pushToast("error", "Something went wrong", "Please try again later.");
-        } else {
-          const msg = extractApiErrorMessage(e);
-          pushToast("error", "Unregister failed", msg);
-        }
-      } finally {
-        setLoadingId(null);
-      }
-    };
-    
-
 
   return (
     <div
@@ -363,7 +213,6 @@ export default function ExamRegistrationPage() {
             ) : (
               <>
                 These are exams you&apos;re registered for. Sorted by exam date.
-                You can unregister before the registration deadline.
               </>
             )}
           </div>
@@ -378,7 +227,7 @@ export default function ExamRegistrationPage() {
         {/* AVAILABLE TAB */}
         {tab === "available" && (
           <>
-            {availableFiltered.length === 0 ? (
+            {available !== null && availableFiltered.length === 0 ? (
               <ExamEmptyState
                 title="No available exams"
                 description="There are currently no exams you can register for."
@@ -403,7 +252,7 @@ export default function ExamRegistrationPage() {
         {/* REGISTERED TAB */}
         {tab === "registered" && (
           <>
-            {registeredFiltered.length === 0 ? (
+            {registered !== null && registeredFiltered.length === 0 ? (
               <ExamEmptyState
                 title="No registered exams"
                 description="You have not registered for any exams yet."
@@ -417,7 +266,6 @@ export default function ExamRegistrationPage() {
                       exam={exam}
                       isRegistered
                       loading={loadingId === exam.id}
-                      onUnregister={handleUnregister}
                     />
                   </CCol>
                 ))}

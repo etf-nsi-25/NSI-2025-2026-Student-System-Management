@@ -3,8 +3,9 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 
 const pushToastMock = vi.hoisted(() => vi.fn());
 
-const registerForExamMock = vi.hoisted(() => vi.fn());
-const unregisterExamMock = vi.hoisted(() => vi.fn());
+const getAvailableStudentExamsMock = vi.hoisted(() => vi.fn());
+const getRegisteredStudentExamsMock = vi.hoisted(() => vi.fn());
+const registerForStudentExamMock = vi.hoisted(() => vi.fn());
 
 vi.mock("../../../context/toast", () => ({
   useToast: () => ({
@@ -12,13 +13,12 @@ vi.mock("../../../context/toast", () => ({
   }),
 }));
 
-vi.mock("../../../service/examService", () => ({
-  examService: {
-    getEligibleExams: vi.fn(),
-    getRegisteredExams: vi.fn(),
-    registerForExam: registerForExamMock,
-    unregisterExam: unregisterExamMock,
-  },
+vi.mock("../../../context/services", () => ({
+  useAPI: () => ({
+    getAvailableStudentExams: getAvailableStudentExamsMock,
+    getRegisteredStudentExams: getRegisteredStudentExamsMock,
+    registerForStudentExam: registerForStudentExamMock,
+  }),
 }));
 
 import ExamRegistrationPage from "./ExamRegistrationPage";
@@ -45,15 +45,100 @@ describe("ExamRegistrationPage", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     pushToastMock.mockReset();
-    registerForExamMock.mockReset();
-    unregisterExamMock.mockReset();
+    getAvailableStudentExamsMock.mockReset();
+    getRegisteredStudentExamsMock.mockReset();
+    registerForStudentExamMock.mockReset();
+
+    // Default in-memory API behavior (per-test)
+    let available: any[] = [
+      {
+        examId: 1,
+        courseId: "00000000-0000-0000-0000-000000000001",
+        courseName: "Algorithms and Data Structures",
+        courseCode: "ADS101",
+        examName: "Algorithms and Data Structures",
+        examDate: "2026-02-10T09:00:00Z",
+        registrationDeadline: "2026-02-06T23:59:00Z",
+      },
+      {
+        examId: 999,
+        courseId: "00000000-0000-0000-0000-000000000999",
+        courseName: "MOCK: Already registered (4xx)",
+        courseCode: "MOCK400",
+        examName: "MOCK: Already registered (4xx)",
+        examDate: "2026-02-09T09:00:00Z",
+        registrationDeadline: "2026-02-08T23:59:00Z",
+      },
+      {
+        examId: 2,
+        courseId: "00000000-0000-0000-0000-000000000002",
+        courseName: "Computer Networks",
+        courseCode: "CN201",
+        examName: "Computer Networks",
+        examDate: "2026-02-12T11:00:00Z",
+        registrationDeadline: "2026-02-07T23:59:00Z",
+      },
+      {
+        examId: 3,
+        courseId: "00000000-0000-0000-0000-000000000003",
+        courseName: "Operating Systems",
+        courseCode: "OS150",
+        examName: "Operating Systems",
+        examDate: "2026-02-14T08:00:00Z",
+        registrationDeadline: "2026-02-09T23:59:00Z",
+      },
+    ];
+
+    let registered: any[] = [
+      {
+        registrationId: 101,
+        examId: 105,
+        courseId: "00000000-0000-0000-0000-000000000105",
+        courseName: "Software Engineering",
+        courseCode: "SE310",
+        examName: "Software Engineering",
+        examDate: "2025-02-20T10:00:00Z",
+        registrationDeadline: "2025-02-13T23:59:00Z",
+        registrationDate: "2025-01-01T10:00:00Z",
+        status: "Registered",
+      },
+    ];
+
+    getAvailableStudentExamsMock.mockImplementation(async () => available);
+    getRegisteredStudentExamsMock.mockImplementation(async () => registered);
+
+    registerForStudentExamMock.mockImplementation(async (examId: number) => {
+      const found = available.find((x) => x.examId === examId);
+      if (found) {
+        available = available.filter((x) => x.examId !== examId);
+        registered = [
+          ...registered,
+          {
+            registrationId: 9999,
+            examId: found.examId,
+            courseId: found.courseId,
+            courseName: found.courseName,
+            courseCode: found.courseCode,
+            examName: found.examName,
+            examDate: found.examDate,
+            registrationDeadline: found.registrationDeadline,
+            registrationDate: new Date().toISOString(),
+            status: "Registered",
+          },
+        ];
+      }
+
+      return { registrationId: 9999, message: "OK" };
+    });
   });
 
-  it("renders only upcoming eligible exams (filters out past exam dates)", () => {
+  it("renders only upcoming eligible exams (filters out past exam dates)", async () => {
     // Make the first mock (2026-02-10) be in the past, while others remain upcoming.
     vi.setSystemTime(new Date("2026-02-11T00:00:00Z"));
 
     render(<ExamRegistrationPage />);
+
+    await flushAll();
 
     expect(screen.getByText(/Exam Registration/i)).toBeInTheDocument();
 
@@ -68,9 +153,9 @@ describe("ExamRegistrationPage", () => {
 
   it("registers successfully and moves exam from available to registered", async () => {
     vi.setSystemTime(new Date("2025-12-22T10:00:00Z"));
-    registerForExamMock.mockResolvedValueOnce(undefined);
-
     render(<ExamRegistrationPage />);
+
+    await flushAll();
 
     const card = getCardRootByTitle("Computer Networks");
     const registerButton = within(card).getByRole("button", { name: /register/i });
@@ -89,8 +174,8 @@ describe("ExamRegistrationPage", () => {
     fireEvent.click(screen.getByRole("button", { name: /Registered Exams/i }));
     expect(screen.getByText("Computer Networks")).toBeInTheDocument();
 
-    expect(registerForExamMock).toHaveBeenCalledTimes(1);
-    expect(registerForExamMock).toHaveBeenCalledWith(2);
+    expect(registerForStudentExamMock).toHaveBeenCalledTimes(1);
+    expect(registerForStudentExamMock).toHaveBeenCalledWith(2);
   });
 
   it("shows a user-facing error toast for 4xx registration errors", async () => {
@@ -98,9 +183,11 @@ describe("ExamRegistrationPage", () => {
 
     const err: any = new Error("Already registered");
     err.status = 400;
-    registerForExamMock.mockRejectedValueOnce(err);
+    registerForStudentExamMock.mockRejectedValueOnce(err);
 
     render(<ExamRegistrationPage />);
+
+    await flushAll();
 
     const card = getCardRootByTitle("MOCK: Already registered (4xx)");
     const registerButton = within(card).getByRole("button", { name: /register/i });
@@ -115,7 +202,7 @@ describe("ExamRegistrationPage", () => {
       "Already registered"
     );
 
-    expect(registerForExamMock).toHaveBeenCalledWith(999);
+    expect(registerForStudentExamMock).toHaveBeenCalledWith(999);
   });
 
   it("shows a generic toast for server/network failures", async () => {
@@ -123,9 +210,11 @@ describe("ExamRegistrationPage", () => {
 
     const err: any = new Error("Server down");
     err.status = 500;
-    registerForExamMock.mockRejectedValueOnce(err);
+    registerForStudentExamMock.mockRejectedValueOnce(err);
 
     render(<ExamRegistrationPage />);
+
+    await flushAll();
 
     const card = getCardRootByTitle("Computer Networks");
     const registerButton = within(card).getByRole("button", { name: /register/i });
@@ -141,10 +230,12 @@ describe("ExamRegistrationPage", () => {
     );
   });
 
-  it("filters available exams by search text", () => {
+  it("filters available exams by search text", async () => {
     vi.setSystemTime(new Date("2025-12-22T10:00:00Z"));
 
     render(<ExamRegistrationPage />);
+
+    await flushAll();
 
     const input = screen.getByPlaceholderText(/Search for a course\.{3}/i);
     fireEvent.change(input, { target: { value: "networks" } });
@@ -153,11 +244,13 @@ describe("ExamRegistrationPage", () => {
     expect(screen.queryByText("Operating Systems")).not.toBeInTheDocument();
   });
 
-  it("shows empty state when no available exams exist", () => {
+  it("shows empty state when no available exams exist", async () => {
     // Move time far in the future so all mock exam dates are in the past.
     vi.setSystemTime(new Date("2027-01-01T00:00:00Z"));
 
     render(<ExamRegistrationPage />);
+
+    await flushAll();
 
     expect(screen.getByText(/No available exams/i)).toBeInTheDocument();
     expect(
@@ -168,9 +261,11 @@ describe("ExamRegistrationPage", () => {
   it("shows a validation toast if deadline passes after render but before click", async () => {
     // Render while deadline is still in the future (button enabled), then advance time.
     vi.setSystemTime(new Date("2026-02-07T00:00:00Z"));
-    registerForExamMock.mockResolvedValueOnce(undefined);
+    registerForStudentExamMock.mockResolvedValueOnce(undefined);
 
     render(<ExamRegistrationPage />);
+
+    await flushAll();
 
     // Advance past Computer Networks deadline: 2026-02-07T23:59:00Z
     vi.setSystemTime(new Date("2026-02-08T10:00:00Z"));
@@ -188,54 +283,7 @@ describe("ExamRegistrationPage", () => {
     );
 
     // Should not call API when deadline has passed.
-    expect(registerForExamMock).not.toHaveBeenCalled();
+    expect(registerForStudentExamMock).not.toHaveBeenCalled();
   });
 
-  it("unregisters successfully and (if before deadline) moves exam back to available", async () => {
-    // Before deadlines in mockRegistered (Feb 2025), so it will be re-added to available.
-    vi.setSystemTime(new Date("2025-01-10T10:00:00Z"));
-    unregisterExamMock.mockResolvedValueOnce(undefined);
-
-    render(<ExamRegistrationPage />);
-
-    // Go to registered tab.
-    fireEvent.click(screen.getByRole("button", { name: /Registered Exams/i }));
-
-    const card = getCardRootByTitle("Software Engineering");
-    const unregisterButton = within(card).getByRole("button", { name: /unregister/i });
-
-    fireEvent.click(unregisterButton);
-    await flushAll();
-
-    expect(screen.getByText(/Successfully unregistered from the exam\./i)).toBeInTheDocument();
-    expect(unregisterExamMock).toHaveBeenCalledWith(101);
-
-    // Now verify it appears back in Available tab.
-    fireEvent.click(screen.getByRole("button", { name: /Available Exams/i }));
-    expect(screen.getAllByText("Software Engineering")[0]).toBeInTheDocument();
-  });
-
-  it("shows a user-facing error toast for 4xx unregister errors", async () => {
-    vi.setSystemTime(new Date("2025-01-10T10:00:00Z"));
-
-    const err: any = new Error("Cannot unregister");
-    err.status = 400;
-    unregisterExamMock.mockRejectedValueOnce(err);
-
-    render(<ExamRegistrationPage />);
-
-    fireEvent.click(screen.getByRole("button", { name: /Registered Exams/i }));
-
-    const card = getCardRootByTitle("Software Engineering");
-    const unregisterButton = within(card).getByRole("button", { name: /unregister/i });
-
-    fireEvent.click(unregisterButton);
-    await flushAll();
-
-    expect(pushToastMock).toHaveBeenCalledWith(
-      "error",
-      "Unregister failed",
-      "Cannot unregister"
-    );
-  });
 });

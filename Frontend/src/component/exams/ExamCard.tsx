@@ -15,14 +15,13 @@ type ExamCardProps = {
     courseName: string;
     courseCode: string;
     examDate: string;
-    regDeadline: string;
-    location: string;
+    regDeadline?: string;
+    location?: string;
     registrationDate?: string;
   };
   isRegistered?: boolean;
   loading?: boolean;
   onRegister?: (id: number) => void;
-  onUnregister?: (id: number) => void;
 };
 
 export function ExamCard({
@@ -30,28 +29,23 @@ export function ExamCard({
   isRegistered = false,
   loading = false,
   onRegister,
-  onUnregister,
 }: ExamCardProps) {
   const examDate = formatDateTime(exam.examDate);
-  const regDeadline = formatDateOnly(exam.regDeadline);
-  const deadlinePassed = new Date(exam.regDeadline) < new Date();
+  const regDeadlineText = exam.regDeadline
+    ? formatDateOnly(exam.regDeadline)
+    : null;
+  const deadlinePassed = exam.regDeadline
+    ? new Date(exam.regDeadline) < new Date()
+    : false;
 
   const handleClick = () => {
     if (loading) return;
-    if (isRegistered && onUnregister) {
-      onUnregister(exam.id);
-    } else if (!isRegistered && onRegister) {
+    if (!isRegistered && onRegister) {
       onRegister(exam.id);
     }
   };
 
-  const buttonLabel = loading
-    ? isRegistered
-      ? "Unregistering..."
-      : "Registering..."
-    : isRegistered
-      ? "Unregister"
-      : "Register";
+  const buttonLabel = loading ? "Registering..." : "Register";
 
   return (
     <CCard
@@ -82,9 +76,11 @@ export function ExamCard({
               <CIcon icon={cilLibrary} size="sm" /> {exam.courseCode}
             </CBadge>
 
-            <CBadge className="ui-badge ui-badge-soft d-flex align-items-center gap-1">
-              <CIcon icon={cilLocationPin} size="sm" /> {exam.location}
-            </CBadge>
+            {exam.location ? (
+              <CBadge className="ui-badge ui-badge-soft d-flex align-items-center gap-1">
+                <CIcon icon={cilLocationPin} size="sm" /> {exam.location}
+              </CBadge>
+            ) : null}
           </div>
 
           {isRegistered && (
@@ -115,10 +111,12 @@ export function ExamCard({
             <span>{examDate}</span>
           </div>
 
-          <div className="ui-info-pill">
-            <CIcon icon={cilAlarm} size="sm" className="ui-info-icon" />
-            <span>Deadline: {regDeadline}</span>
-          </div>
+          {regDeadlineText ? (
+            <div className="ui-info-pill">
+              <CIcon icon={cilAlarm} size="sm" className="ui-info-icon" />
+              <span>Deadline: {regDeadlineText}</span>
+            </div>
+          ) : null}
         </div>
 
         {/* ACTION ROW */}
@@ -126,35 +124,37 @@ export function ExamCard({
           className="d-flex justify-content-between align-items-center"
           style={{ marginTop: 16 }}
         >
-          <CButton
-            className="ui-button-cta"
-            style={{
-              minWidth: 120,
-              padding: "10px 18px",
-              fontSize: 13,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-            }}
-            disabled={loading || (!isRegistered && deadlinePassed)}
-            onClick={handleClick}
-          >
-            {loading ? (
-              <>
-                <CSpinner size="sm" />
-                <span>
-                  {isRegistered ? "Unregistering" : "Registering"}
-                </span>
-              </>
-            ) : (
-              buttonLabel.toUpperCase()
-            )}
-          </CButton>
+          {!isRegistered ? (
+            <>
+              <CButton
+                className="ui-button-cta"
+                style={{
+                  minWidth: 120,
+                  padding: "10px 18px",
+                  fontSize: 13,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                }}
+                disabled={loading || deadlinePassed}
+                onClick={handleClick}
+              >
+                {loading ? (
+                  <>
+                    <CSpinner size="sm" />
+                    <span>Registering</span>
+                  </>
+                ) : (
+                  buttonLabel.toUpperCase()
+                )}
+              </CButton>
 
-          {!isRegistered && deadlinePassed && (
-            <span className="ui-validation-text">Registration deadline has passed.</span>
-          )}
+              {deadlinePassed && (
+                <span className="ui-validation-text">Registration deadline has passed.</span>
+              )}
+            </>
+          ) : null}
 
 
           {exam.registrationDate && (
