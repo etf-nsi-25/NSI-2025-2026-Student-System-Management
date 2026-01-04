@@ -65,7 +65,7 @@ public class JwtTokenService : IJwtTokenService
         return Convert.ToBase64String(randomBytes);
     }
 
-    public RefreshToken CreateRefreshToken(Guid userId, string ipAddress, string userAgent)
+    public RefreshToken CreateRefreshToken(Guid userId)
     {
         return new RefreshToken
         {
@@ -74,8 +74,6 @@ public class JwtTokenService : IJwtTokenService
             UserId = userId,
             ExpiresAt = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationDays),
             CreatedAt = DateTime.UtcNow,
-            IpAddress = ipAddress,
-            UserAgent = userAgent,
             IsRevoked = false
         };
     }

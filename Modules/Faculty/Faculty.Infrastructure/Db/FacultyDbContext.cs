@@ -1,4 +1,6 @@
 ﻿using Faculty.Core.Entities;
+using Faculty.Core.Enums;
+using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,20 +12,14 @@ namespace Faculty.Infrastructure.Db;
 public class FacultyDbContext : DbContext
 {
     private readonly ITenantService _tenantService;
-    private readonly Guid _currentFacultyId;
 
     public FacultyDbContext(DbContextOptions<FacultyDbContext> options, ITenantService tenantService)
         : base(options)
     {
         _tenantService = tenantService ?? throw new ArgumentNullException(nameof(tenantService));
-        _currentFacultyId = _tenantService.GetCurrentFacultyId();
     }
 
-	/// <summary>
-	/// Gets the current Faculty ID that was resolved during context instantiation.
-	/// This value is used in query filters and can be properly translated to SQL.
-	/// </summary>
-	private Guid CurrentFacultyId => _currentFacultyId;
+    private Guid CurrentFacultyId => _tenantService.GetCurrentFacultyId();
 
     // DbSets
     public DbSet<Teacher> Teachers { get; set; } = null!;
@@ -37,6 +33,18 @@ public class FacultyDbContext : DbContext
     public DbSet<ExamRegistration> ExamRegistrations { get; set; } = null!;
     public DbSet<StudentExamGrade> StudentExamGrades { get; set; } = null!;
     public DbSet<Attendance> Attendances { get; set; } = null!;
+
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        ApplyTenantInformation();
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    {
+        ApplyTenantInformation();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -57,6 +65,17 @@ public class FacultyDbContext : DbContext
         ConfigureExamRegistration(modelBuilder);
         ConfigureStudentExamGrade(modelBuilder);
         ConfigureAttendance(modelBuilder);
+    }
+
+    private void ApplyTenantInformation()
+    {
+        foreach (var entry in ChangeTracker.Entries<ITenantAware>())
+        {
+            if (entry.State == EntityState.Added && entry.Entity.FacultyId == Guid.Empty)
+            {
+                entry.Entity.FacultyId = CurrentFacultyId;
+            }
+        }
     }
 
     private void ConfigureTeacher(ModelBuilder modelBuilder)
@@ -292,6 +311,11 @@ public class FacultyDbContext : DbContext
             entity.Property(e => e.FacultyId).IsRequired();
             entity.Property(e => e.CourseId).IsRequired();
             entity.Property(e => e.Name).HasMaxLength(200);
+            entity.Property(e => e.Location).HasMaxLength(200);
+            entity.Property(e => e.ExamType)
+                .IsRequired()
+                .HasConversion<string>()
+                .HasMaxLength(50);
             entity.Property(e => e.ExamDate);
             entity.Property(e => e.RegDeadline);
             entity.Property(e => e.CreatedAt).IsRequired();
@@ -341,7 +365,7 @@ public class FacultyDbContext : DbContext
             entity.HasOne(e => e.Exam)
                 .WithMany(ex => ex.ExamRegistrations)
                 .HasForeignKey(e => e.ExamId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Indexes
             entity.HasIndex(e => e.FacultyId);
@@ -379,7 +403,7 @@ public class FacultyDbContext : DbContext
             entity.HasOne(e => e.Exam)
                 .WithMany(ex => ex.StudentExamGrades)
                 .HasForeignKey(e => e.ExamId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Indexes
             entity.HasIndex(e => e.FacultyId);

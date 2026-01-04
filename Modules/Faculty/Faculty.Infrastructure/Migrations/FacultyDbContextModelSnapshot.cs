@@ -252,8 +252,17 @@ namespace Faculty.Infrastructure.Migrations
                     b.Property<DateTime?>("ExamDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("ExamType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<Guid>("FacultyId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("Name")
                         .HasMaxLength(200)
@@ -597,7 +606,7 @@ namespace Faculty.Infrastructure.Migrations
                     b.HasOne("Faculty.Core.Entities.Exam", "Exam")
                         .WithMany("ExamRegistrations")
                         .HasForeignKey("ExamId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Faculty.Core.Entities.Student", "Student")
@@ -635,7 +644,7 @@ namespace Faculty.Infrastructure.Migrations
                     b.HasOne("Faculty.Core.Entities.Exam", "Exam")
                         .WithMany("StudentExamGrades")
                         .HasForeignKey("ExamId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Faculty.Core.Entities.Student", "Student")
