@@ -35,14 +35,10 @@ public class AuthController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-            var userAgent = HttpContext.Request.Headers["User-Agent"].ToString() ?? "unknown";
 
             var result = await _authService.AuthenticateAsync(
                 request.Email,
-                request.Password,
-                ipAddress,
-                userAgent);
+                request.Password);
 
             // Set HTTP-only cookie for refresh token
             HttpContext.Response.Cookies.Append(
@@ -67,7 +63,7 @@ public class AuthController : ControllerBase
         catch (UnauthorizedAccessException ex)
         {
             _logger.LogWarning(ex, "Login failed for email: {Email}", request.Email);
-            return Unauthorized(new { message = "Invalid email or password" });
+            return Unauthorized(new { message = ex.Message });
         }
         catch (Exception ex)
         {
@@ -90,13 +86,8 @@ public class AuthController : ControllerBase
                 return BadRequest(new { message = "Refresh token is required" });
             }
 
-            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-            var userAgent = HttpContext.Request.Headers["User-Agent"].ToString() ?? "unknown";
-
             var result = await _authService.RefreshAuthenticationAsync(
-                refreshToken,
-                ipAddress,
-                userAgent);
+                refreshToken);
 
             // Set HTTP-only cookie for new refresh token
             HttpContext.Response.Cookies.Append(
