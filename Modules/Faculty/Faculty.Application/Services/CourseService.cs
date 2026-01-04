@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Faculty.Core.Interfaces.Faculty.Core.Interfaces;
+
 
 namespace Faculty.Application.Services
 {
@@ -59,6 +59,12 @@ namespace Faculty.Application.Services
         public async Task<List<CourseDTO>> GetAllAsync()
         {
             var list = await _repo.GetAllAsync();
+            return list.Select(ToDto).ToList();
+        }
+
+        public async Task<List<CourseDTO>> GetByTeacherAsync(string userId)
+        {
+            var list = await _repo.GetByTeacherUserIdAsync(userId);
             return list.Select(ToDto).ToList();
         }
 

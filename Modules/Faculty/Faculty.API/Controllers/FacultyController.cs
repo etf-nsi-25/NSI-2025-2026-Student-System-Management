@@ -1,4 +1,5 @@
 ﻿using Faculty.Application.DTOs;
+using Microsoft.AspNetCore.Mvc;
 using Faculty.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ namespace Faculty.API.Controllers
 {
     [ApiController]
     [Route("api/faculty/courses")]
+    [Authorize]
     public class FacultyController : ControllerBase
     {
         private readonly ICourseService _service;
@@ -17,10 +19,35 @@ namespace Faculty.API.Controllers
             _service = service;
         }
 
+        private string GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst("userId");
+            if (userIdClaim == null || string.IsNullOrWhiteSpace(userIdClaim.Value))
+            {
+                throw new UnauthorizedAccessException("UserId claim not found in token.");
+            }
+
+            return userIdClaim.Value;
+        }
+
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> GetAll()
             => Ok(await _service.GetAllAsync());
+
+        [HttpGet("assigned")]
+        public async Task<IActionResult> GetAssignedToTeacher()
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var result = await _service.GetByTeacherAsync(userId);
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { error = ex.Message });
+            }
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
@@ -28,6 +55,7 @@ namespace Faculty.API.Controllers
             var result = await _service.GetByIdAsync(id);
             return result == null ? NotFound() : Ok(result);
         }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CourseDTO dto)
         {
