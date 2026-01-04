@@ -2,11 +2,6 @@
 using Faculty.Core.Entities;
 using Faculty.Application.Interfaces;
 using Faculty.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 
 namespace Faculty.Application.Services
@@ -35,7 +30,7 @@ namespace Faculty.Application.Services
             Id = dto.Id,
             Name = dto.Name,
             Code = dto.Code,
-            Type = Enum.Parse<CourseType>(dto.Type,true),
+            Type = Enum.Parse<CourseType>(dto.Type, true),
             ProgramId = dto.ProgramId,
             ECTS = dto.ECTS
         };
@@ -56,6 +51,12 @@ namespace Faculty.Application.Services
         public async Task<List<CourseDTO>> GetAllAsync()
         {
             var list = await _repo.GetAllAsync();
+            return list.Select(ToDto).ToList();
+        }
+
+        public async Task<List<CourseDTO>> GetByTeacherAsync(string userId)
+        {
+            var list = await _repo.GetByTeacherUserIdAsync(userId);
             return list.Select(ToDto).ToList();
         }
 

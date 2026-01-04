@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import logoImage from "../../assets/logo-unsa-sms.png";
 import { Link, useLocation, Outlet } from "react-router-dom";
+import { useAuthContext } from "../../init/auth";
+import { isTeacher } from "../../constants/roles";
 
 const AppLayout = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile only
   const location = useLocation();
+  const { authInfo } = useAuthContext();
 
   const handleLinkClick = () => {
     if (isMobile) {
@@ -160,6 +163,13 @@ const AppLayout = () => {
           <Link to="/help" style={getLinkStyle("/help")} onClick={handleLinkClick}>
             {(!isCollapsed || isMobile) && "Help"}
           </Link>
+
+          {authInfo && isTeacher(authInfo.role) && (
+            <Link to="/attendance" style={getLinkStyle("/attendance")} onClick={handleLinkClick}>
+              {(!isCollapsed || isMobile) && "Attendance"}
+            </Link>
+          )}
+
         </div>
 
         {/* CONTENT */}
