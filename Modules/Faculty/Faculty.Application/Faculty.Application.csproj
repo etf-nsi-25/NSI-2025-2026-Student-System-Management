@@ -1,5 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Identity\Identity.Core\Identity.Core.csproj" />
+    <ProjectReference Include="..\Faculty.Core\Faculty.Core.csproj" />
+  </ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\Common\Common.Core\Common.Core.csproj" />
 		<ProjectReference Include="..\..\Common\Common.Application\Common.Application.csproj" />
@@ -7,7 +15,7 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediatR" Version="12.2.0" />
+    <PackageReference Include="MediatR" Version="13.1.0" />
   </ItemGroup>
 
   <PropertyGroup>

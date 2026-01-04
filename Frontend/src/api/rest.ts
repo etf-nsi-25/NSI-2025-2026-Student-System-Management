@@ -1,5 +1,4 @@
 import type { AuthInfo } from '../init/auth.tsx';
-import { API } from './api.ts';
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
@@ -19,7 +18,7 @@ export class RestClient {
     #authFailCallback: () => Promise<AuthInfo | undefined>;
 
     /**
-     * Instantiates a new {@link API} service.
+     * Instantiates a new {@link RestClient} service.
      *
      * @param authInfo auth info necessary to construct auth headers
      * @param authFailCallback in case of 401 or 403, allows us to attempt silent refresh of token
@@ -33,11 +32,11 @@ export class RestClient {
         return this.#submitRequestWithFallback<T>(url, 'GET');
     }
 
-    async post<T>(url: string, body?: any): Promise<T> {
+    async post<T>(url: string, body?: unknown): Promise<T> {
         return this.#submitRequestWithFallback<T>(url, 'POST', body);
     }
 
-    async put<T>(url: string, body?: any): Promise<T> {
+    async put<T>(url: string, body?: unknown): Promise<T> {
         return this.#submitRequestWithFallback<T>(url, 'PUT', body);
     }
 
@@ -62,7 +61,6 @@ export class RestClient {
                     // Attempt to fetch one more time after token refresh
                     const newToken = await this.#authFailCallback();
                     if (!newToken) {
-                        // TODO: this could have problems in high concurrency. Implement aborting in-flight requests if needed.
                         throw {
                             message: errorResponse.message,
                             status: errorResponse.status

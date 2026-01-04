@@ -86,6 +86,10 @@ namespace Faculty.Infrastructure.Migrations
                     b.Property<DateTime>("LectureDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<string>("Status")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");

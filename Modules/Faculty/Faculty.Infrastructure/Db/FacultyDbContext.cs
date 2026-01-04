@@ -11,20 +11,14 @@ namespace Faculty.Infrastructure.Db;
 public class FacultyDbContext : DbContext
 {
     private readonly ITenantService _tenantService;
-    private readonly Guid _currentFacultyId;
 
     public FacultyDbContext(DbContextOptions<FacultyDbContext> options, ITenantService tenantService)
         : base(options)
     {
         _tenantService = tenantService ?? throw new ArgumentNullException(nameof(tenantService));
-        _currentFacultyId = _tenantService.GetCurrentFacultyId();
     }
 
-	/// <summary>
-	/// Gets the current Faculty ID that was resolved during context instantiation.
-	/// This value is used in query filters and can be properly translated to SQL.
-	/// </summary>
-	private Guid CurrentFacultyId => _currentFacultyId;
+    private Guid CurrentFacultyId => _tenantService.GetCurrentFacultyId();
 
     // DbSets
     public DbSet<Teacher> Teachers { get; set; } = null!;
@@ -423,6 +417,7 @@ public class FacultyDbContext : DbContext
             entity.Property(e => e.CourseId).IsRequired();
             entity.Property(e => e.LectureDate).IsRequired();
             entity.Property(e => e.Status).HasMaxLength(50);
+            entity.Property(e => e.Note).HasMaxLength(500);
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.UpdatedAt);
 

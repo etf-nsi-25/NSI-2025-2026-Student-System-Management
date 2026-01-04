@@ -11,6 +11,7 @@ import TenantManagementPage from '../page/tenant-management/TenantManagementPage
 import StudentSupportPage from '../page/student-support/StudentSupportPage.tsx';
 import SettingsPage from '../page/settings/SettingsPage.tsx';
 import HelpPage from '../page/help/HelpPage.tsx';
+import AttendancePage from '../page/attendance/AttendancePage.tsx';
 
 //////////// VERSION FROM master ////////////
 import CourseListPage from '../page/university/courses/CourseListPage';
@@ -58,8 +59,8 @@ export function Router(): React.ReactNode {
         <Route path="request-management" element={<RequestManagement />} />
         <Route path="enrollment" element={<EnrollmentPage />} />
         <Route path="profile-settings" element={<ProfileSettings />} />
-        <Route path="support" element={<StudentSupport />} />
-        <Route path="student-enrollment" element={<EnrollmentStudentPage />} />  
+        <Route path="support" element={<StudentSupportPage />} />
+        <Route path="student-enrollment" element={<EnrollmentStudentPage />} />
         <Route index element={<StudentDashboardPage />} />
       </Route>
 
@@ -78,16 +79,17 @@ export function Router(): React.ReactNode {
       <Route path="/student-support" element={<AppLayout><StudentSupportPage /></AppLayout>} />
       <Route path="/settings" element={<AppLayout><SettingsPage /></AppLayout>} />
       <Route path="/help" element={<AppLayout><HelpPage /></AppLayout>} />
+      <Route path="/attendance" element={<AppLayout><AttendancePage /></AppLayout>} />
 
       {/*University dashboard*/}
 
-          <Route path="/university-dashboard" element={<DefaultLayout><UniversityDashboard /></DefaultLayout>} />
-          <Route path="/documents" element={<DefaultLayout><DocumentCenter /></DefaultLayout>} />
-          <Route path="/analytics" element={<DefaultLayout><StudentAnalytics /></DefaultLayout>} />
-          <Route path="/requests" element={<DefaultLayout><RequestManagement /></DefaultLayout>} />
-          <Route path="/profile" element={<DefaultLayout><SettingsPage /></DefaultLayout>} />
-          <Route path="/support" element={<DefaultLayout><StudentSupport /></DefaultLayout>} />
-          <Route path="/help" element={<DefaultLayout><HelpPage /></DefaultLayout>} />
+      <Route path="/university-dashboard" element={<DefaultLayout><UniversityDashboard /></DefaultLayout>} />
+      <Route path="/documents" element={<DefaultLayout><DocumentCenter /></DefaultLayout>} />
+      <Route path="/analytics" element={<DefaultLayout><StudentAnalytics /></DefaultLayout>} />
+      <Route path="/requests" element={<DefaultLayout><RequestManagement /></DefaultLayout>} />
+      <Route path="/profile" element={<DefaultLayout><SettingsPage /></DefaultLayout>} />
+      <Route path="/support" element={<DefaultLayout><StudentSupport /></DefaultLayout>} />
+      <Route path="/help" element={<DefaultLayout><HelpPage /></DefaultLayout>} />
 
 
       {/* error pages */}

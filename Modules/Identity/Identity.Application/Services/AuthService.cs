@@ -36,7 +36,7 @@ public class AuthService : IAuthService
     {
         _logger.LogInformation("Authentication attempt for email: {Email}", email);
 
-        // Find user by email
+         // Find user by email
         var user = await _userRepository.GetByEmailAsync(email, cancellationToken);
 
         if (user == null) 

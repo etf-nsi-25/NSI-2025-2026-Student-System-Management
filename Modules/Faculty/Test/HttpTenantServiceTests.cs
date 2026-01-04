@@ -1,10 +1,11 @@
 using System.Security.Claims;
+using Common.Core.Tenant;
 using Faculty.Infrastructure.Http;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
-namespace Faculty.Test
+namespace Faculty.Tests
 {
     /// <summary>
     /// Unit tests for HttpTenantService to verify correct TenantId resolution from claims.
@@ -13,11 +14,12 @@ namespace Faculty.Test
     {
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor;
         private readonly HttpTenantService _tenantService;
+        private readonly IScopedTenantContext _scopedTenantContext = new MockScopedTenantContext();
 
         public HttpTenantServiceTests()
         {
             _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
-            _tenantService = new HttpTenantService(_mockHttpContextAccessor.Object);
+            _tenantService = new HttpTenantService(_mockHttpContextAccessor.Object, _scopedTenantContext);
         }
 
         #region Successful Resolution Tests
@@ -47,6 +49,16 @@ namespace Faculty.Test
 
             // Assert
             Assert.Equal(expectedTenantId, result);
+        }
+
+        [Fact]
+        public void GetCurrentFacultyId_ShouldReturnTenantId_WhenTenantContextIsPopulated()
+        {
+            var expectedTenantId = Guid.NewGuid();
+            using (_scopedTenantContext.Use(expectedTenantId))
+            {
+                Assert.Equal(expectedTenantId, _tenantService.GetCurrentFacultyId());
+            }
         }
 
         #endregion
@@ -195,15 +207,25 @@ namespace Faculty.Test
 
         #endregion
 
-        #region Constructor Tests
-
-        [Fact]
-        public void Constructor_ShouldThrowArgumentNullException_WhenHttpContextAccessorIsNull()
+        private class MockScopedTenantContext : IScopedTenantContext
         {
-            // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => new HttpTenantService(null!));
-        }
+            private static Guid? _tenantId;
+            
+            public Guid? CurrentTenantId() => _tenantId;
 
-        #endregion
+            public IDisposable Use(Guid tenantId)
+            {
+                _tenantId =  tenantId;
+                return new DummyDisposable();
+            }
+
+            private sealed class DummyDisposable : IDisposable
+            {
+                public void Dispose()
+                {
+                    _tenantId = null;
+                }
+            }
+        }
     }
 }

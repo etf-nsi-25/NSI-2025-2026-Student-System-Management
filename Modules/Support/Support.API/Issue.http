@@ -1,0 +1,79 @@
+### Support Issue API Endpoints
+
+@baseUrl = https://localhost:5001/api
+@issueEndpoint = {{baseUrl}}/issue
+@categoryEndpoint = {{baseUrl}}/issue-category
+
+### === ISSUE CATEGORY ENDPOINTS ===
+
+### 1. Create a new category
+POST {{categoryEndpoint}}
+Content-Type: application/json
+
+{
+  "title": "Technical Issues",
+  "priority": 1
+}
+
+### 2. Get all categories
+GET {{categoryEndpoint}}
+
+### 3. Get category by ID
+GET {{categoryEndpoint}}/1
+
+### 4. Update a category
+PUT {{categoryEndpoint}}/1
+Content-Type: application/json
+
+{
+  "title": "Technical Support",
+  "priority": 2
+}
+
+### 5. Delete a category
+DELETE {{categoryEndpoint}}/1
+
+### === ISSUE ENDPOINTS ===
+
+### 6. Get all categories (from issue endpoint)
+GET {{issueEndpoint}}/categories
+
+### 7. Create a new issue
+POST {{issueEndpoint}}
+Content-Type: application/json
+
+{
+  "subject": "Cannot access course materials",
+  "description": "I'm unable to access the course materials for Computer Science 101. The download link appears to be broken.",
+  "categoryId": 1,
+  "userId": "user123"
+}
+
+### 8. Get all issues
+GET {{issueEndpoint}}
+
+### 9. Get issue by ID
+GET {{issueEndpoint}}/1
+
+### 10. Get issues by user ID
+GET {{issueEndpoint}}/user/user123
+
+### 11. Update an issue
+PUT {{issueEndpoint}}/1
+Content-Type: application/json
+
+{
+  "subject": "Updated: Cannot access course materials",
+  "status": 1
+}
+
+### 12. Update issue status to Closed
+PUT {{issueEndpoint}}/1
+Content-Type: application/json
+
+{
+  "status": 2
+}
+
+### 13. Delete an issue
+DELETE {{issueEndpoint}}/1

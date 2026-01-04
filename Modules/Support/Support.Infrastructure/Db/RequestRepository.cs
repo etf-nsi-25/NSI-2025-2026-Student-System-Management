@@ -1,30 +1,23 @@
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Support.Core.Entities;
 using Support.Core.Interfaces;
+using Common.Infrastructure.Repositories;
 
 namespace Support.Infrastructure.Db
 {
-    public class RequestRepository : IRequestRepository
+    public class RequestRepository : BaseRepository<DocumentRequest>, IRequestRepository
     {
-        private readonly SupportDbContext _db;
-
-        public RequestRepository(SupportDbContext db)
+        public RequestRepository(SupportDbContext context) : base(context)
         {
-            _db = db;
-        }
-
-        public async Task<DocumentRequest> CreateAsync(DocumentRequest request)
-        {
-            _db.DocumentRequests.Add(request);
-            await _db.SaveChangesAsync();
-            return request;
         }
 
         public async Task<DocumentRequest?> GetByIdAsync(int id)
         {
-            return await _db.DocumentRequests
-                            .FirstOrDefaultAsync(x => x.Id == id);
+            return await base.GetByIdAsync(id);
+        }
+
+        public async Task<DocumentRequest> CreateAsync(DocumentRequest request)
+        {
+            return await base.AddAsync(request);
         }
     }
 }
