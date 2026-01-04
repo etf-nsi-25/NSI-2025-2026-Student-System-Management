@@ -4,10 +4,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Identity\Identity.Core\Identity.Core.csproj" />
-    <ProjectReference Include="..\Faculty.Core\Faculty.Core.csproj" />
-  </ItemGroup>
 	<ItemGroup>
     <ProjectReference Include="..\..\Identity\Identity.Core\Identity.Core.csproj" />
 		<ProjectReference Include="..\..\Common\Common.Core\Common.Core.csproj" />
@@ -16,11 +12,8 @@
 	</ItemGroup>
 
   <ItemGroup>
-<<<<<<< HEAD
     <PackageReference Include="MediatR" Version="13.1.0" />
-=======
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.0" />
->>>>>>> e53f9f5875eb12485e5a758a999e5889747f0823
   </ItemGroup>
 
   <PropertyGroup>
