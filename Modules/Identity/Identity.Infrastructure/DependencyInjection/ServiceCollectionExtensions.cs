@@ -25,6 +25,10 @@ namespace Identity.Infrastructure.DependencyInjection
         {
             // Load environment variables
             var env = DotNetEnv.Env.TraversePath().Load();
+            if (env == null || !env.Any())
+            {
+                DotNetEnv.Env.TraversePath().Load(".env.example");
+            }
             
             // Data Protection (Required for Token Providers)
             services.AddDataProtection();
