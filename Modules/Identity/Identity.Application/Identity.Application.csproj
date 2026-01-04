@@ -6,6 +6,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\EventBus\EventBus.Core\EventBus.Core.csproj" />
 		<ProjectReference Include="..\Identity.Core\Identity.Core.csproj" />
 	</ItemGroup>
 

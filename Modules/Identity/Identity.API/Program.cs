@@ -87,7 +87,6 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSet
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IIdentityHasherService, IdentityHasherService>();
-builder.Services.AddScoped<IEventPublisher, EventPublisher>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 // Register Repositories

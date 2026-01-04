@@ -7,7 +7,8 @@ namespace Support.Infrastructure.Db
 	{
 		public DbSet<DocumentRequest> DocumentRequests { get; set; } = null!;
 		public DbSet<EnrollmentRequest> EnrollmentRequests { get; set; } = null!;
-
+		public DbSet<Issue> Issues { get; set; } = null!;
+		public DbSet<IssueCategory> IssueCategories { get; set; } = null!;
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{

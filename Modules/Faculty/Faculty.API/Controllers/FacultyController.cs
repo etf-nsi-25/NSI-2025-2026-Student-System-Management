@@ -1,8 +1,7 @@
 ﻿using Faculty.Application.DTOs;
-using Faculty.Application.Services;
-using Microsoft.AspNetCore.Mvc;
 using Faculty.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 
 namespace Faculty.API.Controllers
