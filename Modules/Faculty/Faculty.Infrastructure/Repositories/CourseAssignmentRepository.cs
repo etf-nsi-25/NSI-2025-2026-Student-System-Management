@@ -1,6 +1,5 @@
 ﻿using Faculty.Core.Entities;
 using Faculty.Core.Interfaces;
-using Faculty.Core.Interfaces.Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Db;
 using Microsoft.EntityFrameworkCore;
 using System;
