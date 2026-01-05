@@ -15,7 +15,7 @@ namespace University.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Department>> GetAllByFacultyIdAsync(int facultyId)
+        public async Task<IEnumerable<Department>> GetAllByFacultyIdAsync(Guid facultyId)
         {
             var entities = await _context.Departments
                 .Include(d => d.Faculty)
