@@ -4,6 +4,7 @@ using Faculty.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+
 namespace Faculty.API.Controllers
 {
     [ApiController]
@@ -80,6 +81,15 @@ namespace Faculty.API.Controllers
             bool ok = await _service.DeleteAsync(id);
             return ok ? Ok(new { success = true }) : NotFound();
         }
+
+        [HttpGet("{courseId}/teacher")]
+        [Authorize]
+        public async Task<IActionResult> GetTeacherForCourse(Guid courseId)
+        {
+            var teacher = await _service.GetTeacherForCourseAsync(courseId);
+            return teacher == null ? NotFound() : Ok(teacher);
+        }
+
 
     }
 }
