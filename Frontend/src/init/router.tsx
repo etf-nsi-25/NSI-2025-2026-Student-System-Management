@@ -93,14 +93,6 @@ export function Router(): React.ReactNode {
       <Route path="/profile" element={<DefaultLayout><SettingsPage /></DefaultLayout>} />
       <Route path="/support" element={<DefaultLayout><StudentSupport /></DefaultLayout>} />
       <Route path="/help" element={<DefaultLayout><HelpPage /></DefaultLayout>} />
-          <Route path="/university-dashboard" element={<DefaultLayout><UniversityDashboard /></DefaultLayout>} />
-          <Route path="/documents" element={<DefaultLayout><DocumentCenter /></DefaultLayout>} />
-          <Route path="/analytics" element={<DefaultLayout><StudentAnalytics /></DefaultLayout>} />
-          <Route path="/requests" element={<DefaultLayout><RequestManagement /></DefaultLayout>} />
-          <Route path="/profile" element={<DefaultLayout><SettingsPage /></DefaultLayout>} />
-          <Route path="/support" element={<DefaultLayout><StudentSupport /></DefaultLayout>} />
-          <Route path="/help" element={<DefaultLayout><HelpPage /></DefaultLayout>} />
-          
 
 
       {/* error pages */}

@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import {
@@ -25,6 +23,7 @@ import {
 
 import "@coreui/coreui/dist/css/coreui.min.css";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { useAPI } from "../../context/services";
 
 const Pie = dynamic(
   () =>
@@ -76,6 +75,8 @@ export default function AcademicRecordsPage() {
     "all"
   );
 
+  const api = useAPI();
+
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -88,22 +89,10 @@ export default function AcademicRecordsPage() {
         setLoading(true);
         setError(null);
 
-        const response = await fetch(
-          "https://localhost:5283/api/faculty/courses"
-        );
-
-        if (response.status === 401) {
-          throw new Error("Unauthorized (401). Please check your session.");
-        }
-
-        if (!response.ok) {
-          throw new Error(`Server error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setCourses(Array.isArray(data) ? data : []);
+        const data = await api.getAllCourses();
+        setCourses(Array.isArray(data) ? (data as unknown as CourseApiDto[]) : []);
       } catch (err: any) {
-        setError(err.message || "Network error or CORS issue.");
+        setError(err.message || "Error loading academic records from server.");
         setCourses([]);
       } finally {
         setLoading(false);
@@ -111,7 +100,7 @@ export default function AcademicRecordsPage() {
     };
 
     fetchData();
-  }, [isClient]);
+  }, [isClient, api]);
 
   const semesters = useMemo(() => {
     const set = new Set<number>();
