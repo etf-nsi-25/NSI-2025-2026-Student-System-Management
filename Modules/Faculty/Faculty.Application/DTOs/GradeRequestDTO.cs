@@ -1,6 +1,6 @@
 namespace Faculty.Application.DTOs;
 
-public class GradeRequest
+public class GradeRequestDTO
 {
     public int StudentId { get; set; }
     public int ExamId { get; set; }

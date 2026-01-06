@@ -32,7 +32,7 @@ public class StudentExamGradeServiceTests
         var service = CreateService();
 
         var result = await service.CreateOrUpdateAsync(
-            new GradeRequest
+            new GradeRequestDTO
             {
                 StudentId = 1,
                 ExamId = 1,
@@ -70,7 +70,7 @@ public class StudentExamGradeServiceTests
         var service = CreateService();
 
         var result = await service.CreateOrUpdateAsync(
-            new GradeRequest
+            new GradeRequestDTO
             {
                 StudentId = 1,
                 ExamId = 1,
@@ -118,7 +118,7 @@ public class StudentExamGradeServiceTests
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
             service.CreateOrUpdateAsync(
-                new GradeRequest
+                new GradeRequestDTO
                 {
                     StudentId = 1,
                     ExamId = 1,
@@ -140,7 +140,7 @@ public class StudentExamGradeServiceTests
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             service.CreateOrUpdateAsync(
-                new GradeRequest
+                new GradeRequestDTO
                 {
                     StudentId = 1,
                     ExamId = 1,
@@ -213,7 +213,7 @@ public class StudentExamGradeServiceTests
 
         var service = CreateService();
 
-        var dto = new GradeUpdateRequest
+        var dto = new GradeUpdateRequestDTO
         {
             Points = 40,
             DateRecorded = DateTime.UtcNow
@@ -248,7 +248,7 @@ public class StudentExamGradeServiceTests
 
         var service = CreateService();
 
-        var dto = new GradeUpdateRequest { Points = 150 };
+        var dto = new GradeUpdateRequestDTO { Points = 150 };
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             service.UpdateAsync(1, 1, dto, _facultyId, _teacherId, default));
@@ -273,7 +273,7 @@ public class StudentExamGradeServiceTests
 
         var service = CreateService();
 
-        var dto = new GradeUpdateRequest { Points = 70 };
+        var dto = new GradeUpdateRequestDTO { Points = 70 };
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
             service.UpdateAsync(1, 1, dto, _facultyId, _teacherId, default));

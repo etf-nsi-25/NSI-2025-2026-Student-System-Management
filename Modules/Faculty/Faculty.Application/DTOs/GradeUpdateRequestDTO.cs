@@ -1,6 +1,6 @@
 namespace Faculty.Application.DTOs;
 
-public class GradeUpdateRequest
+public class GradeUpdateRequestDTO
 {
     public double? Points { get; set; }
     public bool? Passed { get; set; }

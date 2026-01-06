@@ -4,9 +4,9 @@ namespace Faculty.Application.Interfaces;
 
 public interface IStudentExamGradeService
 {
-    Task<StudentGradeListResponse> GetAllForExamAsync(int examId, Guid facultyId, int teacherId, CancellationToken ct);
-    Task<GradeResponse> CreateOrUpdateAsync(GradeRequest request, Guid facultyId, int teacherId, CancellationToken ct);
-    Task<GradeResponse> UpdateAsync(int studentId, int examId, GradeUpdateRequest request, Guid facultyId,
+    Task<StudentGradeListResponseDTO> GetAllForExamAsync(int examId, Guid facultyId, int teacherId, CancellationToken ct);
+    Task<GradeResponseDTO> CreateOrUpdateAsync(GradeRequestDTO requestDto, Guid facultyId, int teacherId, CancellationToken ct);
+    Task<GradeResponseDTO> UpdateAsync(int studentId, int examId, GradeUpdateRequestDTO requestDto, Guid facultyId,
         int teacherId, CancellationToken ct);
     Task DeleteAsync(int studentId, int examId, Guid facultyId, int teacherId, CancellationToken ct);
 }

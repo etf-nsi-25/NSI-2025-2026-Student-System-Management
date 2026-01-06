@@ -28,16 +28,16 @@ public class StudentExamGradeController : ControllerBase
     }
 
     [HttpPost("exams/{examId}/students/{studentId}")]
-    public async Task<IActionResult> CreateOrUpdate(int examId, int studentId, [FromBody] GradeRequest request, CancellationToken ct)
+    public async Task<IActionResult> CreateOrUpdate(int examId, int studentId, [FromBody] GradeRequestDTO requestDto, CancellationToken ct)
     {
-        var result = await _service.CreateOrUpdateAsync(request, FacultyId, TeacherId, ct);
+        var result = await _service.CreateOrUpdateAsync(requestDto, FacultyId, TeacherId, ct);
         return Ok(result);
     }
 
     [HttpPut("exams/{examId}/students/{studentId}")]
-    public async Task<IActionResult> Update(int examId, int studentId, [FromBody] GradeUpdateRequest request, CancellationToken ct)
+    public async Task<IActionResult> Update(int examId, int studentId, [FromBody] GradeUpdateRequestDTO requestDto, CancellationToken ct)
     {
-        var result = await _service.UpdateAsync(studentId, examId, request, FacultyId, TeacherId, ct);
+        var result = await _service.UpdateAsync(studentId, examId, requestDto, FacultyId, TeacherId, ct);
         return Ok(result);
     }
 

@@ -1,6 +1,6 @@
 namespace Faculty.Application.DTOs;
 
-public class GradeResponse
+public class GradeResponseDTO
 {
     public int StudentId { get; set; }
     public string StudentName { get; set; } = null!;
