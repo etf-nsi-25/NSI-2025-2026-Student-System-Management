@@ -11,13 +11,14 @@ import TenantManagementPage from '../page/tenant-management/TenantManagementPage
 import StudentSupportPage from '../page/student-support/StudentSupportPage.tsx';
 import SettingsPage from '../page/settings/SettingsPage.tsx';
 import HelpPage from '../page/help/HelpPage.tsx';
+import AttendancePage from '../page/attendance/AttendancePage.tsx';
 
 //////////// VERSION FROM master ////////////
 import CourseListPage from '../page/university/courses/CourseListPage';
 import TwoFASetupPage from "../page/identity/2FASetupPage";
 import { Login } from '../page/login/login.tsx';
 import { ProtectedRoute } from '../component/ProtectedRoute.tsx';
-import { DocumentCenter, ProfileSettings, RequestManagement, StudentAnalytics, StudentLayout, StudentSupport } from '../features/student/index.ts';
+import { DocumentCenter, ProfileSettings, StudentAnalytics, StudentLayout, StudentSupport } from '../features/student/index.ts';
 import EnrollmentPage from "../page/enrollment/enrollment.tsx";
 import { EnrollmentStudentPage } from '../page/enrollment/enrollmentPage.tsx';
 import StudentDashboardPage from '../page/student dashboard/dashboard.tsx';
@@ -26,6 +27,10 @@ import AppLayout from '../component/AppLayout/AppLayout.tsx';
 import DefaultLayout from '../component/UniversityDashboardLayout/DefaultLayout.tsx';
 import UniversityDashboard from "../page/university-dashboard/UniversityDashboard.tsx";
 import GradeManagementPage from "../page/teacher/GradeManagementPage.tsx"
+import RequestManagement from '../page/requests/RequestManagement';
+import AcademicRecordsPage from '../page/academic-records/AcademicRecordsPage.tsx';
+
+
 
 export function Router(): React.ReactNode {
   return (
@@ -61,6 +66,7 @@ export function Router(): React.ReactNode {
         <Route path="support" element={<StudentSupportPage />} />
         <Route path="student-enrollment" element={<EnrollmentStudentPage />} />
         <Route index element={<StudentDashboardPage />} />
+        <Route path="academic-records" element={<AcademicRecordsPage />} />
       </Route>
 
       <Route path="/document-center" element={
@@ -78,6 +84,7 @@ export function Router(): React.ReactNode {
       <Route path="/student-support" element={<AppLayout><StudentSupportPage /></AppLayout>} />
       <Route path="/settings" element={<AppLayout><SettingsPage /></AppLayout>} />
       <Route path="/help" element={<AppLayout><HelpPage /></AppLayout>} />
+      <Route path="/attendance" element={<AppLayout><AttendancePage /></AppLayout>} />
 
       {/*University dashboard*/}
 
@@ -94,6 +101,16 @@ export function Router(): React.ReactNode {
       <Route path="/teacher">
         <Route path="grades" element={<GradeManagementPage />} />
       </Route>
+
+      <Route path="/student/request-management" element={
+        <ProtectedRoute>
+          <RequestManagement />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/faculty/request-management" element={ 
+          <RequestManagement />
+      } />
 
       {/* error pages */}
       <Route path="/unauthorized" element={

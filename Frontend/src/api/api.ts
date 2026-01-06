@@ -3,6 +3,7 @@ import type { CourseDTO } from '../dto/CourseDTO';
 import type { StudentGradeListResponse } from '../dto/GradeDTO';
 
 import type { TwoFAConfirmResponse, TwoFASetupResponse } from '../models/2fa/TwoFA.types';
+import type { StudentRequestDto } from '../page/requests/RequestTypes';
 import type { RestClient } from './rest';
 
 export class API {
@@ -16,11 +17,11 @@ export class API {
         return this.#restClient.get<T>(url);
     }
 
-    post<T>(url: string, body?: any) {
+    post<T>(url: string, body?: unknown) {
         return this.#restClient.post<T>(url, body);
     }
 
-    put<T>(url: string, body?: any) {
+    put<T>(url: string, body?: unknown) {
         return this.#restClient.put<T>(url, body);
     }
 
@@ -73,5 +74,15 @@ export class API {
 
     async saveGrades(examId: number, grades: { studentId: number; points: number | null }[]): Promise<void> {
         return this.post(`/api/grades/${examId}`, { grades });
+    }
+  
+    //request management 
+    async getAllRequests(): Promise<StudentRequestDto[]> {
+        return this.get<StudentRequestDto[]>(`/api/Support/requests`);
+    }
+
+    async updateStatus(id: string | number, status: string): Promise<{ message: string }> {
+        const dto = { status };
+        return this.put<{ message: string }>(`/api/Support/requests/${id}/status`, dto);
     }
 }

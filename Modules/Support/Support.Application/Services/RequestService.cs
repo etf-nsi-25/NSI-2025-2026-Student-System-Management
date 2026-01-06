@@ -23,11 +23,10 @@ namespace Support.Application.Services
             if (dto.StudentId <= 0)
                 throw new ArgumentException("Invalid student id");
 
-            // 🚀 KREIRAMO DocumentRequest SA TAČNIM TIPOVIMA
             var request = new DocumentRequest
             {
-                UserId = dto.StudentId.ToString(),   // string
-                FacultyId = dto.FacultyId,           // DTO sada ima FacultyId
+                UserId = dto.StudentId.ToString(),   
+                FacultyId = dto.FacultyId,           
                 DocumentType = dto.RequestType,
                 Status = "Pending",
                 CreatedAt = DateTime.UtcNow

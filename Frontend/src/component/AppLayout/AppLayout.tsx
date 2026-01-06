@@ -1,6 +1,8 @@
 import React, { useState, useEffect, type PropsWithChildren } from "react";
 import logoImage from "../../assets/logo-unsa-sms.png";
 import {Link, useLocation} from "react-router-dom";
+import { useAuthContext } from "../../init/auth";
+import { isTeacher } from "../../constants/roles";
 
 
 const AppLayout: React.FC<PropsWithChildren<object>> = ({ children }) => {
@@ -8,6 +10,7 @@ const AppLayout: React.FC<PropsWithChildren<object>> = ({ children }) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile only
   const location=useLocation();
+  const { authInfo } = useAuthContext();
 
   const handleLinkClick = () => {
 if (isMobile) {
@@ -152,6 +155,10 @@ setSidebarOpen(false);
             {(!isCollapsed || isMobile) && "Course Management"}
           </Link>
 
+          <Link to="/faculty/request-management" style={getLinkStyle("/faculty/request-management")} onClick={handleLinkClick}>
+            {(!isCollapsed || isMobile) && "Request Management"}
+          </Link>
+
           <Link to="/users" style={getLinkStyle("/users")} onClick={handleLinkClick}>
             {(!isCollapsed || isMobile) && "User Management"}
           </Link>
@@ -171,6 +178,12 @@ setSidebarOpen(false);
           <Link to="/help" style={getLinkStyle("/help")} onClick={handleLinkClick}>
             {(!isCollapsed || isMobile) && "Help"}
           </Link>
+
+          {authInfo && isTeacher(authInfo.role) && (
+            <Link to="/attendance" style={getLinkStyle("/attendance")} onClick={handleLinkClick}>
+              {(!isCollapsed || isMobile) && "Attendance"}
+            </Link>
+          )}
 
         </div>
 
