@@ -50,6 +50,7 @@ namespace Identity.API.Controllers
                     {
                         Id = userId,
                         Username = request.Username,
+                        Email = request.Email,
                         FirstName = request.FirstName,
                         LastName = request.LastName,
                         IndexNumber = request.IndexNumber,
@@ -80,12 +81,12 @@ namespace Identity.API.Controllers
         public async Task<IActionResult> GetCurrentUser()
         {
             var userIdStr = User.FindFirstValue("userId");
-            if (!Guid.TryParse(userIdStr, out var userId))
+            if (string.IsNullOrEmpty(userIdStr))
             {
                 return Unauthorized();
             }
 
-            var user = await _userService.GetUserByIdAsync(userId);
+            var user = await _userService.GetUserByIdAsync(userIdStr);
             if (user == null)
             {
                 return NotFound();
@@ -120,10 +121,10 @@ namespace Identity.API.Controllers
             }
         }
 
-        [HttpGet("{userId:guid}")]
+        [HttpGet("{userId}")]
         [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetUserById(Guid userId)
+        public async Task<IActionResult> GetUserById(string userId)
         {
             var user = await _userService.GetUserByIdAsync(userId);
             if (user == null)
@@ -147,11 +148,11 @@ namespace Identity.API.Controllers
             return Ok(usersList);
         }
 
-        [HttpPut("{userId:guid}")]
+        [HttpPut("{userId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateUser(Guid userId, [FromBody] UpdateUserRequest request)
+        public async Task<IActionResult> UpdateUser(string userId, [FromBody] UpdateUserRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -179,11 +180,11 @@ namespace Identity.API.Controllers
             }
         }
 
-        [HttpPatch("{userId:guid}/deactivate")]
+        [HttpPatch("{userId}/deactivate")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> DeactivateUser(Guid userId)
+        public async Task<IActionResult> DeactivateUser(string userId)
         {
             try
             {
@@ -206,11 +207,11 @@ namespace Identity.API.Controllers
             }
         }
 
-        [HttpDelete("{userId:guid}")]
+        [HttpDelete("{userId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> DeleteUser(Guid userId)
+        public async Task<IActionResult> DeleteUser(string userId)
         {
             try
             {

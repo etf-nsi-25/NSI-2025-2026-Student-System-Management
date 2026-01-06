@@ -6,7 +6,6 @@ namespace Identity.Core.DTO;
 
 public class UserFilterRequest
 {
-    //filters
     public Guid? FacultyId { get; set; }
     public UserRole? Role { get; set; }
 
