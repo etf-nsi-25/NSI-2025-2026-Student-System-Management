@@ -1,51 +1,38 @@
-﻿using Identity.Core.Entities;
+﻿using Identity.Core.DTO;
+using Identity.Infrastructure.Entities;
 
 namespace Identity.Infrastructure.Mappers;
 
 public static class UserMapper
 {
-    public static User ToCore(this ApplicationUser appUser)
+    public static UserResponse MapToResponse(ApplicationUser appUser)
     {
-        var user = User.Create(
-            username: appUser.UserName ?? string.Empty,
-            passwordHash: appUser.PasswordHash ?? string.Empty,
-            firstName: appUser.FirstName ?? string.Empty,
-            lastName: appUser.LastName ?? string.Empty,
-            email: appUser.Email ?? string.Empty,
-            facultyId: appUser.FacultyId,
-            role: appUser.Role,
-            indexNumber: appUser.IndexNumber
-        );
-
-        // Set the ID from the database entity and update status
-        return user.SetId(Guid.Parse(appUser.Id));
-    }
-
-    public static ApplicationUser ToInfrastructure(this User user)
-    {
-        return new ApplicationUser
+        return new UserResponse
         {
-            Id = user.Id.ToString(),
-            UserName = user.Username,
-            PasswordHash = user.PasswordHash,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            FacultyId = user.FacultyId,
-            IndexNumber = user.IndexNumber,
-            Role = user.Role,
-            Status = user.Status
+            Id = appUser.Id,
+            Username = appUser.UserName ?? string.Empty,
+            FirstName = appUser.FirstName ?? string.Empty,
+            LastName = appUser.LastName ?? string.Empty,
+            IndexNumber = appUser.IndexNumber,
+            FacultyId = appUser.FacultyId, 
+            Role = appUser.Role,
+            Status = appUser.Status,
+            Email = appUser.Email ?? string.Empty,
         };
     }
 
-    public static void UpdateFrom(this ApplicationUser appUser, User user)
+    public static ApplicationUser MapToInfrastructure(CreateUserRequest request)
     {
-        appUser.UserName = user.Username;
-        appUser.PasswordHash = user.PasswordHash;
-        appUser.FirstName = user.FirstName;
-        appUser.LastName = user.LastName;
-        appUser.FacultyId = user.FacultyId;
-        appUser.IndexNumber = user.IndexNumber;
-        appUser.Role = user.Role;
-        appUser.Status = user.Status;
+        return new ApplicationUser
+        {
+            UserName = request.Email,
+            Email = request.Email,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            FacultyId = request.FacultyId,
+            IndexNumber = request.IndexNumber,
+            Role = request.Role,
+            Status = Core.Enums.UserStatus.Active
+        };
     }
 }

@@ -1,6 +1,8 @@
 using Identity.Core.Enums;
 using Microsoft.AspNetCore.Identity;
 
+namespace Identity.Infrastructure.Entities; 
+
 public class ApplicationUser : IdentityUser
 {
     public string FirstName { get; set; } = string.Empty;

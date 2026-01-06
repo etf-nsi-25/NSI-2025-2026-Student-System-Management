@@ -5,7 +5,7 @@ namespace Identity.Core.Events;
 
 
 public record UserRoleAssignedEvent(
-    Guid UserId, 
+    string UserId, 
     UserRole PreviousRole, 
     UserRole NewRole
 ): IEvent;

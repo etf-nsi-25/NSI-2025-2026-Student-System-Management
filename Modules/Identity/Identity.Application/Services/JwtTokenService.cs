@@ -65,11 +65,11 @@ public class JwtTokenService : IJwtTokenService
         return Convert.ToBase64String(randomBytes);
     }
 
-    public RefreshToken CreateRefreshToken(Guid userId)
+    public RefreshToken CreateRefreshToken(string userId)
     {
         return new RefreshToken
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.NewGuid().ToString(),
             Token = GenerateRefreshToken(),
             UserId = userId,
             ExpiresAt = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationDays),
