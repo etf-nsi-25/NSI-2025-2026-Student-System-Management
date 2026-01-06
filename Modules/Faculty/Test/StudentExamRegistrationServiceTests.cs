@@ -6,6 +6,7 @@ using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Db;
 using Faculty.Infrastructure.Http;
 using Faculty.Infrastructure.Repositories;
+using Faculty.Infrastructure.Schemas;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -58,7 +59,7 @@ public class StudentExamRegistrationServiceTests
         var closedExam = SeedExam(context, course.Id, DateTime.UtcNow.AddDays(4), DateTime.UtcNow.AddHours(-1));
         var alreadyRegisteredExam = SeedExam(context, course.Id, DateTime.UtcNow.AddDays(6), DateTime.UtcNow.AddDays(4));
 
-        context.ExamRegistrations.Add(new ExamRegistration
+        context.ExamRegistrations.Add(new ExamRegistrationSchema
         {
             ExamId = alreadyRegisteredExam.Id,
             StudentId = student.Id,
@@ -83,9 +84,9 @@ public class StudentExamRegistrationServiceTests
         return new StudentExamRegistrationService(repository);
     }
 
-    private (Student student, Course course) SeedStudentAndCourse(FacultyDbContext context, string userId, bool includeEnrollment)
+    private (StudentSchema student, CourseSchema course) SeedStudentAndCourse(FacultyDbContext context, string userId, bool includeEnrollment)
     {
-        var course = new Course
+        var course = new CourseSchema
         {
             Id = Guid.NewGuid(),
             FacultyId = _facultyId,
@@ -97,7 +98,7 @@ public class StudentExamRegistrationServiceTests
             CreatedAt = DateTime.UtcNow
         };
 
-        var student = new Student
+        var student = new StudentSchema
         {
             FacultyId = _facultyId,
             UserId = userId,
@@ -109,26 +110,27 @@ public class StudentExamRegistrationServiceTests
 
         context.Courses.Add(course);
         context.Students.Add(student);
+        context.SaveChanges();
 
         if (includeEnrollment)
         {
-            context.Enrollments.Add(new Enrollment
+            context.Enrollments.Add(new EnrollmentSchema
             {
                 FacultyId = _facultyId,
-                Student = student,
-                Course = course,
+                StudentId = student.Id,
+                CourseId = course.Id,
                 Status = "Active",
                 CreatedAt = DateTime.UtcNow
             });
+            context.SaveChanges();
         }
 
-        context.SaveChanges();
         return (student, course);
     }
 
-    private Exam SeedExam(FacultyDbContext context, Guid courseId, DateTime examDate, DateTime? regDeadline)
+    private ExamSchema SeedExam(FacultyDbContext context, Guid courseId, DateTime examDate, DateTime? regDeadline)
     {
-        var exam = new Exam
+        var exam = new ExamSchema
         {
             FacultyId = _facultyId,
             CourseId = courseId,

@@ -2,6 +2,8 @@
 using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Db;
 using Faculty.Infrastructure.Http;
+using Faculty.Infrastructure.Mappers;
+using Faculty.Infrastructure.Schemas;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faculty.Infrastructure.Repositories
@@ -23,56 +25,66 @@ namespace Faculty.Infrastructure.Repositories
             course.FacultyId = _tenantService.GetCurrentFacultyId();
             course.CreatedAt = DateTime.UtcNow;
 
-            _context.Courses.Add(course);
+            var courseSchema = CourseMapper.ToPersistence(course);
+            _context.Courses.Add(courseSchema);
             await _context.SaveChangesAsync();
-            return course;
+            return CourseMapper.ToDomain(courseSchema, includeRelationships: false);
         }
 
-        public Task<Course?> GetByIdAsync(Guid id)
-            => Task.FromResult(_context.Courses.FirstOrDefault(x => x.Id == id));
+        public async Task<Course?> GetByIdAsync(Guid id)
+        {
+            var courseSchema = await _context.Courses
+                .FirstOrDefaultAsync(x => x.Id == id);
+            
+            return courseSchema != null 
+                ? CourseMapper.ToDomain(courseSchema, includeRelationships: false) 
+                : null;
+        }
 
-        public Task<List<Course>> GetAllAsync()
-            => Task.FromResult(_context.Courses.ToList());
+        public async Task<List<Course>> GetAllAsync()
+        {
+            var courseSchemas = await _context.Courses.ToListAsync();
+            return CourseMapper.ToDomainCollection(courseSchemas, includeRelationships: false).ToList();
+        }
 
         public async Task<List<Course>> GetByTeacherUserIdAsync(string userId)
         {
-            var teacher = await _context.Teachers.FirstOrDefaultAsync(t => t.UserId == userId);
-            if (teacher == null)
+            var teacherSchema = await _context.Teachers.FirstOrDefaultAsync(t => t.UserId == userId);
+            if (teacherSchema == null)
             {
                 return new List<Course>();
             }
 
-            return await _context.CourseAssignments
-                .Where(ca => ca.TeacherId == teacher.Id)
+            var courseSchemas = await _context.CourseAssignments
+                .Include(ca => ca.Course)
+                .Where(ca => ca.TeacherId == teacherSchema.Id)
                 .Select(ca => ca.Course)
                 .Distinct()
                 .ToListAsync();
+
+            return CourseMapper.ToDomainCollection(courseSchemas, includeRelationships: false).ToList();
         }
 
         public async Task<Course?> UpdateAsync(Course course)
         {
-            var existing = _context.Courses.FirstOrDefault(x => x.Id == course.Id);
-            if (existing == null)
+            var existingSchema = await _context.Courses.FirstOrDefaultAsync(x => x.Id == course.Id);
+            if (existingSchema == null)
                 return null;
 
-            existing.Name = course.Name;
-            existing.Code = course.Code;
-            existing.Type = course.Type;
-            existing.ProgramId = course.ProgramId;
-            existing.ECTS = course.ECTS;
-            existing.UpdatedAt = DateTime.UtcNow;
+            CourseMapper.UpdatePersistence(existingSchema, course);
+            existingSchema.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
-            return existing;
+            return CourseMapper.ToDomain(existingSchema, includeRelationships: false);
         }
 
         public async Task<bool> DeleteAsync(Guid id)
         {
-            var existing = _context.Courses.FirstOrDefault(x => x.Id == id);
-            if (existing == null)
+            var existingSchema = await _context.Courses.FirstOrDefaultAsync(x => x.Id == id);
+            if (existingSchema == null)
                 return false;
 
-            _context.Courses.Remove(existing);
+            _context.Courses.Remove(existingSchema);
             await _context.SaveChangesAsync();
             return true;
         }
