@@ -41,8 +41,7 @@ namespace Faculty.Infrastructure.DependencyInjection
             // Event handlers
             services.AddScoped<UserCreatedEventHandler>();
 
-            services.AddDbContext<FacultyDbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString("Database")));
+           
 
             services.AddMediatR(cfg => {
                 cfg.RegisterServicesFromAssembly(typeof(GetStudentAcademicDataHandler).Assembly);
