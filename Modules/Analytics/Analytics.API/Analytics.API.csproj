@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Analytics.Core\Analytics.Core.csproj" />
     <ProjectReference Include="..\Analytics.Application\Analytics.Application.csproj" />
+    <ProjectReference Include="..\Analytics.Infrastructure\Analytics.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
