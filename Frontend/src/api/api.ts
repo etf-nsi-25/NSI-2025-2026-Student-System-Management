@@ -3,6 +3,7 @@ import type { CourseDTO } from '../dto/CourseDTO';
 
 import type { TwoFAConfirmResponse, TwoFASetupResponse } from '../models/2fa/TwoFA.types';
 import type { StudentRequestDto } from '../page/requests/RequestTypes';
+import type { StudentAssignmentOverviewDTO } from '../page/assignments/AssignmentTypes';
 import type { RestClient } from './rest';
 
 export class API {
@@ -76,4 +77,10 @@ export class API {
         const dto = { status };
         return this.put<{ message: string }>(`/api/Support/requests/${id}/status`, dto);
     }
+
+    //student assignment overview
+    async getMyAssignmentsForCourse(courseId: string): Promise<StudentAssignmentOverviewDTO[]> {
+        return this.get<StudentAssignmentOverviewDTO[]>(`/api/faculty/my-assignments/courses/${courseId}`);
+}
+
 }
