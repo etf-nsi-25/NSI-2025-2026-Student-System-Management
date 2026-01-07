@@ -138,4 +138,13 @@ public class StudentRepository : IStudentRepository
             await _context.SaveChangesAsync(cancellationToken);
         }
     }
+
+    public async Task<Student?> GetByUserIdAsync(string userId)
+{
+    var schema = await _context.Students
+        .FirstOrDefaultAsync(s => s.UserId == userId);
+        
+    return schema != null ? StudentMapper.ToDomain(schema, includeRelationships: false) : null;
+}
+
 }
