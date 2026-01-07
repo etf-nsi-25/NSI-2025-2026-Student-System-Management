@@ -82,22 +82,23 @@ public class IdentityService : IIdentityService
     }
 
     public async Task<IEnumerable<UserResponse>> GetAllFilteredAsync(UserFilterRequest filter)
-    {
-        var query = _userManager.Users.AsQueryable();
+{
+    var query = _userManager.Users.AsQueryable();
 
-        if (filter.FacultyId.HasValue)
-            query = query.Where(u => u.FacultyId == filter.FacultyId);
-        
-        if (filter.Role.HasValue)
-            query = query.Where(u => u.Role == filter.Role);
+    if (filter.FacultyId.HasValue)
+        query = query.Where(u => u.FacultyId == filter.FacultyId);
+    
+    if (filter.Role.HasValue)
+        query = query.Where(u => u.Role == filter.Role);
 
-        var appUsers = await query
-            .Skip((filter.PageNumber - 1) * filter.PageSize)
-            .Take(filter.PageSize)
-            .ToListAsync();
+    var appUsers = await query
+        .OrderBy(u => u.UserName) 
+        .Skip((filter.PageNumber - 1) * filter.PageSize)
+        .Take(filter.PageSize)
+        .ToListAsync();
 
-        return appUsers.Select(UserMapper.MapToResponse);
-    }
+    return appUsers.Select(UserMapper.MapToResponse);
+}
 
     public async Task<int> CountAsync(UserFilterRequest filter)
     {
