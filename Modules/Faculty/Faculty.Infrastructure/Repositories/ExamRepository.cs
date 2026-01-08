@@ -1,6 +1,8 @@
 using Faculty.Core.Entities;
 using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Db;
+using Faculty.Infrastructure.Mappers;
+using Faculty.Infrastructure.Schemas;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faculty.Infrastructure.Repositories
@@ -17,25 +19,31 @@ namespace Faculty.Infrastructure.Repositories
         public async Task<Exam> AddAsync(Exam exam)
         {
             exam.CreatedAt = DateTime.UtcNow;
-            _context.Exams.Add(exam);
+            var persistence = ExamMapper.ToPersistence(exam);
+            _context.Exams.Add(persistence);
             await _context.SaveChangesAsync();
-            return exam;
+
+            return ExamMapper.ToDomain(persistence, includeRelationships: false);
         }
 
         public async Task<Exam?> GetByIdAsync(int id)
         {
-            return await _context.Exams
+            var persistence = await _context.Exams
                 .Include(e => e.Course)
                 .FirstOrDefaultAsync(e => e.Id == id);
+
+            return persistence == null ? null : ExamMapper.ToDomain(persistence, includeRelationships: true);
         }
 
         public async Task<List<Exam>> GetExamsByTeacherAsync(int teacherId)
         {
-            return await _context.Exams
+            var persistence = await _context.Exams
                 .Include(e => e.Course)
                 .Where(e => _context.CourseAssignments
                     .Any(ca => ca.TeacherId == teacherId && ca.CourseId == e.CourseId))
                 .ToListAsync();
+
+            return ExamMapper.ToDomainCollection(persistence, includeRelationships: true).ToList();
         }
 
         public async Task<Exam?> UpdateAsync(Exam exam)
@@ -44,15 +52,11 @@ namespace Faculty.Infrastructure.Repositories
             if (existing == null)
                 return null;
 
-            existing.Name = exam.Name;
-            existing.Location = exam.Location;
-            existing.ExamType = exam.ExamType;
-            existing.ExamDate = exam.ExamDate;
-            existing.RegDeadline = exam.RegDeadline;
-            existing.UpdatedAt = DateTime.UtcNow;
+            exam.UpdatedAt = DateTime.UtcNow;
+            ExamMapper.UpdatePersistence(existing, exam);
 
             await _context.SaveChangesAsync();
-            return existing;
+            return ExamMapper.ToDomain(existing, includeRelationships: false);
         }
 
         public async Task<bool> DeleteAsync(int id)

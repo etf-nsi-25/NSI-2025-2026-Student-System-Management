@@ -1,4 +1,5 @@
 using Faculty.Core.Entities;
+using Faculty.Core.Enums;
 using Faculty.Infrastructure.Schemas;
 
 namespace Faculty.Infrastructure.Mappers;
@@ -19,6 +20,8 @@ public static class ExamMapper
             FacultyId = domain.FacultyId,
             CourseId = domain.CourseId,
             Name = domain.Name,
+            Location = domain.Location,
+            ExamType = domain.ExamType.ToString(),
             ExamDate = domain.ExamDate,
             RegDeadline = domain.RegDeadline,
             CreatedAt = domain.CreatedAt,
@@ -37,6 +40,10 @@ public static class ExamMapper
             FacultyId = persistence.FacultyId,
             CourseId = persistence.CourseId,
             Name = persistence.Name,
+            Location = persistence.Location,
+            ExamType = Enum.TryParse<ExamType>(persistence.ExamType, ignoreCase: true, out var examType)
+                ? examType
+                : default,
             ExamDate = persistence.ExamDate,
             RegDeadline = persistence.RegDeadline,
             CreatedAt = persistence.CreatedAt,
@@ -92,6 +99,8 @@ public static class ExamMapper
 
         persistence.CourseId = domain.CourseId;
         persistence.Name = domain.Name;
+        persistence.Location = domain.Location;
+        persistence.ExamType = domain.ExamType.ToString();
         persistence.ExamDate = domain.ExamDate;
         persistence.RegDeadline = domain.RegDeadline;
         persistence.UpdatedAt = domain.UpdatedAt ?? DateTime.UtcNow;

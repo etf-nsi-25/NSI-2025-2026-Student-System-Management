@@ -1,6 +1,7 @@
 using Faculty.Core.Entities;
 using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Db;
+using Faculty.Infrastructure.Mappers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faculty.Infrastructure.Repositories
@@ -16,14 +17,18 @@ namespace Faculty.Infrastructure.Repositories
 
         public async Task<Teacher?> GetByUserIdAsync(string userId)
         {
-            return await _context.Teachers
+            var persistence = await _context.Teachers
                 .FirstOrDefaultAsync(t => t.UserId == userId);
+
+            return persistence == null ? null : TeacherMapper.ToDomain(persistence, includeRelationships: false);
         }
 
         public async Task<Teacher?> GetByIdAsync(int id)
         {
-            return await _context.Teachers
+            var persistence = await _context.Teachers
                 .FirstOrDefaultAsync(t => t.Id == id);
+
+            return persistence == null ? null : TeacherMapper.ToDomain(persistence, includeRelationships: false);
         }
     }
 }

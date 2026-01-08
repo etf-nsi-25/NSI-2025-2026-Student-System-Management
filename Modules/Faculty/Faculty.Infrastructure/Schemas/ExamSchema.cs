@@ -11,6 +11,8 @@ public class ExamSchema : ITenantAware
     public Guid FacultyId { get; set; }
     public Guid CourseId { get; set; }
     public string? Name { get; set; }
+    public string? Location { get; set; }
+    public string ExamType { get; set; } = "Written";
     public DateTime? ExamDate { get; set; }
     public DateTime? RegDeadline { get; set; }
     public DateTime CreatedAt { get; set; }
