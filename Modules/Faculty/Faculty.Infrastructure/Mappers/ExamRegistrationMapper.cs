@@ -52,7 +52,7 @@ public static class ExamRegistrationMapper
 
             if (persistence.Exam != null)
             {
-                domain.Exam = ExamMapper.ToDomain(persistence.Exam, false);
+                domain.Exam = ExamMapper.ToDomain(persistence.Exam, true);
             }
         }
 

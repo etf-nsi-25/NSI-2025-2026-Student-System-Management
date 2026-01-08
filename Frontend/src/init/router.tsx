@@ -23,7 +23,9 @@ import DocumentCenterDashboard from '../page/document-center/documentCenter.tsx'
 import AppLayout from '../component/AppLayout/AppLayout.tsx';
 import DefaultLayout from '../component/UniversityDashboardLayout/DefaultLayout.tsx';
 import UniversityDashboard from "../page/university-dashboard/UniversityDashboard.tsx";
-import RequestManagement from '../page/requests/RequestManagement';
+import { ExamPage } from '../page/exams/ExamPage.tsx';
+import { CreateExamPage } from '../page/exams/CreateExamPage.tsx';
+import { EditExamPage } from '../page/exams/EditExamPage.tsx';import RequestManagement from '../page/requests/RequestManagement';
 import AcademicRecordsPage from '../page/academic-records/AcademicRecordsPage.tsx';
 
 
@@ -90,6 +92,9 @@ export function Router(): React.ReactNode {
       <Route path="/support" element={<DefaultLayout><StudentSupport /></DefaultLayout>} />
       <Route path="/help" element={<DefaultLayout><HelpPage /></DefaultLayout>} />
 
+      <Route path="/faculty/exams" element={<DefaultLayout><ExamPage /></DefaultLayout>} />
+      <Route path="/faculty/exams/create" element={<DefaultLayout><CreateExamPage /></DefaultLayout>} />
+      <Route path="/faculty/exams/:id/edit" element={<DefaultLayout><EditExamPage /></DefaultLayout>} />
 
       <Route path="/student/request-management" element={
         <ProtectedRoute>

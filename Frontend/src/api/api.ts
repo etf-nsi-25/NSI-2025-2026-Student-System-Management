@@ -6,6 +6,7 @@ import type {
     ExamRegistrationResponseDto,
     RegisteredStudentExamDto,
 } from '../dto/StudentExamsDTO';
+import type { CreateExamRequestDTO, ExamResponseDTO, UpdateExamRequestDTO } from '../dto/ExamDTO';
 
 import type { TwoFAConfirmResponse, TwoFASetupResponse } from '../models/2fa/TwoFA.types';
 import type { StudentRequestDto } from '../page/requests/RequestTypes';
@@ -95,5 +96,26 @@ export class API {
     async updateStatus(id: string | number, status: string): Promise<{ message: string }> {
         const dto = { status };
         return this.put<{ message: string }>(`/api/Support/requests/${id}/status`, dto);
+    }
+
+    // Exam management methods
+    async getExams(): Promise<ExamResponseDTO[]> {
+        return this.get<ExamResponseDTO[]>('/api/exams');
+    }
+
+    async getExam(id: number | string): Promise<ExamResponseDTO> {
+        return this.get<ExamResponseDTO>(`/api/exams/${id}`);
+    }
+
+    async createExam(dto: CreateExamRequestDTO): Promise<ExamResponseDTO> {
+        return this.post<ExamResponseDTO>('/api/exams', dto);
+    }
+
+    async updateExam(id: number | string, dto: UpdateExamRequestDTO): Promise<ExamResponseDTO> {
+        return this.put<ExamResponseDTO>(`/api/exams/${id}`, dto);
+    }
+
+    async deleteExam(id: number | string): Promise<void> {
+        await this.delete<null>(`/api/exams/${id}`);
     }
 }
