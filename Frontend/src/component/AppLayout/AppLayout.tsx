@@ -144,6 +144,10 @@ const AppLayout = () => {
             {(!isCollapsed || isMobile) && "Course Management"}
           </Link>
 
+          <Link to="/faculty/request-management" style={getLinkStyle("/faculty/request-management")} onClick={handleLinkClick}>
+            {(!isCollapsed || isMobile) && "Request Management"}
+          </Link>
+
           <Link to="/users" style={getLinkStyle("/users")} onClick={handleLinkClick}>
             {(!isCollapsed || isMobile) && "User Management"}
           </Link>

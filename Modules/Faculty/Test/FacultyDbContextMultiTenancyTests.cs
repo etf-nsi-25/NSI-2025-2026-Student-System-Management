@@ -1,6 +1,7 @@
 using Faculty.Core.Entities;
 using Faculty.Infrastructure.Db;
 using Faculty.Infrastructure.Http;
+using Faculty.Infrastructure.Schemas;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -91,9 +92,9 @@ public class FacultyDbContextMultiTenancyTests : IDisposable
 
     private void SeedData(FacultyDbContext context)
     {
-        var teachers = new List<Teacher>
+        var teachers = new List<TeacherSchema>
         {
-            new Teacher
+            new TeacherSchema
             {
                 FacultyId = _facultyAGuid,
                 UserId = Guid.NewGuid().ToString(),
@@ -102,7 +103,7 @@ public class FacultyDbContextMultiTenancyTests : IDisposable
                 Title = "Prof.",
                 CreatedAt = DateTime.UtcNow
             },
-            new Teacher
+            new TeacherSchema
             {
                 FacultyId = _facultyBGuid,
                 UserId = Guid.NewGuid().ToString(),
@@ -113,9 +114,9 @@ public class FacultyDbContextMultiTenancyTests : IDisposable
             }
         };
 
-        var students = new List<Student>
+        var students = new List<StudentSchema>
         {
-            new Student
+            new StudentSchema
             {
                 FacultyId = _facultyAGuid,
                 UserId = Guid.NewGuid().ToString(),
@@ -124,7 +125,7 @@ public class FacultyDbContextMultiTenancyTests : IDisposable
                 LastName = "Clark",
                 CreatedAt = DateTime.UtcNow
             },
-            new Student
+            new StudentSchema
             {
                 FacultyId = _facultyBGuid,
                 UserId = Guid.NewGuid().ToString(),

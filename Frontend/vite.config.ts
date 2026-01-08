@@ -43,6 +43,7 @@ export default defineConfig(() => {
         console.info('Detected already present certificate/key pair.');
     }
 
+
     return {
         plugins: [react()],
         server: {

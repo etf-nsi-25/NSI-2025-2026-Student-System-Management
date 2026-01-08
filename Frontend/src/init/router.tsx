@@ -10,21 +10,14 @@ import { ProfileSettings as TeacherProfileSettings } from '../features/teacher';
 import { ProfessorSupport } from '../features/teacher';
 //////////// MASTER ////////////
 import CourseListPage from '../page/university/courses/CourseListPage';
-import TwoFASetupPage from '../page/identity/2FASetupPage';
-import { Login } from '../page/login/login';
-import { ProtectedRoute } from '../component/ProtectedRoute';
-import {
-  DocumentCenter,
-  ProfileSettings,
-  RequestManagement,
-  StudentAnalytics,
-  StudentLayout,
-  StudentSupport,
-} from '../features/student';
-import EnrollmentPage from '../page/enrollment/enrollment';
-import { EnrollmentStudentPage } from '../page/enrollment/enrollmentPage';
-import StudentDashboardPage from '../page/student dashboard/dashboard';
-import DocumentCenterDashboard from '../page/document-center/documentCenter';
+import TwoFASetupPage from "../page/identity/2FASetupPage";
+import { Login } from '../page/login/login.tsx';
+import { ProtectedRoute } from '../component/ProtectedRoute.tsx';
+import { DocumentCenter, ProfileSettings, RequestManagement, StudentAnalytics, StudentLayout, StudentSupport } from '../features/student/index.ts';
+import EnrollmentPage from "../page/enrollment/enrollment.tsx";
+import { EnrollmentStudentPage } from '../page/enrollment/enrollmentPage.tsx';
+import StudentDashboardPage from '../page/student dashboard/dashboard.tsx';
+import DocumentCenterDashboard from '../page/document-center/documentCenter.tsx';
 import UniversityDashboard from '../page/university-dashboard/UniversityDashboard';
 import { TeacherLayout } from '../features/teacher';
 import { AssistentLayout } from '../features/assistent';
@@ -38,12 +31,15 @@ import UniversityProfileSettings from '../page/profile/UniversityProfileSettings
 // layouts
 import PublicLayout from '../component/AppLayout/PublicLayout';
 import AssistantDashboardPage from '../page/assistant-dashboard/dashboard';
+import RequestManagement from '../page/requests/RequestManagement';
+import AcademicRecordsPage from '../page/academic-records/AcademicRecordsPage.tsx';
+
 
 export function Router(): React.ReactNode {
   return (
     <Routes>
 
-      {/* ================= PUBLIC ROUTES ================= */}
+            {/* ================= PUBLIC ROUTES ================= */}
       <Route element={<PublicLayout />}>
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
@@ -80,6 +76,7 @@ export function Router(): React.ReactNode {
           <Route path="profile-settings" element={<ProfileSettings />} />
           <Route path="support" element={<StudentSupport />} />
           <Route path="student-enrollment" element={<EnrollmentStudentPage />} />
+          <Route path="academic-records" element={<AcademicRecordsPage />} />
         </Route>        
 
           
@@ -128,7 +125,6 @@ export function Router(): React.ReactNode {
         <Route path="/2fa/setup" element={<TwoFASetupPage />} />
         <Route path="/document-center" element={<DocumentCenterDashboard />} />
         <Route path="/faculty/courses" element={<CourseListPage />} />
-
       </Route>
 
       {/* ================= 404 ================= */}
