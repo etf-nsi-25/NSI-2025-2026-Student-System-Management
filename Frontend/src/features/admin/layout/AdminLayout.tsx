@@ -10,34 +10,31 @@ import {
     CAvatar,
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import {
-    cilSpeedometer,
-    cilFile,
-    cilChartLine,
-    cilClipboard,
-    cilEducation,
-    cilUser,
-    cilLifeRing,
+import { 
+    cilChartPie,
     cilAccountLogout,
     cilMenu,
+    cilContact,
+    cilUser,
+    cilMonitor,
 } from '@coreui/icons';
 import { useAuthContext } from '../../../init/auth';
 import logo from '../../../assets/images/login/unsa-sms-logo.png';
-import './StudentLayout.css';
+import './AdminLayout.css';
 import './layout-common.css';
 import { useCallback, useState, useEffect } from 'react';
 import { logoutFromServer, resetAuthInfo } from '../../../utils/authUtils';
 
 
-export function StudentLayout() {
+export function AdminLayout() {
     const { authInfo, setAuthInfo } = useAuthContext();
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const [isTablet, setIsTablet] = useState(window.innerWidth >= 768 && window.innerWidth <= 991.98);
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false); // mobile only
     const navigate = useNavigate();
 
-    // Handle window resize for mobile/tablet/desktop transitions
+    // Handle window resize for mobile/desktop transitions
     useEffect(() => {
         const handleResize = () => {
             const width = window.innerWidth;
@@ -47,20 +44,13 @@ export function StudentLayout() {
             setIsMobile(mobile);
             setIsTablet(tablet);
             
-            // Close sidebar when resizing to desktop
             if (width > 991.98) {
-                setSidebarOpen(false);
-            }
-
-            if (width > 991.98) {
-                setSidebarOpen(false);
-                setIsCollapsed(false);
-            } else if (mobile) {
                 setSidebarOpen(false);
             }
         };
 
         window.addEventListener('resize', handleResize);
+        handleResize(); // Initial check
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
@@ -78,17 +68,17 @@ export function StudentLayout() {
         navigate('/login');
     }, [navigate, setAuthInfo]);
 
+    const handleNavClick = () => {
+        if (isMobile || isTablet) {
+            setSidebarOpen(false);
+        }
+    };
+
     const handleToggleSidebar = () => {
         if (isMobile || isTablet) {
             setSidebarOpen(!sidebarOpen);
         } else {
             setIsCollapsed(!isCollapsed);
-        }
-    };
-
-    const handleNavClick = () => {
-        if (isMobile || isTablet) {
-            setSidebarOpen(false);
         }
     };
 
@@ -98,49 +88,31 @@ export function StudentLayout() {
             <div className="assistant-header">
                 <div className="header-left">
                     <img src={logo} alt="UNSA Logo" className="header-logo" />
-                    {(isMobile || isTablet) && (
-                        <div
-                            className="sidebar-overlay"
-                            onClick={() => setSidebarOpen(false)}
-                            style={{
-                                display: sidebarOpen ? 'block' : 'none',
-                                position: 'fixed',
-                                top: '60px',
-                                left: 0,
-                                right: 0,
-                                bottom: 0,
-                                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                                zIndex: 1029,
-                            }}
-                        />
-                    )}
-                    {isMobile ? (
-                        <button
-                            className="sidebar-toggle-btn"
-                            onClick={() => setSidebarOpen(!sidebarOpen)}
-                        >
-                            <CIcon icon={cilMenu} />
-                        </button>
-                    ) : (
-                        <button
-                            className="sidebar-toggle-btn"
-                            onClick={handleToggleSidebar}
-                        >
-                            <CIcon icon={cilMenu} />
-                        </button>
-                    )}
+                    <button
+                        className="sidebar-toggle-btn"
+                        onClick={handleToggleSidebar}
+                    >
+                        <CIcon icon={cilMenu} />
+                    </button>
                 </div>
                 <div className="header-title">
-                    <span>Student Portal</span>
+                    <span>Faculty Admin Portal</span>
                 </div>
                 <div 
                     className="header-user"
-                    data-initial={authInfo?.fullName ? authInfo.fullName.charAt(0) : 'S'}
+                    data-initial={authInfo?.fullName ? authInfo.fullName.charAt(0) : 'A'}
                 >
-                    <span className="user-name">{authInfo?.fullName || 'Student'}</span>
+                    <span className="user-name">{authInfo?.fullName || 'Admin'}</span>
                 </div>
             </div>
 
+            {/* Mobile overlay */}
+            {sidebarOpen && isMobile && (
+                <div 
+                    className="sidebar-overlay"
+                    onClick={() => setSidebarOpen(false)}
+                />
+            )}
             {/* Overlay for mobile/tablet */}
             <div 
                 className={`sidebar-overlay ${(isMobile || isTablet) && sidebarOpen ? 'show' : ''}`}
@@ -162,10 +134,10 @@ export function StudentLayout() {
                     boxShadow: (isMobile || isTablet) && sidebarOpen ? '2px 0 10px rgba(0, 0, 0, 0.1)' : 'none',
                 }}
             >
-                <CSidebarBrand className="sidebar-brand-wrapper" style={{ height: '10px', justifyContent: (isCollapsed && !isMobile && !isTablet) ? 'center' : 'flex-start' }}>
+                <CSidebarBrand className="sidebar-brand-wrapper" style={{ height: '60px', justifyContent: isCollapsed && !isMobile ? 'center' : 'flex-start' }}>
                     {!isCollapsed || isMobile ? (
                         <div className="unsa-logo">
-                            <img src={logo} alt="UNSA Logo" style={{ maxHeight: '25px' }} />
+                            <img src={logo} alt="UNSA Logo" style={{ maxHeight: '40px' }} />
                         </div>
                     ) : null}
                 </CSidebarBrand>
@@ -175,103 +147,58 @@ export function StudentLayout() {
 
                     <CNavItem>
                         <NavLink 
-                            to="/student/dashboard" 
+                            to="/admin/dashboard" 
                             className="nav-link"
                             onClick={handleNavClick}
                         >
-                            <CIcon customClassName="nav-icon" icon={cilSpeedometer} />
-                            {(!isCollapsed || isMobile) && 'Student dashboard'}
+                            <CIcon customClassName="nav-icon" icon={cilChartPie} />
+                            {(!isCollapsed || isMobile) && 'Faculty Dashboard'}
                         </NavLink>
                     </CNavItem>
 
                     <CNavItem>
                         <NavLink 
-                            to="/student/document-center" 
+                            to="/admin/course-management" 
                             className="nav-link"
                             onClick={handleNavClick}
                         >
-                            <CIcon customClassName="nav-icon" icon={cilFile} />
-                            {(!isCollapsed || isMobile) && 'Document center'}
+                            <CIcon customClassName="nav-icon" icon={cilMonitor} />
+                            {(!isCollapsed || isMobile) && 'Course Management'}
                         </NavLink>
                     </CNavItem>
 
                     <CNavItem>
                         <NavLink 
-                            to="/student/analytics" 
+                            to="/admin/user-management" 
                             className="nav-link"
                             onClick={handleNavClick}
                         >
-                            <CIcon customClassName="nav-icon" icon={cilChartLine} />
-                            {(!isCollapsed || isMobile) && 'Student analytics'}
+                            <CIcon customClassName="nav-icon" icon={cilContact} />
+                            {(!isCollapsed || isMobile) && 'User Management'}
                         </NavLink>
                     </CNavItem>
-
-                    <CNavItem>
-                        <NavLink 
-                            to="/student/request-management" 
-                            className="nav-link"
-                            onClick={handleNavClick}
-                        >
-                            <CIcon customClassName="nav-icon" icon={cilClipboard} />
-                            {(!isCollapsed || isMobile) && 'Request management'}
-                        </NavLink>
-                    </CNavItem>
-
-                    <CNavItem>
-                        <NavLink 
-                            to="/student/enrollment" 
-                            className="nav-link"
-                            onClick={handleNavClick}
-                        >
-                            <CIcon customClassName="nav-icon" icon={cilEducation} />
-                            {(!isCollapsed || isMobile) && 'Course Enrollment'}
-                        </NavLink>
-                    </CNavItem>
-                    <CNavItem>
-                        <NavLink 
-                            to="/student/student-enrollment" 
-                            className="nav-link"
-                            onClick={handleNavClick}
-                        >
-                            <CIcon customClassName="nav-icon" icon={cilEducation} />
-                            {(!isCollapsed || isMobile) && 'Enrollment'}
-                        </NavLink>
-                    </CNavItem>
+                    
                     <CNavTitle style={{ display: isCollapsed && !isMobile ? 'none' : 'block' }}>Settings</CNavTitle>
-
                     <CNavItem>
                         <NavLink 
-                            to="/student/profile-settings" 
+                            to="/admin/profile-settings" 
                             className="nav-link"
                             onClick={handleNavClick}
                         >
                             <CIcon customClassName="nav-icon" icon={cilUser} />
-                            {(!isCollapsed || isMobile) && 'Student profile settings'}
-                        </NavLink>
-                    </CNavItem>
-
-                    <CNavTitle style={{ display: isCollapsed && !isMobile ? 'none' : 'block' }}>Help</CNavTitle>
-
-                    <CNavItem>
-                        <NavLink 
-                            to="/student/support" 
-                            className="nav-link"
-                            onClick={handleNavClick}
-                        >
-                            <CIcon customClassName="nav-icon" icon={cilLifeRing} />
-                            {(!isCollapsed || isMobile) && 'Student support'}
+                            {(!isCollapsed || isMobile) && 'Faculty Profile Settings'}
                         </NavLink>
                     </CNavItem>
                 </CSidebarNav>
 
                 <div className="sidebar-footer">
-                    <div className="user-profile" style={{ justifyContent: (isCollapsed && !isMobile && !isTablet) ? 'center' : 'flex-start' }}>
+                    <div className="user-profile" style={{ justifyContent: isCollapsed && !isMobile ? 'center' : 'flex-start' }}>
                         <CAvatar color="primary" textColor="white" className="user-avatar">
-                            {authInfo?.fullName?.charAt(0) || 'S'}
+                            {authInfo?.fullName?.charAt(0) || 'A'}
                         </CAvatar>
                         {(!isCollapsed || isMobile) && (
                             <div className="user-info">
-                                <span className="user-name">{authInfo?.fullName || 'Student'}</span>
+                                <span className="user-name">{authInfo?.fullName || 'Admin'}</span>
                             </div>
                         )}
                         {(!isCollapsed || isMobile) && (
