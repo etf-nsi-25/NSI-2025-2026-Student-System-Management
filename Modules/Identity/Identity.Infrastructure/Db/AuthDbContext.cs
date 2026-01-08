@@ -23,13 +23,13 @@ namespace Identity.Infrastructure.Db
                 entity.HasKey(e => e.Id);
                 
                 entity.HasOne<ApplicationUser>() 
-                    .WithMany()
-                    .HasForeignKey(e => e.UserId)
-                    .IsRequired()
-                    .OnDelete(DeleteBehavior.Cascade);
+                .WithMany(u => u.RefreshTokens) 
+                .HasForeignKey(e => e.UserId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
-                entity.Property(e => e.Token).IsRequired();
-            });
+            entity.Property(e => e.Token).IsRequired();
+        });
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AuthDbContext).Assembly);
         }
