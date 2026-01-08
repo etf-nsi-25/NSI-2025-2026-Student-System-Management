@@ -1,9 +1,12 @@
 using Identity.API.Filters;
+using Identity.Core.Configuration;
 using Identity.Infrastructure.Db;
+using Identity.Infrastructure.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
-using Identity.Infrastructure.DependencyInjection;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -70,6 +73,30 @@ builder.Services.AddSwaggerGen(options =>
 //builder.Services.AddHealthChecks()
 //.AddDbContextCheck<IdentityDbContext>();
 
+builder.Services.AddIdentityModule(builder.Configuration);
+
+var jwtSettings = builder.Configuration
+    .GetSection("JwtSettings")
+    .Get<JwtSettings>()!;
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey =
+                new SymmetricSecurityKey(
+                    Convert.FromBase64String(jwtSettings.SigningKey)),
+            ValidateIssuer = true,
+            ValidIssuer = jwtSettings.Issuer,
+            ValidateAudience = true,
+            ValidAudience = jwtSettings.Audience,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
 // Logging
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -102,8 +129,8 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
     try
     {
-        context.Database.Migrate();
-    }
+    context.Database.Migrate();
+}
     catch (Exception ex)
     {
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
