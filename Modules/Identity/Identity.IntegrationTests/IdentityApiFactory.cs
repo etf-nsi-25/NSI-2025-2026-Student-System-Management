@@ -74,10 +74,6 @@ namespace Identity.IntegrationTests
                     var db = scopedServices.GetRequiredService<AuthDbContext>();
                     db.Database.EnsureCreated();
                 }
-
-                services.AddIdentity<ApplicationUser, IdentityRole>()
-                    .AddEntityFrameworkStores<AuthDbContext>()
-                    .AddDefaultTokenProviders();
             });
         }
 

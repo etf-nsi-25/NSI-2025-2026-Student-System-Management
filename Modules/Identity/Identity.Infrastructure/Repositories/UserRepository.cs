@@ -16,6 +16,15 @@ public class UserRepository : IUserRepository
 
     }
 
+    public async Task<bool> AnySuperAdminExistsAsync(CancellationToken cancellationToken = default)
+{
+    // TODO: TEAM KILO MIGRATION - This query relies on ApplicationUser.Role.
+    // If Team Kilo changes how Roles are stored (e.g., to AspNetRoles table), this query must be updated.
+    
+    return await _context.Users
+        .AnyAsync(u => u.Role == Identity.Core.Enums.UserRole.Superadmin, cancellationToken);
+}
+
 
     public async Task AddAsync(User user)
     {

@@ -1,21 +1,12 @@
 using Identity.API.Filters;
-using Identity.Application.Interfaces;
-using Identity.Application.Services;
-using Identity.Core.Interfaces.Repositories;
-using Identity.Core.Interfaces.Services;
-using Identity.Core.Repositories;
-using Identity.Core.Services;
 using Identity.Infrastructure.Db;
-using Identity.Infrastructure.Repositories;
-using Identity.Infrastructure.Services;
+using Identity.Infrastructure.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using Identity.Core.Configuration;
 
-
 var builder = WebApplication.CreateBuilder(args);
-
 
 // Add services to the container
 builder.Services.AddControllers(options =>
@@ -74,25 +65,7 @@ builder.Services.AddSwaggerGen(options =>
     }
 });
 
-// Database Configuration
-builder.Services.AddDbContext<AuthDbContext>(options =>
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("Database"),
-        b => b.MigrationsAssembly("Identity.Infrastructure")));
-
-// JWT Settings
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-
-// Register Services
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
-builder.Services.AddScoped<IIdentityHasherService, IdentityHasherService>();
-builder.Services.AddScoped<IUserService, UserService>();
-
-// Register Repositories
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-
+builder.Services.AddIdentityModule(builder.Configuration);
 
 // Health Checks
 //builder.Services.AddHealthChecks()

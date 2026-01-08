@@ -20,4 +20,8 @@ public interface IUserRepository
 
     Task<int> CountAsync(UserFilterRequest filter);
     Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken);
+
+    // --- ADDED FOR TASK 598 ---
+    /// Checks if any user with the Superadmin role already exists in the database.
+    Task<bool> AnySuperAdminExistsAsync(CancellationToken cancellationToken = default);
 }
