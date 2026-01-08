@@ -107,6 +107,13 @@ This will roll back the database to the specified migration.
 
 Always ensure you are in the correct Default Project corresponding to the DbContext.
 
+## QA Sandbox
+
+To bring up a clean, isolated QA sandbox database (Docker Postgres + migrations + seeded tenants/users), run:
+
+- `powershell -ExecutionPolicy Bypass -File Deployment/local/sandbox.ps1 -ResetDb`
+
+This will reset the local Postgres volume, create/use the `unsa_test_sprint4` database, apply migrations, and seed 3 tenants + users.
 
 ## Frontend 
 The frontend is a React 19 application. To install it you will need to install Node 20.
