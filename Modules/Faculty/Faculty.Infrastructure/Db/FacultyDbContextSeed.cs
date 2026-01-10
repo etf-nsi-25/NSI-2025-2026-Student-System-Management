@@ -1,5 +1,6 @@
 ﻿using Common.Core.Tenant;
 using Faculty.Core.Entities;
+using Faculty.Infrastructure.Schemas;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faculty.Infrastructure.Db;
@@ -24,7 +25,7 @@ public class FacultyDbContextSeed
         if (!await context.Teachers
                 .AnyAsync(t => t.FacultyId == tenantId))
         {
-            context.Teachers.Add(new Teacher
+            context.Teachers.Add(new TeacherSchema
             {
                 FacultyId = tenantId,
                 UserId = teacherUserId.ToString(),
@@ -42,7 +43,7 @@ public class FacultyDbContextSeed
         if (!await context.Students
                 .AnyAsync(s => s.FacultyId == tenantId))
         {
-            context.Students.Add(new Student
+            context.Students.Add(new StudentSchema
             {
                 FacultyId = tenantId,
                 UserId = studentUserId.ToString(),
@@ -60,7 +61,7 @@ public class FacultyDbContextSeed
                 .AnyAsync(c => c.FacultyId == tenantId))
         {
             context.Courses.AddRange(
-                new Course
+                new CourseSchema
                 {
                     Id = Guid.NewGuid(),
                     FacultyId = tenantId,
@@ -70,7 +71,7 @@ public class FacultyDbContextSeed
                     Type = CourseType.Mandatory,
                     CreatedAt = DateTime.UtcNow
                 },
-                new Course
+                new CourseSchema
                 {
                     Id = Guid.NewGuid(),
                     FacultyId = tenantId,
@@ -107,7 +108,7 @@ public class FacultyDbContextSeed
                         ca.CourseId == course.Id &&
                         ca.TeacherId == teacher.Id))
             {
-                context.CourseAssignments.Add(new CourseAssignment
+                context.CourseAssignments.Add(new CourseAssignmentSchema
                 {
                     FacultyId = tenantId,
                     CourseId = course.Id,
@@ -131,7 +132,7 @@ public class FacultyDbContextSeed
                             e.StudentId == student.Id &&
                             e.CourseId == course.Id))
                 {
-                    context.Enrollments.Add(new Enrollment
+                    context.Enrollments.Add(new EnrollmentSchema
                     {
                         FacultyId = tenantId,
                         StudentId = student.Id,
