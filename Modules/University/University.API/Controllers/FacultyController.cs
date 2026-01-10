@@ -33,7 +33,7 @@ namespace University.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetFacultyById(int id)
+        public async Task<IActionResult> GetFacultyById(Guid id)
         {
             try
             {
@@ -74,7 +74,7 @@ namespace University.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateFaculty(int id, [FromBody] UpdateFacultyDto dto)
+        public async Task<IActionResult> UpdateFaculty(Guid id, [FromBody] UpdateFacultyDto dto)
         {
             if (!ModelState.IsValid)
             {
@@ -101,7 +101,7 @@ namespace University.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteFaculty(int id)
+        public async Task<IActionResult> DeleteFaculty(Guid id)
         {
             try
             {

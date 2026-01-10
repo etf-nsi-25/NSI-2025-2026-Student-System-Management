@@ -10,7 +10,7 @@ namespace Support.Core.Entities
 	{
 		public int Id { get; set; }
 		public string UserId { get; set; }
-		public int FacultyId { get; set; }
+		public Guid FacultyId { get; set; }
 		public string DocumentType { get; set; }
 		public string Status { get; set; }
 		public DateTime CreatedAt { get; set; }

@@ -9,9 +9,9 @@ namespace University.Application.Services
         // TODO: REMOVE DUMMY DATA AND REPLACE WITH REPOSITORY CALL ONCE DB CODE IS MERGED.
         private static List<Faculty> _dummyFaculties = new List<Faculty>
         {
-            new Faculty { Id = 1, Name = "Faculty of Electrical Engineering", Address = "Zmaja od Bosne bb", Code = "ETF" },
-            new Faculty { Id = 2, Name = "Faculty of Philosophy", Address = "Franje Račkog 1", Code = "FF" },
-            new Faculty { Id = 3, Name = "Faculty of Economics", Address = "Trg oslobođenja - Alija Izetbegović 1", Code = "EFSA" }
+            new Faculty { Id = Guid.NewGuid(), Name = "Faculty of Electrical Engineering", Address = "Zmaja od Bosne bb", Code = "ETF" },
+            new Faculty { Id = Guid.NewGuid(), Name = "Faculty of Philosophy", Address = "Franje Račkog 1", Code = "FF" },
+            new Faculty { Id = Guid.NewGuid(), Name = "Faculty of Economics", Address = "Trg oslobođenja - Alija Izetbegović 1", Code = "EFSA" }
         };
         private static int _nextId = 4;
 
@@ -37,7 +37,7 @@ namespace University.Application.Services
             return Task.FromResult(dtos);
         }
 
-        public Task<FacultyDto?> GetFacultyByIdAsync(int id)
+        public Task<FacultyDto?> GetFacultyByIdAsync(Guid id)
         {
             // TODO: REMOVE DUMMY DATA AND REPLACE WITH REPOSITORY CALL ONCE DB CODE IS MERGED.
             var faculty = _dummyFaculties.FirstOrDefault(f => f.Id == id);
@@ -71,7 +71,7 @@ namespace University.Application.Services
 
             var newFaculty = new Faculty
             {
-                Id = _nextId++,
+                Id = Guid.NewGuid(),
                 Name = dto.Name,
                 Address = dto.Address,
                 Code = dto.Code
@@ -90,7 +90,7 @@ namespace University.Application.Services
             return Task.FromResult(facultyDto);
         }
 
-        public Task<FacultyDto?> UpdateFacultyAsync(int id, UpdateFacultyDto dto)
+        public Task<FacultyDto?> UpdateFacultyAsync(Guid id, UpdateFacultyDto dto)
         {
             // TODO: REMOVE DUMMY DATA AND REPLACE WITH REPOSITORY CALL ONCE DB CODE IS MERGED.
             var faculty = _dummyFaculties.FirstOrDefault(f => f.Id == id);
@@ -133,7 +133,7 @@ namespace University.Application.Services
             return Task.FromResult<FacultyDto?>(facultyDto);
         }
 
-        public Task<bool> DeleteFacultyAsync(int id)
+        public Task<bool> DeleteFacultyAsync(Guid id)
         {
             // TODO: REMOVE DUMMY DATA AND REPLACE WITH REPOSITORY CALL ONCE DB CODE IS MERGED.
             var faculty = _dummyFaculties.FirstOrDefault(f => f.Id == id);

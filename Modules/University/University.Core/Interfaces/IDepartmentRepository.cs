@@ -5,6 +5,6 @@ namespace University.Core.Interfaces
 {
     public interface IDepartmentRepository : IBaseRepository<Department>
     {
-        Task<IEnumerable<Department>> GetAllByFacultyIdAsync(int facultyId);
+        Task<IEnumerable<Department>> GetAllByFacultyIdAsync(Guid facultyId);
     }
 }
