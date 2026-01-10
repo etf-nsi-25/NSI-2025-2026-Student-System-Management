@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
 using Identity.Application.Interfaces;
 using Identity.Core.DomainServices;
-using Identity.Core.Repositories;
-using Identity.Core.Entities;
+using Identity.Core.DTO;
+using Identity.Core.Interfaces.Services;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Identity.Infrastructure")]
 
@@ -10,31 +10,27 @@ namespace Identity.Application.Services
 {
     public class TwoFactorAuthService : ITwoFactorAuthService
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IIdentityService _identityService;
         private readonly TwoFactorDomainService _twoFactorDomain;
 
         public TwoFactorAuthService(
-            IUserRepository userRepository,
+            IIdentityService identityService,
             TwoFactorDomainService twoFactorDomain)
         {
-            _userRepository = userRepository;
+            _identityService = identityService;
             _twoFactorDomain = twoFactorDomain;
         }
 
         public async Task<TwoFASetupResult> EnableTwoFactorAsync(string userId)
         {
-            
-            Guid userGuid = Guid.Parse(userId); 
-
-            User? user = await _userRepository.GetByIdAsync(userGuid);
+            UserResponse? user = await _identityService.FindByIdAsync(userId);
 
             if (user is null)
             {
-                    throw new InvalidOperationException($"User with ID {userId} not found."); 
+                throw new InvalidOperationException($"User with ID {userId} not found."); 
             }       
+            
             var (secret, qrCode) = _twoFactorDomain.GenerateSetupFor(user.Username);
-
-
 
             return new TwoFASetupResult(
                 ManualKey: secret,

@@ -21,6 +21,7 @@ using University.Infrastructure;
 using University.Infrastructure.Db;
 using FacultyController = Faculty.API.Controllers.FacultyController;
 using Common.Core.Tenant;
+using Identity.Infrastructure.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
