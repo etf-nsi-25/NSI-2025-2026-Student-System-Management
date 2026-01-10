@@ -106,6 +106,25 @@ export class API {
     async getMyAssignmentsForCourse(courseId: string): Promise<Assignment[]> {
         return this.get<Assignment[]>(`/api/faculty/my-assignments/courses/${courseId}`);
     }
+    async getExams(): Promise<ExamResponseDTO[]> {
+        return this.get<ExamResponseDTO[]>('/api/exams');
+    }
+
+    async getExam(id: number | string): Promise<ExamResponseDTO> {
+        return this.get<ExamResponseDTO>(`/api/exams/${id}`);
+    }
+
+    async createExam(dto: CreateExamRequestDTO): Promise<ExamResponseDTO> {
+        return this.post<ExamResponseDTO>('/api/exams', dto);
+    }
+
+    async updateExam(id: number | string, dto: UpdateExamRequestDTO): Promise<ExamResponseDTO> {
+        return this.put<ExamResponseDTO>(`/api/exams/${id}`, dto);
+    }
+
+    async deleteExam(id: number | string): Promise<void> {
+        await this.delete<null>(`/api/exams/${id}`);
+    }
 
 
     // Exam management methods
