@@ -15,6 +15,8 @@ namespace Identity.Infrastructure.Migrations
                 name: "FK_RefreshTokens_DomainUsers_UserId",
                 table: "RefreshTokens");
 
+            migrationBuilder.Sql("DELETE FROM \"RefreshTokens\"");
+
             migrationBuilder.DropTable(
                 name: "DomainUsers");
 
