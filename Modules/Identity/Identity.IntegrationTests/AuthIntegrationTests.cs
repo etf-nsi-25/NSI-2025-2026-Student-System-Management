@@ -15,7 +15,7 @@ namespace Identity.IntegrationTests
         private readonly HttpClient _client;
         private Guid _createdUserId;
         private const string TestEmail = "integration@test.com";
-        private const string TestPassword = "Password123!";
+        private readonly string TestPassword = IdentityApiFactory.TestHasherService.PredefinedHash.Key;
         private const string LoginEndpointPath = "/api/auth/login";
         private const string UserEndpointPath = "/api/users";
 
@@ -31,7 +31,6 @@ namespace Identity.IntegrationTests
             var createUserRequest = new CreateUserRequest
             {
                 Username = "integrationUser",
-                Password = TestPassword,
                 FirstName = "Integration",
                 LastName = "Test",
                 Email = TestEmail,
@@ -66,7 +65,7 @@ namespace Identity.IntegrationTests
             var loginRequest = new LoginRequestDto
             {
                 Email = TestEmail,
-                Password = TestPassword
+                Password = IdentityApiFactory.TestHasherService.PredefinedHash.Key
             };
 
             // Act

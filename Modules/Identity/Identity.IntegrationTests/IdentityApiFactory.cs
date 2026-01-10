@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using EventBus.Core;
+using Identity.Application.Services;
+using Identity.Core.Entities;
+using Identity.Core.Services;
 
 namespace Identity.IntegrationTests
 {
@@ -65,6 +68,8 @@ namespace Identity.IntegrationTests
                 });
 
                 services.AddScoped<IEventBus, TestEventBus>();
+                services.AddScoped<IUserNotifierService, TestUserNotifierService>();
+                services.AddScoped<IIdentityHasherService, TestHasherService>();
 
                 var sp = services.BuildServiceProvider();
 
@@ -92,6 +97,36 @@ namespace Identity.IntegrationTests
             public Task Dispatch(IEvent domainEvent, Guid tenantId, CancellationToken ct = default)
             {
                 return Task.CompletedTask;
+            }
+        }
+
+        public class TestUserNotifierService : IUserNotifierService
+        {
+            public Task SendAccountCreatedNotification(User user, string tempPassword)
+            {
+                return Task.CompletedTask;
+            }
+        }
+
+        public class TestHasherService : IIdentityHasherService
+        {
+            public static readonly KeyValuePair<string, string> PredefinedHash = new("PASS1", "HASH1");
+            
+            public string HashPassword(string password)
+            {
+                // Whatever password comes in, hash it to P1/H1. This is to avoid undeterministic hashing
+                // imposed by salting.
+                return PredefinedHash.Value;
+            }
+
+            public bool VerifyPassword(User user, string password, string hashedPassword)
+            {
+                if (!PredefinedHash.Value.Equals(hashedPassword) || !PredefinedHash.Key.Equals(password))
+                {
+                    return false;
+                }
+
+                return PredefinedHash.Value.Equals(user.PasswordHash);
             }
         }
     }
