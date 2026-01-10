@@ -1,7 +1,7 @@
 
 
 import type React from "react"
-import { CCard, CCardBody, CButton } from "@coreui/react"
+import { CCard, CCardBody } from "@coreui/react"
 import type { Assignment } from "./AssignmentTypes"
 import { formatDate } from "./AssignmentTypes"
 import styles from "./assignments.module.css"
@@ -11,8 +11,8 @@ interface AssignmentCardProps {
     onSubmit: (id: number) => void
 }
 
-export const AssignmentCard: React.FC<AssignmentCardProps> = ({ assignment, onSubmit }) => {
-    const { assignmentId, title, description, dueDate, status, submissionDate, points, feedback } = assignment
+export const AssignmentCard: React.FC<AssignmentCardProps> = ({ assignment }) => {
+    const { title, description, dueDate, status, submissionDate, points, feedback } = assignment
 
     const initials = title?.split(" ")[0]?.slice(0, 3) || "Asg"
 

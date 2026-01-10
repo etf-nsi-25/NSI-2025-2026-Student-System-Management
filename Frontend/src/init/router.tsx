@@ -25,8 +25,9 @@ import { ExamPage } from '../page/exams/ExamPage.tsx';
 import { CreateExamPage } from '../page/exams/CreateExamPage.tsx';
 import { EditExamPage } from '../page/exams/EditExamPage.tsx'; import RequestManagement from '../page/requests/RequestManagement';
 import AcademicRecordsPage from '../page/academic-records/AcademicRecordsPage.tsx';
-
 import AssignmentsPage from '../page/assignments/assignmentPage.tsx';
+
+
 
 
 
@@ -108,7 +109,7 @@ export function Router(): React.ReactNode {
       } />
 
       <Route path="/faculty/request-management" element={
-        <AppLayout><RequestManagement /></AppLayout>
+        <RequestManagement />
       } />
 
       {/* error pages */}
