@@ -20,7 +20,6 @@ import { EnrollmentStudentPage } from '../page/enrollment/enrollmentPage.tsx';
 import StudentDashboardPage from '../page/student dashboard/dashboard.tsx';
 import DocumentCenterDashboard from '../page/document-center/documentCenter.tsx';
 import AppLayout from '../component/AppLayout/AppLayout.tsx';
-import DefaultLayout from '../component/UniversityDashboardLayout/DefaultLayout.tsx';
 import UniversityDashboard from "../page/university-dashboard/UniversityDashboard.tsx";
 import RequestManagement from '../page/requests/RequestManagement';
 import AcademicRecordsPage from '../page/academic-records/AcademicRecordsPage.tsx';
@@ -85,12 +84,12 @@ export function Router(): React.ReactNode {
 
       {/*University dashboard*/}
 
-      <Route path="/university-dashboard" element={<DefaultLayout><UniversityDashboard /></DefaultLayout>} />
-      <Route path="/documents" element={<DefaultLayout><DocumentCenter /></DefaultLayout>} />
-      <Route path="/analytics" element={<DefaultLayout><StudentAnalytics /></DefaultLayout>} />
-      <Route path="/requests" element={<DefaultLayout><RequestManagement /></DefaultLayout>} />
-      <Route path="/profile" element={<DefaultLayout><ProfileSettings /></DefaultLayout>} />
-      <Route path="/support" element={<DefaultLayout><StudentSupport /></DefaultLayout>} />
+      <Route path="/university-dashboard" element={<AppLayout><UniversityDashboard /></AppLayout>} />
+      <Route path="/documents" element={<AppLayout><DocumentCenter /></AppLayout>} />
+      <Route path="/analytics" element={<AppLayout><StudentAnalytics /></AppLayout>} />
+      <Route path="/requests" element={<AppLayout><RequestManagement /></AppLayout>} />
+      <Route path="/profile" element={<AppLayout><ProfileSettings /></AppLayout>} />
+      <Route path="/support" element={<AppLayout><StudentSupport /></AppLayout>} />
       <Route path="/help" element={<AppLayout><HelpPage /></AppLayout>} />
 
 
