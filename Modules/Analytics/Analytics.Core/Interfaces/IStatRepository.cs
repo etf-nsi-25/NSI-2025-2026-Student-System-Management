@@ -10,6 +10,6 @@ namespace Analytics.Core.Interfaces
 {
     public interface IStatRepository: IBaseRepository<Stat>
     {
-        Task<IEnumerable<Stat>> GetStatsByMetricAndScopeAsync(Metric metric, Scope scope, Guid scopeIdentifier);
+        Task<IEnumerable<Stat>> GetStatsByMetricAndScopeAsync(string metricCode, Scope scope, Guid scopeIdentifier);
     }
 }
