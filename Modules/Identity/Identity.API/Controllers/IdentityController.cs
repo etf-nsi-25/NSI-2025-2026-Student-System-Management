@@ -32,7 +32,6 @@ namespace Identity.API.Controllers
             {
                 var userId = await _userService.CreateUserAsync(
                     request.Username,
-                    request.Password,
                     request.FirstName,
                     request.LastName,
                     request.Email,

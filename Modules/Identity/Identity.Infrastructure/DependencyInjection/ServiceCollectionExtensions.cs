@@ -43,6 +43,8 @@ namespace Identity.Infrastructure.DependencyInjection
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            
+            services.AddScoped<IUserNotifierService, UserNotifierService>();
 
             JwtSettings jwtSettings = new JwtSettings();
             configuration.Bind("JwtSettings", jwtSettings);

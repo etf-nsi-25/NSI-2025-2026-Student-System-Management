@@ -7,6 +7,7 @@ using Identity.Core.Events;
 using Identity.Core.Enums;
 using Identity.Core.DTO;
 using Identity.Core.Services;
+using Notifications.Application.Services;
 
 // Allow injection.
 [assembly: InternalsVisibleTo("Identity.Infrastructure"), InternalsVisibleTo("Identity.API")]
@@ -15,11 +16,11 @@ namespace Identity.Application.Services;
 internal class UserService(
     IUserRepository userRepository,
     IIdentityHasherService identityHasherService,
-    IEventBus eventBus) : IUserService
+    IEventBus eventBus,
+    IUserNotifierService userNotifierService) : IUserService
 {
     public async Task<Guid> CreateUserAsync(
        string username,
-       string password,
        string firstName,
        string lastName,
        string email,
@@ -37,8 +38,10 @@ internal class UserService(
             // TODO: this should check for email instead ?? Thats what we login with
             throw new ArgumentException($"Username '{username}' is already taken.", nameof(username));
         }
+        
+        var tempPassword = Guid.NewGuid().ToString().Replace("-", "")[..6];
 
-        var passwordHash = identityHasherService.HashPassword(password);
+        var passwordHash = identityHasherService.HashPassword(tempPassword);
         var newUser = User.Create(
             username,
             passwordHash,
@@ -52,6 +55,8 @@ internal class UserService(
 
         await userRepository.AddAsync(newUser);
         await userRepository.SaveAsync();
+        
+        await userNotifierService.SendAccountCreatedNotification(newUser, tempPassword);
 
         var userCreatedEvent = new UserCreatedEvent(
             newUser.Id,
