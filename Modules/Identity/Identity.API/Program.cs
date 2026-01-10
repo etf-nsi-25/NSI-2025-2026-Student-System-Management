@@ -1,17 +1,12 @@
 using Identity.API.Filters;
-using Identity.Application.Interfaces;
-using Identity.Application.Services;
-using Identity.Core.Interfaces.Repositories;
-using Identity.Core.Interfaces.Services;
-using Identity.Core.Repositories;
-using Identity.Core.Services;
+using Identity.Core.Configuration;
 using Identity.Infrastructure.Db;
-using Identity.Infrastructure.Repositories;
-using Identity.Infrastructure.Services;
+using Identity.Infrastructure.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
-using Identity.Core.Configuration;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -74,29 +69,33 @@ builder.Services.AddSwaggerGen(options =>
     }
 });
 
-// Database Configuration
-builder.Services.AddDbContext<AuthDbContext>(options =>
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("Database"),
-        b => b.MigrationsAssembly("Identity.Infrastructure")));
-
-// JWT Settings
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-
-// Register Services
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
-builder.Services.AddScoped<IIdentityHasherService, IdentityHasherService>();
-builder.Services.AddScoped<IUserService, UserService>();
-
-// Register Repositories
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-
-
 // Health Checks
 //builder.Services.AddHealthChecks()
 //.AddDbContextCheck<IdentityDbContext>();
+
+builder.Services.AddIdentityModule(builder.Configuration);
+
+var jwtSettings = builder.Configuration
+    .GetSection("JwtSettings")
+    .Get<JwtSettings>()!;
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey =
+                new SymmetricSecurityKey(
+                    Convert.FromBase64String(jwtSettings.SigningKey)),
+            ValidateIssuer = true,
+            ValidIssuer = jwtSettings.Issuer,
+            ValidateAudience = true,
+            ValidAudience = jwtSettings.Audience,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 
 // Logging
 builder.Logging.ClearProviders();
@@ -130,8 +129,8 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
     try
     {
-        context.Database.Migrate();
-    }
+    context.Database.Migrate();
+}
     catch (Exception ex)
     {
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
