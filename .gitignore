@@ -66,8 +66,10 @@ bower_components/
 *.nuspec
 packages/
 !packages/build/
+
 project.lock.json
 project.fragment.lock.json
+package-lock.json
 
 # NuGet
 .nuget/

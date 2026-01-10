@@ -25,7 +25,7 @@ import DefaultLayout from '../component/UniversityDashboardLayout/DefaultLayout.
 import UniversityDashboard from "../page/university-dashboard/UniversityDashboard.tsx";
 import RequestManagement from '../page/requests/RequestManagement';
 import AcademicRecordsPage from '../page/academic-records/AcademicRecordsPage.tsx';
-
+import CourseOverviewDashboard from '../page/course-overview-dashboard/CourseOverviewDashboard.tsx'; 
 
 
 export function Router(): React.ReactNode {
@@ -99,6 +99,12 @@ export function Router(): React.ReactNode {
 
       <Route path="/faculty/request-management" element={ 
           <RequestManagement />
+      } />
+
+      <Route path="/course-overview-dashboard" element={
+        
+          <CourseOverviewDashboard />
+     
       } />
 
       {/* error pages */}
