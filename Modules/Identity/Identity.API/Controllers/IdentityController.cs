@@ -20,6 +20,7 @@ namespace Identity.API.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -93,33 +94,6 @@ namespace Identity.API.Controllers
             return Ok(user);
         }
 
-        [HttpPut("me")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateCurrentUser([FromBody] UpdateUserRequest request)
-        {
-            var userIdStr = User.FindFirstValue("userId");
-            if (!Guid.TryParse(userIdStr, out var userId))
-            {
-                return Unauthorized();
-            }
-
-            try
-            {
-                var result = await _userService.UpdateUserAsync(userId, request);
-                if (!result)
-                {
-                    return NotFound();
-                }
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Error = ex.Message });
-            }
-        }
-
         [HttpPost("me/change-password")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -187,7 +161,7 @@ namespace Identity.API.Controllers
 
             try
             {
-                if (!CanModifyUser(userId))
+                if (!IsAdmin())
                 {
                     return Forbid();
                 }
@@ -219,7 +193,7 @@ namespace Identity.API.Controllers
         {
             try
             {
-                if (!CanModifyUser(userId))
+                if (!IsAdmin())
                 {
                     return Forbid();
                 }
@@ -251,7 +225,7 @@ namespace Identity.API.Controllers
         {
             try
             {
-                if (!CanModifyUser(userId))
+                if (!IsAdmin())
                 {
                     return Forbid();
                 }
@@ -308,20 +282,21 @@ namespace Identity.API.Controllers
             }
         }
 
-        private bool CanModifyUser(Guid userId)
+        private bool IsAdmin()
+        {
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+            return userRole == UserRole.Admin.ToString() || userRole == UserRole.Superadmin.ToString();
+        }
+
+        private bool IsSelf(Guid userId)
         {
             var currentUserId = User.FindFirstValue("userId");
-            var userRole = User.FindFirstValue(ClaimTypes.Role);
+            return currentUserId == userId.ToString();
+        }
 
-            if (string.IsNullOrEmpty(currentUserId)) return false;
-
-            // User can modify themselves
-            if (currentUserId == userId.ToString()) return true;
-
-            // Admin can modify anyone
-            if (userRole == UserRole.Admin.ToString() || userRole == UserRole.Superadmin.ToString()) return true;
-
-            return false;
+        private bool CanModifyUser(Guid userId)
+        {
+            return IsAdmin() || IsSelf(userId);
         }
     }
 }
