@@ -1,9 +1,9 @@
 ﻿using Common.Core.Tenant;
-using Identity.Core.Entities;
 using Identity.Core.Enums;
 using Identity.Infrastructure.Db;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Identity.Infrastructure.Entities;
 
 public class IdentityDbContextSeed
 {
@@ -22,101 +22,57 @@ public class IdentityDbContextSeed
         Guid teacherId,
         Guid studentId)
     {
-        if (await context.DomainUsers.AnyAsync())
+        if (await userManager.Users.AnyAsync())
             return;
-
-        var tenantId = _tenantContext.CurrentTenantId()
-            ?? throw new InvalidOperationException("Tenant not set");
 
         var superAdminAppUser = new ApplicationUser
         {
             Id = superAdminId.ToString(),
             UserName = "superadmin",
             Email = "superadmin@unsa.ba",
-            EmailConfirmed = true
+            FirstName = "Super",
+            LastName = "Admin",
+            EmailConfirmed = true,
+            Role = UserRole.Superadmin
         };
-
         await userManager.CreateAsync(superAdminAppUser, "Test123!");
-
-        context.DomainUsers.Add(
-            User.Create(
-                "superadmin",
-                string.Empty,
-                "Super",
-                "Admin",
-                "superadmin@unsa.ba",
-                tenantId,
-                UserRole.Superadmin
-            ).SetId(superAdminId)
-        );
 
         var adminAppUser = new ApplicationUser
         {
             Id = adminId.ToString(),
             UserName = "admin",
             Email = "admin@unsa.ba",
-            EmailConfirmed = true
+            FirstName = "Admin",
+            LastName = "User",
+            EmailConfirmed = true,
+            Role = UserRole.Admin
         };
-
         await userManager.CreateAsync(adminAppUser, "Test123!");
-
-        context.DomainUsers.Add(
-            User.Create(
-                "admin",
-                string.Empty,
-                "Admin",
-                "User",
-                "admin@unsa.ba",
-                tenantId,
-                UserRole.Admin
-            ).SetId(adminId)
-        );
 
         var teacherAppUser = new ApplicationUser
         {
             Id = teacherId.ToString(),
             UserName = "teacher",
             Email = "emir.buza@unsa.ba",
-            EmailConfirmed = true
+            FirstName = "Emir",
+            LastName = "Buza",
+            EmailConfirmed = true,
+            Role = UserRole.Teacher
         };
-
         await userManager.CreateAsync(teacherAppUser, "Test123!");
-
-        context.DomainUsers.Add(
-            User.Create(
-                "teacher",
-                string.Empty,
-                "Emir",
-                "Buza",
-                "emir.buza@unsa.ba",
-                tenantId,
-                UserRole.Teacher
-            ).SetId(teacherId)
-        );
 
         var studentAppUser = new ApplicationUser
         {
             Id = studentId.ToString(),
             UserName = "student",
             Email = "niko.nikic@unsa.ba",
-            EmailConfirmed = true
+            FirstName = "Niko",
+            LastName = "Nikic",
+            EmailConfirmed = true,
+            Role = UserRole.Student,
+            IndexNumber = "IB20001"
         };
-
         await userManager.CreateAsync(studentAppUser, "Test123!");
 
-        context.DomainUsers.Add(
-            User.Create(
-                "student",
-                string.Empty,
-                "Niko",
-                "Nikic",
-                "niko.nikic@unsa.ba",
-                tenantId,
-                UserRole.Student,
-                "IB20001"
-            ).SetId(studentId)
-        );
-
-        await context.SaveChangesAsync();
     }
 }
