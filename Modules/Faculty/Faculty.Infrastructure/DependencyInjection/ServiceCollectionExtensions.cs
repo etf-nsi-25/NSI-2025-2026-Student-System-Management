@@ -10,8 +10,6 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Faculty.Infrastructure.Repositories;
-using Faculty.Infrastructure.Http;
 
 namespace Faculty.Infrastructure.DependencyInjection
 {
@@ -30,6 +28,7 @@ namespace Faculty.Infrastructure.DependencyInjection
             services.AddScoped<IStudentExamRegistrationService, StudentExamRegistrationService>();
             services.AddScoped<StudentService>();
             services.AddScoped<IStudentRepository, StudentRepository>();
+            services.AddScoped<FacultyDbContextSeed>();
 
             services.AddHttpContextAccessor();
             services.AddScoped<ITenantService, HttpTenantService>();
