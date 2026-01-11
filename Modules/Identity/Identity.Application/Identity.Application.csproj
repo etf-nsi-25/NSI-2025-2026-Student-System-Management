@@ -7,7 +7,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\EventBus\EventBus.Core\EventBus.Core.csproj" />
-		<ProjectReference Include="..\..\Notifications\Notifications.Application\Notifications.Application.csproj" />
 		<ProjectReference Include="..\Identity.Core\Identity.Core.csproj" />
 	</ItemGroup>
 

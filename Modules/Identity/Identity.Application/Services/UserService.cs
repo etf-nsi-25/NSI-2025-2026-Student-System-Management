@@ -7,7 +7,6 @@ using Identity.Core.Events;
 using Identity.Core.Enums;
 using Identity.Core.DTO;
 using Identity.Core.Services;
-using Notifications.Application.Services;
 
 // Allow injection.
 [assembly: InternalsVisibleTo("Identity.Infrastructure"), InternalsVisibleTo("Identity.API")]

@@ -6,6 +6,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\Notifications\Notifications.Application\Notifications.Application.csproj" />
 		<ProjectReference Include="..\Identity.Application\Identity.Application.csproj" />
 		<ProjectReference Include="..\Identity.Core\Identity.Core.csproj" />
 		<ProjectReference Include="..\..\Common\Common.Core\Common.Core.csproj" />
