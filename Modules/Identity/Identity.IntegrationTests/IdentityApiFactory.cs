@@ -1,12 +1,12 @@
 using Identity.Infrastructure.Db;
 using Identity.API.Controllers;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using EventBus.Core;
+using Common.Core.Tenant;
 
 namespace Identity.IntegrationTests
 {
@@ -65,6 +65,10 @@ namespace Identity.IntegrationTests
                 });
 
                 services.AddScoped<IEventBus, TestEventBus>();
+
+                // Register a simple tenant context for tests so seeders depending on
+                // IScopedTenantContext can be constructed during test setup.
+                services.AddScoped<IScopedTenantContext, ThreadLocalScopedTenantContext>();
 
                 var sp = services.BuildServiceProvider();
 
