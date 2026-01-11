@@ -20,10 +20,11 @@ namespace University.Infrastructure
             services.AddScoped<IProgramRepository, ProgramRepository>();
             services.AddDbContext<UniversityDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("Database")));
+            services.AddScoped<UniversityDbInitializier>();
 
             // Application services
             services.AddScoped<IFacultyService, FacultyService>();
-
+            
             return services;
         }
     }

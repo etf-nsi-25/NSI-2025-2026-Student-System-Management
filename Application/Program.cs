@@ -121,6 +121,9 @@ if (applyMigrations)
             {
                 var universityDb = services.GetRequiredService<UniversityDbContext>();
                 universityDb.Database.Migrate();
+                var universitySeeder = services.GetRequiredService<UniversityDbInitializier>();
+                await universitySeeder.SeedAsync(
+                    universityDb);
             }
             catch (Exception ex)
             {
