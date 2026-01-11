@@ -16,10 +16,12 @@ namespace Faculty.API.Controllers
     public class FacultyController : ControllerBase
     {
         private readonly ICourseService _service;
+        private readonly IUpcomingActivityService _upcomingActivityService;
 
-        public FacultyController(ICourseService service)
+        public FacultyController(ICourseService service, IUpcomingActivityService upcomingActivityService)
         {
             _service = service;
+            _upcomingActivityService = upcomingActivityService;
         }
 
         private string GetCurrentUserId()
@@ -84,9 +86,24 @@ namespace Faculty.API.Controllers
             bool ok = await _service.DeleteAsync(id);
             return ok ? Ok(new { success = true }) : NotFound();
         }
-    }
 
+        [HttpGet("upcoming-activities")]
+        [Authorize(Roles = "Teacher")]
+        public async Task<IActionResult> GetUpcomingActivities()
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var result = await _upcomingActivityService.GetUpcomingActivitiesAsync(userId);
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { error = ex.Message });
+            }
+        }
     }
+}
 
 
 

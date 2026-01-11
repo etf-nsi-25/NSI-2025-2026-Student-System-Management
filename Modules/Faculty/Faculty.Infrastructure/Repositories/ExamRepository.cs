@@ -46,6 +46,26 @@ namespace Faculty.Infrastructure.Repositories
             return ExamMapper.ToDomainCollection(persistence, includeRelationships: true).ToList();
         }
 
+        public async Task<List<Exam>> GetUpcomingByCourseIdsAsync(List<Guid> courseIds)
+        {
+            if (courseIds == null || courseIds.Count == 0)
+            {
+                return new List<Exam>();
+            }
+
+            var now = DateTime.UtcNow;
+
+            var examSchemas = await _context.Exams
+                .Include(e => e.Course)
+                .Where(e => courseIds.Contains(e.CourseId) &&
+                           e.ExamDate.HasValue &&
+                           e.ExamDate.Value > now)
+                .OrderBy(e => e.ExamDate)
+                .ToListAsync();
+
+            return ExamMapper.ToDomainCollection(examSchemas, includeRelationships: true).ToList();
+        }
+
         public async Task<Exam?> UpdateAsync(Exam exam)
         {
             var existing = await _context.Exams.FindAsync(exam.Id);

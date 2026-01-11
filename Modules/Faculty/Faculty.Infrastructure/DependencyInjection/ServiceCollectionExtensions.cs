@@ -18,6 +18,7 @@ namespace Faculty.Infrastructure.DependencyInjection
         public static IServiceCollection AddFacultyModule(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<ICourseRepository, CourseRepository>();
+            services.AddScoped<IAssignmentRepository, AssignmentRepository>();
             services.AddScoped<IAttendanceRepository, AttendanceRepository>();
             services.AddScoped<ICourseService, CourseService>();
             services.AddScoped<IAttendanceService, AttendanceService>();
@@ -26,6 +27,7 @@ namespace Faculty.Infrastructure.DependencyInjection
             services.AddScoped<ITeacherRepository, TeacherRepository>();
             services.AddScoped<IStudentExamRegistrationRepository, StudentExamRegistrationRepository>();
             services.AddScoped<IStudentExamRegistrationService, StudentExamRegistrationService>();
+            services.AddScoped<IUpcomingActivityService, UpcomingActivityService>();
             services.AddScoped<StudentService>();
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<FacultyDbContextSeed>();
