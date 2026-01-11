@@ -19,7 +19,6 @@ import {
 } from "@coreui/react"
 import CIcon from "@coreui/icons-react"
 import { cilSearch, cilCheckCircle } from "@coreui/icons"
-import "@coreui/coreui/dist/css/coreui.min.css"
 import "./enrollment.css"
 import { useAPI } from '../../context/services.tsx';
 import { enrollInCourse, getCourses } from "../../service/enrollment/api"

@@ -55,6 +55,7 @@ namespace Identity.Infrastructure.DependencyInjection
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IIdentityHasherService, IdentityHasherService>();
             services.AddSingleton<IJwtTokenService, JwtTokenService>();
+            services.AddScoped<IdentityDbContextSeed>();
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();

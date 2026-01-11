@@ -188,7 +188,7 @@ body {
     align-items: center;
     padding: 4px 10px;
     border-radius: 999px;
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     border: 1px solid transparent;
@@ -231,6 +231,78 @@ body {
     background: rgba(58, 217, 159, 0.08);
     border-color: rgba(58, 217, 159, 0.45);
     color: var(--ui-success);
+  }
+
+  /* ========================================================================
+     Toasts (error / success)
+     - Lightweight app-wide toasts (no external lib)
+     ======================================================================== */
+
+  .ui-toast-container {
+    position: fixed;
+    top: 1.2rem;
+    right: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    z-index: 9999;
+  }
+
+  .ui-toast {
+    min-width: 300px;
+    max-width: 420px;
+    background: var(--ui-surface-glass);
+    border-radius: 12px;
+    padding: 0;
+    border: 1px solid var(--ui-border-strong);
+    border-left: 6px solid transparent;
+    overflow: hidden;
+    box-shadow: var(--ui-shadow-soft);
+    backdrop-filter: blur(var(--ui-glass-blur));
+    color: var(--ui-text-main) !important;
+  }
+
+  .ui-toast-success {
+    border-left-color: var(--ui-success);
+  }
+
+  .ui-toast-error {
+    border-left-color: var(--ui-error);
+  }
+
+  .ui-toast-header,
+  .ui-toast .toast-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.7rem 0.9rem;
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: var(--ui-text-main) !important;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .ui-toast-body,
+  .ui-toast .toast-body {
+    padding: 0.9rem 1rem;
+    line-height: 1.4;
+    font-size: 0.9rem;
+    color: rgba(245, 245, 247, 0.9) !important;
+  }
+
+  .ui-toast-close,
+  .ui-toast .btn-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1;
+    color: rgba(245, 245, 247, 0.75);
+  }
+
+  .ui-toast-close:hover,
+  .ui-toast .btn-close:hover {
+    color: rgba(245, 245, 247, 1);
   }
   
   
@@ -347,6 +419,11 @@ body {
     font-size: 11px;
     color: var(--ui-text-muted);
   }
+
+  .ui-validation-text {
+    font-size: 12px;
+    color: var(--ui-error);
+  }
   
   
   /* ==========================================================================
@@ -376,7 +453,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.16);
     background: rgba(3, 3, 10, 0.8);
     color: var(--ui-text-main);
-    font-size: 14px;
+    font-size: 16px;
     outline: none;
     transition:
       border-color 0.15s ease,
@@ -387,6 +464,7 @@ body {
   
   .ui-input-base::placeholder {
     color: rgba(255, 255, 255, 0.26);
+    font-size: 16px;
   }
   
   .ui-input-base:focus {
@@ -395,4 +473,70 @@ body {
     box-shadow: 0 0 0 1px rgba(79, 156, 255, 0.45);
     transform: translateY(-1px);
   }
-  
+
+    /* ==========================================================================
+     10. UI info pill
+     ========================================================================== */
+
+     .ui-info-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 14px;
+    
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    
+      color: var(--ui-text-main);
+      font-size: 16px;
+      font-weight: 400;
+    
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+    
+    .ui-info-pill:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
+    }
+    
+    .ui-info-icon {
+      opacity: 0.85;
+      color: var(--ui-accent);
+    }
+    
+      /* ==========================================================================
+     11. UI Tabs - more windows to manage more pages in one page by sliding between them
+     ========================================================================== */
+
+    /* Modern glassy tab buttons */
+.ui-tab-btn {
+  padding: 10px 24px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px);
+  transition: 0.25s ease;
+}
+
+.ui-tab-btn:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.18);
+}
+
+.ui-tab-btn.active {
+  color: #fff;
+  background: linear-gradient(135deg, #3a86ff, #6ea8ff);
+  border: none;
+  box-shadow: 0 0 18px rgba(58,134,255,0.45);
+}
+
+/* Smooth animated tab panels */
+.ui-tab-panel {
+  position: absolute;
+  width: 100%;
+  transition: all 0.45s cubic-bezier(.4,0,.2,1);
+}

@@ -1,6 +1,8 @@
 using Faculty.Core.Entities;
 using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Db;
+using Faculty.Infrastructure.Mappers;
+using Faculty.Infrastructure.Schemas;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faculty.Infrastructure.Repositories;
@@ -19,12 +21,14 @@ public class AttendanceRepository : IAttendanceRepository
 
     public async Task<List<Enrollment>> GetEnrolledStudentsAsync(Guid courseId)
     {
-        return await _context.Enrollments
+        var enrollmentSchemas = await _context.Enrollments
             .Include(e => e.Student)
             .Where(e => e.CourseId == courseId)
             .OrderBy(e => e.Student.LastName)
             .ThenBy(e => e.Student.FirstName)
             .ToListAsync();
+
+        return EnrollmentMapper.ToDomainCollection(enrollmentSchemas, includeRelationships: true).ToList();
     }
 
     public async Task<Attendance?> GetAttendanceAsync(int studentId, Guid courseId, DateTime date)
@@ -32,12 +36,16 @@ public class AttendanceRepository : IAttendanceRepository
         // Normalize date to compare only date part (ignore time)
         var dateOnly = date.Date;
         
-        return await _context.Attendances
+        var attendanceSchema = await _context.Attendances
             .Include(a => a.Student)
             .FirstOrDefaultAsync(a => 
                 a.StudentId == studentId && 
                 a.CourseId == courseId && 
                 a.LectureDate.Date == dateOnly);
+
+        return attendanceSchema != null 
+            ? AttendanceMapper.ToDomain(attendanceSchema, includeRelationships: true) 
+            : null;
     }
 
     public async Task<List<Attendance>> GetAttendanceForDateRangeAsync(Guid courseId, DateTime startDate, DateTime endDate)
@@ -45,38 +53,45 @@ public class AttendanceRepository : IAttendanceRepository
         var startDateOnly = startDate.Date;
         var endDateOnly = endDate.Date;
         
-        return await _context.Attendances
+        var attendanceSchemas = await _context.Attendances
             .Include(a => a.Student)
             .Where(a => 
                 a.CourseId == courseId && 
                 a.LectureDate.Date >= startDateOnly && 
                 a.LectureDate.Date <= endDateOnly)
             .ToListAsync();
+
+        return AttendanceMapper.ToDomainCollection(attendanceSchemas, includeRelationships: true).ToList();
     }
 
     public async Task<Attendance> CreateOrUpdateAttendanceAsync(Attendance attendance)
     {
         // Check if attendance record already exists
-        var existing = await GetAttendanceAsync(attendance.StudentId, attendance.CourseId, attendance.LectureDate);
+        var dateOnly = attendance.LectureDate.Date;
+        var existingSchema = await _context.Attendances
+            .FirstOrDefaultAsync(a => 
+                a.StudentId == attendance.StudentId && 
+                a.CourseId == attendance.CourseId && 
+                a.LectureDate.Date == dateOnly);
         
-        if (existing != null)
+        if (existingSchema != null)
         {
             // Update existing record
-            existing.Status = attendance.Status;
-            existing.Note = attendance.Note;
-            existing.UpdatedAt = DateTime.UtcNow;
-            _context.Attendances.Update(existing);
+            AttendanceMapper.UpdatePersistence(existingSchema, attendance);
+            existingSchema.UpdatedAt = DateTime.UtcNow;
+            _context.Attendances.Update(existingSchema);
             await _context.SaveChangesAsync();
-            return existing;
+            return AttendanceMapper.ToDomain(existingSchema, includeRelationships: false);
         }
         else
         {
             // Create new record
             attendance.CreatedAt = DateTime.UtcNow;
             attendance.LectureDate = attendance.LectureDate.Date; // Ensure only date part
-            _context.Attendances.Add(attendance);
+            var attendanceSchema = AttendanceMapper.ToPersistence(attendance);
+            _context.Attendances.Add(attendanceSchema);
             await _context.SaveChangesAsync();
-            return attendance;
+            return AttendanceMapper.ToDomain(attendanceSchema, includeRelationships: false);
         }
     }
 
@@ -94,8 +109,12 @@ public class AttendanceRepository : IAttendanceRepository
 
     public async Task<Teacher?> GetTeacherByUserIdAsync(string userId)
     {
-        return await _context.Teachers
+        var teacherSchema = await _context.Teachers
             .FirstOrDefaultAsync(t => t.UserId == userId);
+
+        return teacherSchema != null 
+            ? TeacherMapper.ToDomain(teacherSchema, includeRelationships: false) 
+            : null;
     }
 
     public async Task<Guid> GetCourseFacultyIdAsync(Guid courseId)

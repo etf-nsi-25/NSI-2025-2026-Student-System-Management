@@ -23,7 +23,7 @@ namespace Faculty.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Faculty.Core.Entities.Assignment", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.AssignmentSchema", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -66,7 +66,7 @@ namespace Faculty.Infrastructure.Migrations
                     b.ToTable("Assignment", "public");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.Attendance", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.AttendanceSchema", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -111,7 +111,48 @@ namespace Faculty.Infrastructure.Migrations
                     b.ToTable("Attendance", "public");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.Course", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.CourseAssignmentSchema", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AcademicYearId")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("FacultyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Role")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("FacultyId");
+
+                    b.HasIndex("TeacherId", "CourseId");
+
+                    b.ToTable("CourseAssignment", "public");
+                });
+
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.CourseSchema", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -156,48 +197,7 @@ namespace Faculty.Infrastructure.Migrations
                     b.ToTable("Course", "public");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.CourseAssignment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AcademicYearId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("CourseId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("FacultyId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Role")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<int>("TeacherId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("FacultyId");
-
-                    b.HasIndex("TeacherId", "CourseId");
-
-                    b.ToTable("CourseAssignment", "public");
-                });
-
-            modelBuilder.Entity("Faculty.Core.Entities.Enrollment", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.EnrollmentSchema", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -256,8 +256,17 @@ namespace Faculty.Infrastructure.Migrations
                     b.Property<DateTime?>("ExamDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("ExamType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<Guid>("FacultyId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("Name")
                         .HasMaxLength(200)
@@ -278,7 +287,7 @@ namespace Faculty.Infrastructure.Migrations
                     b.ToTable("Exam", "public");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.ExamRegistration", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.ExamRegistrationSchema", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -320,7 +329,7 @@ namespace Faculty.Infrastructure.Migrations
                     b.ToTable("ExamRegistration", "public");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.Student", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.ExamSchema", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -328,48 +337,38 @@ namespace Faculty.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("EnrollmentDate")
+                    b.Property<DateTime?>("ExamDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("FacultyId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("FirstName")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                    b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
-                    b.Property<string>("IndexNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("LastName")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                    b.Property<DateTime?>("RegDeadline")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("character varying(450)");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
 
                     b.HasIndex("FacultyId");
 
-                    b.HasIndex("IndexNumber");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Student", "public");
+                    b.ToTable("Exam", "public");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.StudentAssignment", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.StudentAssignmentSchema", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -419,7 +418,7 @@ namespace Faculty.Infrastructure.Migrations
                     b.ToTable("StudentAssignment", "public");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.StudentExamGrade", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.StudentExamGradeSchema", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -466,7 +465,56 @@ namespace Faculty.Infrastructure.Migrations
                     b.ToTable("StudentExamGrade", "public");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.Teacher", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.StudentSchema", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("EnrollmentDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("FacultyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("IndexNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FacultyId");
+
+                    b.HasIndex("IndexNumber");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Student", "public");
+                });
+
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.TeacherSchema", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -517,9 +565,9 @@ namespace Faculty.Infrastructure.Migrations
                     b.ToTable("Teacher", "public");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.Assignment", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.AssignmentSchema", b =>
                 {
-                    b.HasOne("Faculty.Core.Entities.Course", "Course")
+                    b.HasOne("Faculty.Infrastructure.Schemas.CourseSchema", "Course")
                         .WithMany("Assignments")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -528,15 +576,15 @@ namespace Faculty.Infrastructure.Migrations
                     b.Navigation("Course");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.Attendance", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.AttendanceSchema", b =>
                 {
-                    b.HasOne("Faculty.Core.Entities.Course", "Course")
+                    b.HasOne("Faculty.Infrastructure.Schemas.CourseSchema", "Course")
                         .WithMany("Attendances")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Faculty.Core.Entities.Student", "Student")
+                    b.HasOne("Faculty.Infrastructure.Schemas.StudentSchema", "Student")
                         .WithMany("Attendances")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -547,15 +595,15 @@ namespace Faculty.Infrastructure.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.CourseAssignment", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.CourseAssignmentSchema", b =>
                 {
-                    b.HasOne("Faculty.Core.Entities.Course", "Course")
+                    b.HasOne("Faculty.Infrastructure.Schemas.CourseSchema", "Course")
                         .WithMany("CourseAssignments")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Faculty.Core.Entities.Teacher", "Teacher")
+                    b.HasOne("Faculty.Infrastructure.Schemas.TeacherSchema", "Teacher")
                         .WithMany("CourseAssignments")
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -566,15 +614,15 @@ namespace Faculty.Infrastructure.Migrations
                     b.Navigation("Teacher");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.Enrollment", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.EnrollmentSchema", b =>
                 {
-                    b.HasOne("Faculty.Core.Entities.Course", "Course")
+                    b.HasOne("Faculty.Infrastructure.Schemas.CourseSchema", "Course")
                         .WithMany("Enrollments")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Faculty.Core.Entities.Student", "Student")
+                    b.HasOne("Faculty.Infrastructure.Schemas.StudentSchema", "Student")
                         .WithMany("Enrollments")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -585,26 +633,15 @@ namespace Faculty.Infrastructure.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.Exam", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.ExamRegistrationSchema", b =>
                 {
-                    b.HasOne("Faculty.Core.Entities.Course", "Course")
-                        .WithMany("Exams")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-                });
-
-            modelBuilder.Entity("Faculty.Core.Entities.ExamRegistration", b =>
-                {
-                    b.HasOne("Faculty.Core.Entities.Exam", "Exam")
+                    b.HasOne("Faculty.Infrastructure.Schemas.ExamSchema", "Exam")
                         .WithMany("ExamRegistrations")
                         .HasForeignKey("ExamId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Faculty.Core.Entities.Student", "Student")
+                    b.HasOne("Faculty.Infrastructure.Schemas.StudentSchema", "Student")
                         .WithMany("ExamRegistrations")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -615,15 +652,26 @@ namespace Faculty.Infrastructure.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.StudentAssignment", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.ExamSchema", b =>
                 {
-                    b.HasOne("Faculty.Core.Entities.Assignment", "Assignment")
+                    b.HasOne("Faculty.Infrastructure.Schemas.CourseSchema", "Course")
+                        .WithMany("Exams")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+                });
+
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.StudentAssignmentSchema", b =>
+                {
+                    b.HasOne("Faculty.Infrastructure.Schemas.AssignmentSchema", "Assignment")
                         .WithMany("StudentAssignments")
                         .HasForeignKey("AssignmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Faculty.Core.Entities.Student", "Student")
+                    b.HasOne("Faculty.Infrastructure.Schemas.StudentSchema", "Student")
                         .WithMany("StudentAssignments")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -634,15 +682,15 @@ namespace Faculty.Infrastructure.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.StudentExamGrade", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.StudentExamGradeSchema", b =>
                 {
-                    b.HasOne("Faculty.Core.Entities.Exam", "Exam")
+                    b.HasOne("Faculty.Infrastructure.Schemas.ExamSchema", "Exam")
                         .WithMany("StudentExamGrades")
                         .HasForeignKey("ExamId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Faculty.Core.Entities.Student", "Student")
+                    b.HasOne("Faculty.Infrastructure.Schemas.StudentSchema", "Student")
                         .WithMany("StudentExamGrades")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -653,12 +701,12 @@ namespace Faculty.Infrastructure.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.Assignment", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.AssignmentSchema", b =>
                 {
                     b.Navigation("StudentAssignments");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.Course", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.CourseSchema", b =>
                 {
                     b.Navigation("Assignments");
 
@@ -671,14 +719,14 @@ namespace Faculty.Infrastructure.Migrations
                     b.Navigation("Exams");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.Exam", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.ExamSchema", b =>
                 {
                     b.Navigation("ExamRegistrations");
 
                     b.Navigation("StudentExamGrades");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.Student", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.StudentSchema", b =>
                 {
                     b.Navigation("Attendances");
 
@@ -691,7 +739,7 @@ namespace Faculty.Infrastructure.Migrations
                     b.Navigation("StudentExamGrades");
                 });
 
-            modelBuilder.Entity("Faculty.Core.Entities.Teacher", b =>
+            modelBuilder.Entity("Faculty.Infrastructure.Schemas.TeacherSchema", b =>
                 {
                     b.Navigation("CourseAssignments");
                 });

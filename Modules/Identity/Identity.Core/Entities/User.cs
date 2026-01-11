@@ -93,5 +93,9 @@ public class User
         Role = newRole;
     }
 
+    public void UpdatePasswordHash(string newPasswordHash)
+    {
+        PasswordHash = newPasswordHash;
+    }
 
 }

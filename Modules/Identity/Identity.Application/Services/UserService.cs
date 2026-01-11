@@ -204,4 +204,22 @@ internal class UserService(
 
         return true;
     }
+
+    public async Task<bool> ChangePasswordAsync(Guid userId, string newPassword)
+    {
+        var user = await userRepository.GetByIdAsync(userId);
+        if (user == null)
+        {
+            return false;
+        }
+
+        var passwordHash = identityHasherService.HashPassword(newPassword);
+        
+        user.UpdatePasswordHash(passwordHash);
+
+        await userRepository.UpdateAsync(user);
+        await userRepository.SaveAsync();
+        
+        return true;
+    }
 }

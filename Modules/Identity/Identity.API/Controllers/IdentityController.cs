@@ -1,8 +1,9 @@
 ﻿using Identity.Application.Interfaces;
-using Identity.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using Identity.Core.DTO;
 using Identity.Core.Enums;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace Identity.API.Controllers
 {
@@ -18,6 +19,7 @@ namespace Identity.API.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -68,6 +70,53 @@ namespace Identity.API.Controllers
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Error = "An unexpected error occurred. Please try again." });
+            }
+        }
+
+        [HttpGet("me")]
+        [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var userIdStr = User.FindFirstValue("userId");
+            if (!Guid.TryParse(userIdStr, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _userService.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return Ok(user);
+        }
+
+        [HttpPost("me/change-password")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ChangeCurrentPassword([FromBody] ChangePasswordRequest request)
+        {
+            var userIdStr = User.FindFirstValue("userId");
+            if (!Guid.TryParse(userIdStr, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var result = await _userService.ChangePasswordAsync(userId, request.NewPassword);
+                if (!result)
+                {
+                    return NotFound();
+                }
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
             }
         }
 
@@ -138,7 +187,6 @@ namespace Identity.API.Controllers
         {
             try
             {
-
                 var result = await _userService.DeactivateUserAsync(userId);
 
                 if (!result)
@@ -183,6 +231,56 @@ namespace Identity.API.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
+        }
+
+        [HttpPost("{userId:guid}/change-password")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ChangePassword(Guid userId, [FromBody] ChangePasswordRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                if (!CanModifyUser(userId))
+                {
+                    return Forbid();
+                }
+
+                var result = await _userService.ChangePasswordAsync(userId, request.NewPassword);
+
+                if (!result)
+                {
+                    return NotFound();
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        private bool IsAdmin()
+        {
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+            return userRole == UserRole.Admin.ToString() || userRole == UserRole.Superadmin.ToString();
+        }
+
+        private bool IsSelf(Guid userId)
+        {
+            var currentUserId = User.FindFirstValue("userId");
+            return currentUserId == userId.ToString();
+        }
+
+        private bool CanModifyUser(Guid userId)
+        {
+            return IsAdmin() || IsSelf(userId);
         }
     }
 }
