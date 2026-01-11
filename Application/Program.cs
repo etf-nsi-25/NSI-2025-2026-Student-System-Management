@@ -28,6 +28,7 @@ using Identity.Infrastructure.Entities;
 // Prevents failures when DateTime.Kind is Unspecified but the DB column is timestamptz.
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 using Analytics.Infrastructure.Db;
+using Analytics.Infrastructure.Db.Seeding;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -162,6 +163,9 @@ if (applyMigrations)
             {
                 var analyticsDb = services.GetRequiredService<AnalyticsDbContext>();
                 analyticsDb.Database.Migrate();
+                var analyticSeeder = services.GetRequiredService<AnalyticsDbInitializer>();
+                await analyticSeeder.SeedAsync(
+                    analyticsDb);
             }
             catch (Exception ex)
             {

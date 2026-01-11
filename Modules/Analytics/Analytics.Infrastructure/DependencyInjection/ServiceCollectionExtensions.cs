@@ -1,4 +1,7 @@
-﻿using Analytics.Infrastructure.Db;
+﻿using Analytics.Core.Interfaces;
+using Analytics.Infrastructure.Db;
+using Analytics.Infrastructure.Db.Seeding;
+using Analytics.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +14,10 @@ namespace Analytics.Infrastructure
         {
             services.AddDbContext<AnalyticsDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("Database")));
+            
+            services.AddScoped<IStatRepository, StatsRepository>();
+            services.AddScoped<IMetricRepository, MetricRepository>();
+            services.AddScoped<AnalyticsDbInitializer>();
 
             return services;
         }

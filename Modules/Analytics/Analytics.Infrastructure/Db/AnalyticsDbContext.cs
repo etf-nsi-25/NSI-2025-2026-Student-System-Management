@@ -11,7 +11,7 @@ namespace Analytics.Infrastructure.Db
 
         public DbSet<Metric> Metrics { get; set; }
         public DbSet<Stat> Stats { get; set; }
-        
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
