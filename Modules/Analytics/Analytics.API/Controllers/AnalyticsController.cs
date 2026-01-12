@@ -8,5 +8,6 @@ namespace Analytics.API.Controllers
     {
         [HttpGet]
         public IActionResult Get() => Ok("Hello from Analytics API!");
+
     }
 }

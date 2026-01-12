@@ -4,11 +4,11 @@ using Microsoft.Extensions.Configuration;
 
 namespace Support.Infrastructure.Db
 {
-    public class SupportDbContextFactory : IDesignTimeDbContextFactory<SupportDbContext>
-    {
-        public SupportDbContext CreateDbContext(string[] args)
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<SupportDbContext>();
+	public class SupportDbContextFactory : IDesignTimeDbContextFactory<SupportDbContext>
+	{
+		public SupportDbContext CreateDbContext(string[] args)
+		{
+			var optionsBuilder = new DbContextOptionsBuilder<SupportDbContext>();
 
             var configurationPath = FindApplicationDirectory();
 
@@ -23,24 +23,21 @@ namespace Support.Infrastructure.Db
             if (string.IsNullOrEmpty(connectionString))
             {
                 throw new InvalidOperationException(
-                    $"Connection string 'Database' not found in configuration. Searched in: {configurationPath}. "
-                        + "Please ensure it's configured in appsettings.json or appsettings.Development.json"
-                );
+                    $"Connection string 'Database' not found in configuration. Searched in: {configurationPath}. " +
+                    "Please ensure it's configured in appsettings.json or appsettings.Development.json");
             }
 
             optionsBuilder.UseNpgsql(connectionString);
 
-            return new SupportDbContext(optionsBuilder.Options);
-        }
+			return new SupportDbContext(optionsBuilder.Options);
+		}
 
         private static string FindApplicationDirectory()
         {
             var currentDir = Directory.GetCurrentDirectory();
 
-            if (
-                Directory.Exists(Path.Combine(currentDir, "Application"))
-                || File.Exists(Path.Combine(currentDir, "appsettings.json"))
-            )
+            if (Directory.Exists(Path.Combine(currentDir, "Application")) ||
+                File.Exists(Path.Combine(currentDir, "appsettings.json")))
             {
                 if (File.Exists(Path.Combine(currentDir, "appsettings.json")))
                 {
@@ -48,10 +45,7 @@ namespace Support.Infrastructure.Db
                 }
 
                 var appDir = Path.Combine(currentDir, "Application");
-                if (
-                    Directory.Exists(appDir)
-                    && File.Exists(Path.Combine(appDir, "appsettings.json"))
-                )
+                if (Directory.Exists(appDir) && File.Exists(Path.Combine(appDir, "appsettings.json")))
                 {
                     return appDir;
                 }
@@ -61,10 +55,7 @@ namespace Support.Infrastructure.Db
             while (directory != null)
             {
                 var applicationPath = Path.Combine(directory.FullName, "Application");
-                if (
-                    Directory.Exists(applicationPath)
-                    && File.Exists(Path.Combine(applicationPath, "appsettings.json"))
-                )
+                if (Directory.Exists(applicationPath) && File.Exists(Path.Combine(applicationPath, "appsettings.json")))
                 {
                     return applicationPath;
                 }
@@ -73,9 +64,8 @@ namespace Support.Infrastructure.Db
             }
 
             throw new InvalidOperationException(
-                $"Could not find Application project directory with appsettings.json. "
-                    + $"Searched from: {currentDir}"
-            );
+                $"Could not find Application project directory with appsettings.json. " +
+                $"Searched from: {currentDir}");
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿namespace Application.NewFolder
 {
-    public class Middleware { }
+    public class Middleware
+    {
+    }
 }

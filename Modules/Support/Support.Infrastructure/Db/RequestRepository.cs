@@ -1,13 +1,14 @@
-using Common.Infrastructure.Repositories;
 using Support.Core.Entities;
 using Support.Core.Interfaces;
+using Common.Infrastructure.Repositories;
 
 namespace Support.Infrastructure.Db
 {
     public class RequestRepository : BaseRepository<DocumentRequest>, IRequestRepository
     {
-        public RequestRepository(SupportDbContext context)
-            : base(context) { }
+        public RequestRepository(SupportDbContext context) : base(context)
+        {
+        }
 
         public async Task<DocumentRequest?> GetByIdAsync(int id)
         {

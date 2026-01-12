@@ -20,10 +20,7 @@ namespace Support.API.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(IssueDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IssueDto>> CreateIssue(
-            [FromBody] CreateIssueDto createIssueDto,
-            CancellationToken cancellationToken
-        )
+        public async Task<ActionResult<IssueDto>> CreateIssue([FromBody] CreateIssueDto createIssueDto, CancellationToken cancellationToken)
         {
             try
             {
@@ -43,20 +40,14 @@ namespace Support.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating issue");
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new { message = "An error occurred while creating the issue" }
-                );
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while creating the issue" });
             }
         }
 
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(IssueDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IssueDto>> GetIssueById(
-            int id,
-            CancellationToken cancellationToken
-        )
+        public async Task<ActionResult<IssueDto>> GetIssueById(int id, CancellationToken cancellationToken)
         {
             try
             {
@@ -71,18 +62,13 @@ namespace Support.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving issue with ID {IssueId}", id);
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new { message = "An error occurred while retrieving the issue" }
-                );
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving the issue" });
             }
         }
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<IssueDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<IssueDto>>> GetAllIssues(
-            CancellationToken cancellationToken
-        )
+        public async Task<ActionResult<IEnumerable<IssueDto>>> GetAllIssues(CancellationToken cancellationToken)
         {
             try
             {
@@ -92,19 +78,13 @@ namespace Support.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving all issues");
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new { message = "An error occurred while retrieving issues" }
-                );
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving issues" });
             }
         }
 
         [HttpGet("user/{userId}")]
         [ProducesResponseType(typeof(IEnumerable<IssueDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<IssueDto>>> GetIssuesByUserId(
-            string userId,
-            CancellationToken cancellationToken
-        )
+        public async Task<ActionResult<IEnumerable<IssueDto>>> GetIssuesByUserId(string userId, CancellationToken cancellationToken)
         {
             try
             {
@@ -114,10 +94,7 @@ namespace Support.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving issues for user {UserId}", userId);
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new { message = "An error occurred while retrieving issues" }
-                );
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving issues" });
             }
         }
 
@@ -125,11 +102,7 @@ namespace Support.API.Controllers
         [ProducesResponseType(typeof(IssueDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IssueDto>> UpdateIssue(
-            int id,
-            [FromBody] UpdateIssueDto updateIssueDto,
-            CancellationToken cancellationToken
-        )
+        public async Task<ActionResult<IssueDto>> UpdateIssue(int id, [FromBody] UpdateIssueDto updateIssueDto, CancellationToken cancellationToken)
         {
             try
             {
@@ -138,11 +111,7 @@ namespace Support.API.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var updatedIssue = await _issueService.UpdateIssueAsync(
-                    id,
-                    updateIssueDto,
-                    cancellationToken
-                );
+                var updatedIssue = await _issueService.UpdateIssueAsync(id, updateIssueDto, cancellationToken);
                 if (updatedIssue == null)
                 {
                     return NotFound(new { message = $"Issue with ID {id} not found" });
@@ -158,10 +127,7 @@ namespace Support.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating issue {IssueId}", id);
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new { message = "An error occurred while updating the issue" }
-                );
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while updating the issue" });
             }
         }
 
@@ -183,18 +149,13 @@ namespace Support.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting issue {IssueId}", id);
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new { message = "An error occurred while deleting the issue" }
-                );
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while deleting the issue" });
             }
         }
 
         [HttpGet("categories")]
         [ProducesResponseType(typeof(IEnumerable<IssueCategoryDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<IssueCategoryDto>>> GetAllCategories(
-            CancellationToken cancellationToken
-        )
+        public async Task<ActionResult<IEnumerable<IssueCategoryDto>>> GetAllCategories(CancellationToken cancellationToken)
         {
             try
             {
@@ -204,10 +165,7 @@ namespace Support.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving issue categories");
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new { message = "An error occurred while retrieving issue categories" }
-                );
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving issue categories" });
             }
         }
     }

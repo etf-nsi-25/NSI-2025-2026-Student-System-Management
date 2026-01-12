@@ -9,27 +9,9 @@ namespace University.Application.Services
         // TODO: REMOVE DUMMY DATA AND REPLACE WITH REPOSITORY CALL ONCE DB CODE IS MERGED.
         private static List<Faculty> _dummyFaculties = new List<Faculty>
         {
-            new Faculty
-            {
-                Id = 1,
-                Name = "Faculty of Electrical Engineering",
-                Address = "Zmaja od Bosne bb",
-                Code = "ETF",
-            },
-            new Faculty
-            {
-                Id = 2,
-                Name = "Faculty of Philosophy",
-                Address = "Franje Račkog 1",
-                Code = "FF",
-            },
-            new Faculty
-            {
-                Id = 3,
-                Name = "Faculty of Economics",
-                Address = "Trg oslobođenja - Alija Izetbegović 1",
-                Code = "EFSA",
-            },
+            new Faculty { Id = 1, Name = "Faculty of Electrical Engineering", Address = "Zmaja od Bosne bb", Code = "ETF" },
+            new Faculty { Id = 2, Name = "Faculty of Philosophy", Address = "Franje Račkog 1", Code = "FF" },
+            new Faculty { Id = 3, Name = "Faculty of Economics", Address = "Trg oslobođenja - Alija Izetbegović 1", Code = "EFSA" }
         };
         private static int _nextId = 4;
 
@@ -40,17 +22,16 @@ namespace University.Application.Services
 
             if (!string.IsNullOrEmpty(nameFilter))
             {
-                faculties = faculties.Where(f =>
-                    f.Name.Contains(nameFilter, StringComparison.OrdinalIgnoreCase)
-                );
+                faculties = faculties.Where(f => f.Name.Contains(nameFilter, StringComparison.OrdinalIgnoreCase));
             }
+
 
             var dtos = faculties.Select(f => new FacultyDto
             {
                 Id = f.Id,
                 Name = f.Name,
                 Address = f.Address,
-                Code = f.Code,
+                Code = f.Code
             });
 
             return Task.FromResult(dtos);
@@ -70,7 +51,7 @@ namespace University.Application.Services
                 Id = faculty.Id,
                 Name = faculty.Name,
                 Address = faculty.Address,
-                Code = faculty.Code,
+                Code = faculty.Code
             };
             return Task.FromResult<FacultyDto?>(dto);
         }
@@ -78,20 +59,12 @@ namespace University.Application.Services
         public Task<FacultyDto> CreateFacultyAsync(CreateFacultyDto dto)
         {
             // TODO: REMOVE DUMMY DATA AND REPLACE WITH REPOSITORY CALL ONCE DB CODE IS MERGED.
-            if (
-                _dummyFaculties.Any(f =>
-                    f.Name.Equals(dto.Name, StringComparison.OrdinalIgnoreCase)
-                )
-            )
+            if (_dummyFaculties.Any(f => f.Name.Equals(dto.Name, StringComparison.OrdinalIgnoreCase)))
             {
                 throw new ArgumentException("Faculty with the same name already exists.");
             }
 
-            if (
-                _dummyFaculties.Any(f =>
-                    f.Code.Equals(dto.Code, StringComparison.OrdinalIgnoreCase)
-                )
-            )
+            if (_dummyFaculties.Any(f => f.Code.Equals(dto.Code, StringComparison.OrdinalIgnoreCase)))
             {
                 throw new ArgumentException("Faculty with the same code already exists.");
             }
@@ -101,7 +74,7 @@ namespace University.Application.Services
                 Id = _nextId++,
                 Name = dto.Name,
                 Address = dto.Address,
-                Code = dto.Code,
+                Code = dto.Code
             };
 
             _dummyFaculties.Add(newFaculty);
@@ -111,7 +84,7 @@ namespace University.Application.Services
                 Id = newFaculty.Id,
                 Name = newFaculty.Name,
                 Address = newFaculty.Address,
-                Code = newFaculty.Code,
+                Code = newFaculty.Code
             };
 
             return Task.FromResult(facultyDto);
@@ -126,22 +99,12 @@ namespace University.Application.Services
                 return Task.FromResult<FacultyDto?>(null);
             }
 
-            if (
-                dto.Name != null
-                && _dummyFaculties.Any(f =>
-                    f.Id != id && f.Name.Equals(dto.Name, StringComparison.OrdinalIgnoreCase)
-                )
-            )
+            if (dto.Name != null && _dummyFaculties.Any(f => f.Id != id && f.Name.Equals(dto.Name, StringComparison.OrdinalIgnoreCase)))
             {
                 throw new ArgumentException("Faculty with the same name already exists.");
             }
 
-            if (
-                dto.Code != null
-                && _dummyFaculties.Any(f =>
-                    f.Id != id && f.Code.Equals(dto.Code, StringComparison.OrdinalIgnoreCase)
-                )
-            )
+            if (dto.Code != null && _dummyFaculties.Any(f => f.Id != id && f.Code.Equals(dto.Code, StringComparison.OrdinalIgnoreCase)))
             {
                 throw new ArgumentException("Faculty with the same code already exists.");
             }
@@ -164,7 +127,7 @@ namespace University.Application.Services
                 Id = faculty.Id,
                 Name = faculty.Name,
                 Address = faculty.Address,
-                Code = faculty.Code,
+                Code = faculty.Code
             };
 
             return Task.FromResult<FacultyDto?>(facultyDto);

@@ -16,14 +16,16 @@ namespace Faculty.Infrastructure.Migrations
                 table: "Attendance",
                 type: "character varying(500)",
                 maxLength: 500,
-                nullable: true
-            );
+                nullable: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(name: "Note", schema: "public", table: "Attendance");
+            migrationBuilder.DropColumn(
+                name: "Note",
+                schema: "public",
+                table: "Attendance");
         }
     }
 }

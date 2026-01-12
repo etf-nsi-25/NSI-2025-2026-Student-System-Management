@@ -41,10 +41,7 @@ public class FacultyDbContextMultiTenancyTests : IDisposable
             .Select(t => t.Id)
             .ToList();
 
-        await using var contextB = CreateContext(
-            new FixedTenantService(_facultyBGuid),
-            ensureCreated: false
-        );
+        await using var contextB = CreateContext(new FixedTenantService(_facultyBGuid), ensureCreated: false);
         var tenantBTeachers = await contextB.Teachers.AsNoTracking().ToListAsync();
 
         Assert.Single(tenantBTeachers);
@@ -68,7 +65,10 @@ public class FacultyDbContextMultiTenancyTests : IDisposable
     {
         await using var context = CreateContext(new FixedTenantService(_facultyAGuid));
 
-        var teachers = await context.Teachers.IgnoreQueryFilters().AsNoTracking().ToListAsync();
+        var teachers = await context.Teachers
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .ToListAsync();
 
         Assert.Equal(2, teachers.Count);
         Assert.Contains(teachers, t => t.FacultyId == _facultyAGuid);
@@ -100,7 +100,7 @@ public class FacultyDbContextMultiTenancyTests : IDisposable
                 FirstName = "Alice",
                 LastName = "Anderson",
                 Title = "Prof.",
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow
             },
             new Teacher
             {
@@ -109,8 +109,8 @@ public class FacultyDbContextMultiTenancyTests : IDisposable
                 FirstName = "Bob",
                 LastName = "Brown",
                 Title = "Dr.",
-                CreatedAt = DateTime.UtcNow,
-            },
+                CreatedAt = DateTime.UtcNow
+            }
         };
 
         var students = new List<Student>
@@ -122,7 +122,7 @@ public class FacultyDbContextMultiTenancyTests : IDisposable
                 IndexNumber = "A-001",
                 FirstName = "Charlie",
                 LastName = "Clark",
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow
             },
             new Student
             {
@@ -131,8 +131,8 @@ public class FacultyDbContextMultiTenancyTests : IDisposable
                 IndexNumber = "B-001",
                 FirstName = "Dana",
                 LastName = "Davis",
-                CreatedAt = DateTime.UtcNow,
-            },
+                CreatedAt = DateTime.UtcNow
+            }
         };
 
         context.AddRange(teachers);
@@ -157,3 +157,4 @@ public class FacultyDbContextMultiTenancyTests : IDisposable
         public Guid GetCurrentFacultyId() => _facultyId;
     }
 }
+

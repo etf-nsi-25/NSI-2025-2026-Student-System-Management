@@ -1,6 +1,6 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using Identity.Core.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Identity.Core.DTO;
 
@@ -12,7 +12,7 @@ public class UpdateUserRequest
     [Required]
     public required string LastName { get; set; }
 
-    [Required]
+    [Required] 
     public required string Email { get; set; }
 
     [Required]
@@ -22,6 +22,6 @@ public class UpdateUserRequest
 
     public UserStatus Status { get; set; }
 
-    [Required]
-    public required UserRole Role { get; set; }
+    [Required] 
+    public required UserRole Role { get; set; } 
 }

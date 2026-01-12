@@ -2,12 +2,12 @@
 using System.Reflection;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Moq;
+using Xunit;
 using Identity.Application.Services;
 using Identity.Core.DomainServices;
 using Identity.Core.Entities;
 using Identity.Core.Repositories;
-using Moq;
-using Xunit;
 
 namespace Identity.Tests.TwoFactor
 {
@@ -61,15 +61,13 @@ namespace Identity.Tests.TwoFactor
 
             var usernameProp = typeof(User).GetProperty(
                 "Username",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
-            );
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
             usernameProp!.SetValue(user, username);
 
             var idProp = typeof(User).GetProperty(
                 "Id",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
-            );
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
             idProp!.SetValue(user, id);
 
@@ -84,7 +82,9 @@ namespace Identity.Tests.TwoFactor
             var user = CreateUser(userId, "flow-user");
 
             var userRepoMock = new Mock<IUserRepository>();
-            userRepoMock.Setup(r => r.GetByIdAsync(userId)).ReturnsAsync(user);
+            userRepoMock
+                .Setup(r => r.GetByIdAsync(userId))
+                .ReturnsAsync(user);
 
             var totpProvider = new FakeTotpProvider();
             var domainService = new TwoFactorDomainService(totpProvider);
@@ -117,7 +117,9 @@ namespace Identity.Tests.TwoFactor
             var user = CreateUser(userId, "flow-user");
 
             var userRepoMock = new Mock<IUserRepository>();
-            userRepoMock.Setup(r => r.GetByIdAsync(userId)).ReturnsAsync(user);
+            userRepoMock
+                .Setup(r => r.GetByIdAsync(userId))
+                .ReturnsAsync(user);
 
             var totpProvider = new FakeTotpProvider();
             var domainService = new TwoFactorDomainService(totpProvider);

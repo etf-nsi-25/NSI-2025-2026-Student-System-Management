@@ -19,110 +19,93 @@ public class EnrollmentService : IEnrollmentService
 
     public async Task<List<StudentEnrollmentItemDto>> GetMyEnrollmentsAsync(
         string userId,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
         try
         {
             if (string.IsNullOrWhiteSpace(userId))
                 throw new FacultyApplicationException(
                     "Authenticated user identifier was not provided.",
-                    HttpStatusCode.BadRequest
-                );
+                    HttpStatusCode.BadRequest);
 
             var student = await _repository.GetStudentByUserIdAsync(userId, cancellationToken);
             if (student == null)
                 throw new FacultyApplicationException(
                     "Student record for the current user was not found.",
-                    HttpStatusCode.NotFound
-                );
+                    HttpStatusCode.NotFound);
 
-            var enrollments = await _repository.GetEnrollmentsByStudentIdAsync(
-                student.Id,
-                cancellationToken
-            );
+            var enrollments = await _repository.GetEnrollmentsByStudentIdAsync(student.Id, cancellationToken);
 
-            return enrollments
-                .Select(e => new StudentEnrollmentItemDto
-                {
-                    EnrollmentId = e.Id,
-                    CourseId = e.CourseId,
-                    CourseName = e.Course?.Name ?? string.Empty,
-                    Status = e.Status,
-                    Grade = e.Grade,
-                })
-                .ToList();
+            return enrollments.Select(e => new StudentEnrollmentItemDto
+            {
+                EnrollmentId = e.Id,
+                CourseId = e.CourseId,
+                CourseName = e.Course?.Name ?? string.Empty,
+                Status = e.Status,
+                Grade = e.Grade
+            }).ToList();
         }
         catch (OperationCanceledException)
         {
             // request cancelled or db command timeout (often surfaces as cancellation)
             throw new FacultyApplicationException(
                 "The request was cancelled or the database operation timed out.",
-                HttpStatusCode.InternalServerError
-            );
+                HttpStatusCode.InternalServerError);
         }
         catch (FacultyApplicationException)
         {
-            throw;
+            throw; 
         }
         catch (Exception)
         {
             // fallback
             throw new FacultyApplicationException(
                 "An unexpected error occurred while reading enrollments.",
-                HttpStatusCode.InternalServerError
-            );
+                HttpStatusCode.InternalServerError);
         }
     }
 
     public async Task<EnrollmentResponseDto> CreateEnrollmentAsync(
         Guid courseId,
         string userId,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
         try
         {
             if (courseId == Guid.Empty)
                 throw new FacultyApplicationException(
                     "A valid course identifier must be provided.",
-                    HttpStatusCode.BadRequest
-                );
+                    HttpStatusCode.BadRequest);
 
             if (string.IsNullOrWhiteSpace(userId))
                 throw new FacultyApplicationException(
                     "Authenticated user identifier was not provided.",
-                    HttpStatusCode.BadRequest
-                );
+                    HttpStatusCode.BadRequest);
 
             var student = await _repository.GetStudentByUserIdAsync(userId, cancellationToken);
             if (student == null)
                 throw new FacultyApplicationException(
                     "Student record for the current user was not found.",
-                    HttpStatusCode.NotFound
-                );
+                    HttpStatusCode.NotFound);
 
             var course = await _repository.GetCourseAsync(courseId, cancellationToken);
             if (course == null)
                 throw new FacultyApplicationException(
                     "Requested course does not exist.",
-                    HttpStatusCode.NotFound
-                );
+                    HttpStatusCode.NotFound);
 
-            var alreadyEnrolled = await _repository.IsAlreadyEnrolledAsync(
-                student.Id,
-                courseId,
-                cancellationToken
-            );
+            var alreadyEnrolled = await _repository.IsAlreadyEnrolledAsync(student.Id, courseId, cancellationToken);
             if (alreadyEnrolled)
-                throw new FacultyApplicationException("Already enrolled.", HttpStatusCode.Conflict);
+                throw new FacultyApplicationException(
+                    "Already enrolled.",
+                    HttpStatusCode.Conflict);
 
             var enrollment = new Enrollment
             {
                 StudentId = student.Id,
                 CourseId = course.Id,
                 Status = DefaultStatus,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow
             };
 
             var saved = await _repository.CreateEnrollmentAsync(enrollment, cancellationToken);
@@ -133,26 +116,24 @@ public class EnrollmentService : IEnrollmentService
                 StudentId = saved.StudentId,
                 CourseId = course.Id,
                 CourseName = course.Name,
-                EnrollmentDate = saved.CreatedAt,
+                EnrollmentDate = saved.CreatedAt
             };
         }
         catch (OperationCanceledException)
         {
             throw new FacultyApplicationException(
                 "The request was cancelled or the database operation timed out.",
-                HttpStatusCode.InternalServerError
-            );
+                HttpStatusCode.InternalServerError);
         }
         catch (FacultyApplicationException)
         {
-            throw;
+            throw; 
         }
         catch (Exception)
         {
             throw new FacultyApplicationException(
                 "An unexpected error occurred while creating the enrollment.",
-                HttpStatusCode.InternalServerError
-            );
+                HttpStatusCode.InternalServerError);
         }
     }
 }

@@ -11,7 +11,7 @@ public interface IScopedTenantContext
     /// Returns the tenant id for current scope, if existing.
     /// </summary>
     Guid? CurrentTenantId();
-
+    
     /// <summary>
     /// Starts a new tenant scope.
     /// </summary>

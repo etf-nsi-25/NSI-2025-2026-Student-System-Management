@@ -7,10 +7,8 @@ namespace Support.Core.Entities
     {
         [Key]
         public int Id { get; set; }
-
         [Required]
         public string Subject { get; set; } = string.Empty;
-
         [Required]
         public string Description { get; set; } = string.Empty;
 

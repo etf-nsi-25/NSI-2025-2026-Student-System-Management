@@ -1,5 +1,4 @@
-﻿using Faculty.Application.Exceptions;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
 namespace Application
@@ -13,8 +12,7 @@ namespace Application
         public GlobalExceptionHandlingMiddleware(
             RequestDelegate next,
             ILogger<GlobalExceptionHandlingMiddleware> logger,
-            IHostEnvironment env
-        )
+            IHostEnvironment env)
         {
             _next = next;
             _logger = logger;
@@ -27,65 +25,44 @@ namespace Application
             {
                 await _next(context);
             }
-            catch (FacultyApplicationException ex)
-            {
-                _logger.LogWarning(ex, "Faculty application error.");
-                await WriteJsonAsync(context, (int)ex.StatusCode, ex.Message);
-            }
             catch (OperationCanceledException ex)
             {
                 _logger.LogWarning(ex, "Request cancelled/timeout.");
-                await WriteJsonAsync(
-                    context,
-                    StatusCodes.Status500InternalServerError,
-                    "The request was cancelled or the operation timed out."
-                );
+                await WriteJsonAsync(context, StatusCodes.Status500InternalServerError,
+                    "The request was cancelled or the operation timed out.");
             }
             catch (NpgsqlException ex)
             {
                 _logger.LogError(ex, "Database connection error.");
-                await WriteJsonAsync(
-                    context,
-                    StatusCodes.Status500InternalServerError,
-                    "Database connection error."
-                );
+                await WriteJsonAsync(context, StatusCodes.Status500InternalServerError,
+                    "Database connection error.");
             }
             catch (DbUpdateConcurrencyException ex)
             {
                 _logger.LogWarning(ex, "Concurrency error.");
-                await WriteJsonAsync(
-                    context,
-                    StatusCodes.Status409Conflict,
-                    "A concurrency error occurred. Please retry."
-                );
+                await WriteJsonAsync(context, StatusCodes.Status409Conflict,
+                    "A concurrency error occurred. Please retry.");
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Database update error.");
-                await WriteJsonAsync(
-                    context,
-                    StatusCodes.Status500InternalServerError,
-                    "Database update error."
-                );
+                await WriteJsonAsync(context, StatusCodes.Status500InternalServerError,
+                    "Database update error.");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unhandled exception.");
 
+                // u dev možeš vratiti više detalja, u prod generic poruku
                 var msg = _env.IsDevelopment() ? ex.Message : "Internal Server Error";
 
                 await WriteJsonAsync(context, StatusCodes.Status500InternalServerError, msg);
             }
         }
 
-        private static async Task WriteJsonAsync(
-            HttpContext context,
-            int statusCode,
-            string message
-        )
+        private static async Task WriteJsonAsync(HttpContext context, int statusCode, string message)
         {
-            if (context.Response.HasStarted)
-                return;
+            if (context.Response.HasStarted) return;
 
             context.Response.Clear();
             context.Response.StatusCode = statusCode;

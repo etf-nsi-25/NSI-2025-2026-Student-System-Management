@@ -1,7 +1,7 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using System;
 using University.Application.DTOs;
 using University.Application.Interfaces;
 
@@ -46,10 +46,7 @@ namespace University.API.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(
-                    500,
-                    $"An error occurred while retrieving the faculty with id {id}."
-                );
+                return StatusCode(500, $"An error occurred while retrieving the faculty with id {id}.");
             }
         }
 
@@ -64,11 +61,7 @@ namespace University.API.Controllers
             try
             {
                 var newFaculty = await _facultyService.CreateFacultyAsync(dto);
-                return CreatedAtAction(
-                    nameof(GetFacultyById),
-                    new { id = newFaculty.Id },
-                    newFaculty
-                );
+                return CreatedAtAction(nameof(GetFacultyById), new { id = newFaculty.Id }, newFaculty);
             }
             catch (ArgumentException ex)
             {
@@ -103,10 +96,7 @@ namespace University.API.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(
-                    500,
-                    $"An error occurred while updating the faculty with id {id}."
-                );
+                return StatusCode(500, $"An error occurred while updating the faculty with id {id}.");
             }
         }
 
@@ -124,10 +114,7 @@ namespace University.API.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(
-                    500,
-                    $"An error occurred while deleting the faculty with id {id}."
-                );
+                return StatusCode(500, $"An error occurred while deleting the faculty with id {id}.");
             }
         }
     }

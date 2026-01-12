@@ -21,8 +21,7 @@ namespace Faculty.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(
             [FromBody] CreateEnrollmentRequestDto request,
-            CancellationToken cancellationToken
-        )
+            CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -33,24 +32,28 @@ namespace Faculty.API.Controllers
             var result = await _service.CreateEnrollmentAsync(
                 request.CourseId,
                 userId!,
-                cancellationToken
-            );
+                cancellationToken);
 
             return Ok(result);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMyEnrollments(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetMyEnrollments(
+            CancellationToken cancellationToken)
         {
             if (!TryResolveUserId(out var userId, out var errorResult))
                 return errorResult!;
 
-            var result = await _service.GetMyEnrollmentsAsync(userId!, cancellationToken);
+            var result = await _service.GetMyEnrollmentsAsync(
+                userId!,
+                cancellationToken);
 
             return Ok(result);
         }
 
-        private bool TryResolveUserId(out string? userId, out IActionResult? errorResult)
+        private bool TryResolveUserId(
+            out string? userId,
+            out IActionResult? errorResult)
         {
             userId =
                 User.FindFirst("userId")?.Value

@@ -14,44 +14,28 @@ public class StudentExamRegistrationRepository : IStudentExamRegistrationReposit
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }
 
-    public async Task<Student?> GetStudentByUserIdAsync(
-        string userId,
-        CancellationToken cancellationToken = default
-    )
+    public async Task<Student?> GetStudentByUserIdAsync(string userId, CancellationToken cancellationToken = default)
     {
-        return await _context
-            .Students.Include(s => s.Enrollments)
+        return await _context.Students
+            .Include(s => s.Enrollments)
             .AsNoTracking()
             .FirstOrDefaultAsync(s => s.UserId == userId, cancellationToken);
     }
 
-    public async Task<Exam?> GetExamWithDetailsAsync(
-        int examId,
-        CancellationToken cancellationToken = default
-    )
+    public async Task<Exam?> GetExamWithDetailsAsync(int examId, CancellationToken cancellationToken = default)
     {
-        return await _context
-            .Exams.Include(e => e.Course)
+        return await _context.Exams
+            .Include(e => e.Course)
             .AsNoTracking()
             .FirstOrDefaultAsync(e => e.Id == examId, cancellationToken);
     }
 
-    public Task<bool> HasExistingRegistrationAsync(
-        int studentId,
-        int examId,
-        CancellationToken cancellationToken = default
-    )
+    public Task<bool> HasExistingRegistrationAsync(int studentId, int examId, CancellationToken cancellationToken = default)
     {
-        return _context.ExamRegistrations.AnyAsync(
-            r => r.StudentId == studentId && r.ExamId == examId,
-            cancellationToken
-        );
+        return _context.ExamRegistrations.AnyAsync(r => r.StudentId == studentId && r.ExamId == examId, cancellationToken);
     }
 
-    public async Task<ExamRegistration> SaveRegistrationAsync(
-        ExamRegistration registration,
-        CancellationToken cancellationToken = default
-    )
+    public async Task<ExamRegistration> SaveRegistrationAsync(ExamRegistration registration, CancellationToken cancellationToken = default)
     {
         await _context.ExamRegistrations.AddAsync(registration, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
@@ -62,21 +46,20 @@ public class StudentExamRegistrationRepository : IStudentExamRegistrationReposit
         int studentId,
         IReadOnlyCollection<Guid> enrolledCourseIds,
         DateTime currentUtc,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
         if (enrolledCourseIds.Count == 0)
         {
             return Array.Empty<Exam>();
         }
 
-        var registeredExamIds = await _context
-            .ExamRegistrations.Where(r => r.StudentId == studentId)
+        var registeredExamIds = await _context.ExamRegistrations
+            .Where(r => r.StudentId == studentId)
             .Select(r => r.ExamId)
             .ToListAsync(cancellationToken);
 
-        var query = _context
-            .Exams.Include(e => e.Course)
+        var query = _context.Exams
+            .Include(e => e.Course)
             .AsNoTracking()
             .Where(e => enrolledCourseIds.Contains(e.CourseId))
             .Where(e => e.ExamDate.HasValue && e.ExamDate.Value > currentUtc)
@@ -87,16 +70,15 @@ public class StudentExamRegistrationRepository : IStudentExamRegistrationReposit
             query = query.Where(e => !registeredExamIds.Contains(e.Id));
         }
 
-        return await query.OrderBy(e => e.ExamDate).ToListAsync(cancellationToken);
+        return await query
+            .OrderBy(e => e.ExamDate)
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyList<ExamRegistration>> GetRegistrationsAsync(
-        int studentId,
-        CancellationToken cancellationToken = default
-    )
+    public async Task<IReadOnlyList<ExamRegistration>> GetRegistrationsAsync(int studentId, CancellationToken cancellationToken = default)
     {
-        return await _context
-            .ExamRegistrations.Where(r => r.StudentId == studentId)
+        return await _context.ExamRegistrations
+            .Where(r => r.StudentId == studentId)
             .Include(r => r.Exam)
                 .ThenInclude(e => e.Course)
             .AsNoTracking()

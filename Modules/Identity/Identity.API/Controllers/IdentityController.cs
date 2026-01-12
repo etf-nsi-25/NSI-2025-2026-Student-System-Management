@@ -1,8 +1,8 @@
 ﻿using Identity.Application.Interfaces;
 using Identity.Application.Services;
+using Microsoft.AspNetCore.Mvc;
 using Identity.Core.DTO;
 using Identity.Core.Enums;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Identity.API.Controllers
 {
@@ -53,7 +53,7 @@ namespace Identity.API.Controllers
                         IndexNumber = request.IndexNumber,
                         Role = request.Role,
                         FacultyId = request.FacultyId,
-                        Status = UserStatus.Active,
+                        Status = UserStatus.Active
                     }
                 );
             }
@@ -67,10 +67,7 @@ namespace Identity.API.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new { Error = "An unexpected error occurred. Please try again." }
-                );
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Error = "An unexpected error occurred. Please try again." });
             }
         }
 
@@ -105,10 +102,7 @@ namespace Identity.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateUser(
-            Guid userId,
-            [FromBody] UpdateUserRequest request
-        )
+        public async Task<IActionResult> UpdateUser(Guid userId, [FromBody] UpdateUserRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -144,6 +138,7 @@ namespace Identity.API.Controllers
         {
             try
             {
+
                 var result = await _userService.DeactivateUserAsync(userId);
 
                 if (!result)

@@ -1,12 +1,12 @@
-using EventBus.Core;
-using Identity.API.Controllers;
 using Identity.Infrastructure.Db;
+using Identity.API.Controllers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using EventBus.Core;
 
 namespace Identity.IntegrationTests
 {
@@ -23,42 +23,36 @@ namespace Identity.IntegrationTests
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            builder.ConfigureAppConfiguration(
-                (context, config) =>
+            builder.ConfigureAppConfiguration((context, config) =>
+            {
+                config.AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    config.AddInMemoryCollection(
-                        new Dictionary<string, string?>
-                        {
-                            { "JwtSettings:Issuer", "IntegrationTest" },
-                            { "JwtSettings:Audience", "IntegrationTest" },
-                            { "JwtSettings:SigningKey", Convert.ToBase64String(new byte[32]) },
-                        }
-                    );
-                }
-            );
+                    {"JwtSettings:Issuer", "IntegrationTest"},
+                    {"JwtSettings:Audience", "IntegrationTest"},
+                    {"JwtSettings:SigningKey", Convert.ToBase64String(new byte[32])}
+                });
+            });
 
             builder.ConfigureServices(services =>
             {
-                var descriptor = services.SingleOrDefault(d =>
-                    d.ServiceType == typeof(DbContextOptions<AuthDbContext>)
-                );
+                var descriptor = services.SingleOrDefault(
+                    d => d.ServiceType ==
+                        typeof(DbContextOptions<AuthDbContext>));
 
                 if (descriptor != null)
                 {
                     services.Remove(descriptor);
                 }
 
-                var contextDescriptor = services.SingleOrDefault(d =>
-                    d.ServiceType == typeof(AuthDbContext)
-                );
+                var contextDescriptor = services.SingleOrDefault(
+                    d => d.ServiceType == typeof(AuthDbContext));
                 if (contextDescriptor != null)
                 {
                     services.Remove(contextDescriptor);
                 }
 
-                var optionsDescriptor = services.SingleOrDefault(d =>
-                    d.ServiceType == typeof(DbContextOptions)
-                );
+                var optionsDescriptor = services.SingleOrDefault(
+                    d => d.ServiceType == typeof(DbContextOptions));
                 if (optionsDescriptor != null)
                 {
                     services.Remove(optionsDescriptor);
@@ -81,8 +75,7 @@ namespace Identity.IntegrationTests
                     db.Database.EnsureCreated();
                 }
 
-                services
-                    .AddIdentity<ApplicationUser, IdentityRole>()
+                services.AddIdentity<ApplicationUser, IdentityRole>()
                     .AddEntityFrameworkStores<AuthDbContext>()
                     .AddDefaultTokenProviders();
             });

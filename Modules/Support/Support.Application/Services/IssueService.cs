@@ -9,32 +9,19 @@ namespace Support.Application.Services
         private readonly IIssueRepository _issueRepository;
         private readonly IIssueCategoryRepository _categoryRepository;
 
-        public IssueService(
-            IIssueRepository issueRepository,
-            IIssueCategoryRepository categoryRepository
-        )
+        public IssueService(IIssueRepository issueRepository, IIssueCategoryRepository categoryRepository)
         {
-            _issueRepository =
-                issueRepository ?? throw new ArgumentNullException(nameof(issueRepository));
-            _categoryRepository =
-                categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
+            _issueRepository = issueRepository ?? throw new ArgumentNullException(nameof(issueRepository));
+            _categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
         }
 
-        public async Task<IssueDto> CreateIssueAsync(
-            CreateIssueDto createIssueDto,
-            CancellationToken cancellationToken = default
-        )
+        public async Task<IssueDto> CreateIssueAsync(CreateIssueDto createIssueDto, CancellationToken cancellationToken = default)
         {
             // Validate that the category exists
-            var categoryExists = await _categoryRepository.AnyAsync(
-                c => c.Id == createIssueDto.CategoryId,
-                cancellationToken
-            );
+            var categoryExists = await _categoryRepository.AnyAsync(c => c.Id == createIssueDto.CategoryId, cancellationToken);
             if (!categoryExists)
             {
-                throw new ArgumentException(
-                    $"Category with ID {createIssueDto.CategoryId} does not exist."
-                );
+                throw new ArgumentException($"Category with ID {createIssueDto.CategoryId} does not exist.");
             }
 
             var issue = new Issue
@@ -44,7 +31,7 @@ namespace Support.Application.Services
                 CategoryId = createIssueDto.CategoryId,
                 UserId = createIssueDto.UserId,
                 Status = Status.Open,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow
             };
 
             var createdIssue = await _issueRepository.AddAsync(issue, cancellationToken);
@@ -52,10 +39,7 @@ namespace Support.Application.Services
             return await MapToIssueDtoAsync(createdIssue, cancellationToken);
         }
 
-        public async Task<IssueDto?> GetIssueByIdAsync(
-            int id,
-            CancellationToken cancellationToken = default
-        )
+        public async Task<IssueDto?> GetIssueByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             var issues = await _issueRepository.GetAsync(
                 filter: i => i.Id == id,
@@ -67,9 +51,7 @@ namespace Support.Application.Services
             return issue != null ? MapToIssueDto(issue) : null;
         }
 
-        public async Task<IEnumerable<IssueDto>> GetAllIssuesAsync(
-            CancellationToken cancellationToken = default
-        )
+        public async Task<IEnumerable<IssueDto>> GetAllIssuesAsync(CancellationToken cancellationToken = default)
         {
             var issues = await _issueRepository.GetAsync(
                 includeProperties: "Category",
@@ -80,10 +62,7 @@ namespace Support.Application.Services
             return issues.Select(MapToIssueDto);
         }
 
-        public async Task<IEnumerable<IssueDto>> GetIssuesByUserIdAsync(
-            string userId,
-            CancellationToken cancellationToken = default
-        )
+        public async Task<IEnumerable<IssueDto>> GetIssuesByUserIdAsync(string userId, CancellationToken cancellationToken = default)
         {
             var issues = await _issueRepository.GetAsync(
                 filter: i => i.UserId == userId,
@@ -95,11 +74,7 @@ namespace Support.Application.Services
             return issues.Select(MapToIssueDto);
         }
 
-        public async Task<IssueDto?> UpdateIssueAsync(
-            int id,
-            UpdateIssueDto updateIssueDto,
-            CancellationToken cancellationToken = default
-        )
+        public async Task<IssueDto?> UpdateIssueAsync(int id, UpdateIssueDto updateIssueDto, CancellationToken cancellationToken = default)
         {
             var issue = await _issueRepository.GetByIdAsync(id, cancellationToken);
             if (issue == null)
@@ -120,15 +95,10 @@ namespace Support.Application.Services
 
             if (updateIssueDto.CategoryId.HasValue)
             {
-                var categoryExists = await _categoryRepository.AnyAsync(
-                    c => c.Id == updateIssueDto.CategoryId.Value,
-                    cancellationToken
-                );
+                var categoryExists = await _categoryRepository.AnyAsync(c => c.Id == updateIssueDto.CategoryId.Value, cancellationToken);
                 if (!categoryExists)
                 {
-                    throw new ArgumentException(
-                        $"Category with ID {updateIssueDto.CategoryId.Value} does not exist."
-                    );
+                    throw new ArgumentException($"Category with ID {updateIssueDto.CategoryId.Value} does not exist.");
                 }
                 issue.CategoryId = updateIssueDto.CategoryId.Value;
             }
@@ -149,10 +119,7 @@ namespace Support.Application.Services
             return await MapToIssueDtoAsync(issue, cancellationToken);
         }
 
-        public async Task<bool> DeleteIssueAsync(
-            int id,
-            CancellationToken cancellationToken = default
-        )
+        public async Task<bool> DeleteIssueAsync(int id, CancellationToken cancellationToken = default)
         {
             var issue = await _issueRepository.GetByIdAsync(id, cancellationToken);
             if (issue == null)
@@ -164,15 +131,12 @@ namespace Support.Application.Services
             return true;
         }
 
-        public async Task<IssueCategoryDto> CreateCategoryAsync(
-            CreateIssueCategoryDto createCategoryDto,
-            CancellationToken cancellationToken = default
-        )
+        public async Task<IssueCategoryDto> CreateCategoryAsync(CreateIssueCategoryDto createCategoryDto, CancellationToken cancellationToken = default)
         {
             var category = new IssueCategory
             {
                 Title = createCategoryDto.Title,
-                Priority = createCategoryDto.Priority,
+                Priority = createCategoryDto.Priority
             };
 
             var createdCategory = await _categoryRepository.AddAsync(category, cancellationToken);
@@ -181,14 +145,11 @@ namespace Support.Application.Services
             {
                 Id = createdCategory.Id,
                 Title = createdCategory.Title,
-                Priority = createdCategory.Priority,
+                Priority = createdCategory.Priority
             };
         }
 
-        public async Task<IssueCategoryDto?> GetCategoryByIdAsync(
-            int id,
-            CancellationToken cancellationToken = default
-        )
+        public async Task<IssueCategoryDto?> GetCategoryByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             var category = await _categoryRepository.GetByIdAsync(id, cancellationToken);
             if (category == null)
@@ -198,13 +159,11 @@ namespace Support.Application.Services
             {
                 Id = category.Id,
                 Title = category.Title,
-                Priority = category.Priority,
+                Priority = category.Priority
             };
         }
 
-        public async Task<IEnumerable<IssueCategoryDto>> GetAllCategoriesAsync(
-            CancellationToken cancellationToken = default
-        )
+        public async Task<IEnumerable<IssueCategoryDto>> GetAllCategoriesAsync(CancellationToken cancellationToken = default)
         {
             var categories = await _categoryRepository.GetAsync(
                 orderBy: q => q.OrderBy(c => c.Priority).ThenBy(c => c.Title),
@@ -215,15 +174,11 @@ namespace Support.Application.Services
             {
                 Id = c.Id,
                 Title = c.Title,
-                Priority = c.Priority,
+                Priority = c.Priority
             });
         }
 
-        public async Task<IssueCategoryDto?> UpdateCategoryAsync(
-            int id,
-            UpdateIssueCategoryDto updateCategoryDto,
-            CancellationToken cancellationToken = default
-        )
+        public async Task<IssueCategoryDto?> UpdateCategoryAsync(int id, UpdateIssueCategoryDto updateCategoryDto, CancellationToken cancellationToken = default)
         {
             var category = await _categoryRepository.GetByIdAsync(id, cancellationToken);
             if (category == null)
@@ -241,28 +196,20 @@ namespace Support.Application.Services
             {
                 Id = category.Id,
                 Title = category.Title,
-                Priority = category.Priority,
+                Priority = category.Priority
             };
         }
 
-        public async Task<bool> DeleteCategoryAsync(
-            int id,
-            CancellationToken cancellationToken = default
-        )
+        public async Task<bool> DeleteCategoryAsync(int id, CancellationToken cancellationToken = default)
         {
             var category = await _categoryRepository.GetByIdAsync(id, cancellationToken);
             if (category == null)
                 return false;
 
             // Check if any issues are using this category
-            var hasIssues = await _issueRepository.AnyAsync(
-                i => i.CategoryId == id,
-                cancellationToken
-            );
+            var hasIssues = await _issueRepository.AnyAsync(i => i.CategoryId == id, cancellationToken);
             if (hasIssues)
-                throw new InvalidOperationException(
-                    $"Cannot delete category with ID {id} because it has associated issues."
-                );
+                throw new InvalidOperationException($"Cannot delete category with ID {id} because it has associated issues.");
 
             await _categoryRepository.DeleteAsync(category, cancellationToken);
             return true;
@@ -280,19 +227,13 @@ namespace Support.Application.Services
                 UserId = issue.UserId,
                 Status = issue.Status.ToString(),
                 CreatedAt = issue.CreatedAt,
-                ClosedAt = issue.ClosedAt,
+                ClosedAt = issue.ClosedAt
             };
         }
 
-        private async Task<IssueDto> MapToIssueDtoAsync(
-            Issue issue,
-            CancellationToken cancellationToken
-        )
+        private async Task<IssueDto> MapToIssueDtoAsync(Issue issue, CancellationToken cancellationToken)
         {
-            var category = await _categoryRepository.GetByIdAsync(
-                issue.CategoryId,
-                cancellationToken
-            );
+            var category = await _categoryRepository.GetByIdAsync(issue.CategoryId, cancellationToken);
 
             return new IssueDto
             {
@@ -304,7 +245,7 @@ namespace Support.Application.Services
                 UserId = issue.UserId,
                 Status = issue.Status.ToString(),
                 CreatedAt = issue.CreatedAt,
-                ClosedAt = issue.ClosedAt,
+                ClosedAt = issue.ClosedAt
             };
         }
     }

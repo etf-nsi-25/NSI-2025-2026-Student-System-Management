@@ -12,3 +12,4 @@ public class StudentAttendanceDTO
     public string? Status { get; set; } // Present, Absent, Late
     public string? Note { get; set; }
 }
+

@@ -12,11 +12,10 @@ public class MediatREventBus(IMediator mediator, IScopedTenantContext tenantCont
 {
     public Task Dispatch(IEvent domainEvent, CancellationToken ct = default)
     {
-        var eventToPublish = (INotification)
-            Activator.CreateInstance(
-                typeof(DomainEventNotification<>).MakeGenericType(domainEvent.GetType()),
-                domainEvent
-            )!;
+        var eventToPublish = (INotification)Activator.CreateInstance(
+            typeof(DomainEventNotification<>).MakeGenericType(domainEvent.GetType()),
+            domainEvent
+        )!;
 
         return mediator.Publish(eventToPublish, ct);
     }

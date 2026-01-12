@@ -13,7 +13,7 @@ public class ThreadLocalScopedTenantContext : IScopedTenantContext
     {
         var previous = ScopeStack.Value ??= ImmutableStack<Guid>.Empty;
         ScopeStack.Value = ScopeStack.Value.Push(tenantId);
-
+        
         return new TenantScope(previous);
     }
 

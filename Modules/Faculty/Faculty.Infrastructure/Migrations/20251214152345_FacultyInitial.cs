@@ -12,7 +12,8 @@ namespace Faculty.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.EnsureSchema(name: "public");
+            migrationBuilder.EnsureSchema(
+                name: "public");
 
             migrationBuilder.CreateTable(
                 name: "Course",
@@ -21,178 +22,77 @@ namespace Faculty.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     FacultyId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(
-                        type: "character varying(200)",
-                        maxLength: 200,
-                        nullable: false
-                    ),
-                    Code = table.Column<string>(
-                        type: "character varying(50)",
-                        maxLength: 50,
-                        nullable: false
-                    ),
+                    Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Code = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Type = table.Column<string>(type: "text", nullable: false),
-                    ProgramId = table.Column<string>(
-                        type: "character varying(50)",
-                        maxLength: 50,
-                        nullable: true
-                    ),
+                    ProgramId = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     ECTS = table.Column<int>(type: "integer", nullable: false),
-                    CreatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: false
-                    ),
-                    UpdatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Course", x => x.Id);
-                }
-            );
+                });
 
             migrationBuilder.CreateTable(
                 name: "Student",
                 schema: "public",
                 columns: table => new
                 {
-                    Id = table
-                        .Column<int>(type: "integer", nullable: false)
-                        .Annotation(
-                            "Npgsql:ValueGenerationStrategy",
-                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
-                        ),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FacultyId = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<string>(
-                        type: "character varying(450)",
-                        maxLength: 450,
-                        nullable: false
-                    ),
-                    IndexNumber = table.Column<string>(
-                        type: "character varying(50)",
-                        maxLength: 50,
-                        nullable: false
-                    ),
-                    FirstName = table.Column<string>(
-                        type: "character varying(100)",
-                        maxLength: 100,
-                        nullable: true
-                    ),
-                    LastName = table.Column<string>(
-                        type: "character varying(100)",
-                        maxLength: 100,
-                        nullable: true
-                    ),
-                    EnrollmentDate = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
-                    CreatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: false
-                    ),
-                    UpdatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
+                    UserId = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: false),
+                    IndexNumber = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    FirstName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    LastName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    EnrollmentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Student", x => x.Id);
-                }
-            );
+                });
 
             migrationBuilder.CreateTable(
                 name: "Teacher",
                 schema: "public",
                 columns: table => new
                 {
-                    Id = table
-                        .Column<int>(type: "integer", nullable: false)
-                        .Annotation(
-                            "Npgsql:ValueGenerationStrategy",
-                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
-                        ),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FacultyId = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<string>(
-                        type: "character varying(450)",
-                        maxLength: 450,
-                        nullable: false
-                    ),
-                    Title = table.Column<string>(
-                        type: "character varying(50)",
-                        maxLength: 50,
-                        nullable: true
-                    ),
-                    FirstName = table.Column<string>(
-                        type: "character varying(100)",
-                        maxLength: 100,
-                        nullable: true
-                    ),
-                    LastName = table.Column<string>(
-                        type: "character varying(100)",
-                        maxLength: 100,
-                        nullable: true
-                    ),
-                    Office = table.Column<string>(
-                        type: "character varying(50)",
-                        maxLength: 50,
-                        nullable: true
-                    ),
-                    Email = table.Column<string>(
-                        type: "character varying(255)",
-                        maxLength: 255,
-                        nullable: true
-                    ),
-                    CreatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: false
-                    ),
-                    UpdatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
+                    UserId = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: false),
+                    Title = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    FirstName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    LastName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    Office = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Teacher", x => x.Id);
-                }
-            );
+                });
 
             migrationBuilder.CreateTable(
                 name: "Assignment",
                 schema: "public",
                 columns: table => new
                 {
-                    Id = table
-                        .Column<int>(type: "integer", nullable: false)
-                        .Annotation(
-                            "Npgsql:ValueGenerationStrategy",
-                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
-                        ),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FacultyId = table.Column<Guid>(type: "uuid", nullable: false),
                     CourseId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(
-                        type: "character varying(200)",
-                        maxLength: 200,
-                        nullable: false
-                    ),
+                    Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    DueDate = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
+                    DueDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     MaxPoints = table.Column<int>(type: "integer", nullable: true),
-                    CreatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: false
-                    ),
-                    UpdatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -203,45 +103,23 @@ namespace Faculty.Infrastructure.Migrations
                         principalSchema: "public",
                         principalTable: "Course",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict
-                    );
-                }
-            );
+                        onDelete: ReferentialAction.Restrict);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Exam",
                 schema: "public",
                 columns: table => new
                 {
-                    Id = table
-                        .Column<int>(type: "integer", nullable: false)
-                        .Annotation(
-                            "Npgsql:ValueGenerationStrategy",
-                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
-                        ),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FacultyId = table.Column<Guid>(type: "uuid", nullable: false),
                     CourseId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(
-                        type: "character varying(200)",
-                        maxLength: 200,
-                        nullable: true
-                    ),
-                    ExamDate = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
-                    RegDeadline = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
-                    CreatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: false
-                    ),
-                    UpdatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
+                    Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    ExamDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    RegDeadline = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -252,42 +130,23 @@ namespace Faculty.Infrastructure.Migrations
                         principalSchema: "public",
                         principalTable: "Course",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict
-                    );
-                }
-            );
+                        onDelete: ReferentialAction.Restrict);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Attendance",
                 schema: "public",
                 columns: table => new
                 {
-                    Id = table
-                        .Column<int>(type: "integer", nullable: false)
-                        .Annotation(
-                            "Npgsql:ValueGenerationStrategy",
-                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
-                        ),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FacultyId = table.Column<Guid>(type: "uuid", nullable: false),
                     StudentId = table.Column<int>(type: "integer", nullable: false),
                     CourseId = table.Column<Guid>(type: "uuid", nullable: false),
-                    LectureDate = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: false
-                    ),
-                    Status = table.Column<string>(
-                        type: "character varying(50)",
-                        maxLength: 50,
-                        nullable: true
-                    ),
-                    CreatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: false
-                    ),
-                    UpdatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
+                    LectureDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -298,47 +157,30 @@ namespace Faculty.Infrastructure.Migrations
                         principalSchema: "public",
                         principalTable: "Course",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict
-                    );
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Attendance_Student_StudentId",
                         column: x => x.StudentId,
                         principalSchema: "public",
                         principalTable: "Student",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict
-                    );
-                }
-            );
+                        onDelete: ReferentialAction.Restrict);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Enrollment",
                 schema: "public",
                 columns: table => new
                 {
-                    Id = table
-                        .Column<int>(type: "integer", nullable: false)
-                        .Annotation(
-                            "Npgsql:ValueGenerationStrategy",
-                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
-                        ),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FacultyId = table.Column<Guid>(type: "uuid", nullable: false),
                     StudentId = table.Column<int>(type: "integer", nullable: false),
                     CourseId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Status = table.Column<string>(
-                        type: "character varying(50)",
-                        maxLength: 50,
-                        nullable: true
-                    ),
+                    Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     Grade = table.Column<int>(type: "integer", nullable: true),
-                    CreatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: false
-                    ),
-                    UpdatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -349,47 +191,30 @@ namespace Faculty.Infrastructure.Migrations
                         principalSchema: "public",
                         principalTable: "Course",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict
-                    );
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Enrollment_Student_StudentId",
                         column: x => x.StudentId,
                         principalSchema: "public",
                         principalTable: "Student",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict
-                    );
-                }
-            );
+                        onDelete: ReferentialAction.Restrict);
+                });
 
             migrationBuilder.CreateTable(
                 name: "CourseAssignment",
                 schema: "public",
                 columns: table => new
                 {
-                    Id = table
-                        .Column<int>(type: "integer", nullable: false)
-                        .Annotation(
-                            "Npgsql:ValueGenerationStrategy",
-                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
-                        ),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FacultyId = table.Column<Guid>(type: "uuid", nullable: false),
                     TeacherId = table.Column<int>(type: "integer", nullable: false),
                     CourseId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Role = table.Column<string>(
-                        type: "character varying(50)",
-                        maxLength: 50,
-                        nullable: true
-                    ),
+                    Role = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     AcademicYearId = table.Column<int>(type: "integer", nullable: false),
-                    CreatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: false
-                    ),
-                    UpdatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -400,53 +225,33 @@ namespace Faculty.Infrastructure.Migrations
                         principalSchema: "public",
                         principalTable: "Course",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict
-                    );
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_CourseAssignment_Teacher_TeacherId",
                         column: x => x.TeacherId,
                         principalSchema: "public",
                         principalTable: "Teacher",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict
-                    );
-                }
-            );
+                        onDelete: ReferentialAction.Restrict);
+                });
 
             migrationBuilder.CreateTable(
                 name: "StudentAssignment",
                 schema: "public",
                 columns: table => new
                 {
-                    Id = table
-                        .Column<int>(type: "integer", nullable: false)
-                        .Annotation(
-                            "Npgsql:ValueGenerationStrategy",
-                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
-                        ),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FacultyId = table.Column<Guid>(type: "uuid", nullable: false),
                     StudentId = table.Column<int>(type: "integer", nullable: false),
                     AssignmentId = table.Column<int>(type: "integer", nullable: false),
-                    SubmissionDate = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
+                    SubmissionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     Points = table.Column<int>(type: "integer", nullable: true),
                     Grade = table.Column<int>(type: "integer", nullable: true),
                     Feedback = table.Column<string>(type: "text", nullable: true),
-                    SubmissionUrl = table.Column<string>(
-                        type: "character varying(500)",
-                        maxLength: 500,
-                        nullable: true
-                    ),
-                    CreatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: false
-                    ),
-                    UpdatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
+                    SubmissionUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -457,50 +262,30 @@ namespace Faculty.Infrastructure.Migrations
                         principalSchema: "public",
                         principalTable: "Assignment",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict
-                    );
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_StudentAssignment_Student_StudentId",
                         column: x => x.StudentId,
                         principalSchema: "public",
                         principalTable: "Student",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict
-                    );
-                }
-            );
+                        onDelete: ReferentialAction.Restrict);
+                });
 
             migrationBuilder.CreateTable(
                 name: "ExamRegistration",
                 schema: "public",
                 columns: table => new
                 {
-                    Id = table
-                        .Column<int>(type: "integer", nullable: false)
-                        .Annotation(
-                            "Npgsql:ValueGenerationStrategy",
-                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
-                        ),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FacultyId = table.Column<Guid>(type: "uuid", nullable: false),
                     StudentId = table.Column<int>(type: "integer", nullable: false),
                     ExamId = table.Column<int>(type: "integer", nullable: false),
-                    RegistrationDate = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: false
-                    ),
-                    Status = table.Column<string>(
-                        type: "character varying(50)",
-                        maxLength: 50,
-                        nullable: false
-                    ),
-                    CreatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: false
-                    ),
-                    UpdatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
+                    RegistrationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -511,52 +296,32 @@ namespace Faculty.Infrastructure.Migrations
                         principalSchema: "public",
                         principalTable: "Exam",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict
-                    );
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ExamRegistration_Student_StudentId",
                         column: x => x.StudentId,
                         principalSchema: "public",
                         principalTable: "Student",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict
-                    );
-                }
-            );
+                        onDelete: ReferentialAction.Restrict);
+                });
 
             migrationBuilder.CreateTable(
                 name: "StudentExamGrade",
                 schema: "public",
                 columns: table => new
                 {
-                    Id = table
-                        .Column<int>(type: "integer", nullable: false)
-                        .Annotation(
-                            "Npgsql:ValueGenerationStrategy",
-                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
-                        ),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FacultyId = table.Column<Guid>(type: "uuid", nullable: false),
                     StudentId = table.Column<int>(type: "integer", nullable: false),
                     ExamId = table.Column<int>(type: "integer", nullable: false),
                     Passed = table.Column<bool>(type: "boolean", nullable: true),
                     Points = table.Column<double>(type: "double precision", nullable: true),
-                    URL = table.Column<string>(
-                        type: "character varying(500)",
-                        maxLength: 500,
-                        nullable: true
-                    ),
-                    DateRecorded = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
-                    CreatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: false
-                    ),
-                    UpdatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
+                    URL = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    DateRecorded = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -567,248 +332,238 @@ namespace Faculty.Infrastructure.Migrations
                         principalSchema: "public",
                         principalTable: "Exam",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict
-                    );
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_StudentExamGrade_Student_StudentId",
                         column: x => x.StudentId,
                         principalSchema: "public",
                         principalTable: "Student",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict
-                    );
-                }
-            );
+                        onDelete: ReferentialAction.Restrict);
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Assignment_CourseId",
                 schema: "public",
                 table: "Assignment",
-                column: "CourseId"
-            );
+                column: "CourseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Assignment_FacultyId",
                 schema: "public",
                 table: "Assignment",
-                column: "FacultyId"
-            );
+                column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Attendance_CourseId",
                 schema: "public",
                 table: "Attendance",
-                column: "CourseId"
-            );
+                column: "CourseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Attendance_FacultyId",
                 schema: "public",
                 table: "Attendance",
-                column: "FacultyId"
-            );
+                column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Attendance_StudentId_CourseId_LectureDate",
                 schema: "public",
                 table: "Attendance",
-                columns: new[] { "StudentId", "CourseId", "LectureDate" }
-            );
+                columns: new[] { "StudentId", "CourseId", "LectureDate" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Course_Code",
                 schema: "public",
                 table: "Course",
-                column: "Code"
-            );
+                column: "Code");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Course_FacultyId",
                 schema: "public",
                 table: "Course",
-                column: "FacultyId"
-            );
+                column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CourseAssignment_CourseId",
                 schema: "public",
                 table: "CourseAssignment",
-                column: "CourseId"
-            );
+                column: "CourseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CourseAssignment_FacultyId",
                 schema: "public",
                 table: "CourseAssignment",
-                column: "FacultyId"
-            );
+                column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CourseAssignment_TeacherId_CourseId",
                 schema: "public",
                 table: "CourseAssignment",
-                columns: new[] { "TeacherId", "CourseId" }
-            );
+                columns: new[] { "TeacherId", "CourseId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Enrollment_CourseId",
                 schema: "public",
                 table: "Enrollment",
-                column: "CourseId"
-            );
+                column: "CourseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Enrollment_FacultyId",
                 schema: "public",
                 table: "Enrollment",
-                column: "FacultyId"
-            );
+                column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Enrollment_StudentId_CourseId",
                 schema: "public",
                 table: "Enrollment",
                 columns: new[] { "StudentId", "CourseId" },
-                unique: true
-            );
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Exam_CourseId",
                 schema: "public",
                 table: "Exam",
-                column: "CourseId"
-            );
+                column: "CourseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Exam_FacultyId",
                 schema: "public",
                 table: "Exam",
-                column: "FacultyId"
-            );
+                column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ExamRegistration_ExamId",
                 schema: "public",
                 table: "ExamRegistration",
-                column: "ExamId"
-            );
+                column: "ExamId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ExamRegistration_FacultyId",
                 schema: "public",
                 table: "ExamRegistration",
-                column: "FacultyId"
-            );
+                column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ExamRegistration_StudentId_ExamId",
                 schema: "public",
                 table: "ExamRegistration",
-                columns: new[] { "StudentId", "ExamId" }
-            );
+                columns: new[] { "StudentId", "ExamId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Student_FacultyId",
                 schema: "public",
                 table: "Student",
-                column: "FacultyId"
-            );
+                column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Student_IndexNumber",
                 schema: "public",
                 table: "Student",
-                column: "IndexNumber"
-            );
+                column: "IndexNumber");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Student_UserId",
                 schema: "public",
                 table: "Student",
-                column: "UserId"
-            );
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentAssignment_AssignmentId",
                 schema: "public",
                 table: "StudentAssignment",
-                column: "AssignmentId"
-            );
+                column: "AssignmentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentAssignment_FacultyId",
                 schema: "public",
                 table: "StudentAssignment",
-                column: "FacultyId"
-            );
+                column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentAssignment_StudentId_AssignmentId",
                 schema: "public",
                 table: "StudentAssignment",
-                columns: new[] { "StudentId", "AssignmentId" }
-            );
+                columns: new[] { "StudentId", "AssignmentId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentExamGrade_ExamId",
                 schema: "public",
                 table: "StudentExamGrade",
-                column: "ExamId"
-            );
+                column: "ExamId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentExamGrade_FacultyId",
                 schema: "public",
                 table: "StudentExamGrade",
-                column: "FacultyId"
-            );
+                column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentExamGrade_StudentId_ExamId",
                 schema: "public",
                 table: "StudentExamGrade",
-                columns: new[] { "StudentId", "ExamId" }
-            );
+                columns: new[] { "StudentId", "ExamId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Teacher_FacultyId",
                 schema: "public",
                 table: "Teacher",
-                column: "FacultyId"
-            );
+                column: "FacultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Teacher_UserId",
                 schema: "public",
                 table: "Teacher",
-                column: "UserId"
-            );
+                column: "UserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(name: "Attendance", schema: "public");
+            migrationBuilder.DropTable(
+                name: "Attendance",
+                schema: "public");
 
-            migrationBuilder.DropTable(name: "CourseAssignment", schema: "public");
+            migrationBuilder.DropTable(
+                name: "CourseAssignment",
+                schema: "public");
 
-            migrationBuilder.DropTable(name: "Enrollment", schema: "public");
+            migrationBuilder.DropTable(
+                name: "Enrollment",
+                schema: "public");
 
-            migrationBuilder.DropTable(name: "ExamRegistration", schema: "public");
+            migrationBuilder.DropTable(
+                name: "ExamRegistration",
+                schema: "public");
 
-            migrationBuilder.DropTable(name: "StudentAssignment", schema: "public");
+            migrationBuilder.DropTable(
+                name: "StudentAssignment",
+                schema: "public");
 
-            migrationBuilder.DropTable(name: "StudentExamGrade", schema: "public");
+            migrationBuilder.DropTable(
+                name: "StudentExamGrade",
+                schema: "public");
 
-            migrationBuilder.DropTable(name: "Teacher", schema: "public");
+            migrationBuilder.DropTable(
+                name: "Teacher",
+                schema: "public");
 
-            migrationBuilder.DropTable(name: "Assignment", schema: "public");
+            migrationBuilder.DropTable(
+                name: "Assignment",
+                schema: "public");
 
-            migrationBuilder.DropTable(name: "Exam", schema: "public");
+            migrationBuilder.DropTable(
+                name: "Exam",
+                schema: "public");
 
-            migrationBuilder.DropTable(name: "Student", schema: "public");
+            migrationBuilder.DropTable(
+                name: "Student",
+                schema: "public");
 
-            migrationBuilder.DropTable(name: "Course", schema: "public");
+            migrationBuilder.DropTable(
+                name: "Course",
+                schema: "public");
         }
     }
 }

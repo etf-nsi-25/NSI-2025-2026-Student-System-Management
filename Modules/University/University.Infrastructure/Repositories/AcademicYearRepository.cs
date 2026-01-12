@@ -1,8 +1,8 @@
 ﻿using Common.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
-using University.Core.Entities;
-using University.Core.Interfaces;
 using University.Infrastructure.Db;
+using University.Core.Interfaces;
+using University.Core.Entities;
 
 namespace University.Infrastructure.Repositories
 {
@@ -10,15 +10,15 @@ namespace University.Infrastructure.Repositories
     {
         private new readonly UniversityDbContext _context;
 
-        public AcademicYearRepository(UniversityDbContext context)
-            : base(context)
+        public AcademicYearRepository(UniversityDbContext context) : base(context)
         {
             _context = context;
         }
 
         public async Task<AcademicYear?> GetActiveAcademicYearAsync()
         {
-            var entity = await _context.AcademicYears.FirstOrDefaultAsync(ay => ay.IsActive);
+            var entity = await _context.AcademicYears
+                .FirstOrDefaultAsync(ay => ay.IsActive);
 
             if (entity == null)
                 return null;

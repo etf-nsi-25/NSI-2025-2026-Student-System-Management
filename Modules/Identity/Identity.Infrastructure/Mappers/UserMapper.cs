@@ -33,7 +33,7 @@ public static class UserMapper
             FacultyId = user.FacultyId,
             IndexNumber = user.IndexNumber,
             Role = user.Role,
-            Status = user.Status,
+            Status = user.Status
         };
     }
 

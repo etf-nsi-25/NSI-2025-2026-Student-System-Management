@@ -11,10 +11,7 @@ namespace Support.API.Controllers
         private readonly IIssueService _issueService;
         private readonly ILogger<IssueCategoryController> _logger;
 
-        public IssueCategoryController(
-            IIssueService issueService,
-            ILogger<IssueCategoryController> logger
-        )
+        public IssueCategoryController(IIssueService issueService, ILogger<IssueCategoryController> logger)
         {
             _issueService = issueService ?? throw new ArgumentNullException(nameof(issueService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -23,39 +20,27 @@ namespace Support.API.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(IssueCategoryDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IssueCategoryDto>> CreateCategory(
-            [FromBody] CreateIssueCategoryDto createCategoryDto,
-            CancellationToken cancellationToken
-        )
+        public async Task<ActionResult<IssueCategoryDto>> CreateCategory([FromBody] CreateIssueCategoryDto createCategoryDto, CancellationToken cancellationToken)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                var category = await _issueService.CreateCategoryAsync(
-                    createCategoryDto,
-                    cancellationToken
-                );
+                var category = await _issueService.CreateCategoryAsync(createCategoryDto, cancellationToken);
                 return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, category);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating category");
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new { message = "An error occurred while creating the category" }
-                );
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while creating the category" });
             }
         }
 
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(IssueCategoryDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IssueCategoryDto>> GetCategoryById(
-            int id,
-            CancellationToken cancellationToken
-        )
+        public async Task<ActionResult<IssueCategoryDto>> GetCategoryById(int id, CancellationToken cancellationToken)
         {
             try
             {
@@ -68,18 +53,13 @@ namespace Support.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving category with ID {CategoryId}", id);
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new { message = "An error occurred while retrieving the category" }
-                );
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving the category" });
             }
         }
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<IssueCategoryDto>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<IssueCategoryDto>>> GetAllCategories(
-            CancellationToken cancellationToken
-        )
+        public async Task<ActionResult<IEnumerable<IssueCategoryDto>>> GetAllCategories(CancellationToken cancellationToken)
         {
             try
             {
@@ -89,10 +69,7 @@ namespace Support.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving all categories");
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new { message = "An error occurred while retrieving categories" }
-                );
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while retrieving categories" });
             }
         }
 
@@ -100,22 +77,14 @@ namespace Support.API.Controllers
         [ProducesResponseType(typeof(IssueCategoryDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IssueCategoryDto>> UpdateCategory(
-            int id,
-            [FromBody] UpdateIssueCategoryDto updateCategoryDto,
-            CancellationToken cancellationToken
-        )
+        public async Task<ActionResult<IssueCategoryDto>> UpdateCategory(int id, [FromBody] UpdateIssueCategoryDto updateCategoryDto, CancellationToken cancellationToken)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                var updatedCategory = await _issueService.UpdateCategoryAsync(
-                    id,
-                    updateCategoryDto,
-                    cancellationToken
-                );
+                var updatedCategory = await _issueService.UpdateCategoryAsync(id, updateCategoryDto, cancellationToken);
                 if (updatedCategory == null)
                     return NotFound(new { message = $"Category with ID {id} not found" });
 
@@ -124,10 +93,7 @@ namespace Support.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating category {CategoryId}", id);
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new { message = "An error occurred while updating the category" }
-                );
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while updating the category" });
             }
         }
 
@@ -153,10 +119,7 @@ namespace Support.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting category {CategoryId}", id);
-                return StatusCode(
-                    StatusCodes.Status500InternalServerError,
-                    new { message = "An error occurred while deleting the category" }
-                );
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while deleting the category" });
             }
         }
     }

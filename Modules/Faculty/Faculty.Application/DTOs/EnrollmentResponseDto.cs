@@ -14,3 +14,4 @@ public class EnrollmentResponseDto
     public string CourseName { get; set; } = string.Empty;
     public DateTime EnrollmentDate { get; set; }
 }
+

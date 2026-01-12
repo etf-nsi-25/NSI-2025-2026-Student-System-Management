@@ -10,3 +10,4 @@ public class CreateEnrollmentRequestDto
 {
     public Guid CourseId { get; set; }
 }
+

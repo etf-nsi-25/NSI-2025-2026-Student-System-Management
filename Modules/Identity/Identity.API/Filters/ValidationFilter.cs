@@ -9,15 +9,13 @@ public class ValidationFilter : IActionFilter
     {
         if (!context.ModelState.IsValid)
         {
-            var errors = context
-                .ModelState.Where(x => x.Value?.Errors.Count > 0)
+            var errors = context.ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
                 .SelectMany(x => x.Value!.Errors)
                 .Select(x => x.ErrorMessage)
                 .ToList();
 
-            context.Result = new BadRequestObjectResult(
-                new { message = "Validation failed", errors }
-            );
+            context.Result = new BadRequestObjectResult(new { message = "Validation failed", errors });
         }
     }
 

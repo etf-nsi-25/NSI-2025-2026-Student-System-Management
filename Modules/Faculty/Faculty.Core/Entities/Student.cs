@@ -19,11 +19,9 @@ public class Student : ITenantAware
 
     // Navigation properties
     public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
-    public ICollection<StudentAssignment> StudentAssignments { get; set; } =
-        new List<StudentAssignment>();
-    public ICollection<ExamRegistration> ExamRegistrations { get; set; } =
-        new List<ExamRegistration>();
-    public ICollection<StudentExamGrade> StudentExamGrades { get; set; } =
-        new List<StudentExamGrade>();
+    public ICollection<StudentAssignment> StudentAssignments { get; set; } = new List<StudentAssignment>();
+    public ICollection<ExamRegistration> ExamRegistrations { get; set; } = new List<ExamRegistration>();
+    public ICollection<StudentExamGrade> StudentExamGrades { get; set; } = new List<StudentExamGrade>();
     public ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();
 }
+

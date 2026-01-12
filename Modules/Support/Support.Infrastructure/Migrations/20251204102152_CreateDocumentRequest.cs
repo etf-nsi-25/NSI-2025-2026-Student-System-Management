@@ -16,36 +16,26 @@ namespace Support.Infrastructure.Migrations
                 name: "DocumentRequests",
                 columns: table => new
                 {
-                    Id = table
-                        .Column<int>(type: "integer", nullable: false)
-                        .Annotation(
-                            "Npgsql:ValueGenerationStrategy",
-                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
-                        ),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<string>(type: "text", nullable: false),
                     FacultyId = table.Column<int>(type: "integer", nullable: false),
                     DocumentType = table.Column<string>(type: "text", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: false
-                    ),
-                    CompletedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: true
-                    ),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DocumentRequests", x => x.Id);
-                }
-            );
+                });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(name: "DocumentRequests");
+            migrationBuilder.DropTable(
+                name: "DocumentRequests");
         }
     }
 }

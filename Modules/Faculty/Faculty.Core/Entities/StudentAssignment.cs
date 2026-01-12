@@ -23,3 +23,4 @@ public class StudentAssignment : ITenantAware
     public Student Student { get; set; } = null!;
     public Assignment Assignment { get; set; } = null!;
 }
+

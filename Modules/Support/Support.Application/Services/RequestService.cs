@@ -26,12 +26,13 @@ namespace Support.Application.Services
             // 🚀 KREIRAMO DocumentRequest SA TAČNIM TIPOVIMA
             var request = new DocumentRequest
             {
-                UserId = dto.StudentId.ToString(), // string
-                FacultyId = dto.FacultyId, // DTO sada ima FacultyId
+                UserId = dto.StudentId.ToString(),   // string
+                FacultyId = dto.FacultyId,           // DTO sada ima FacultyId
                 DocumentType = dto.RequestType,
                 Status = "Pending",
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow
             };
+
 
             await _repo.CreateAsync(request);
 
@@ -39,7 +40,7 @@ namespace Support.Application.Services
             {
                 Id = request.Id,
                 Success = true,
-                Message = "Request created successfully",
+                Message = "Request created successfully"
             };
         }
     }

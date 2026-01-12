@@ -1,4 +1,5 @@
-﻿namespace Identity.Core.Models;
+﻿
+namespace Identity.Core.Models;
 
 public class AuthResult
 {

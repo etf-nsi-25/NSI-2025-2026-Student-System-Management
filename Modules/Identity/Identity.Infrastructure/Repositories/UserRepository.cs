@@ -1,8 +1,8 @@
-using Identity.Core.DTO;
 using Identity.Core.Entities;
 using Identity.Core.Repositories;
 using Identity.Infrastructure.Db;
 using Microsoft.EntityFrameworkCore;
+using Identity.Core.DTO;
 
 namespace Identity.Infrastructure.Repositories;
 
@@ -13,7 +13,9 @@ public class UserRepository : IUserRepository
     public UserRepository(AuthDbContext context)
     {
         _context = context;
+
     }
+
 
     public async Task AddAsync(User user)
     {
@@ -29,6 +31,7 @@ public class UserRepository : IUserRepository
     {
         return await _context.DomainUsers.AnyAsync(u => u.Username == username);
     }
+
 
     public Task UpdateAsync(User user)
     {
@@ -60,6 +63,7 @@ public class UserRepository : IUserRepository
             query = query.Where(u => u.Role == filter.Role.Value);
         }
 
+
         query = ApplySorting(query, filter.SortBy, filter.SortOrder);
 
         var skip = (filter.PageNumber - 1) * filter.PageSize;
@@ -84,11 +88,7 @@ public class UserRepository : IUserRepository
         return await query.CountAsync();
     }
 
-    private static IQueryable<User> ApplySorting(
-        IQueryable<User> query,
-        string? sortBy,
-        string sortOrder
-    )
+    private static IQueryable<User> ApplySorting(IQueryable<User> query, string? sortBy, string sortOrder)
     {
         if (string.IsNullOrWhiteSpace(sortBy))
         {
@@ -101,16 +101,10 @@ public class UserRepository : IUserRepository
 
         orderedQuery = sortBy.ToLowerInvariant() switch
         {
-            "username" => isAscending
-                ? query.OrderBy(u => u.Username)
-                : query.OrderByDescending(u => u.Username),
-            "firstname" => isAscending
-                ? query.OrderBy(u => u.FirstName)
-                : query.OrderByDescending(u => u.FirstName),
-            "role" => isAscending
-                ? query.OrderBy(u => u.Role)
-                : query.OrderByDescending(u => u.Role),
-            _ => query.OrderBy(u => u.Id),
+            "username" => isAscending ? query.OrderBy(u => u.Username) : query.OrderByDescending(u => u.Username),
+            "firstname" => isAscending ? query.OrderBy(u => u.FirstName) : query.OrderByDescending(u => u.FirstName),
+            "role" => isAscending ? query.OrderBy(u => u.Role) : query.OrderByDescending(u => u.Role),
+            _ => query.OrderBy(u => u.Id)
         };
 
         return orderedQuery;
@@ -118,8 +112,8 @@ public class UserRepository : IUserRepository
 
     public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        return await _context
-            .DomainUsers.AsNoTracking()
+        return await _context.DomainUsers
+            .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
     }
 }

@@ -1,8 +1,8 @@
 ﻿using Common.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
-using University.Core.Entities;
-using University.Core.Interfaces;
 using University.Infrastructure.Db;
+using University.Core.Interfaces;
+using University.Core.Entities;
 
 namespace University.Infrastructure.Repositories
 {
@@ -10,16 +10,15 @@ namespace University.Infrastructure.Repositories
     {
         private new readonly UniversityDbContext _context;
 
-        public ProgramRepository(UniversityDbContext context)
-            : base(context)
+        public ProgramRepository(UniversityDbContext context) : base(context)
         {
             _context = context;
         }
 
         public async Task<IEnumerable<Program>> GetAllByDepartmentIdAsync(int departmentId)
         {
-            var programs = await _context
-                .Programs.Where(p => p.DepartmentId == departmentId)
+            var programs = await _context.Programs
+                .Where(p => p.DepartmentId == departmentId)
                 .ToListAsync();
 
             return programs.Select(p => new Program

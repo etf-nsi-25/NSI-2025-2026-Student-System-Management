@@ -19,6 +19,6 @@ public class Teacher : ITenantAware
     public DateTime? UpdatedAt { get; set; }
 
     // Navigation properties
-    public ICollection<CourseAssignment> CourseAssignments { get; set; } =
-        new List<CourseAssignment>();
+    public ICollection<CourseAssignment> CourseAssignments { get; set; } = new List<CourseAssignment>();
 }
+

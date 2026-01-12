@@ -18,8 +18,7 @@ public class Course : ITenantAware
     public DateTime? UpdatedAt { get; set; }
 
     // Navigation properties
-    public ICollection<CourseAssignment> CourseAssignments { get; set; } =
-        new List<CourseAssignment>();
+    public ICollection<CourseAssignment> CourseAssignments { get; set; } = new List<CourseAssignment>();
     public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
     public ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
     public ICollection<Exam> Exams { get; set; } = new List<Exam>();
@@ -32,5 +31,6 @@ public class Course : ITenantAware
 public enum CourseType
 {
     Mandatory = 1,
-    Elective = 2,
+    Elective = 2
 }
+

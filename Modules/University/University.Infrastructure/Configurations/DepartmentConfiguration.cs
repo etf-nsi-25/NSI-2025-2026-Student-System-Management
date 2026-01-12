@@ -16,8 +16,7 @@ namespace University.Infrastructure.Configurations
 
             builder.HasIndex(x => new { x.FacultyId, x.Code }).IsUnique();
 
-            builder
-                .HasOne(d => d.Faculty)
+            builder.HasOne(d => d.Faculty)
                 .WithMany(f => f.Departments)
                 .HasForeignKey(d => d.FacultyId)
                 .OnDelete(DeleteBehavior.Restrict);

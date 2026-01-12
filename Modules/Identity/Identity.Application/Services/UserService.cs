@@ -1,49 +1,41 @@
 using System.Runtime.CompilerServices;
 using EventBus.Core;
 using Identity.Application.Interfaces;
-using Identity.Core.DTO;
 using Identity.Core.Entities;
-using Identity.Core.Enums;
-using Identity.Core.Events;
 using Identity.Core.Repositories;
+using Identity.Core.Events;
+using Identity.Core.Enums;
+using Identity.Core.DTO;
 using Identity.Core.Services;
 
 // Allow injection.
 [assembly: InternalsVisibleTo("Identity.Infrastructure"), InternalsVisibleTo("Identity.API")]
-
 namespace Identity.Application.Services;
 
 internal class UserService(
     IUserRepository userRepository,
     IIdentityHasherService identityHasherService,
-    IEventBus eventBus
-) : IUserService
+    IEventBus eventBus) : IUserService
 {
     public async Task<Guid> CreateUserAsync(
-        string username,
-        string password,
-        string firstName,
-        string lastName,
-        string email,
-        Guid facultyId,
-        string? indexNumber,
-        UserRole role
-    )
+       string username,
+       string password,
+       string firstName,
+       string lastName,
+       string email,
+       Guid facultyId,
+       string? indexNumber,
+       UserRole role)
     {
         if (role == UserRole.Superadmin || role == UserRole.Admin)
         {
-            throw new InvalidOperationException(
-                "Admin users are restricted from assigning Superadmin or Admin roles."
-            );
+            throw new InvalidOperationException("Admin users are restricted from assigning Superadmin or Admin roles.");
         }
 
         if (await userRepository.IsUsernameTakenAsync(username))
         {
             // TODO: this should check for email instead ?? Thats what we login with
-            throw new ArgumentException(
-                $"Username '{username}' is already taken.",
-                nameof(username)
-            );
+            throw new ArgumentException($"Username '{username}' is already taken.", nameof(username));
         }
 
         var passwordHash = identityHasherService.HashPassword(password);
@@ -83,26 +75,24 @@ internal class UserService(
 
         var totalCount = await userRepository.CountAsync(filter);
 
-        var userResponses = domainUsers
-            .Select(u => new UserResponse
-            {
-                Id = u.Id,
-                Username = u.Username,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                FacultyId = u.FacultyId,
-                IndexNumber = u.IndexNumber,
-                Role = u.Role,
-                Status = u.Status,
-            })
-            .ToList();
+        var userResponses = domainUsers.Select(u => new UserResponse
+        {
+            Id = u.Id,
+            Username = u.Username,
+            FirstName = u.FirstName,
+            LastName = u.LastName,
+            FacultyId = u.FacultyId,
+            IndexNumber = u.IndexNumber,
+            Role = u.Role,
+            Status = u.Status
+        }).ToList();
 
         return new UserListResponse
         {
             Items = userResponses,
             TotalCount = totalCount,
             PageNumber = filter.PageNumber,
-            PageSize = filter.PageSize,
+            PageSize = filter.PageSize
         };
     }
 
@@ -125,10 +115,9 @@ internal class UserService(
             FacultyId = user.FacultyId,
             Status = user.Status,
             IndexNumber = user.IndexNumber,
-            Role = user.Role,
+            Role = user.Role
         };
     }
-
     //delete
     public async Task<bool> DeleteUserAsync(Guid userId)
     {
@@ -166,9 +155,7 @@ internal class UserService(
 
         if (request.Role == UserRole.Superadmin || request.Role == UserRole.Admin)
         {
-            throw new InvalidOperationException(
-                "Admin users are restricted from assigning Superadmin or Admin roles."
-            );
+            throw new InvalidOperationException("Admin users are restricted from assigning Superadmin or Admin roles.");
         }
 
         user.UpdateDetails(
@@ -194,7 +181,6 @@ internal class UserService(
 
         return true;
     }
-
     public async Task<bool> DeactivateUserAsync(Guid userId)
     {
         var user = await userRepository.GetByIdAsync(userId);
@@ -213,6 +199,8 @@ internal class UserService(
 
         await userRepository.UpdateAsync(user);
         await userRepository.SaveAsync();
+
+
 
         return true;
     }

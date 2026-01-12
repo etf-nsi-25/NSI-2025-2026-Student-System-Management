@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Identity.Infrastructure.Services;
 
+
 public class IdentityHasherService : IIdentityHasherService
 {
     private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
@@ -21,11 +22,7 @@ public class IdentityHasherService : IIdentityHasherService
 
     public bool VerifyPassword(User user, string password, string hashedPassword)
     {
-        var result = _passwordHasher.VerifyHashedPassword(
-            user.ToInfrastructure(),
-            hashedPassword,
-            password
-        );
+        var result = _passwordHasher.VerifyHashedPassword(user.ToInfrastructure(), hashedPassword, password);
         return result == PasswordVerificationResult.Success;
     }
 }

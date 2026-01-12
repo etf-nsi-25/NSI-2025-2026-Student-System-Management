@@ -8,7 +8,7 @@ namespace Identity.Application.Interfaces
         Task<TwoFAVerificationResult> VerifySetupAsync(string userId, string code);
         Task<TwoFAVerificationResult> VerifyLoginAsync(string userId, string code);
     }
-
+    
     public record TwoFASetupResult(string ManualKey, string QrCodeImageBase64);
 
     public record TwoFAVerificationResult(bool Success, string? Message);

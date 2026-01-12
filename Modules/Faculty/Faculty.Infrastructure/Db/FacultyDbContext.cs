@@ -12,10 +12,7 @@ public class FacultyDbContext : DbContext
 {
     private readonly ITenantService _tenantService;
 
-    public FacultyDbContext(
-        DbContextOptions<FacultyDbContext> options,
-        ITenantService tenantService
-    )
+    public FacultyDbContext(DbContextOptions<FacultyDbContext> options, ITenantService tenantService)
         : base(options)
     {
         _tenantService = tenantService ?? throw new ArgumentNullException(nameof(tenantService));
@@ -42,10 +39,7 @@ public class FacultyDbContext : DbContext
         return base.SaveChanges(acceptAllChangesOnSuccess);
     }
 
-    public override Task<int> SaveChangesAsync(
-        bool acceptAllChangesOnSuccess,
-        CancellationToken cancellationToken = default
-    )
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
         ApplyTenantInformation();
         return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
@@ -183,14 +177,12 @@ public class FacultyDbContext : DbContext
             entity.HasQueryFilter(e => e.FacultyId == CurrentFacultyId);
 
             // Relationships
-            entity
-                .HasOne(e => e.Teacher)
+            entity.HasOne(e => e.Teacher)
                 .WithMany(t => t.CourseAssignments)
                 .HasForeignKey(e => e.TeacherId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity
-                .HasOne(e => e.Course)
+            entity.HasOne(e => e.Course)
                 .WithMany(c => c.CourseAssignments)
                 .HasForeignKey(e => e.CourseId)
                 .OnDelete(DeleteBehavior.Restrict);
@@ -221,14 +213,12 @@ public class FacultyDbContext : DbContext
             entity.HasQueryFilter(e => e.FacultyId == CurrentFacultyId);
 
             // Relationships
-            entity
-                .HasOne(e => e.Student)
+            entity.HasOne(e => e.Student)
                 .WithMany(s => s.Enrollments)
                 .HasForeignKey(e => e.StudentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity
-                .HasOne(e => e.Course)
+            entity.HasOne(e => e.Course)
                 .WithMany(c => c.Enrollments)
                 .HasForeignKey(e => e.CourseId)
                 .OnDelete(DeleteBehavior.Restrict);
@@ -260,8 +250,7 @@ public class FacultyDbContext : DbContext
             entity.HasQueryFilter(e => e.FacultyId == CurrentFacultyId);
 
             // Relationships
-            entity
-                .HasOne(e => e.Course)
+            entity.HasOne(e => e.Course)
                 .WithMany(c => c.Assignments)
                 .HasForeignKey(e => e.CourseId)
                 .OnDelete(DeleteBehavior.Restrict);
@@ -295,14 +284,12 @@ public class FacultyDbContext : DbContext
             entity.HasQueryFilter(e => e.FacultyId == CurrentFacultyId);
 
             // Relationships
-            entity
-                .HasOne(e => e.Student)
+            entity.HasOne(e => e.Student)
                 .WithMany(s => s.StudentAssignments)
                 .HasForeignKey(e => e.StudentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity
-                .HasOne(e => e.Assignment)
+            entity.HasOne(e => e.Assignment)
                 .WithMany(a => a.StudentAssignments)
                 .HasForeignKey(e => e.AssignmentId)
                 .OnDelete(DeleteBehavior.Restrict);
@@ -333,8 +320,7 @@ public class FacultyDbContext : DbContext
             entity.HasQueryFilter(e => e.FacultyId == CurrentFacultyId);
 
             // Relationships
-            entity
-                .HasOne(e => e.Course)
+            entity.HasOne(e => e.Course)
                 .WithMany(c => c.Exams)
                 .HasForeignKey(e => e.CourseId)
                 .OnDelete(DeleteBehavior.Restrict);
@@ -365,14 +351,12 @@ public class FacultyDbContext : DbContext
             entity.HasQueryFilter(e => e.FacultyId == CurrentFacultyId);
 
             // Relationships
-            entity
-                .HasOne(e => e.Student)
+            entity.HasOne(e => e.Student)
                 .WithMany(s => s.ExamRegistrations)
                 .HasForeignKey(e => e.StudentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity
-                .HasOne(e => e.Exam)
+            entity.HasOne(e => e.Exam)
                 .WithMany(ex => ex.ExamRegistrations)
                 .HasForeignKey(e => e.ExamId)
                 .OnDelete(DeleteBehavior.Restrict);
@@ -405,14 +389,12 @@ public class FacultyDbContext : DbContext
             entity.HasQueryFilter(e => e.FacultyId == CurrentFacultyId);
 
             // Relationships
-            entity
-                .HasOne(e => e.Student)
+            entity.HasOne(e => e.Student)
                 .WithMany(s => s.StudentExamGrades)
                 .HasForeignKey(e => e.StudentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity
-                .HasOne(e => e.Exam)
+            entity.HasOne(e => e.Exam)
                 .WithMany(ex => ex.StudentExamGrades)
                 .HasForeignKey(e => e.ExamId)
                 .OnDelete(DeleteBehavior.Restrict);
@@ -444,26 +426,19 @@ public class FacultyDbContext : DbContext
             entity.HasQueryFilter(e => e.FacultyId == CurrentFacultyId);
 
             // Relationships
-            entity
-                .HasOne(e => e.Student)
+            entity.HasOne(e => e.Student)
                 .WithMany(s => s.Attendances)
                 .HasForeignKey(e => e.StudentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity
-                .HasOne(e => e.Course)
+            entity.HasOne(e => e.Course)
                 .WithMany(c => c.Attendances)
                 .HasForeignKey(e => e.CourseId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Indexes
             entity.HasIndex(e => e.FacultyId);
-            entity.HasIndex(e => new
-            {
-                e.StudentId,
-                e.CourseId,
-                e.LectureDate,
-            });
+            entity.HasIndex(e => new { e.StudentId, e.CourseId, e.LectureDate });
         });
     }
 }

@@ -6,10 +6,7 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.12" />
 
     <!-- Dependency Injection -->
-    <PackageVersion
-      Include="Microsoft.Extensions.DependencyInjection.Abstractions"
-      Version="7.0.0"
-    />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
 
     <!-- ASP.NET Core MVC -->
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Core" Version="7.0.12" />

@@ -15,7 +15,7 @@ namespace Support.API.Controllers
         {
             new DocumentDto(1, "example.pdf", "Sample PDF document", 10),
             new DocumentDto(2, "transcript.pdf", "Transcript document", 10),
-            new DocumentDto(3, "enrollment.pdf", "Enrollment confirmation", 15),
+            new DocumentDto(3, "enrollment.pdf", "Enrollment confirmation", 15)
         };
 
         // -------------------------------------------------------------

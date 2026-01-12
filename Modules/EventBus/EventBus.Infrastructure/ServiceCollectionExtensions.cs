@@ -13,7 +13,7 @@ public static class ServiceCollectionExtensions
             cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
             cfg.Lifetime = ServiceLifetime.Scoped;
         });
-
+            
         services.AddScoped<IEventBus, MediatREventBus>();
         return services;
     }

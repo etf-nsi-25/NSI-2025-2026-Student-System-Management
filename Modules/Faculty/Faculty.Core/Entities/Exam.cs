@@ -18,8 +18,7 @@ public class Exam : ITenantAware
 
     // Navigation properties
     public Course Course { get; set; } = null!;
-    public ICollection<ExamRegistration> ExamRegistrations { get; set; } =
-        new List<ExamRegistration>();
-    public ICollection<StudentExamGrade> StudentExamGrades { get; set; } =
-        new List<StudentExamGrade>();
+    public ICollection<ExamRegistration> ExamRegistrations { get; set; } = new List<ExamRegistration>();
+    public ICollection<StudentExamGrade> StudentExamGrades { get; set; } = new List<StudentExamGrade>();
 }
+

@@ -17,10 +17,7 @@ namespace Faculty.Infrastructure.Repositories
             _tenantService = tenantService;
         }
 
-        public async Task<Course> AddAsync(
-            Course course,
-            CancellationToken cancellationToken = default
-        )
+        public async Task<Course> AddAsync(Course course, CancellationToken cancellationToken = default)
         {
             course.Id = Guid.NewGuid();
             course.FacultyId = _tenantService.GetCurrentFacultyId();
@@ -32,40 +29,32 @@ namespace Faculty.Infrastructure.Repositories
             return course;
         }
 
-        public Task<Course?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
-            _context.Courses.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        public Task<Course?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+            => _context.Courses
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
-        public Task<List<Course>> GetAllAsync(CancellationToken cancellationToken = default) =>
-            _context.Courses.AsNoTracking().ToListAsync(cancellationToken);
+        public Task<List<Course>> GetAllAsync(CancellationToken cancellationToken = default)
+            => _context.Courses
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
 
-        public async Task<List<Course>> GetByTeacherUserIdAsync(
-            string userId,
-            CancellationToken cancellationToken = default
-        )
+        public async Task<List<Course>> GetByTeacherUserIdAsync(string userId, CancellationToken cancellationToken = default)
         {
-            var teacher = await _context.Teachers.FirstOrDefaultAsync(
-                t => t.UserId == userId,
-                cancellationToken
-            );
+            var teacher = await _context.Teachers.FirstOrDefaultAsync(t => t.UserId == userId, cancellationToken);
             if (teacher == null)
                 return new List<Course>();
 
-            return await _context
-                .CourseAssignments.Where(ca => ca.TeacherId == teacher.Id)
+            return await _context.CourseAssignments
+                .Where(ca => ca.TeacherId == teacher.Id)
                 .Select(ca => ca.Course)
                 .Distinct()
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<Course?> UpdateAsync(
-            Course course,
-            CancellationToken cancellationToken = default
-        )
+        public async Task<Course?> UpdateAsync(Course course, CancellationToken cancellationToken = default)
         {
-            var existing = await _context.Courses.FirstOrDefaultAsync(
-                x => x.Id == course.Id,
-                cancellationToken
-            );
+            var existing = await _context.Courses.FirstOrDefaultAsync(x => x.Id == course.Id, cancellationToken);
             if (existing == null)
                 return null;
 
@@ -82,10 +71,7 @@ namespace Faculty.Infrastructure.Repositories
 
         public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var existing = await _context.Courses.FirstOrDefaultAsync(
-                x => x.Id == id,
-                cancellationToken
-            );
+            var existing = await _context.Courses.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
             if (existing == null)
                 return false;
 

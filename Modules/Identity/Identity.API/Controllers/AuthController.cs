@@ -20,6 +20,7 @@ public class AuthController : ControllerBase
         _logger = logger;
     }
 
+
     [HttpPost("login")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
@@ -34,7 +35,10 @@ public class AuthController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            var result = await _authService.AuthenticateAsync(request.Email, request.Password);
+
+            var result = await _authService.AuthenticateAsync(
+                request.Email,
+                request.Password);
 
             // Set HTTP-only cookie for refresh token
             HttpContext.Response.Cookies.Append(
@@ -45,14 +49,13 @@ public class AuthController : ControllerBase
                     HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.None,
-                    Expires = result.ExpiresAt,
-                }
-            );
+                    Expires = result.ExpiresAt
+                });
 
             var response = new LoginResponseDto
             {
                 AccessToken = result.AccessToken,
-                TokenType = "Bearer",
+                TokenType = "Bearer"
             };
 
             return Ok(response);
@@ -69,6 +72,7 @@ public class AuthController : ControllerBase
         }
     }
 
+
     [HttpPost("refresh")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
@@ -77,15 +81,13 @@ public class AuthController : ControllerBase
     {
         try
         {
-            if (
-                !HttpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken)
-                || string.IsNullOrWhiteSpace(refreshToken)
-            )
+            if (!HttpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken) || string.IsNullOrWhiteSpace(refreshToken))
             {
                 return BadRequest(new { message = "Refresh token is required" });
             }
 
-            var result = await _authService.RefreshAuthenticationAsync(refreshToken);
+            var result = await _authService.RefreshAuthenticationAsync(
+                refreshToken);
 
             // Set HTTP-only cookie for new refresh token
             HttpContext.Response.Cookies.Append(
@@ -96,18 +98,18 @@ public class AuthController : ControllerBase
                     HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.None,
-                    Expires = result.ExpiresAt,
-                }
-            );
+                    Expires = result.ExpiresAt
+                });
 
             // Map domain model to DTO
             var response = new LoginResponseDto
             {
                 AccessToken = result.AccessToken,
-                TokenType = "Bearer",
+                TokenType = "Bearer"
             };
 
             return Ok(response);
+
         }
         catch (UnauthorizedAccessException ex)
         {
@@ -129,10 +131,7 @@ public class AuthController : ControllerBase
     {
         try
         {
-            if (
-                !HttpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken)
-                || string.IsNullOrWhiteSpace(refreshToken)
-            )
+            if (!HttpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken) || string.IsNullOrWhiteSpace(refreshToken))
             {
                 return BadRequest(new { message = "Refresh token is required" });
             }

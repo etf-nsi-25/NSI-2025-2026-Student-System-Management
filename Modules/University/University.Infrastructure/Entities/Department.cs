@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Identity.Core.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Identity.Core.Entities;
 using University.Core.Entities;
 
 namespace University.Infrastructure.Entities

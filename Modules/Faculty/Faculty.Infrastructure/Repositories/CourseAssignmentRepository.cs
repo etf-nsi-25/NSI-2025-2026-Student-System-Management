@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Faculty.Core.Entities;
+﻿using Faculty.Core.Entities;
 using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Db;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Faculty.Infrastructure.Repositories
 {
@@ -19,8 +19,8 @@ namespace Faculty.Infrastructure.Repositories
 
         public async Task<Teacher?> GetTeacherForCourseAsync(Guid courseId)
         {
-            return await _context
-                .CourseAssignments.Where(ca => ca.CourseId == courseId)
+            return await _context.CourseAssignments
+                .Where(ca => ca.CourseId == courseId)
                 .Include(ca => ca.Teacher)
                 .Select(ca => ca.Teacher)
                 .FirstOrDefaultAsync();

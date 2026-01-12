@@ -4,6 +4,6 @@ namespace Support.Core.Entities
     {
         Open,
         InProgress,
-        Closed,
+        Closed
     }
 }

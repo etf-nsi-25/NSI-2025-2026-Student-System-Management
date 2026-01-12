@@ -46,9 +46,8 @@ public class FacultyDbContextFactory : IDesignTimeDbContextFactory<FacultyDbCont
         if (string.IsNullOrEmpty(connectionString))
         {
             throw new InvalidOperationException(
-                $"Connection string 'Database' not found in configuration. Searched in: {configurationPath}. "
-                    + "Please ensure it's configured in appsettings.json or appsettings.Development.json"
-            );
+                $"Connection string 'Database' not found in configuration. Searched in: {configurationPath}. " +
+                "Please ensure it's configured in appsettings.json or appsettings.Development.json");
         }
 
         // Configure DbContext options
@@ -69,19 +68,17 @@ public class FacultyDbContextFactory : IDesignTimeDbContextFactory<FacultyDbCont
     private static string FindApplicationDirectory()
     {
         var currentDir = Directory.GetCurrentDirectory();
-
+        
         // Try current directory first (when --startup-project is used, this should be Application)
-        if (
-            Directory.Exists(Path.Combine(currentDir, "Application"))
-            || File.Exists(Path.Combine(currentDir, "appsettings.json"))
-        )
+        if (Directory.Exists(Path.Combine(currentDir, "Application")) || 
+            File.Exists(Path.Combine(currentDir, "appsettings.json")))
         {
             // If we're already in Application directory or appsettings.json exists here
             if (File.Exists(Path.Combine(currentDir, "appsettings.json")))
             {
                 return currentDir;
             }
-
+            
             // If Application subdirectory exists
             var appDir = Path.Combine(currentDir, "Application");
             if (Directory.Exists(appDir) && File.Exists(Path.Combine(appDir, "appsettings.json")))
@@ -95,20 +92,16 @@ public class FacultyDbContextFactory : IDesignTimeDbContextFactory<FacultyDbCont
         while (directory != null)
         {
             var applicationPath = Path.Combine(directory.FullName, "Application");
-            if (
-                Directory.Exists(applicationPath)
-                && File.Exists(Path.Combine(applicationPath, "appsettings.json"))
-            )
+            if (Directory.Exists(applicationPath) && File.Exists(Path.Combine(applicationPath, "appsettings.json")))
             {
                 return applicationPath;
             }
-
+            
             directory = directory.Parent;
         }
 
         throw new InvalidOperationException(
-            $"Could not find Application project directory with appsettings.json. "
-                + $"Searched from: {currentDir}"
-        );
+            $"Could not find Application project directory with appsettings.json. " +
+            $"Searched from: {currentDir}");
     }
 }

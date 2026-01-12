@@ -6,7 +6,9 @@ namespace University.Infrastructure.Db
     public class UniversityDbContext : DbContext
     {
         public UniversityDbContext(DbContextOptions<UniversityDbContext> options)
-            : base(options) { }
+        : base(options)
+        {
+        }
 
         public DbSet<AcademicYear> AcademicYears => Set<AcademicYear>();
         public DbSet<Faculty> Faculties => Set<Faculty>();

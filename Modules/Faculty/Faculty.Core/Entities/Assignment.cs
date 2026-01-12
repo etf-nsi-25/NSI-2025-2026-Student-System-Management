@@ -19,6 +19,6 @@ public class Assignment : ITenantAware
 
     // Navigation properties
     public Course Course { get; set; } = null!;
-    public ICollection<StudentAssignment> StudentAssignments { get; set; } =
-        new List<StudentAssignment>();
+    public ICollection<StudentAssignment> StudentAssignments { get; set; } = new List<StudentAssignment>();
 }
+

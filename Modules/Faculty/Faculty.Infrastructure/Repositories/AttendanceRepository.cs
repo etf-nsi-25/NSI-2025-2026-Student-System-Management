@@ -19,8 +19,8 @@ public class AttendanceRepository : IAttendanceRepository
 
     public async Task<List<Enrollment>> GetEnrolledStudentsAsync(Guid courseId)
     {
-        return await _context
-            .Enrollments.Include(e => e.Student)
+        return await _context.Enrollments
+            .Include(e => e.Student)
             .Where(e => e.CourseId == courseId)
             .OrderBy(e => e.Student.LastName)
             .ThenBy(e => e.Student.FirstName)
@@ -31,42 +31,34 @@ public class AttendanceRepository : IAttendanceRepository
     {
         // Normalize date to compare only date part (ignore time)
         var dateOnly = date.Date;
-
-        return await _context
-            .Attendances.Include(a => a.Student)
-            .FirstOrDefaultAsync(a =>
-                a.StudentId == studentId && a.CourseId == courseId && a.LectureDate.Date == dateOnly
-            );
+        
+        return await _context.Attendances
+            .Include(a => a.Student)
+            .FirstOrDefaultAsync(a => 
+                a.StudentId == studentId && 
+                a.CourseId == courseId && 
+                a.LectureDate.Date == dateOnly);
     }
 
-    public async Task<List<Attendance>> GetAttendanceForDateRangeAsync(
-        Guid courseId,
-        DateTime startDate,
-        DateTime endDate
-    )
+    public async Task<List<Attendance>> GetAttendanceForDateRangeAsync(Guid courseId, DateTime startDate, DateTime endDate)
     {
         var startDateOnly = startDate.Date;
         var endDateOnly = endDate.Date;
-
-        return await _context
-            .Attendances.Include(a => a.Student)
-            .Where(a =>
-                a.CourseId == courseId
-                && a.LectureDate.Date >= startDateOnly
-                && a.LectureDate.Date <= endDateOnly
-            )
+        
+        return await _context.Attendances
+            .Include(a => a.Student)
+            .Where(a => 
+                a.CourseId == courseId && 
+                a.LectureDate.Date >= startDateOnly && 
+                a.LectureDate.Date <= endDateOnly)
             .ToListAsync();
     }
 
     public async Task<Attendance> CreateOrUpdateAttendanceAsync(Attendance attendance)
     {
         // Check if attendance record already exists
-        var existing = await GetAttendanceAsync(
-            attendance.StudentId,
-            attendance.CourseId,
-            attendance.LectureDate
-        );
-
+        var existing = await GetAttendanceAsync(attendance.StudentId, attendance.CourseId, attendance.LectureDate);
+        
         if (existing != null)
         {
             // Update existing record
@@ -96,20 +88,20 @@ public class AttendanceRepository : IAttendanceRepository
             return false;
 
         // Check if teacher is assigned to the course
-        return await _context.CourseAssignments.AnyAsync(ca =>
-            ca.TeacherId == teacher.Id && ca.CourseId == courseId
-        );
+        return await _context.CourseAssignments
+            .AnyAsync(ca => ca.TeacherId == teacher.Id && ca.CourseId == courseId);
     }
 
     public async Task<Teacher?> GetTeacherByUserIdAsync(string userId)
     {
-        return await _context.Teachers.FirstOrDefaultAsync(t => t.UserId == userId);
+        return await _context.Teachers
+            .FirstOrDefaultAsync(t => t.UserId == userId);
     }
 
     public async Task<Guid> GetCourseFacultyIdAsync(Guid courseId)
     {
-        var facultyId = await _context
-            .Courses.Where(c => c.Id == courseId)
+        var facultyId = await _context.Courses
+            .Where(c => c.Id == courseId)
             .Select(c => c.FacultyId)
             .FirstOrDefaultAsync();
 
@@ -121,3 +113,4 @@ public class AttendanceRepository : IAttendanceRepository
         return facultyId;
     }
 }
+

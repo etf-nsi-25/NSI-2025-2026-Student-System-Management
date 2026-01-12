@@ -20,3 +20,4 @@ public class Enrollment : ITenantAware
     public Student Student { get; set; } = null!;
     public Course Course { get; set; } = null!;
 }
+

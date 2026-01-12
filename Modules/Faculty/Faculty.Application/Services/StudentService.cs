@@ -11,15 +11,14 @@ public class StudentService(IStudentRepository repository)
     {
         if (userCreatedEvent.Role == UserRole.Student)
         {
-            await repository.AddAsync(
-                new Student
+            await repository.AddAsync(new Student
                 {
                     UserId = userCreatedEvent.UserId.ToString(),
                     IndexNumber = userCreatedEvent.IndexNumber!,
                     LastName = userCreatedEvent.LastName,
                     FirstName = userCreatedEvent.FirstName,
-                    EnrollmentDate = DateTime.UtcNow,
-                    CreatedAt = DateTime.UtcNow,
+                    EnrollmentDate = DateTime.UtcNow, 
+                    CreatedAt = DateTime.UtcNow
                 },
                 ct
             );

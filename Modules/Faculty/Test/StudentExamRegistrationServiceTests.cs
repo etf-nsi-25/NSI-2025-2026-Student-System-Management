@@ -21,12 +21,7 @@ public class StudentExamRegistrationServiceTests
         await using var context = CreateContext();
         var userId = "student-eligible";
         var (student, course) = SeedStudentAndCourse(context, userId, includeEnrollment: true);
-        var exam = SeedExam(
-            context,
-            course.Id,
-            DateTime.UtcNow.AddDays(3),
-            DateTime.UtcNow.AddDays(1)
-        );
+        var exam = SeedExam(context, course.Id, DateTime.UtcNow.AddDays(3), DateTime.UtcNow.AddDays(1));
         var service = CreateService(context);
 
         var result = await service.RegisterAsync(exam.Id, userId);
@@ -43,17 +38,11 @@ public class StudentExamRegistrationServiceTests
         await using var context = CreateContext();
         var userId = "student-not-enrolled";
         var (_, course) = SeedStudentAndCourse(context, userId, includeEnrollment: false);
-        var exam = SeedExam(
-            context,
-            course.Id,
-            DateTime.UtcNow.AddDays(3),
-            DateTime.UtcNow.AddDays(1)
-        );
+        var exam = SeedExam(context, course.Id, DateTime.UtcNow.AddDays(3), DateTime.UtcNow.AddDays(1));
         var service = CreateService(context);
 
         var exception = await Assert.ThrowsAsync<FacultyApplicationException>(() =>
-            service.RegisterAsync(exam.Id, userId)
-        );
+            service.RegisterAsync(exam.Id, userId));
 
         Assert.Equal(HttpStatusCode.Forbidden, exception.StatusCode);
     }
@@ -64,42 +53,20 @@ public class StudentExamRegistrationServiceTests
         await using var context = CreateContext();
         var userId = "student-filter";
         var (student, course) = SeedStudentAndCourse(context, userId, includeEnrollment: true);
-        var visibleExam = SeedExam(
-            context,
-            course.Id,
-            DateTime.UtcNow.AddDays(5),
-            DateTime.UtcNow.AddDays(3)
-        );
-        var pastExam = SeedExam(
-            context,
-            course.Id,
-            DateTime.UtcNow.AddDays(-1),
-            DateTime.UtcNow.AddDays(-2)
-        );
-        var closedExam = SeedExam(
-            context,
-            course.Id,
-            DateTime.UtcNow.AddDays(4),
-            DateTime.UtcNow.AddHours(-1)
-        );
-        var alreadyRegisteredExam = SeedExam(
-            context,
-            course.Id,
-            DateTime.UtcNow.AddDays(6),
-            DateTime.UtcNow.AddDays(4)
-        );
+        var visibleExam = SeedExam(context, course.Id, DateTime.UtcNow.AddDays(5), DateTime.UtcNow.AddDays(3));
+        var pastExam = SeedExam(context, course.Id, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(-2));
+        var closedExam = SeedExam(context, course.Id, DateTime.UtcNow.AddDays(4), DateTime.UtcNow.AddHours(-1));
+        var alreadyRegisteredExam = SeedExam(context, course.Id, DateTime.UtcNow.AddDays(6), DateTime.UtcNow.AddDays(4));
 
-        context.ExamRegistrations.Add(
-            new ExamRegistration
-            {
-                ExamId = alreadyRegisteredExam.Id,
-                StudentId = student.Id,
-                FacultyId = _facultyId,
-                Status = "Registered",
-                RegistrationDate = DateTime.UtcNow,
-                CreatedAt = DateTime.UtcNow,
-            }
-        );
+        context.ExamRegistrations.Add(new ExamRegistration
+        {
+            ExamId = alreadyRegisteredExam.Id,
+            StudentId = student.Id,
+            FacultyId = _facultyId,
+            Status = "Registered",
+            RegistrationDate = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow
+        });
         await context.SaveChangesAsync();
 
         var service = CreateService(context);
@@ -116,11 +83,7 @@ public class StudentExamRegistrationServiceTests
         return new StudentExamRegistrationService(repository);
     }
 
-    private (Student student, Course course) SeedStudentAndCourse(
-        FacultyDbContext context,
-        string userId,
-        bool includeEnrollment
-    )
+    private (Student student, Course course) SeedStudentAndCourse(FacultyDbContext context, string userId, bool includeEnrollment)
     {
         var course = new Course
         {
@@ -131,7 +94,7 @@ public class StudentExamRegistrationServiceTests
             Type = CourseType.Mandatory,
             ProgramId = "CS",
             ECTS = 6,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow
         };
 
         var student = new Student
@@ -141,7 +104,7 @@ public class StudentExamRegistrationServiceTests
             IndexNumber = "IB-123",
             FirstName = "Test",
             LastName = "Student",
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow
         };
 
         context.Courses.Add(course);
@@ -149,28 +112,21 @@ public class StudentExamRegistrationServiceTests
 
         if (includeEnrollment)
         {
-            context.Enrollments.Add(
-                new Enrollment
-                {
-                    FacultyId = _facultyId,
-                    Student = student,
-                    Course = course,
-                    Status = "Active",
-                    CreatedAt = DateTime.UtcNow,
-                }
-            );
+            context.Enrollments.Add(new Enrollment
+            {
+                FacultyId = _facultyId,
+                Student = student,
+                Course = course,
+                Status = "Active",
+                CreatedAt = DateTime.UtcNow
+            });
         }
 
         context.SaveChanges();
         return (student, course);
     }
 
-    private Exam SeedExam(
-        FacultyDbContext context,
-        Guid courseId,
-        DateTime examDate,
-        DateTime? regDeadline
-    )
+    private Exam SeedExam(FacultyDbContext context, Guid courseId, DateTime examDate, DateTime? regDeadline)
     {
         var exam = new Exam
         {
@@ -179,7 +135,7 @@ public class StudentExamRegistrationServiceTests
             Name = "Final Exam",
             ExamDate = examDate,
             RegDeadline = regDeadline,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow
         };
 
         context.Exams.Add(exam);
