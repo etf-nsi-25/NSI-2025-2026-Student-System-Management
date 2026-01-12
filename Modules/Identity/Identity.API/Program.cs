@@ -1,17 +1,9 @@
 using Identity.API.Filters;
-using Identity.Application.Interfaces;
-using Identity.Application.Services;
-using Identity.Core.Interfaces.Repositories;
-using Identity.Core.Interfaces.Services;
 using Identity.Infrastructure.Db;
-using Identity.Infrastructure.Repositories;
-using Identity.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
-using Identity.Core.Configuration;
-using Identity.Infrastructure.Entities;
-using Microsoft.AspNetCore.Identity;
+using Identity.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +15,8 @@ builder.Services.AddControllers(options =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddIdentityModule(builder.Configuration);
 
 // Configure Swagger/OpenAPI with JWT support
 builder.Services.AddSwaggerGen(options =>
@@ -72,28 +66,6 @@ builder.Services.AddSwaggerGen(options =>
         options.IncludeXmlComments(xmlPath);
     }
 });
-
-// Database Configuration
-builder.Services.AddDbContext<AuthDbContext>(options =>
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("Database"),
-        b => b.MigrationsAssembly("Identity.Infrastructure")));
-
-
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<AuthDbContext>()
-    .AddDefaultTokenProviders();
-
-// JWT Settings
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-
-// Register Services
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IIdentityService, IdentityService>();
-// Register Repositories
-builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 
 // Health Checks
