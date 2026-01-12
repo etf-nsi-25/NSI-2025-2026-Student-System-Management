@@ -16,10 +16,9 @@ export interface User {
     facultyId: string;
     status: Status;
     lastActive: string;
-    indexNumber?: string; // Samo za studente
+    indexNumber?: string; 
 } 
 
-// Mock Podaci - Služe kao baza podataka
 export let MOCK_USERS: User[] = [
     { id: 'u1', username: 'adnan', firstName: 'Prof. Adnan', lastName: 'Adnan', email: 'adnan.adnan@unsa.ba', role: 'Professor', facultyId: 'f1', status: 'Active', lastActive: 'Today, 09:15', indexNumber: undefined },
     { id: 'u2', username: 'lamija', firstName: 'Lamija', lastName: 'Salihović', email: 'lamija.s@unsa.ba', role: 'Student', facultyId: 'f1', status: 'Active', lastActive: 'Yesterday', indexNumber: '19045' },
@@ -33,14 +32,12 @@ export const getAvailableFaculties = (): Faculty[] => [
     { id: 'f3', name: 'MED UNSA' },
 ];
 
-// Funckija za dohvaćanje korisnika
 export const fetchUsers = async (): Promise<User[]> => {
     // eslint-disable-next-line no-console
     console.log('identityApi.fetchUsers: returning MOCK_USERS (count=', MOCK_USERS.length, ')');
     return new Promise(resolve => setTimeout(() => resolve(MOCK_USERS), 500));
 };
 
-// Funkcija za kreiranje korisnika
 type CreateUserPayload = Omit<User, 'id' | 'lastActive' | 'status'> & { password: string; status?: Status };
 
 export const createUser = async (data: CreateUserPayload): Promise<User> => {
@@ -71,7 +68,6 @@ export const createUser = async (data: CreateUserPayload): Promise<User> => {
     });
 };
 
-// Funkcija za ažuriranje korisnika
 export const updateUser = async (
     id: string,
     data: Partial<Omit<User, 'id' | 'username' | 'email' | 'lastActive'>>
@@ -97,7 +93,6 @@ export const updateUser = async (
 };
 
 
-// Funkcija za trajno brisanje (uklanja iz liste)
 export const deleteUser = async (id: string): Promise<void> => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
@@ -117,7 +112,6 @@ export const getFacultyName = (facultyId: string): string => {
     return faculty ? faculty.name : 'N/A';
 };
 
-// Funkcija za deaktivaciju (postavi status = 'Inactive')
 export const deactivateUser = async (id: string): Promise<User> => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
