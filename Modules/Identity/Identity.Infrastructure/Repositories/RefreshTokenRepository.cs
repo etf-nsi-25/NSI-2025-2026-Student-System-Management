@@ -12,17 +12,16 @@ public class RefreshTokenRepository : BaseRepository<RefreshToken>, IRefreshToke
 
     public RefreshTokenRepository(AuthDbContext context) : base(context)
     {
-        // Pass context to BaseRepository
         _context = context;
     }
 
     public async Task<RefreshToken?> GetByTokenAsync(string token, CancellationToken cancellationToken = default)
     {
-        return await _dbSet // _dbSet comes from BaseRepository
-            .Include(rt => rt.User)
+        return await _dbSet 
             .FirstOrDefaultAsync(rt => rt.Token == token, cancellationToken);
     }
-    public async Task<IEnumerable<RefreshToken>> GetActiveTokensByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+
+    public async Task<IEnumerable<RefreshToken>> GetActiveTokensByUserIdAsync(string userId, CancellationToken cancellationToken = default)
     {
         return await GetAsync(
               filter: rt => rt.UserId == userId && !rt.IsRevoked && rt.ExpiresAt > DateTime.UtcNow,
@@ -31,8 +30,7 @@ public class RefreshTokenRepository : BaseRepository<RefreshToken>, IRefreshToke
           );
     }
 
-
-    public async Task RevokeAllUserTokensAsync(Guid userId, string reason, CancellationToken cancellationToken = default)
+    public async Task RevokeAllUserTokensAsync(string userId, string reason, CancellationToken cancellationToken = default)
     {
         var tokens = await GetActiveTokensByUserIdAsync(userId, cancellationToken);
 

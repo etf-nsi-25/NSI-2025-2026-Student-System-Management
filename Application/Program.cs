@@ -22,6 +22,7 @@ using University.Infrastructure.Db;
 using FluentValidation.AspNetCore;
 using FacultyController = Faculty.API.Controllers.FacultyController;
 using Common.Core.Tenant;
+using Identity.Infrastructure.Entities;
 
 // Npgsql/Postgres timestamp compatibility for local dev.
 // Prevents failures when DateTime.Kind is Unspecified but the DB column is timestamptz.

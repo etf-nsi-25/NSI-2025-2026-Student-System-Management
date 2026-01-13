@@ -3,17 +3,16 @@ using Identity.Application.Services;
 using Identity.Core.Configuration;
 using Identity.Core.Interfaces.Repositories;
 using Identity.Core.Interfaces.Services;
-using Identity.Core.Repositories;
-using Identity.Core.Services;
 using Identity.Infrastructure.Db;
 using Identity.Infrastructure.Repositories;
-using Identity.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Identity.Infrastructure.Entities;
+using Identity.Infrastructure.Services;
 
 namespace Identity.Infrastructure.DependencyInjection
 {
@@ -32,16 +31,16 @@ namespace Identity.Infrastructure.DependencyInjection
 
             // Identity Framework
             services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<AuthDbContext>();
+                .AddEntityFrameworkStores<AuthDbContext>()
+                .AddDefaultTokenProviders();
 
             // Register services
+            services.AddScoped<IIdentityService, IdentityService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<IIdentityHasherService, IdentityHasherService>();
             services.AddSingleton<IJwtTokenService, JwtTokenService>();
             services.AddScoped<IdentityDbContextSeed>();
 
-            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
             JwtSettings jwtSettings = new JwtSettings();

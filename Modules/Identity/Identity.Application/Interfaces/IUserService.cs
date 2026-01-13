@@ -5,7 +5,7 @@ namespace Identity.Application.Interfaces;
 
 public interface IUserService
 {
-    Task<Guid> CreateUserAsync(
+    Task<string> CreateUserAsync(
            string username,
            string password,
            string firstName,
@@ -20,13 +20,13 @@ public interface IUserService
 
 
 
-    Task<bool> DeleteUserAsync(Guid userId);
+    Task<bool> DeleteUserAsync(string userId);
 
-    Task<UserResponse?> GetUserByIdAsync(Guid userId);
+    Task<UserResponse?> GetUserByIdAsync(string userId);
 
-    Task<bool> UpdateUserAsync(Guid userId, UpdateUserRequest request);
+    Task<bool> UpdateUserAsync(string userId, UpdateUserRequest request);
 
-    Task<bool> DeactivateUserAsync(Guid userId);
+    Task<bool> DeactivateUserAsync(string userId);
 
-    Task<bool> ChangePasswordAsync(Guid userId, string newPassword);
+    Task<bool> ChangePasswordAsync(string userId, string newPassword);
 }
