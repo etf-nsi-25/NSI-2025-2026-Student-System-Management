@@ -1,8 +1,9 @@
+using System.Text.Json.Nodes;
 using Analytics.Core.Entities;
 
 namespace Analytics.Application.Interfaces;
 
 public interface IStatsService
 {
-    Task<string> GetOrUpdateStatAsync(string metricCode, Scope scope, Guid scopeIdentifier, bool forceRefresh = false);
+    Task<JsonObject> GetOrUpdateStatAsync(string metricCode, Scope scope, Guid scopeIdentifier, bool forceRefresh = false);
 }

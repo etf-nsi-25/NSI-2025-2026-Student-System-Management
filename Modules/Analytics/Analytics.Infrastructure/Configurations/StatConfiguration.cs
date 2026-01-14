@@ -19,6 +19,7 @@ public class StatConfiguration : IEntityTypeConfiguration<Stat>
 
               builder.Property(m => m.Value)
                      .IsRequired()
+                     .HasColumnType("jsonb")
                      .HasMaxLength(4000);
 
 

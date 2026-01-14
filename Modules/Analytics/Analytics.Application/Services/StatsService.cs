@@ -1,7 +1,7 @@
+using System.Text.Json.Nodes;
 using Analytics.Application.Interfaces;
 using Analytics.Core.Entities;
 using Analytics.Core.Interfaces;
-using Common.Core.Tenant;
 
 namespace Analytics.Application.Services;
 
@@ -16,7 +16,7 @@ public class StatsService : IStatsService
         _calculators = calculators;
     }
 
-    public async Task<string> GetOrUpdateStatAsync(string metricCode, Scope scope, Guid scopeIdentifier, bool forceRefresh = false)
+    public async Task<JsonObject> GetOrUpdateStatAsync(string metricCode, Scope scope, Guid scopeIdentifier, bool forceRefresh = false)
     {
         if (!_calculators.Any())
         {
@@ -33,13 +33,18 @@ public class StatsService : IStatsService
         var stats = await _statRepository.GetStatsByMetricAndScopeAsync(metricCode, scope, scopeIdentifier);
         var stat = stats.FirstOrDefault();
 
+        
         if (stat != null && !forceRefresh)
         {
-            return stat.Value;
+            var node = JsonNode.Parse(stat.Value);
+            if (node is JsonObject jsonObject)
+            {
+                return jsonObject;
+            }
         }
 
         var newValue = await calculator.CalculateAsync(scopeIdentifier);
-
+        
         if (stat == null)
         {
             stat = new Stat
@@ -48,14 +53,14 @@ public class StatsService : IStatsService
                 MetricCode = metricCode,
                 Scope = scope,
                 ScopeIdentifier = scopeIdentifier,
-                Value = newValue,
+                Value = newValue.ToJsonString(),
                 RecordedAt = DateTime.UtcNow
             };
             await _statRepository.AddAsync(stat);
         }
         else
         {
-            stat.Value = newValue;
+            stat.Value = newValue.ToJsonString();
             stat.RecordedAt = DateTime.UtcNow;
             await _statRepository.UpdateAsync(stat);
         }

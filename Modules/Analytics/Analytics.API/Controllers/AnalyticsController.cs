@@ -15,16 +15,16 @@ public class AnalyticsController : ControllerBase
         _statsService = statsService;
     }
 
-    [HttpGet("total/students")]
+    [HttpGet("total-students")]
     public async Task<IActionResult> GetTotalStudents()
     {
-        string count = await _statsService.GetOrUpdateStatAsync(
+        var data = await _statsService.GetOrUpdateStatAsync(
             MetricKey.CountStudents,
             Scope.University,
             Guid.Empty
         );
 
-        return Ok(new { totalStudents = count });
+        return Ok(data);
     }
 
 }

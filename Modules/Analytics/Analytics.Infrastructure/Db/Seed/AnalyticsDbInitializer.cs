@@ -12,7 +12,7 @@ public class AnalyticsDbInitializer
     public async Task SeedAsync(AnalyticsDbContext _context)
     {
 
-        var path = Path.Combine(AppContext.BaseDirectory, "Db", "Seed", "metrics.json");
+        var path = Path.Combine(AppContext.BaseDirectory, "metrics.json");
 
         if (!File.Exists(path))
         {

@@ -7,6 +7,7 @@ using System.Security.Principal;
 using Identity.Application.Interfaces;
 using Identity.Core.Enums;
 using Identity.Core.DTO;
+using System.Text.Json.Nodes;
 
 namespace Analytics.Application.Calculators;
 
@@ -21,11 +22,14 @@ public class StudentCountCalculator : IStatsCalculator
         _userService = userService;
     }
 
-    public async Task<string> CalculateAsync(Guid scopeIdentifier)
+    public async Task<JsonObject> CalculateAsync(Guid scopeIdentifier)
     {
-        return (await _userService.CountUsers(new UserFilterRequest
+        return new JsonObject
         {
-            Role = UserRole.Student
-        })).ToString();   
-    }            
+            ["count"] = await _userService.CountUsers(new UserFilterRequest
+            {
+                Role = UserRole.Student
+            })
+        };
+    }
 }
