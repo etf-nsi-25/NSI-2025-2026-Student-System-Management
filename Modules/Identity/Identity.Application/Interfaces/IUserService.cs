@@ -13,7 +13,8 @@ public interface IUserService
            string email,
            Guid facultyId,
            string? indexNumber,
-           UserRole role
+           UserRole role,
+           UserRole? requesterRole = null
        );
 
     Task<UserListResponse> GetAllUsersAsync(UserFilterRequest filter);
