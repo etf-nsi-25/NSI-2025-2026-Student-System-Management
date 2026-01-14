@@ -127,27 +127,6 @@ export class API {
     }
 
 
-    // Exam management methods
-    async getExams(): Promise<ExamResponseDTO[]> {
-        return this.get<ExamResponseDTO[]>('/api/exams');
-    }
-
-    async getExam(id: number | string): Promise<ExamResponseDTO> {
-        return this.get<ExamResponseDTO>(`/api/exams/${id}`);
-    }
-
-    async createExam(dto: CreateExamRequestDTO): Promise<ExamResponseDTO> {
-        return this.post<ExamResponseDTO>('/api/exams', dto);
-    }
-
-    async updateExam(id: number | string, dto: UpdateExamRequestDTO): Promise<ExamResponseDTO> {
-        return this.put<ExamResponseDTO>(`/api/exams/${id}`, dto);
-    }
-
-    async deleteExam(id: number | string): Promise<void> {
-        await this.delete<null>(`/api/exams/${id}`);
-    }
-
     // Profile methods
     async getCurrentUser(): Promise<any> {
         return this.get<any>('/api/users/me');
@@ -169,7 +148,7 @@ export class API {
         return this.put<FacultyResponseDTO>(`/api/university/faculties/${id}`, dto);
     }
 
-   async deleteFaculty(id: number): Promise<void> {
-      return this.delete<void>(`/api/university/faculties/${id}`);
-   }
+    async deleteFaculty(id: number): Promise<void> {
+        return this.delete<void>(`/api/university/faculties/${id}`);
+    }
 }
