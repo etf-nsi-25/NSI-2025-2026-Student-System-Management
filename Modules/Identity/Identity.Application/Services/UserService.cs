@@ -21,11 +21,17 @@ internal class UserService(
        string email,
        Guid facultyId,
        string? indexNumber,
-       UserRole role)
+       UserRole role,
+       UserRole? requesterRole = null)
     {
-        if (role == UserRole.Superadmin || role == UserRole.Admin)
+        if (role == UserRole.Superadmin)
         {
-            throw new InvalidOperationException("Admin users are restricted from assigning Superadmin or Admin roles.");
+            throw new InvalidOperationException("Assigning the Superadmin role is not allowed.");
+        }
+
+        if (role == UserRole.Admin && requesterRole != UserRole.Superadmin)
+        {
+            throw new InvalidOperationException("Only Superadmins can assign the Admin role.");
         }
 
         var existingUser = await identityService.FindByEmailAsync(email);

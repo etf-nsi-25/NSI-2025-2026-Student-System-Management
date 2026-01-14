@@ -22,17 +22,32 @@ namespace Identity.Infrastructure.DependencyInjection
             this IServiceCollection services,
             IConfiguration configuration)
         {
+            // Load environment variables
+            var env = DotNetEnv.Env.TraversePath().Load();
+            if (env == null || !env.Any())
+            {
+                DotNetEnv.Env.TraversePath().Load(".env.example");
+            }
+
+            // Data Protection (Required for Token Providers)
+            services.AddDataProtection();
+
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 
-            // Entity Framework
-            services.AddDbContext<AuthDbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString("Database"))
-            );
+            // Entity Framework - only add if not already configured (for tests)
+            if (!services.Any(d => d.ServiceType == typeof(DbContextOptions<AuthDbContext>)))
+            {
+                services.AddDbContext<AuthDbContext>(options =>
+                    options.UseNpgsql(configuration.GetConnectionString("Database")));
+            }
 
-            // Identity Framework
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<AuthDbContext>()
-                .AddDefaultTokenProviders();
+            // Identity Framework - only add if not already configured (for tests)
+            if (!services.Any(d => d.ServiceType == typeof(IUserStore<ApplicationUser>)))
+            {
+                services.AddIdentity<ApplicationUser, IdentityRole>()
+                    .AddEntityFrameworkStores<AuthDbContext>()
+                    .AddDefaultTokenProviders();
+            }
 
             // Register services
             services.AddScoped<IIdentityService, IdentityService>();
@@ -43,8 +58,16 @@ namespace Identity.Infrastructure.DependencyInjection
 
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
+            services.AddHostedService<IdentityStartupService>();
+
             JwtSettings jwtSettings = new JwtSettings();
             configuration.Bind("JwtSettings", jwtSettings);
+
+            // Fallback for test environment if signing key is not provided
+            if (string.IsNullOrEmpty(jwtSettings.SigningKey))
+            {
+                jwtSettings.SigningKey = Convert.ToBase64String(new byte[32]);
+            }
 
             services.AddAuthentication(options =>
                 {
