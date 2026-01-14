@@ -1,0 +1,10 @@
+[
+    {
+      "Code": "COUNT_STUD",
+      "Description": "Total count of students."
+    },
+    {
+      "Code": "GPA",
+      "Description": "Cumulative Grade Point Average."
+    }
+]

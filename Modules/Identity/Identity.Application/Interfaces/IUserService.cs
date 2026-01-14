@@ -29,4 +29,6 @@ public interface IUserService
     Task<bool> DeactivateUserAsync(string userId);
 
     Task<bool> ChangePasswordAsync(string userId, string newPassword);
+
+    Task<int> CountUsers(UserFilterRequest filter);
 }

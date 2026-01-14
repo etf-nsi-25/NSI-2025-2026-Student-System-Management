@@ -1,4 +1,5 @@
 using Identity.Core.DTO;
+using Identity.Core.Enums;
 
 namespace Identity.Core.Interfaces.Services;
 
