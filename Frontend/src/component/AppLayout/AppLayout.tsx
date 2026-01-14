@@ -1,205 +1,195 @@
-import React, { useState, useEffect, type PropsWithChildren } from "react";
-import logoImage from "../../assets/logo-unsa-sms.png";
-import {Link, useLocation} from "react-router-dom";
+import React, { useState, type PropsWithChildren } from "react";
+import logo from "../../assets/logo-unsa-sms.png";
+import { useNavigate, NavLink } from "react-router-dom";
 import { useAuthContext } from "../../init/auth";
-import { isTeacher } from "../../constants/roles";
+import { UserRole } from "../../constants/roles";
+import { logoutFromServer, resetAuthInfo } from "../../utils/authUtils";
+import {
+  CSidebar,
+  CSidebarBrand,
+  CSidebarNav,
+  CNavItem,
+  CNavTitle,
+  CContainer,
+  CAvatar,
+} from '@coreui/react';
+import CIcon from '@coreui/icons-react';
+import {
+  cilSpeedometer,
+  cilFile,
+  cilHouse,
+  cilChartLine,
+  cilClipboard,
+  cilCalendar,
+  cilEducation,
+  cilUser,
+  cilLifeRing,
+  cilAccountLogout,
+  cilPeople,
+  cilMenu
+} from '@coreui/icons';
+import './AppLayout.css';
 
+
+type SidebarItem =
+  | { type: 'item'; label: string; path: string; icon?: any }
+  | { type: 'title'; label: string };
 
 const AppLayout: React.FC<PropsWithChildren<object>> = ({ children }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [sidebarOpen, setSidebarOpen] = useState(false); // mobile only
-  const location=useLocation();
-  const { authInfo } = useAuthContext();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { authInfo, setAuthInfo } = useAuthContext();
+  const navigate = useNavigate();
 
-  const handleLinkClick = () => {
-if (isMobile) {
-setSidebarOpen(false);
-}
-};
-
- const getLinkStyle = (path: string) => {
-  const isActive = location.pathname === path;
-
-  // Kada je sidebar sklopljen (collapsed), ukloni aktivni stil
-  if (isCollapsed && !isMobile) {
-    return {
-      padding: "10px 20px",
-      color: "white",
-      textDecoration: "none",
-      backgroundColor: "transparent",
-      borderLeft: "4px solid transparent",
-      fontWeight: "normal",
-      transition: "0.2s",
-    };
-  }
-
-  // Normalno stanje (sidebar otvoren)
-  return {
-    padding: "10px 20px",
-    color: "white",
-    textDecoration: "none",
-    backgroundColor: isActive ? "#005bb5" : "transparent",
-    borderLeft: isActive ? "4px solid #ffffff" : "4px solid transparent",
-    fontWeight: isActive ? "bold" : "normal",
-    transition: "0.2s",
+  const handleLogout = async () => {
+    try {
+      await logoutFromServer();
+    } catch (error) {
+      console.error("Logout failed on server:", error);
+    } finally {
+      resetAuthInfo(setAuthInfo);
+      navigate("/login");
+    }
   };
-};
 
+  // Role-based sidebar items
+  const getSidebarItems = (): SidebarItem[] => {
+    if (!authInfo) return [];
 
+    const role = authInfo.role;
 
-  // LISTEN TO WINDOW RESIZE
-  useEffect(() => {
-    const handleResize = () => {
-      const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
+    switch (role) {
+      case UserRole.Student:
+        return [
+          { type: 'title', label: 'General' },
+          { type: 'item', label: "Student dashboard", path: "/student/dashboard", icon: cilSpeedometer },
+          { type: 'item', label: "Document center", path: "/student/document-center", icon: cilFile },
+          { type: 'item', label: "Student analytics", path: "/student/analytics", icon: cilChartLine },
+          { type: 'item', label: "Request management", path: "/student/request-management", icon: cilClipboard },
+          { type: 'item', label: "Course Enrollment", path: "/student/enrollment", icon: cilEducation },
+          { type: 'item', label: "Enrollment", path: "/student/student-enrollment", icon: cilEducation },
+          { type: 'item', label: "Exams registration", path: "/student/exams", icon: cilCalendar },
+          { type: 'title', label: 'Settings' },
+          { type: 'item', label: "Profile settings", path: "/profile-settings", icon: cilUser },
+          { type: 'title', label: 'Help' },
+          { type: 'item', label: "Student support", path: "/student/support", icon: cilLifeRing },
+        ];
+      case UserRole.Teacher:
+        return [
+          { type: 'title', label: 'General' },
+          { type: 'item', label: "Professor Dashboard", path: "/teacher/dashboard", icon: cilSpeedometer },
+          { type: 'item', label: "Course Management", path: "/course-management", icon: cilEducation },
+          { type: 'item', label: "Attendance", path: "/attendance", icon: cilClipboard },
+          { type: 'item', label: "Request Management", path: "/faculty/request-management", icon: cilFile },
+          { type: 'title', label: 'Settings' },
+          { type: 'item', label: "Profile settings", path: "/profile-settings", icon: cilUser },
+          { type: 'title', label: 'Help' },
+          { type: 'item', label: "Help", path: "/help", icon: cilLifeRing },
+        ];
+      case UserRole.Assistant:
+        return [
+          { type: 'title', label: 'General' },
+          { type: 'item', label: "Professor Dashboard", path: "/assistant/dashboard", icon: cilSpeedometer },
+          { type: 'item', label: "Course Management", path: "/course-management", icon: cilEducation },
+          { type: 'item', label: "Attendance", path: "/attendance", icon: cilClipboard },
+          { type: 'item', label: "Request Management", path: "/faculty/request-management", icon: cilFile },
+          { type: 'title', label: 'Settings' },
+          { type: 'item', label: "Profile settings", path: "/profile-settings", icon: cilUser },
+          { type: 'title', label: 'Help' },
+          { type: 'item', label: "Help", path: "/help", icon: cilLifeRing },
+        ];
+      case UserRole.Admin:
+        return [
+          { type: 'title', label: 'General' },
+          { type: 'item', label: "Faculty Dashboard", path: "/admin/dashboard", icon: cilSpeedometer },
+          { type: 'item', label: "User Management", path: "/users", icon: cilPeople },
+          { type: 'item', label: "Tenant Management", path: "/tenant-management", icon: cilHouse },
+          { type: 'item', label: "Course Management", path: "/course-management", icon: cilEducation },
+          { type: 'item', label: "Request Management", path: "/faculty/request-management", icon: cilFile },
+          { type: 'title', label: 'Settings' },
+          { type: 'item', label: "Profile settings", path: "/profile-settings", icon: cilUser },
+          { type: 'title', label: 'Help' },
+          { type: 'item', label: "Help", path: "/help", icon: cilLifeRing },
+        ];
+      case UserRole.Superadmin:
+        return [
+          { type: 'title', label: 'General' },
+          { type: 'item', label: "University Dashboard", path: "/admin/dashboard", icon: cilSpeedometer },
+          { type: 'item', label: "User Management", path: "/users", icon: cilPeople },
+          { type: 'item', label: "Tenant Management", path: "/tenant-management", icon: cilHouse },
+          { type: 'item', label: "Course Management", path: "/course-management", icon: cilEducation },
+          { type: 'item', label: "Request Management", path: "/faculty/request-management", icon: cilFile },
+          { type: 'title', label: 'Settings' },
+          { type: 'item', label: "Profile settings", path: "/profile-settings", icon: cilUser },
+          { type: 'title', label: 'Help' },
+          { type: 'item', label: "Help", path: "/help", icon: cilLifeRing },
+        ];
+      default:
+        return [];
+    }
+  };
 
-      if (!mobile) {
-        setSidebarOpen(false);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const sidebarWidth = isCollapsed ? "70px" : "300px";
+  const sidebarItems = getSidebarItems();
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#d9e7f5", overflowX: "hidden" }}>
+    <div className="student-portal-wrapper">
 
-      {/* TOP BLUE HEADER */}
-      <div
-        style={{
-          width: "100%",
-          height: "60px",
-          backgroundColor: "#003b82",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          paddingLeft: "0px",
-          paddingRight: "10px",
-        }}
+      <CSidebar
+        className={`student-sidebar ${sidebarOpen ? 'show' : ''}`}
+        position="fixed"
       >
-        {/* LEFT: Logo + Collapse button */}
-        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-          <img src={logoImage} alt="logo" style={{ height: "42px", paddingLeft: "50px" }} />
+        <CSidebarBrand className="sidebar-brand-wrapper">
+          <div className="unsa-logo">
+            <img src={logo} alt="UNSA Logo" />
+          </div>
+        </CSidebarBrand>
 
-          <button
-            onClick={() => {
-              if (isMobile) setSidebarOpen(!sidebarOpen);
-              else setIsCollapsed(!isCollapsed);
-            }}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "white",
-              fontSize: "24px",
-              cursor: "pointer",
-            }}
-          >
-            ☰
-          </button>
+        <CSidebarNav>
+          {sidebarItems.map((item, index) => {
+            if (item.type === 'title') {
+              return <CNavTitle key={index}>{item.label}</CNavTitle>;
+            }
+            return (
+              <CNavItem key={item.path}>
+                <NavLink to={item.path} className="nav-link">
+                  {item.icon && <CIcon customClassName="nav-icon" icon={item.icon} />}
+                  {item.label}
+                </NavLink>
+              </CNavItem>
+            );
+          })}
+
+        </CSidebarNav>
+
+        <div className="sidebar-footer">
+          <div className="user-profile">
+            <CAvatar color="primary" textColor="white" className="user-avatar">
+              {authInfo?.fullName?.charAt(0) || 'U'}
+            </CAvatar>
+            <div className="user-info">
+              <span className="user-name">{authInfo?.fullName || authInfo?.role || "User"}</span>
+            </div>
+            <button
+              className="logout-btn"
+              onClick={handleLogout}
+              aria-label="Logout"
+            >
+              <CIcon icon={cilAccountLogout} size="lg" />
+            </button>
+          </div>
         </div>
+      </CSidebar>
 
-        <span style={{ color: "white", fontSize: "16px", fontWeight: 500, paddingRight: "40px" }}>
-          Faculty admin
-        </span>
-      </div>
-
-
-      {/* LAYOUT WRAPPER */}
-      <div style={{ display: "flex", flexDirection: "row" }}>
-
-        {/* MOBILE OVERLAY */}
-        {isMobile && sidebarOpen && (
-          <div
-            onClick={() => setSidebarOpen(false)}
-            style={{
-              position: "fixed",
-              inset: 0,
-              backgroundColor: "rgba(0,0,0,0.3)",
-              zIndex: 9,
-            }}
-          ></div>
-        )}
-
-        {/* SIDEBAR */}
-        <div
-          style={{
-            width: isMobile ? "250px" : sidebarWidth,
-            backgroundColor: "#003b82",
-            minHeight: "calc(100vh - 60px)",
-            paddingTop: "20px",
-            color: "white",
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px",
-            transition: "all 0.3s",
-            overflow: "hidden",
-            position: isMobile ? "fixed" : "relative",
-            zIndex: 10,
-            inset: 0,
-            transform: isMobile
-              ? sidebarOpen
-                ? "translateX(0)"
-                : "translateX(-100%)"
-              : "none",
-          }}
+      <div className="student-portal-content">
+        <button
+          type="button"
+          className="sidebar-toggle-btn"
+          onClick={() => setSidebarOpen((prev) => !prev)}
         >
-          <Link to="/dashboard" style={getLinkStyle("/dashboard")} onClick={handleLinkClick}>
-            {(!isCollapsed || isMobile) && "Dashboard"}
-          </Link>
-
-          <Link to="/course-management" style={getLinkStyle("/course-management")} onClick={handleLinkClick}>
-            {(!isCollapsed || isMobile) && "Course Management"}
-          </Link>
-
-          <Link to="/users" style={getLinkStyle("/users")} onClick={handleLinkClick}>
-            {(!isCollapsed || isMobile) && "User Management"}
-          </Link>
-
-          <Link to="/tenant-management" style={getLinkStyle("/tenant-management")} onClick={handleLinkClick}>
-            {(!isCollapsed || isMobile) && "Tenant Management"}
-          </Link>
-
-          <Link to="/student-support" style={getLinkStyle("/student-support")} onClick={handleLinkClick}>
-            {(!isCollapsed || isMobile) && "Student Support"}
-          </Link>
-
-          <Link to="/settings" style={getLinkStyle("/settings")} onClick={handleLinkClick}>
-            {(!isCollapsed || isMobile) && "Settings"}
-          </Link>
-
-          <Link to="/help" style={getLinkStyle("/help")} onClick={handleLinkClick}>
-            {(!isCollapsed || isMobile) && "Help"}
-          </Link>
-
-          {authInfo && isTeacher(authInfo.role) && (
-            <Link to="/attendance" style={getLinkStyle("/attendance")} onClick={handleLinkClick}>
-              {(!isCollapsed || isMobile) && "Attendance"}
-            </Link>
-          )}
-
-        </div>
-
-        {/* CONTENT */}
-        <div style={{ padding: "20px 25px 60px 25px", width: "100%" }}>
+          <CIcon icon={cilMenu} />
+        </button>
+        <CContainer fluid className="portal-body">
           {children}
-
-          {/* FOOTER */}
-          <footer
-            style={{
-              marginTop: "40px",
-              fontSize: "12px",
-              color: "#424242",
-              textAlign: "center",
-            }}
-          >
-            Faculty Admin – User Management (reference layout)
-          </footer>
-        </div>
-
+        </CContainer>
       </div>
     </div>
   );

@@ -26,6 +26,15 @@ export function extractApiErrorMessage(error: unknown): string {
           ) {
             return parsed.message;
           }
+
+          if (
+            parsed &&
+            typeof parsed === "object" &&
+            "error" in parsed &&
+            typeof (parsed as any).error === "string"
+          ) {
+            return (parsed as any).error;
+          }
         } catch {
           /* swallow JSON parse errors */
         }

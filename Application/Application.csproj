@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
@@ -32,7 +32,7 @@
 		<ProjectReference Include="..\Modules\Analytics\Analytics.Infrastructure\Analytics.Infrastructure.csproj" />
 		<ProjectReference Include="..\Modules\EventBus\EventBus.Infrastructure\EventBus.Infrastructure.csproj" />
 	</ItemGroup>
-
+  
 	<Target Name="BuildUI" BeforeTargets="Build">
 		<Exec Command="npm install" WorkingDirectory="../Frontend" />
 		<Exec Command="npm run build" WorkingDirectory="../Frontend" />

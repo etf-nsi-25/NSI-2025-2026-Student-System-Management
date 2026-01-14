@@ -16,6 +16,9 @@ public class UpdateUserRequest
     public required string Email { get; set; }
 
     [Required]
+    public required string Username { get; set; }
+
+    [Required]
     public required Guid FacultyId { get; set; }
 
     public string? IndexNumber { get; set; }
@@ -24,4 +27,7 @@ public class UpdateUserRequest
 
     [Required] 
     public required UserRole Role { get; set; } 
+
+    public string Id { get; set; } = string.Empty;
+    public string? Password { get; set; }
 }

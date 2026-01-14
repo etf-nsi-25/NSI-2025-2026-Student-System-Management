@@ -1,31 +1,31 @@
 import React from 'react';
-import { Route, Routes } from 'react-router';
-
-//////////// VERSION FROM feature/PBI_258 ////////////
+import { Route, Routes, Outlet } from 'react-router';
 import { Home } from '../page/home/home.tsx';
-import { Page1 } from '../page/page1/page1.tsx';
+
 import UserManagementPage from '../page/user-management/UserManagementPage.tsx';
 import DashboardPage from '../page/dashboard/DashboardPage.tsx';
 import CourseManagementPage from '../page/course-management/CourseManagementPage.tsx';
 import TenantManagementPage from '../page/tenant-management/TenantManagementPage.tsx';
 import StudentSupportPage from '../page/student-support/StudentSupportPage.tsx';
-import SettingsPage from '../page/settings/SettingsPage.tsx';
 import HelpPage from '../page/help/HelpPage.tsx';
 import AttendancePage from '../page/attendance/AttendancePage.tsx';
-
-//////////// VERSION FROM master ////////////
 import CourseListPage from '../page/university/courses/CourseListPage';
 import TwoFASetupPage from "../page/identity/2FASetupPage";
 import { Login } from '../page/login/login.tsx';
 import { ProtectedRoute } from '../component/ProtectedRoute.tsx';
-import { DocumentCenter, ProfileSettings, RequestManagement, StudentAnalytics, StudentLayout, StudentSupport } from '../features/student/index.ts';
+import AvailableExamsPage from '../page/university/exams/ExamRegistrationPage.tsx';
+import { DocumentCenter, ProfileSettings, StudentAnalytics, StudentSupport } from '../features/student/index.ts';
 import EnrollmentPage from "../page/enrollment/enrollment.tsx";
 import { EnrollmentStudentPage } from '../page/enrollment/enrollmentPage.tsx';
 import StudentDashboardPage from '../page/student dashboard/dashboard.tsx';
 import DocumentCenterDashboard from '../page/document-center/documentCenter.tsx';
 import AppLayout from '../component/AppLayout/AppLayout.tsx';
-import DefaultLayout from '../component/UniversityDashboardLayout/DefaultLayout.tsx';
 import UniversityDashboard from "../page/university-dashboard/UniversityDashboard.tsx";
+import { ExamPage } from '../page/exams/ExamPage.tsx';
+import { CreateExamPage } from '../page/exams/CreateExamPage.tsx';
+import { EditExamPage } from '../page/exams/EditExamPage.tsx'; import RequestManagement from '../page/requests/RequestManagement';
+import AcademicRecordsPage from '../page/academic-records/AcademicRecordsPage.tsx';
+
 
 
 export function Router(): React.ReactNode {
@@ -40,7 +40,6 @@ export function Router(): React.ReactNode {
           <Home />
         </ProtectedRoute>
       } />
-
       <Route path="/2fa/setup" element={
         <ProtectedRoute>
           <TwoFASetupPage />
@@ -50,18 +49,20 @@ export function Router(): React.ReactNode {
       {/* Student area */}
       <Route path="/student" element={
         <ProtectedRoute>
-          <StudentLayout />
+          <AppLayout><Outlet /></AppLayout>
         </ProtectedRoute>
       }>
         <Route path="dashboard" element={<StudentDashboardPage />} />
         <Route path="document-center" element={<DocumentCenter />} />
         <Route path="analytics" element={<StudentAnalytics />} />
         <Route path="request-management" element={<RequestManagement />} />
+        <Route path="exams" element={<AvailableExamsPage />} />
         <Route path="enrollment" element={<EnrollmentPage />} />
         <Route path="profile-settings" element={<ProfileSettings />} />
         <Route path="support" element={<StudentSupportPage />} />
         <Route path="student-enrollment" element={<EnrollmentStudentPage />} />
         <Route index element={<StudentDashboardPage />} />
+        <Route path="academic-records" element={<AcademicRecordsPage />} />
       </Route>
 
       <Route path="/document-center" element={
@@ -71,26 +72,41 @@ export function Router(): React.ReactNode {
       } />
 
       {/* feature/PBI_258 routes */}
-      <Route path="/page1" element={<AppLayout><Page1 /></AppLayout>} />
       <Route path="/users" element={<AppLayout><UserManagementPage /></AppLayout>} />
       <Route path="/dashboard" element={<AppLayout><DashboardPage /></AppLayout>} />
+      <Route path="/admin/dashboard" element={<AppLayout><DashboardPage /></AppLayout>} />
+      <Route path="/teacher/dashboard" element={<AppLayout><DashboardPage /></AppLayout>} />
+      <Route path="/assistant/dashboard" element={<AppLayout><DashboardPage /></AppLayout>} />
       <Route path="/course-management" element={<AppLayout><CourseManagementPage /></AppLayout>} />
       <Route path="/tenant-management" element={<AppLayout><TenantManagementPage /></AppLayout>} />
       <Route path="/student-support" element={<AppLayout><StudentSupportPage /></AppLayout>} />
-      <Route path="/settings" element={<AppLayout><SettingsPage /></AppLayout>} />
-      <Route path="/help" element={<AppLayout><HelpPage /></AppLayout>} />
+      <Route path="/profile-settings" element={<AppLayout><ProfileSettings /></AppLayout>} />
+      <Route path="/settings" element={<AppLayout><ProfileSettings /></AppLayout>} />
       <Route path="/attendance" element={<AppLayout><AttendancePage /></AppLayout>} />
 
       {/*University dashboard*/}
 
-      <Route path="/university-dashboard" element={<DefaultLayout><UniversityDashboard /></DefaultLayout>} />
-      <Route path="/documents" element={<DefaultLayout><DocumentCenter /></DefaultLayout>} />
-      <Route path="/analytics" element={<DefaultLayout><StudentAnalytics /></DefaultLayout>} />
-      <Route path="/requests" element={<DefaultLayout><RequestManagement /></DefaultLayout>} />
-      <Route path="/profile" element={<DefaultLayout><SettingsPage /></DefaultLayout>} />
-      <Route path="/support" element={<DefaultLayout><StudentSupport /></DefaultLayout>} />
-      <Route path="/help" element={<DefaultLayout><HelpPage /></DefaultLayout>} />
+      <Route path="/university-dashboard" element={<AppLayout><UniversityDashboard /></AppLayout>} />
+      <Route path="/documents" element={<AppLayout><DocumentCenter /></AppLayout>} />
+      <Route path="/analytics" element={<AppLayout><StudentAnalytics /></AppLayout>} />
+      <Route path="/requests" element={<AppLayout><RequestManagement /></AppLayout>} />
+      <Route path="/profile" element={<AppLayout><ProfileSettings /></AppLayout>} />
+      <Route path="/support" element={<AppLayout><StudentSupport /></AppLayout>} />
+      <Route path="/help" element={<AppLayout><HelpPage /></AppLayout>} />
 
+      <Route path="/faculty/exams" element={<AppLayout><ExamPage /></AppLayout>} />
+      <Route path="/faculty/exams/create" element={<AppLayout><CreateExamPage /></AppLayout>} />
+      <Route path="/faculty/exams/:id/edit" element={<AppLayout><EditExamPage /></AppLayout>} />
+
+      <Route path="/student/request-management" element={
+        <ProtectedRoute>
+          <RequestManagement />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/faculty/request-management" element={
+        <AppLayout><RequestManagement /></AppLayout>
+      } />
 
       {/* error pages */}
       <Route path="/unauthorized" element={
@@ -114,7 +130,6 @@ export function Router(): React.ReactNode {
           <CourseListPage />
         </ProtectedRoute>
       } />
-
     </Routes>
   );
 }

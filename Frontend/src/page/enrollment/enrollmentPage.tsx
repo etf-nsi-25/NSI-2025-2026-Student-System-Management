@@ -16,21 +16,28 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from "@coreui/react";
-import type { Enrollment } from "../../models/enrollment/Enrollment.types";
+
+import { useAPI } from "../../context/services";
+import { useAuthContext } from "../../init/auth";
 import { studentEnrollmentService } from "../../service/enrollment/studentEnrollmentService";
+
+import type { EnrollmentRequest } from "../../models/enrollment/Enrollment.types";
 
 const getCurrentAcademicYear = (date = new Date()): string => {
   const year = date.getFullYear();
   const month = date.getMonth(); // 0=Jan ... 8=Sep
-
   const startYear = month >= 8 ? year : year - 1;
   return `${startYear}/${startYear + 1}`;
 };
 
 export const EnrollmentStudentPage: React.FC = () => {
+  const api = useAPI();
+  const { authInfo } = useAuthContext();
 
-  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const userId = authInfo?.userId;
+  const facultyId = authInfo?.tenantId; 
 
+  const [enrollments, setEnrollments] = useState<EnrollmentRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -39,20 +46,27 @@ export const EnrollmentStudentPage: React.FC = () => {
   const CURRENT_ACADEMIC_YEAR = useMemo(() => getCurrentAcademicYear(), []);
 
   const { activeEnrollments, previousEnrollments } = useMemo(() => {
-    const active = enrollments.filter((e) => e.status !== "Done");
-    const previous = enrollments.filter((e) => e.status === "Done");
+    const active = enrollments.filter((e) => e.status === "Pending");
+    const previous = enrollments.filter((e) => e.status !== "Pending"); // Approved/Rejected
     return { activeEnrollments: active, previousEnrollments: previous };
   }, [enrollments]);
 
   const loadData = async () => {
     try {
       setIsLoading(true);
+      setErrorMessage(null);
 
-      const enrollmentsRes = await studentEnrollmentService.getEnrollments();
+      if (!userId) {
+        setEnrollments([]);
+        setErrorMessage("Missing user id. Please login again.");
+        return;
+      }
 
-      setEnrollments(enrollmentsRes);
+      const res = await studentEnrollmentService.getEnrollments(api, userId);
+      setEnrollments(res);
     } catch (e) {
       console.error(e);
+      setEnrollments([]);
       setErrorMessage("Failed to load enrollment data.");
     } finally {
       setIsLoading(false);
@@ -60,8 +74,9 @@ export const EnrollmentStudentPage: React.FC = () => {
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (userId) loadData();
+    else setIsLoading(false);
+  }, [userId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,7 +86,16 @@ export const EnrollmentStudentPage: React.FC = () => {
       setErrorMessage(null);
       setSuccessMessage(null);
 
-      await studentEnrollmentService.createEnrollment(CURRENT_ACADEMIC_YEAR);
+      if (!userId || !facultyId) {
+        throw new Error("Missing userId/facultyId from auth token.");
+      }
+
+      await studentEnrollmentService.createEnrollment(api, {
+        userId,
+        facultyId,
+        academicYear: CURRENT_ACADEMIC_YEAR,
+        semester: 1, 
+      });
 
       setSuccessMessage(
         `Your enrollment request for ${CURRENT_ACADEMIC_YEAR} has been submitted.`
@@ -97,7 +121,7 @@ export const EnrollmentStudentPage: React.FC = () => {
   return (
     <div className="student-enrollment-page px-4 py-3">
       <h2 style={{ color: "#1e4d8b" }} className="mb-4 fw-semibold">
-        Welcome back, Jane!
+        Welcome back, {authInfo?.fullName ?? "Student"}!
       </h2>
 
       <CCard className="mb-4 shadow-sm border-0">
@@ -130,7 +154,7 @@ export const EnrollmentStudentPage: React.FC = () => {
                     color: "white",
                   }}
                   className="px-4"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !userId || !facultyId}
                 >
                   {isSubmitting ? <CSpinner size="sm" /> : "Submit"}
                 </CButton>
@@ -143,16 +167,16 @@ export const EnrollmentStudentPage: React.FC = () => {
       <CCard className="mb-3 shadow-sm border-0">
         <CCardHeader className="bg-white border-0 pb-0">
           <h5 style={{ color: "#1e4d8b" }} className="fw-semibold mb-2">
-            Active enrollments
+            Active enrollment requests
           </h5>
         </CCardHeader>
         <CCardBody>
           <CTable hover responsive>
             <CTableHead className="bg-light">
               <CTableRow>
-                <CTableHeaderCell>Faculty</CTableHeaderCell>
                 <CTableHeaderCell>Date</CTableHeaderCell>
                 <CTableHeaderCell>Academic Year</CTableHeaderCell>
+                <CTableHeaderCell>Semester</CTableHeaderCell>
                 <CTableHeaderCell>Status</CTableHeaderCell>
               </CTableRow>
             </CTableHead>
@@ -160,17 +184,17 @@ export const EnrollmentStudentPage: React.FC = () => {
               {activeEnrollments.length === 0 ? (
                 <CTableRow>
                   <CTableDataCell colSpan={4} className="text-center text-muted">
-                    No active enrollments.
+                    No active enrollment requests.
                   </CTableDataCell>
                 </CTableRow>
               ) : (
                 activeEnrollments.map((e) => (
                   <CTableRow key={e.id}>
-                    <CTableDataCell>{e.facultyName}</CTableDataCell>
                     <CTableDataCell>
-                      {new Date(e.date).toLocaleDateString()}
+                      {new Date(e.createdAt).toLocaleDateString()}
                     </CTableDataCell>
                     <CTableDataCell>{e.academicYear}</CTableDataCell>
+                    <CTableDataCell>{e.semester}</CTableDataCell>
                     <CTableDataCell>{e.status}</CTableDataCell>
                   </CTableRow>
                 ))
@@ -183,16 +207,16 @@ export const EnrollmentStudentPage: React.FC = () => {
       <CCard className="shadow-sm border-0">
         <CCardHeader className="bg-white border-0 pb-0">
           <h5 style={{ color: "#1e4d8b" }} className="fw-semibold mb-2">
-            Previous enrollments
+            Previous enrollment requests
           </h5>
         </CCardHeader>
         <CCardBody>
           <CTable hover responsive>
             <CTableHead className="bg-light">
               <CTableRow>
-                <CTableHeaderCell>Faculty</CTableHeaderCell>
                 <CTableHeaderCell>Date</CTableHeaderCell>
                 <CTableHeaderCell>Academic Year</CTableHeaderCell>
+                <CTableHeaderCell>Semester</CTableHeaderCell>
                 <CTableHeaderCell>Status</CTableHeaderCell>
               </CTableRow>
             </CTableHead>
@@ -200,17 +224,17 @@ export const EnrollmentStudentPage: React.FC = () => {
               {previousEnrollments.length === 0 ? (
                 <CTableRow>
                   <CTableDataCell colSpan={4} className="text-center text-muted">
-                    No previous enrollments.
+                    No previous enrollment requests.
                   </CTableDataCell>
                 </CTableRow>
               ) : (
                 previousEnrollments.map((e) => (
                   <CTableRow key={e.id}>
-                    <CTableDataCell>{e.facultyName}</CTableDataCell>
                     <CTableDataCell>
-                      {new Date(e.date).toLocaleDateString()}
+                      {new Date(e.createdAt).toLocaleDateString()}
                     </CTableDataCell>
                     <CTableDataCell>{e.academicYear}</CTableDataCell>
+                    <CTableDataCell>{e.semester}</CTableDataCell>
                     <CTableDataCell>{e.status}</CTableDataCell>
                   </CTableRow>
                 ))

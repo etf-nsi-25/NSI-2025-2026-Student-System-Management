@@ -15,10 +15,21 @@ import {
     CListGroup,
     CListGroupItem,
 } from "@coreui/react";
-import "@coreui/coreui/dist/css/coreui.min.css";
-import { Search, ArrowRight, Calendar as CalendarIcon } from "lucide-react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isToday } from "date-fns";
-
+import {
+  Search,
+  ArrowRight,
+  Calendar as CalendarIcon,
+  FileText,
+  Award,
+  MoreHorizontal,
+} from "lucide-react";
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isToday,
+} from "date-fns";
 import { getDashboardData } from "../../service/dashboard/api";
 import { useAPI } from "../../context/services";
 import {

@@ -191,5 +191,51 @@ namespace Support.API.Controllers
 			await _dbContext.SaveChangesAsync();
 			return Ok(req);
 		}
-	}
+
+        [HttpGet("requests")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllRequests()
+        {
+            try
+            {
+                var requests = await _dbContext.DocumentRequests
+                    .OrderByDescending(r => r.CreatedAt)
+                    .ToListAsync();
+
+                var response = requests.Select(r => new 
+                {
+                    Id = r.Id.ToString(),
+                    Date = r.CreatedAt,
+                    StudentIndex = r.UserId,
+                    RequestType = r.DocumentType,
+                    RequestDetails = $"Request for {r.DocumentType}",
+                    Status = r.Status
+                });
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpPut("requests/{id}/status")] 
+		[Authorize(Roles = "Admin")]
+		public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusDto dto)
+		{
+			var request = await _dbContext.DocumentRequests.FindAsync(id);
+			
+			if (request == null) 
+				return NotFound(new { message = $"Request with ID {id} not found." });
+
+			request.Status = dto.Status;
+			
+			if (dto.Status == "Approved") 
+				request.CompletedAt = DateTime.UtcNow;
+
+			await _dbContext.SaveChangesAsync();
+			return Ok(new { message = "Status updated successfully" });
+		}
+    }
 }

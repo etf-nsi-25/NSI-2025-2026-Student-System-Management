@@ -7,7 +7,7 @@ using Support.Infrastructure.Db;
 using Microsoft.EntityFrameworkCore;
 
 using EnrollmentRequest = global::Support.Core.Entities.EnrollmentRequest;
-using Student = global::Faculty.Core.Entities.Student;
+using StudentSchema = global::Faculty.Infrastructure.Schemas.StudentSchema;
 using CreateEnrollmentRequestDTO = global::Support.Application.DTOs.CreateEnrollmentRequestDTO;
 using FacultyDbContext = global::Faculty.Infrastructure.Db.FacultyDbContext;
 
@@ -35,7 +35,13 @@ public class EnrollmentRequestsTests : IClassFixture<SupportApiFactory>
 		var exists = await facultyDb.Students.AnyAsync(s => s.UserId == userId);
 		if (!exists)
 		{
-			facultyDb.Students.Add(new Student { UserId = userId, FacultyId = facultyId });
+			facultyDb.Students.Add(new StudentSchema 
+			{ 
+				UserId = userId, 
+				FacultyId = facultyId,
+				IndexNumber = $"TEST-{userId}",
+				CreatedAt = DateTime.UtcNow
+			});
 			await facultyDb.SaveChangesAsync();
 		}
 	}

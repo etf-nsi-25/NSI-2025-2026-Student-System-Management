@@ -2,7 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Faculty.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Mvc;
+
+using System.Collections.Generic;   
 
 
 namespace Faculty.API.Controllers
@@ -92,6 +95,6 @@ namespace Faculty.API.Controllers
 
 
     }
-}
+
 
 

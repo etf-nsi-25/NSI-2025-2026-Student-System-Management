@@ -3,17 +3,16 @@ using Identity.Application.Services;
 using Identity.Core.Configuration;
 using Identity.Core.Interfaces.Repositories;
 using Identity.Core.Interfaces.Services;
-using Identity.Core.Repositories;
-using Identity.Core.Services;
 using Identity.Infrastructure.Db;
 using Identity.Infrastructure.Repositories;
-using Identity.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Identity.Infrastructure.Entities;
+using Identity.Infrastructure.Services;
 
 namespace Identity.Infrastructure.DependencyInjection
 {
@@ -44,20 +43,24 @@ namespace Identity.Infrastructure.DependencyInjection
                 options.UseNpgsql(configuration.GetConnectionString("Database"))
             );
 
-            // Identity Core
-            services.AddIdentityCore<ApplicationUser>(options =>
-            {
-                options.Password.RequireDigit = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequireNonAlphanumeric = false;
-            })
-            .AddRoles<IdentityRole>()
-            .AddEntityFrameworkStores<AuthDbContext>();
+            // Identity Framework
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<AuthDbContext>()
+                .AddDefaultTokenProviders();
 
-          
-            services
-                .AddAuthentication(options =>
+            // Register services
+            services.AddScoped<IIdentityService, IdentityService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddSingleton<IJwtTokenService, JwtTokenService>();
+            services.AddScoped<IdentityDbContextSeed>();
+
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
+            JwtSettings jwtSettings = new JwtSettings();
+            configuration.Bind("JwtSettings", jwtSettings);
+
+            services.AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
