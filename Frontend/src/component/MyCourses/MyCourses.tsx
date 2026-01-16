@@ -148,10 +148,6 @@ export default function MyCourses({ className }: MyCoursesProps) {
                                         <span className="course-modal-value">{courseDetails.ects}</span>
                                     </div>
                                     <div className="course-modal-row">
-                                        <span className="course-modal-label">Program ID:</span>
-                                        <span className="course-modal-value">{courseDetails.programId || '-'}</span>
-                                    </div>
-                                    <div className="course-modal-row">
                                         <span className="course-modal-label">Students:</span>
                                         <span className="course-modal-value">{selectedCourse.studentCount}</span>
                                     </div>

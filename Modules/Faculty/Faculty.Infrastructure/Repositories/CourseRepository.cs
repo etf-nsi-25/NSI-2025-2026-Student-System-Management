@@ -3,7 +3,6 @@ using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Db;
 using Faculty.Infrastructure.Http;
 using Faculty.Infrastructure.Mappers;
-using Faculty.Infrastructure.Schemas;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faculty.Infrastructure.Repositories
@@ -35,9 +34,9 @@ namespace Faculty.Infrastructure.Repositories
         {
             var courseSchema = await _context.Courses
                 .FirstOrDefaultAsync(x => x.Id == id);
-            
-            return courseSchema != null 
-                ? CourseMapper.ToDomain(courseSchema, includeRelationships: false) 
+
+            return courseSchema != null
+                ? CourseMapper.ToDomain(courseSchema, includeRelationships: false)
                 : null;
         }
 
@@ -47,22 +46,32 @@ namespace Faculty.Infrastructure.Repositories
             return CourseMapper.ToDomainCollection(courseSchemas, includeRelationships: false).ToList();
         }
 
-        public async Task<List<Course>> GetByTeacherUserIdAsync(string userId)
+        public async Task<List<(Course Course, int StudentCount)>> GetProfessorCoursesWithStudentCountAsync(string userId)
         {
             var teacherSchema = await _context.Teachers.FirstOrDefaultAsync(t => t.UserId == userId);
             if (teacherSchema == null)
             {
-                return new List<Course>();
+                return new List<(Course, int)>();
             }
 
-            var courseSchemas = await _context.CourseAssignments
-                .Include(ca => ca.Course)
+            var courseIds = await _context.CourseAssignments
                 .Where(ca => ca.TeacherId == teacherSchema.Id)
-                .Select(ca => ca.Course)
+                .Select(ca => ca.CourseId)
                 .Distinct()
                 .ToListAsync();
 
-            return CourseMapper.ToDomainCollection(courseSchemas, includeRelationships: false).ToList();
+            var coursesWithCount = await _context.Courses
+                .Where(c => courseIds.Contains(c.Id))
+                .Select(c => new
+                {
+                    Course = c,
+                    StudentCount = c.Enrollments.Count
+                })
+                .ToListAsync();
+
+            return coursesWithCount
+                .Select(x => (CourseMapper.ToDomain(x.Course, includeRelationships: false), x.StudentCount))
+                .ToList();
         }
 
         public async Task<Course?> UpdateAsync(Course course)
