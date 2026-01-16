@@ -20,9 +20,7 @@ import {
 import { CChart } from '@coreui/react-chartjs';
 import { Save, Download, Search } from 'lucide-react';
 import {
-    getFaculties,
     getPrograms,
-    getCourses,
     getAttendance,
     saveAttendance,
     exportAttendance,
@@ -37,6 +35,7 @@ import type {
     AttendanceStats
 } from '../../models/attendance/Attendance.types';
 import { useAPI } from '../../context/services.tsx';
+import { useAuthContext } from '../../init/auth.tsx';
 
 const DOUGHNUT_CANVAS_SIZE = 300;
 const DOUGHNUT_CONTAINER_SIZE = 320;
@@ -44,7 +43,9 @@ const DOUGHNUT_COLORS = ['#2eb85c', '#e55353', '#f9b115'] as const;
 
 export default function AttendancePage() {
     const api = useAPI();
-    const [faculties, setFaculties] = useState<Faculty[]>([]);
+    const { authInfo } = useAuthContext();
+
+    const [faculty, setFaculty] = useState<Faculty | null>(null);
     const [programs, setPrograms] = useState<Program[]>([]);
     const [courses, setCourses] = useState<Course[]>([]);
 
@@ -143,11 +144,32 @@ export default function AttendancePage() {
     const [saving, setSaving] = useState<boolean>(false);
 
     useEffect(() => {
+        if (!authInfo?.tenantId) {
+            setFaculty(null);
+            setSelectedFaculty('');
+            return;
+        }
+
         void (async () => {
-            const data = await getFaculties();
-            setFaculties(data);
+            try {
+                const facultiesDto = await api.getFaculties();
+                const match = facultiesDto.find(f => String(f.id) === String(authInfo.tenantId) || f.code === authInfo.tenantId);
+
+                if (match) {
+                    const mappedFaculty: Faculty = { id: String(match.id), name: match.name };
+                    setFaculty(mappedFaculty);
+                    setSelectedFaculty(mappedFaculty.id);
+                } else {
+                    setFaculty(null);
+                    setSelectedFaculty('');
+                }
+            } catch (error) {
+                console.error('Failed to load faculty for current tenant', error);
+                setFaculty(null);
+                setSelectedFaculty('');
+            }
         })();
-    }, []);
+    }, [api, authInfo]);
 
     useEffect(() => {
         if (!selectedFaculty) {
@@ -172,11 +194,23 @@ export default function AttendancePage() {
         }
 
         void (async () => {
-            const data = await getCourses(selectedProgram);
-            setCourses(data);
-            setSelectedCourse('');
+            try {
+                const allCourses = await api.getAllCourses();
+                const mapped: Course[] = allCourses.map(c => ({
+                    id: c.id,
+                    name: c.name,
+                    code: c.code,
+                    programId: c.programId,
+                }));
+                setCourses(mapped);
+            } catch (error) {
+                console.error('Failed to load courses for attendance page', error);
+                setCourses([]);
+            } finally {
+                setSelectedCourse('');
+            }
         })();
-    }, [selectedProgram]);
+    }, [api, selectedProgram]);
 
     useEffect(() => {
         if (!chartCourse || !chartMonth) {
@@ -187,7 +221,7 @@ export default function AttendancePage() {
         void (async () => {
             setLoadingStats(true);
             try {
-                const stats = await getAttendanceStats(chartCourse, chartMonth);
+                const stats = await getAttendanceStats(api, chartCourse, chartMonth);
                 setAttendanceStats(stats);
             } catch (error) {
                 console.error('Failed to fetch stats', error);
@@ -210,14 +244,14 @@ export default function AttendancePage() {
         }
         setLoading(true);
         try {
-            const data = await getAttendance(selectedCourse, selectedDate);
+            const data = await getAttendance(api, selectedCourse, selectedDate);
             setAttendanceRecords(data);
         } catch (error) {
             console.error('Failed to fetch attendance', error);
         } finally {
             setLoading(false);
         }
-    }, [selectedCourse, selectedDate]);
+    }, [api, selectedCourse, selectedDate]);
 
     const handleStatusChange = useCallback((id: number, status: AttendanceStatus) => {
         setAttendanceRecords(prev => prev.map(record =>
@@ -277,13 +311,12 @@ export default function AttendancePage() {
                         <CCol md={3}>
                             <CFormSelect
                                 label="Faculty"
-                                value={selectedFaculty}
-                                onChange={(e) => setSelectedFaculty(e.target.value)}
+                                value={faculty?.id ?? ''}
+                                disabled
                             >
-                                <option value="">Select Faculty</option>
-                                {faculties.map(f => (
-                                    <option key={f.id} value={f.id}>{f.name}</option>
-                                ))}
+                                <option value={faculty?.id ?? ''}>
+                                    {faculty ? faculty.name : 'Faculty not available'}
+                                </option>
                             </CFormSelect>
                         </CCol>
                         <CCol md={3}>
