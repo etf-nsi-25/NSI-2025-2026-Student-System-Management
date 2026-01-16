@@ -75,7 +75,11 @@ export function Router(): React.ReactNode {
       <Route path="/users" element={<AppLayout><UserManagementPage /></AppLayout>} />
       <Route path="/dashboard" element={<AppLayout><DashboardPage /></AppLayout>} />
       <Route path="/admin/dashboard" element={<AppLayout><DashboardPage /></AppLayout>} />
-      <Route path="/teacher/dashboard" element={<AppLayout><DashboardPage /></AppLayout>} />
+      <Route path="/teacher/dashboard" element={
+        <ProtectedRoute allowedRoles={["teacher"]}>
+          <AppLayout><DashboardPage /></AppLayout>
+        </ProtectedRoute>
+      } />
       <Route path="/assistant/dashboard" element={<AppLayout><DashboardPage /></AppLayout>} />
       <Route path="/course-management" element={<AppLayout><CourseManagementPage /></AppLayout>} />
       <Route path="/tenant-management" element={<AppLayout><TenantManagementPage /></AppLayout>} />
