@@ -5,7 +5,8 @@ namespace Identity.Core.DTO;
 
 public class UserResponse
 {
-    public Guid Id { get; set; }
+    public required string Id { get; set; }
+    public required string Email { get; set; }
 
     public required string Username { get; set; } 
 
@@ -20,4 +21,6 @@ public class UserResponse
     public UserRole Role { get; set; } 
 
     public UserStatus Status { get; set; } 
+
+    public bool TwoFactorEnabled { get; set; }
 }

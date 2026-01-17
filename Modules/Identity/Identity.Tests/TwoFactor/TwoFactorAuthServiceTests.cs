@@ -1,149 +1,122 @@
-﻿using System.Reflection;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Identity.Application.Services;
+using Identity.Core.DTO;
+using Identity.Core.Interfaces.Services;
 using Moq;
 using Xunit;
-using Identity.Application.Services;
-using Identity.Core.DomainServices;
-using Identity.Core.Entities;
-using Identity.Core.Repositories;
 
-namespace Identity.Tests.TwoFactor
+namespace Identity.Tests.TwoFactor;
+
+public class TwoFactorAuthServiceTests
 {
-    public class TwoFactorAuthServiceTests
+    private readonly Mock<IIdentityService> _identityServiceMock;
+    private readonly TwoFactorAuthService _service;
+
+    public TwoFactorAuthServiceTests()
     {
-        private readonly Mock<IUserRepository> _userRepositoryMock;
-        private readonly Mock<ITotpProvider> _totpProviderMock;
-        private readonly TwoFactorDomainService _domainService;
-        private readonly TwoFactorAuthService _service;
+        _identityServiceMock = new Mock<IIdentityService>();
+        _service = new TwoFactorAuthService(_identityServiceMock.Object);
+    }
 
-        public TwoFactorAuthServiceTests()
-        {
-            _userRepositoryMock = new Mock<IUserRepository>();
-            _totpProviderMock = new Mock<ITotpProvider>();
+    [Fact]
+    public async Task EnableTwoFactorAsync_ReturnsSetupResult_WhenIdentityServiceReturnsSetup()
+    {
+        // Arrange
+        var userId = "user-123";
+        _identityServiceMock
+            .Setup(s => s.GenerateTwoFactorSetupAsync(userId, It.IsAny<string>()))
+            .ReturnsAsync(new TwoFactorSetupInfo(
+                ManualKey: "SECRET-XYZ",
+                QrCodeImageBase64: "data:image/png;base64,AAA",
+                OtpAuthUri: "otpauth://totp/x"));
 
-            _domainService = new TwoFactorDomainService(_totpProviderMock.Object);
+        // Act
+        var result = await _service.EnableTwoFactorAsync(userId);
 
-            _service = new TwoFactorAuthService(
-                _userRepositoryMock.Object,
-                _domainService
-            );
-        }
+        // Assert
+        result.ManualKey.Should().Be("SECRET-XYZ");
+        result.QrCodeImageBase64.Should().StartWith("data:image/png;base64,");
+    }
 
-        [Fact]
-        public async Task EnableTwoFactorAsync_ReturnsSetupResult_WhenUserExists()
-        {
-            // Arrange
-            var userId = Guid.NewGuid();
-            var user = (User)Activator.CreateInstance(typeof(User), nonPublic: true)!;
+    [Fact]
+    public async Task EnableTwoFactorAsync_Throws_WhenUserNotFound()
+    {
+        // Arrange
+        var userId = "unknown-id";
+        _identityServiceMock
+            .Setup(s => s.GenerateTwoFactorSetupAsync(userId, It.IsAny<string>()))
+            .ThrowsAsync(new InvalidOperationException("User not found"));
 
-            var usernameProp = typeof(User).GetProperty(
-                "Username",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        // Act
+        Func<Task> act = async () => await _service.EnableTwoFactorAsync(userId);
 
-            usernameProp!.SetValue(user, "testuser");
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>();
+    }
 
-            var idProp = typeof(User).GetProperty(
-                "Id",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+    [Fact]
+    public async Task VerifySetupAsync_ReturnsSuccess_WhenCodeValid()
+    {
+        // Arrange
+        _identityServiceMock
+            .Setup(s => s.ConfirmTwoFactorSetupAsync("1", "123456"))
+            .ReturnsAsync(true);
 
-            idProp!.SetValue(user, userId);
+        // Act
+        var result = await _service.VerifySetupAsync("1", "123456");
 
-            _userRepositoryMock
-                .Setup(r => r.GetByIdAsync(userId))
-                .ReturnsAsync(user);
+        // Assert
+        result.Success.Should().BeTrue();
+        result.Message.Should().BeNull();
+    }
 
-            _totpProviderMock
-                .Setup(p => p.GenerateSecret())
-                .Returns("SECRET-XYZ");
+    [Fact]
+    public async Task VerifySetupAsync_ReturnsFailure_WhenCodeInvalid()
+    {
+        // Arrange
+        _identityServiceMock
+            .Setup(s => s.ConfirmTwoFactorSetupAsync("1", "999999"))
+            .ReturnsAsync(false);
 
-            _totpProviderMock
-                .Setup(p => p.GenerateQrCode("testuser", "SECRET-XYZ"))
-                .Returns("QR-BASE64");
+        // Act
+        var result = await _service.VerifySetupAsync("1", "999999");
 
-            // Act
-            var result = await _service.EnableTwoFactorAsync(userId.ToString());
+        // Assert
+        result.Success.Should().BeFalse();
+        result.Message.Should().Be("Invalid or expired code. Please try again.");
+    }
 
-            // Assert
-            result.ManualKey.Should().Be("SECRET-XYZ");
-            result.QrCodeImageBase64.Should().Be("QR-BASE64");
-        }
+    [Fact]
+    public async Task VerifyLoginAsync_ReturnsSuccess_WhenCodeValid()
+    {
+        // Arrange
+        _identityServiceMock
+            .Setup(s => s.VerifyTwoFactorCodeAsync("1", "111111"))
+            .ReturnsAsync(true);
 
-        [Fact]
-        public async Task EnableTwoFactorAsync_Throws_WhenUserNotFound()
-        {
-            // Arrange
-            var userId = Guid.NewGuid();
+        // Act
+        var result = await _service.VerifyLoginAsync("1", "111111");
 
-            _userRepositoryMock
-                .Setup(r => r.GetByIdAsync(userId))
-                .ReturnsAsync((User?)null);
+        // Assert
+        result.Success.Should().BeTrue();
+        result.Message.Should().BeNull();
+    }
 
-            // Act
-            Func<Task> act = async () =>
-                await _service.EnableTwoFactorAsync(userId.ToString());
+    [Fact]
+    public async Task VerifyLoginAsync_ReturnsFailure_WhenCodeInvalid()
+    {
+        // Arrange
+        _identityServiceMock
+            .Setup(s => s.VerifyTwoFactorCodeAsync("1", "000000"))
+            .ReturnsAsync(false);
 
-            // Assert
-            await act.Should().ThrowAsync<InvalidOperationException>();
-        }
+        // Act
+        var result = await _service.VerifyLoginAsync("1", "000000");
 
-        [Fact]
-        public async Task VerifySetupAsync_ReturnsSuccess_WhenCodeValid()
-        {
-            // Arrange
-            _totpProviderMock
-                .Setup(p => p.ValidateCode(It.IsAny<string>(), "123456"))
-                .Returns(true);
-
-            // Act
-            var result = await _service.VerifySetupAsync("1", "123456");
-
-            // Assert
-            result.Success.Should().BeTrue();
-            result.Message.Should().BeNull();
-        }
-
-        [Fact]
-        public async Task VerifySetupAsync_ReturnsFailure_WhenCodeInvalid()
-        {
-            // Arrange
-            _totpProviderMock
-                .Setup(p => p.ValidateCode(It.IsAny<string>(), "999999"))
-                .Returns(false);
-
-            // Act
-            var result = await _service.VerifySetupAsync("1", "999999");
-
-            // Assert
-            result.Success.Should().BeFalse();
-            result.Message.Should().Be("Invalid or expired code. Please try again.");
-        }
-
-        [Fact]
-        public async Task VerifyLoginAsync_ReturnsSuccess_WhenCodeValid()
-        {
-            _totpProviderMock
-                .Setup(p => p.ValidateCode(It.IsAny<string>(), "111111"))
-                .Returns(true);
-
-            var result = await _service.VerifyLoginAsync("1", "111111");
-
-            result.Success.Should().BeTrue();
-            result.Message.Should().BeNull();
-        }
-
-        [Fact]
-        public async Task VerifyLoginAsync_ReturnsFailure_WhenCodeInvalid()
-        {
-            _totpProviderMock
-                .Setup(p => p.ValidateCode(It.IsAny<string>(), "000000"))
-                .Returns(false);
-
-            var result = await _service.VerifyLoginAsync("1", "000000");
-
-            result.Success.Should().BeFalse();
-            result.Message.Should().Be("Invalid or expired code. Please try again.");
-        }
+        // Assert
+        result.Success.Should().BeFalse();
+        result.Message.Should().Be("Invalid or expired code. Please try again.");
     }
 }

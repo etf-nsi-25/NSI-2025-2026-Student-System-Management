@@ -1,75 +1,88 @@
 ﻿using Identity.Core.Interfaces.Repositories;
 using Identity.Core.Interfaces.Services;
 using Identity.Core.Models;
-using Identity.Core.Repositories;
-using Identity.Core.Services;
 using Microsoft.Extensions.Logging;
+using Identity.Core.Enums;
 
 namespace Identity.Application.Services;
 
 public class AuthService : IAuthService
 {
     private readonly IJwtTokenService _jwtTokenService;
-    private readonly IIdentityHasherService _passwordHasher;
+    private readonly IIdentityService _identityService; 
     private readonly IRefreshTokenRepository _refreshTokenRepository;
-    private readonly IUserRepository _userRepository;
     private readonly ILogger<AuthService> _logger;
 
     public AuthService(
         IJwtTokenService jwtTokenService,
-        IIdentityHasherService passwordHasher,
+        IIdentityService identityService, 
         IRefreshTokenRepository refreshTokenRepository,
-        IUserRepository userRepository,
         ILogger<AuthService> logger)
     {
         _jwtTokenService = jwtTokenService;
-        _passwordHasher = passwordHasher;
+        _identityService = identityService;
         _refreshTokenRepository = refreshTokenRepository;
-        _userRepository = userRepository;
         _logger = logger;
     }
 
-    public async Task<AuthResult> AuthenticateAsync(
+    public async Task<PrimaryAuthResult> AuthenticatePrimaryAsync(
         string email,
         string password,
         CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Authentication attempt for email: {Email}", email);
 
-         // Find user by email
-        var user = await _userRepository.GetByEmailAsync(email, cancellationToken);
+        var user = await _identityService.FindByEmailAsync(email);
 
-        if (user == null) 
+        if (user == null)
         {
-            _logger.LogWarning("Authentication failed: User not found or inactive - {Email}", email);
+            _logger.LogWarning("Authentication failed: User not found - {Email}", email);
             throw new UnauthorizedAccessException("Invalid email or password");
         }
 
-        // Verify password
-        if (!_passwordHasher.VerifyPassword(user, password, user.PasswordHash))
+        var isPasswordValid = await _identityService.CheckPasswordAsync(user.Id, password);
+        if (!isPasswordValid)
         {
             _logger.LogWarning("Authentication failed: Invalid password - {Email}", email);
             throw new UnauthorizedAccessException("Invalid email or password");
         }
 
-        // Generate tokens using domain model
+        if (user.Status == UserStatus.Inactive)
+        {
+            _logger.LogWarning("Authentication failed: User is deactivated - {Email}", email);
+            throw new UnauthorizedAccessException("User is deactivated");
+        }
+
+        var requiresTwoFactor = await _identityService.IsTwoFactorEnabledAsync(user.Id);
+
+        return new PrimaryAuthResult(user.Id, requiresTwoFactor);
+    }
+
+    public async Task<AuthResult> IssueTokensAsync(string userId, CancellationToken cancellationToken = default)
+    {
+        var user = await _identityService.FindByIdAsync(userId);
+
+        if (user == null)
+        {
+            _logger.LogWarning("Token issuance failed: User not found - {UserId}", userId);
+            throw new UnauthorizedAccessException("User not found or inactive");
+        }
+
         var tokenClaims = new TokenClaims
         {
-            UserId = user.Id.ToString(),
+            UserId = user.Id,
             Email = user.Email,
             Role = user.Role,
-            TenantId = user.FacultyId.ToString(),
-            FullName = user.FirstName + " " + user.LastName
+            TenantId = user.FacultyId.ToString() ?? string.Empty,
+            FullName = $"{user.FirstName ?? ""} {user.LastName ?? ""}".Trim()
         };
 
         var accessToken = _jwtTokenService.GenerateAccessToken(tokenClaims);
         var refreshToken = _jwtTokenService.CreateRefreshToken(user.Id);
 
-        // Save refresh token to repository
         await _refreshTokenRepository.AddAsync(refreshToken, cancellationToken);
 
-
-        _logger.LogInformation("Authentication successful for user: {UserId}", user.Id);
+        _logger.LogInformation("Token issuance successful for user: {UserId}", user.Id);
 
         return new AuthResult
         {
@@ -79,13 +92,28 @@ public class AuthService : IAuthService
         };
     }
 
+    public async Task<AuthResult> AuthenticateAsync(
+        string email,
+        string password,
+        CancellationToken cancellationToken = default)
+    {
+        var primary = await AuthenticatePrimaryAsync(email, password, cancellationToken);
+
+        if (primary.RequiresTwoFactor)
+        {
+            _logger.LogInformation("Authentication requires 2FA for user: {UserId}", primary.UserId);
+            throw new UnauthorizedAccessException("Two-factor authentication required");
+        }
+
+        return await IssueTokensAsync(primary.UserId, cancellationToken);
+    }
+
     public async Task<AuthResult> RefreshAuthenticationAsync(
         string refreshToken,
         CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Token refresh attempt");
 
-        // Validate refresh token
         var token = await _refreshTokenRepository.GetByTokenAsync(refreshToken, cancellationToken);
 
         if (token == null || !token.IsActive)
@@ -94,12 +122,11 @@ public class AuthService : IAuthService
             throw new UnauthorizedAccessException("Invalid or expired refresh token");
         }
 
-        // Get user
-        var user = await _userRepository.GetByIdAsync(token.UserId);
+        var user = await _identityService.FindByIdAsync(token.UserId);
 
         if (user == null)
         {
-            _logger.LogWarning("Token refresh failed: User not found or inactive - {UserId}", token.UserId);
+            _logger.LogWarning("Token refresh failed: User not found - {UserId}", token.UserId);
             throw new UnauthorizedAccessException("User not found or inactive");
         }
 
@@ -108,14 +135,13 @@ public class AuthService : IAuthService
         token.RevokedReason = "Replaced by new token";
         await _refreshTokenRepository.UpdateAsync(token, cancellationToken);
 
-        // Generate new tokens using domain model
         var tokenClaims = new TokenClaims
         {
-            UserId = user.Id.ToString(),
+            UserId = user.Id,
             Email = user.Email,
             Role = user.Role,
-            TenantId = user.FacultyId.ToString(),
-            FullName = user.FirstName + " " + user.LastName
+            TenantId = user.FacultyId.ToString() ?? string.Empty,
+            FullName = $"{user.FirstName ?? ""} {user.LastName ?? ""}".Trim()
         };
 
         var accessToken = _jwtTokenService.GenerateAccessToken(tokenClaims);
@@ -148,7 +174,6 @@ public class AuthService : IAuthService
             token.RevokedReason = "User logout";
             await _refreshTokenRepository.UpdateAsync(token, cancellationToken);
         }
-
 
         _logger.LogInformation("Logout successful");
     }

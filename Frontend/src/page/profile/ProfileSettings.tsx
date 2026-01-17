@@ -14,6 +14,7 @@ import {
   CFormLabel,
 } from '@coreui/react'
 import { useState, useEffect } from 'react'
+import { useLocation, useNavigate } from 'react-router'
 import { useAuthContext } from '../../init/auth'
 import './ProfileSettings.css'
 import { useAPI } from '../../context/services'
@@ -32,6 +33,9 @@ interface UserProfile {
 export function ProfileSettings() {
   const { authInfo } = useAuthContext();
   const api = useAPI();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(false);
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [verificationMethod, setVerificationMethod] =
@@ -67,6 +71,7 @@ export function ProfileSettings() {
       api.getCurrentUser()
         .then(data => {
           //  console.log(data);
+          setIsTwoFactorEnabled(Boolean(data.twoFactorEnabled));
           setUserProfile(prev => ({
             ...prev,
             firstName: data.firstName || prev.firstName,
@@ -195,15 +200,26 @@ export function ProfileSettings() {
           <strong>Security settings</strong>
         </CCardHeader>
         <CCardBody>
-          <CButton
-            color="primary"
-            onClick={() => {
-              setShowResetModal(true)
-              setErrorMessage(null)
-            }}
-          >
-            Reset password
-          </CButton>
+          <div className="d-flex gap-2 flex-wrap">
+            <CButton
+              color="primary"
+              onClick={() => {
+                setShowResetModal(true)
+                setErrorMessage(null)
+              }}
+            >
+              Reset password
+            </CButton>
+            <CButton
+              color="info"
+              disabled={isTwoFactorEnabled}
+              onClick={() => {
+                navigate('/2fa/setup', { state: { returnTo: location.pathname } })
+              }}
+            >
+              {isTwoFactorEnabled ? 'Two-Factor Authentication Enabled' : 'Enable Two-Factor Authentication'}
+            </CButton>
+          </div>
         </CCardBody>
       </CCard>
 

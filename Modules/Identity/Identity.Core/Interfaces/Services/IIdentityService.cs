@@ -1,0 +1,31 @@
+using Identity.Core.DTO;
+using Identity.Core.Enums;
+
+namespace Identity.Core.Interfaces.Services;
+
+public interface IIdentityService
+{
+    Task<UserResponse?> FindByEmailAsync(string email);
+    
+    Task<UserResponse?> FindByIdAsync(string userId);
+
+    Task<bool> IsTwoFactorEnabledAsync(string userId);
+
+    Task<TwoFactorSetupInfo> GenerateTwoFactorSetupAsync(string userId, string issuer);
+
+    Task<bool> ConfirmTwoFactorSetupAsync(string userId, string code);
+
+    Task<bool> VerifyTwoFactorCodeAsync(string userId, string code);
+
+    Task<bool> CheckPasswordAsync(string userId, string password);
+
+    Task<(bool Success, string[] Errors)> CreateUserAsync(CreateUserRequest request, string password);
+
+    Task<bool> UpdateUserAsync(UpdateUserRequest request);
+
+    Task<bool> DeleteUserAsync(string userId);
+
+    Task<IEnumerable<UserResponse>> GetAllFilteredAsync(UserFilterRequest filter);
+
+    Task<int> CountAsync(UserFilterRequest filter);
+}

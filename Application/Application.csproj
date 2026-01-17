@@ -23,7 +23,6 @@
 		<ProjectReference Include="..\Modules\University\University.API\University.API.csproj"/>
 		<ProjectReference Include="..\Modules\Faculty\Faculty.API\Faculty.API.csproj"/>
 		<ProjectReference Include="..\Modules\Support\Support.API\Support.API.csproj"/>
-		<ProjectReference Include="..\Modules\Notifications\Notifications.API\Notifications.API.csproj"/>
 		<ProjectReference Include="..\Modules\Analytics\Analytics.API\Analytics.API.csproj"/>
 		<ProjectReference Include="..\Modules\Identity\Identity.Infrastructure\Identity.Infrastructure.csproj"/>
 		<ProjectReference Include="..\Modules\University\University.Infrastructure\University.Infrastructure.csproj"/>

@@ -1,5 +1,6 @@
 // Identity.API/Controllers/AuthController.cs
 using Identity.API.DTO.Auth;
+using Identity.Application.Interfaces;
 using Identity.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +13,16 @@ namespace Identity.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
+    private readonly ITwoFactorLoginSessionStore _twoFactorLoginSessionStore;
     private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IAuthService authService, ILogger<AuthController> logger)
+    public AuthController(
+        IAuthService authService,
+        ITwoFactorLoginSessionStore twoFactorLoginSessionStore,
+        ILogger<AuthController> logger)
     {
         _authService = authService;
+        _twoFactorLoginSessionStore = twoFactorLoginSessionStore;
         _logger = logger;
     }
 
@@ -36,9 +42,22 @@ public class AuthController : ControllerBase
             }
 
 
-            var result = await _authService.AuthenticateAsync(
+            var primary = await _authService.AuthenticatePrimaryAsync(
                 request.Email,
                 request.Password);
+
+            if (primary.RequiresTwoFactor)
+            {
+                var twoFactorToken = _twoFactorLoginSessionStore.Create(primary.UserId, TimeSpan.FromMinutes(5));
+
+                return Ok(new LoginResponseDto
+                {
+                    RequiresTwoFactor = true,
+                    TwoFactorToken = twoFactorToken
+                });
+            }
+
+            var result = await _authService.IssueTokensAsync(primary.UserId);
 
             // Set HTTP-only cookie for refresh token
             HttpContext.Response.Cookies.Append(
@@ -55,7 +74,9 @@ public class AuthController : ControllerBase
             var response = new LoginResponseDto
             {
                 AccessToken = result.AccessToken,
-                TokenType = "Bearer"
+                TokenType = "Bearer",
+                RequiresTwoFactor = false,
+                TwoFactorToken = null
             };
 
             return Ok(response);

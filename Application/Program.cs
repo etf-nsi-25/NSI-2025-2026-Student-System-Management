@@ -11,7 +11,6 @@ using Identity.Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.EntityFrameworkCore;
-using Notifications.API.Controllers;
 using Notifications.Infrastructure;
 using Support.API.Controllers;
 using Support.Infrastructure;
@@ -22,10 +21,15 @@ using University.Infrastructure.Db;
 using FluentValidation.AspNetCore;
 using FacultyController = Faculty.API.Controllers.FacultyController;
 using Common.Core.Tenant;
+using Notifications.Infrastructure.DependencyInjection;
+using Identity.Infrastructure.Entities;
+using Analytics.Infrastructure.Db;
+using Analytics.Infrastructure.Db.Seed;
 
 // Npgsql/Postgres timestamp compatibility for local dev.
 // Prevents failures when DateTime.Kind is Unspecified but the DB column is timestamptz.
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,8 +39,8 @@ builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddUniversityModule(builder.Configuration);
 builder.Services.AddFacultyModule(builder.Configuration);
 builder.Services.AddSupportModule(builder.Configuration);
-builder.Services.AddNotificationsModule();
-builder.Services.AddAnalyticsModule();
+builder.Services.AddNotificationsModule(builder.Configuration);
+builder.Services.AddAnalyticsModule(builder.Configuration);
 builder.Services.AddEventBus();
 
 // Add controllers and module API assemblies
@@ -48,7 +52,6 @@ var moduleControllers = new[]
     typeof(UniversityController).Assembly,
     typeof(FacultyController).Assembly,
     typeof(SupportController).Assembly,
-    typeof(NotificationsController).Assembly,
     typeof(AnalyticsController).Assembly
 };
 
@@ -118,6 +121,9 @@ if (applyMigrations)
             {
                 var universityDb = services.GetRequiredService<UniversityDbContext>();
                 universityDb.Database.Migrate();
+                var universitySeeder = services.GetRequiredService<UniversityDbInitializier>();
+                await universitySeeder.SeedAsync(
+                    universityDb);
             }
             catch (Exception ex)
             {
@@ -154,6 +160,21 @@ if (applyMigrations)
             {
                 Console.WriteLine($"Error migrating FacultyDbContext: {ex.Message}");
             }
+
+            // Analytics module
+            try
+            {
+                var analyticsDb = services.GetRequiredService<AnalyticsDbContext>();
+                analyticsDb.Database.Migrate();
+                var analyticSeeder = services.GetRequiredService<AnalyticsDbInitializer>();
+                await analyticSeeder.SeedAsync(
+                    analyticsDb);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error migrating AnalyticsDbContext: {ex.Message}");
+            }
+
         }
     }
 }
