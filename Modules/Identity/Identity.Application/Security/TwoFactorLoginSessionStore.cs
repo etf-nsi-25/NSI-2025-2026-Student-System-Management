@@ -2,7 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using Identity.Application.Interfaces;
 
-namespace Identity.Application.Services;
+namespace Identity.Application.Security;
 
 public class TwoFactorLoginSessionStore : ITwoFactorLoginSessionStore
 {

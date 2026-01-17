@@ -1,4 +1,5 @@
 using Identity.Application.Interfaces;
+using Identity.Application.Security;
 using Identity.Application.Services;
 using Identity.Core.Configuration;
 using Identity.Core.Interfaces.Repositories;
