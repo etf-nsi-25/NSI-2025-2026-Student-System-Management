@@ -20,15 +20,12 @@ import {
 import { CChart } from '@coreui/react-chartjs';
 import { Save, Download, Search } from 'lucide-react';
 import {
-    getPrograms,
     getAttendance,
     saveAttendance,
     exportAttendance,
     getAttendanceStats
 } from '../../service/attendanceService';
 import type {
-    Faculty,
-    Program,
     Course,
     AttendanceRecord,
     AttendanceStatus,
@@ -45,12 +42,8 @@ export default function AttendancePage() {
     const api = useAPI();
     const { authInfo } = useAuthContext();
 
-    const [faculty, setFaculty] = useState<Faculty | null>(null);
-    const [programs, setPrograms] = useState<Program[]>([]);
     const [courses, setCourses] = useState<Course[]>([]);
 
-    const [selectedFaculty, setSelectedFaculty] = useState<string>('');
-    const [selectedProgram, setSelectedProgram] = useState<string>('');
     const [selectedCourse, setSelectedCourse] = useState<string>('');
     const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
 
@@ -144,55 +137,6 @@ export default function AttendancePage() {
     const [saving, setSaving] = useState<boolean>(false);
 
     useEffect(() => {
-        if (!authInfo?.tenantId) {
-            setFaculty(null);
-            setSelectedFaculty('');
-            return;
-        }
-
-        void (async () => {
-            try {
-                const facultiesDto = await api.getFaculties();
-                const match = facultiesDto.find(f => String(f.id) === String(authInfo.tenantId) || f.code === authInfo.tenantId);
-
-                if (match) {
-                    const mappedFaculty: Faculty = { id: String(match.id), name: match.name };
-                    setFaculty(mappedFaculty);
-                    setSelectedFaculty(mappedFaculty.id);
-                } else {
-                    setFaculty(null);
-                    setSelectedFaculty('');
-                }
-            } catch (error) {
-                console.error('Failed to load faculty for current tenant', error);
-                setFaculty(null);
-                setSelectedFaculty('');
-            }
-        })();
-    }, [api, authInfo]);
-
-    useEffect(() => {
-        if (!selectedFaculty) {
-            setPrograms([]);
-            setCourses([]);
-            return;
-        }
-
-        void (async () => {
-            const data = await getPrograms(selectedFaculty);
-            setPrograms(data);
-            setSelectedProgram('');
-            setCourses([]);
-            setSelectedCourse('');
-        })();
-    }, [selectedFaculty]);
-
-    useEffect(() => {
-        if (!selectedProgram) {
-            setCourses([]);
-            return;
-        }
-
         void (async () => {
             try {
                 const allCourses = await api.getAllCourses();
@@ -210,7 +154,7 @@ export default function AttendancePage() {
                 setSelectedCourse('');
             }
         })();
-    }, [api, selectedProgram]);
+    }, [api]);
 
     useEffect(() => {
         if (!chartCourse || !chartMonth) {
@@ -236,6 +180,23 @@ export default function AttendancePage() {
             setChartCourse(selectedCourse);
         }
     }, [selectedCourse, chartCourse]);
+
+    useEffect(() => {
+        if (!selectedCourse || !selectedDate) return;
+        if (attendanceRecords.length === 0) return;
+
+        void (async () => {
+            setLoading(true);
+            try {
+                const data = await getAttendance(api, selectedCourse, selectedDate);
+                setAttendanceRecords(data);
+            } catch (error) {
+                console.error('Failed to refresh attendance after date change', error);
+            } finally {
+                setLoading(false);
+            }
+        })();
+    }, [api, selectedCourse, selectedDate]);
 
     const handleSearch = useCallback(async () => {
         if (!selectedCourse || !selectedDate) {
@@ -270,24 +231,41 @@ export default function AttendancePage() {
         try {
             await saveAttendance(api, attendanceRecords);
             alert('Attendance saved successfully!');
+
+            if (chartCourse && chartMonth) {
+                try {
+                    const updatedStats = await getAttendanceStats(api, chartCourse, chartMonth);
+                    setAttendanceStats(updatedStats);
+                } catch (statsError) {
+                    console.error('Failed to refresh attendance stats after save', statsError);
+                }
+            }
         } catch (error) {
             console.error('Failed to save attendance', error);
             alert('Failed to save attendance.');
         } finally {
             setSaving(false);
         }
-    }, [api, attendanceRecords]);
+    }, [api, attendanceRecords, chartCourse, chartMonth]);
 
     const handleExport = useCallback(async () => {
         if (!selectedCourse || !selectedDate) return;
+        if (!authInfo?.accessToken) {
+            alert('You are not authorized to export attendance.');
+            return;
+        }
         try {
-            await exportAttendance(selectedCourse, selectedDate);
-            alert('Attendance exported successfully!');
+            const success = await exportAttendance(selectedCourse, selectedDate, authInfo.accessToken);
+            if (success) {
+                alert('Attendance exported successfully!');
+            } else {
+                alert('Failed to export attendance.');
+            }
         } catch (error) {
             console.error('Failed to export attendance', error);
             alert('Failed to export attendance.');
         }
-    }, [selectedCourse, selectedDate]);
+    }, [selectedCourse, selectedDate, authInfo]);
 
     const attendanceStatusButtons = useMemo(
         () =>
@@ -308,50 +286,27 @@ export default function AttendancePage() {
                 </CCardHeader>
                 <CCardBody>
                     <CRow className="g-3">
-                        <CCol md={3}>
-                            <CFormSelect
-                                label="Faculty"
-                                value={faculty?.id ?? ''}
-                                disabled
-                            >
-                                <option value={faculty?.id ?? ''}>
-                                    {faculty ? faculty.name : 'Faculty not available'}
-                                </option>
-                            </CFormSelect>
-                        </CCol>
-                        <CCol md={3}>
-                            <CFormSelect
-                                label="Program"
-                                value={selectedProgram}
-                                onChange={(e) => setSelectedProgram(e.target.value)}
-                                disabled={!selectedFaculty}
-                            >
-                                <option value="">Select Program</option>
-                                {programs.map(p => (
-                                    <option key={p.id} value={p.id}>{p.name}</option>
-                                ))}
-                            </CFormSelect>
-                        </CCol>
-                        <CCol md={3}>
+                        <CCol md={4}>
                             <CFormSelect
                                 label="Course"
                                 value={selectedCourse}
                                 onChange={(e) => setSelectedCourse(e.target.value)}
-                                disabled={!selectedProgram}
+                                disabled={courses.length === 0}
                             >
                                 <option value="">Select Course</option>
                                 {courseOptions}
                             </CFormSelect>
                         </CCol>
-                        <CCol md={2}>
+                        <CCol md={3}>
                             <CFormInput
                                 type="date"
                                 label="Lecture Date"
                                 value={selectedDate}
+                                max={new Date().toISOString().split('T')[0]}
                                 onChange={(e) => setSelectedDate(e.target.value)}
                             />
                         </CCol>
-                        <CCol md={1} className="d-flex align-items-end">
+                        <CCol md={2} className="d-flex align-items-end">
                             <CButton color="primary" onClick={handleSearch} disabled={loading || !selectedCourse}>
                                 {loading ? <CSpinner size="sm" /> : <><Search size={18} className="me-1" /> Search</>}
                             </CButton>
@@ -386,6 +341,7 @@ export default function AttendancePage() {
                                 {attendanceRecords.map((record) => (
                                     <CTableRow key={record.id}>
                                         <CTableDataCell>{record.student.indexNumber}</CTableDataCell>
+
                                         <CTableDataCell>
                                             <div className="d-flex align-items-center">
                                                 <CAvatar src={record.student.avatarUrl} size="md" className="me-2" />
@@ -438,7 +394,7 @@ export default function AttendancePage() {
                                 label="Course for Stats"
                                 value={chartCourse}
                                 onChange={(e) => setChartCourse(e.target.value)}
-                                disabled={!selectedProgram || courses.length === 0}
+                                disabled={courses.length === 0}
                             >
                                 <option value="">Select Course</option>
                                 {courseOptions}
@@ -449,21 +405,18 @@ export default function AttendancePage() {
                                 type="month"
                                 label="Month"
                                 value={chartMonth}
+                                max={new Date().toISOString().slice(0, 7)}
                                 onChange={(e) => setChartMonth(e.target.value)}
-                                disabled={!selectedProgram || courses.length === 0}
+                                disabled={courses.length === 0}
                             />
                         </CCol>
                     </CRow>
 
                     <CRow className="justify-content-center">
                         <CCol md={6} lg={4}>
-                            {!selectedProgram ? (
+                            {courses.length === 0 ? (
                                 <div className="text-center text-muted p-5">
-                                    Please select a faculty and program first
-                                </div>
-                            ) : courses.length === 0 ? (
-                                <div className="text-center text-muted p-5">
-                                    No courses available for the selected program
+                                    No courses available for attendance tracking
                                 </div>
                             ) : loadingStats ? (
                                 <div className="text-center p-5">
