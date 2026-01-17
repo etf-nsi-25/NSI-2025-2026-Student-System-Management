@@ -6,14 +6,12 @@ import styles from "./AssignmentManagement.module.css"
 import type { Assignment, AssignmentDTO } from "../../models/assignments/Assignments.types"
 import mockAPI from "./mockApi"
 import AssignmentForm from "./AssignmentForm"
-import { useAPI } from "../../context/services"
+//import { useAPI } from "../../context/services" uncomment when BE is ready
 import CIcon from "@coreui/icons-react"
 import { cilCheckCircle } from "@coreui/icons"
 
 export default function AssignmentManagement() {
-  // Form state for creating assignments
-
-  const api = useAPI();
+  //const api = useAPI(); uncomment when BE is ready
 
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

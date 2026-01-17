@@ -95,8 +95,11 @@ export function Router(): React.ReactNode {
       <Route path="/support" element={<AppLayout><StudentSupport /></AppLayout>} />
       <Route path="/help" element={<AppLayout><HelpPage /></AppLayout>} />
 
-      
-      <Route path="/assignment-management" element={<AppLayout><AssignmentManagement /></AppLayout>} />
+      <Route path="/assignment-management" element={
+        <ProtectedRoute>
+          <AppLayout><AssignmentManagement /></AppLayout>
+        </ProtectedRoute>
+      } />
 
       <Route path="/faculty/exams" element={<AppLayout><ExamPage /></AppLayout>} />
       <Route path="/faculty/exams/create" element={<AppLayout><CreateExamPage /></AppLayout>} />

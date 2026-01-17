@@ -80,6 +80,7 @@ const AppLayout: React.FC<PropsWithChildren<object>> = ({ children }) => {
           { type: 'item', label: "Course Management", path: "/course-management", icon: cilEducation },
           { type: 'item', label: "Attendance", path: "/attendance", icon: cilClipboard },
           { type: 'item', label: "Request Management", path: "/faculty/request-management", icon: cilFile },
+          { type: 'item', label: "Assignment Management", path: "/assignment-management", icon: cilFile },
           { type: 'title', label: 'Settings' },
           { type: 'item', label: "Profile settings", path: "/profile-settings", icon: cilUser },
           { type: 'title', label: 'Help' },
