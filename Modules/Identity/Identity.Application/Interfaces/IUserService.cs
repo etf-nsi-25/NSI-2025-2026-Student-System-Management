@@ -5,27 +5,30 @@ namespace Identity.Application.Interfaces;
 
 public interface IUserService
 {
-    Task<Guid> CreateUserAsync(
+    Task<string> CreateUserAsync(
            string username,
-           string password,
            string firstName,
            string lastName,
            string email,
            Guid facultyId,
            string? indexNumber,
-           UserRole role
+           UserRole role,
+           UserRole? requesterRole = null
        );
 
     Task<UserListResponse> GetAllUsersAsync(UserFilterRequest filter);
 
 
 
-    Task<bool> DeleteUserAsync(Guid userId);
+    Task<bool> DeleteUserAsync(string userId);
 
-    Task<UserResponse?> GetUserByIdAsync(Guid userId);
+    Task<UserResponse?> GetUserByIdAsync(string userId);
 
-    Task<bool> UpdateUserAsync(Guid userId, UpdateUserRequest request);
+    Task<bool> UpdateUserAsync(string userId, UpdateUserRequest request);
 
-    Task<bool> DeactivateUserAsync(Guid userId);
+    Task<bool> DeactivateUserAsync(string userId);
 
+    Task<bool> ChangePasswordAsync(string userId, string newPassword);
+
+    Task<int> CountUsers(UserFilterRequest filter);
 }

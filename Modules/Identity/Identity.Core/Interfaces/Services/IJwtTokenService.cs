@@ -8,6 +8,6 @@ public interface IJwtTokenService
 {
     string GenerateAccessToken(TokenClaims claims);
     string GenerateRefreshToken();
-    RefreshToken CreateRefreshToken(Guid userId);
+    RefreshToken CreateRefreshToken(string userId);
     ClaimsPrincipal? ValidateAccessToken(string token);
 }

@@ -26,9 +26,9 @@ namespace University.API.Controllers
                 var faculties = await _facultyService.GetAllFacultiesAsync(name);
                 return Ok(faculties);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while retrieving faculties.");
+                return StatusCode(500, ex.Message);
             }
         }
 

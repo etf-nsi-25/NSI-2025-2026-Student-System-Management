@@ -1,155 +1,124 @@
 using System.Runtime.CompilerServices;
 using EventBus.Core;
 using Identity.Application.Interfaces;
-using Identity.Core.Entities;
-using Identity.Core.Repositories;
 using Identity.Core.Events;
 using Identity.Core.Enums;
 using Identity.Core.DTO;
-using Identity.Core.Services;
+using Identity.Core.Interfaces.Services;
 
-// Allow injection.
 [assembly: InternalsVisibleTo("Identity.Infrastructure"), InternalsVisibleTo("Identity.API")]
 namespace Identity.Application.Services;
 
 internal class UserService(
-    IUserRepository userRepository,
-    IIdentityHasherService identityHasherService,
-    IEventBus eventBus) : IUserService
+    IIdentityService identityService,
+    IEventBus eventBus,
+    IUserNotifierService userNotifierService) : IUserService
 {
-    public async Task<Guid> CreateUserAsync(
+    public async Task<string> CreateUserAsync(
        string username,
-       string password,
        string firstName,
        string lastName,
        string email,
        Guid facultyId,
        string? indexNumber,
-       UserRole role)
+       UserRole role,
+       UserRole? requesterRole = null)
     {
-        if (role == UserRole.Superadmin || role == UserRole.Admin)
+        if (role == UserRole.Superadmin)
         {
-            throw new InvalidOperationException("Admin users are restricted from assigning Superadmin or Admin roles.");
+            throw new InvalidOperationException("Assigning the Superadmin role is not allowed.");
         }
 
-        if (await userRepository.IsUsernameTakenAsync(username))
+        if (role == UserRole.Admin && requesterRole != UserRole.Superadmin)
         {
-            // TODO: this should check for email instead ?? Thats what we login with
-            throw new ArgumentException($"Username '{username}' is already taken.", nameof(username));
+            throw new InvalidOperationException("Only Superadmins can assign the Admin role.");
+        }
+        
+        var tempPassword = GenerateTemporaryPassword();
+
+        var existingUser = await identityService.FindByEmailAsync(email);
+        if (existingUser != null)
+        {
+            throw new ArgumentException($"User with email '{email}' is already taken.", nameof(email));
         }
 
-        var passwordHash = identityHasherService.HashPassword(password);
-        var newUser = User.Create(
-            username,
-            passwordHash,
-            firstName,
-            lastName,
-            email,
-            facultyId,
-            role,
-            indexNumber
-        );
+        var createRequest = new CreateUserRequest
+        {
+            Username = username,
+            Email = email,
+            FirstName = firstName,
+            LastName = lastName,
+            FacultyId = facultyId,
+            IndexNumber = indexNumber,
+            Role = role
+        };
+        
+        await userNotifierService.SendAccountCreatedNotification(email, tempPassword);
 
-        await userRepository.AddAsync(newUser);
-        await userRepository.SaveAsync();
+        var (success, errors) = await identityService.CreateUserAsync(createRequest, tempPassword);
 
-        var userCreatedEvent = new UserCreatedEvent(
-            newUser.Id,
-            newUser.Username,
-            newUser.FirstName,
-            newUser.LastName,
-            newUser.FacultyId,
-            newUser.Role,
-            newUser.IndexNumber
-        );
+        if (!success)
+        {
+            throw new Exception($"User creation failed: {string.Join(", ", errors)}");
+        }
 
-        // TODO: this should not use this variant of dispatch, but for now this endpoint has no auth so we must.
-        await eventBus.Dispatch(userCreatedEvent, facultyId);
+        var createdUser = await identityService.FindByEmailAsync(email);
+        if (createdUser == null) throw new Exception("User retrieval failed.");
 
-        return newUser.Id;
+        await eventBus.Dispatch(new UserCreatedEvent(
+            createdUser.Id,
+            createdUser.Username,
+            createdUser.FirstName,
+            createdUser.LastName,
+            createdUser.FacultyId,
+            createdUser.Role,
+            createdUser.IndexNumber
+        ), facultyId);
+
+        return createdUser.Id;
     }
 
     public async Task<UserListResponse> GetAllUsersAsync(UserFilterRequest filter)
     {
-        var domainUsers = await userRepository.GetAllFilteredAsync(filter);
-
-        var totalCount = await userRepository.CountAsync(filter);
-
-        var userResponses = domainUsers.Select(u => new UserResponse
-        {
-            Id = u.Id,
-            Username = u.Username,
-            FirstName = u.FirstName,
-            LastName = u.LastName,
-            FacultyId = u.FacultyId,
-            IndexNumber = u.IndexNumber,
-            Role = u.Role,
-            Status = u.Status
-        }).ToList();
+        var userResponses = await identityService.GetAllFilteredAsync(filter);
+        var totalCount = await identityService.CountAsync(filter);
 
         return new UserListResponse
         {
-            Items = userResponses,
+            Items = userResponses.ToList(),
             TotalCount = totalCount,
             PageNumber = filter.PageNumber,
             PageSize = filter.PageSize
         };
     }
 
-    //read
-    public async Task<UserResponse?> GetUserByIdAsync(Guid userId)
+    public async Task<UserResponse?> GetUserByIdAsync(string userId)
     {
-        var user = await userRepository.GetByIdAsync(userId);
-
-        if (user == null)
-        {
-            return null;
-        }
-
-        return new UserResponse
-        {
-            Id = user.Id,
-            Username = user.Username,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            FacultyId = user.FacultyId,
-            Status = user.Status,
-            IndexNumber = user.IndexNumber,
-            Role = user.Role
-        };
+        return await identityService.FindByIdAsync(userId);
     }
-    //delete
-    public async Task<bool> DeleteUserAsync(Guid userId)
-    {
-        var user = await userRepository.GetByIdAsync(userId);
 
-        if (user == null)
-        {
-            return false;
-        }
+    public async Task<bool> DeleteUserAsync(string userId)
+    {
+        var user = await identityService.FindByIdAsync(userId);
+        if (user == null) return false;
 
         if (user.Role == UserRole.Superadmin)
         {
             throw new InvalidOperationException("Cannot delete Superadmin user.");
         }
 
-        await userRepository.DeleteAsync(user);
-        await userRepository.SaveAsync();
-
-        await eventBus.Dispatch(new UserDeletedEvent(userId));
-
-        return true;
+        var result = await identityService.DeleteUserAsync(userId);
+        if (result)
+        {
+            await eventBus.Dispatch(new UserDeletedEvent(userId));
+        }
+        return result;
     }
 
-    //update
-    public async Task<bool> UpdateUserAsync(Guid userId, UpdateUserRequest request)
+    public async Task<bool> UpdateUserAsync(string userId, UpdateUserRequest request)
     {
-        var user = await userRepository.GetByIdAsync(userId);
-
-        if (user == null)
-        {
-            return false;
-        }
+        var user = await identityService.FindByIdAsync(userId);
+        if (user == null) return false;
 
         var previousRole = user.Role;
 
@@ -158,50 +127,73 @@ internal class UserService(
             throw new InvalidOperationException("Admin users are restricted from assigning Superadmin or Admin roles.");
         }
 
-        user.UpdateDetails(
-            request.FirstName,
-            request.LastName,
-            request.Email,
-            request.FacultyId,
-            request.IndexNumber
-        );
+        request.Id = userId;
+        var result = await identityService.UpdateUserAsync(request);
 
-        user.ChangeRole(request.Role);
-        user.ChangeStatus(request.Status);
-
-        await userRepository.UpdateAsync(user);
-
-        await userRepository.SaveAsync();
-
-        if (previousRole != user.Role)
+        if (result && previousRole != request.Role)
         {
-            var roleAssignedEvent = new UserRoleAssignedEvent(userId, previousRole, user.Role);
-            await eventBus.Dispatch(roleAssignedEvent);
+            await eventBus.Dispatch(new UserRoleAssignedEvent(userId, previousRole, request.Role));
         }
 
-        return true;
+        return result;
     }
-    public async Task<bool> DeactivateUserAsync(Guid userId)
-    {
-        var user = await userRepository.GetByIdAsync(userId);
 
-        if (user == null)
-        {
-            return false;
-        }
+    public async Task<bool> DeactivateUserAsync(string userId)
+    {
+        var user = await identityService.FindByIdAsync(userId);
+        if (user == null) return false;
 
         if (user.Role == UserRole.Superadmin)
         {
             throw new InvalidOperationException("Cannot deactivate Superadmin user.");
         }
 
-        user.ChangeStatus(UserStatus.Inactive);
+        var updateRequest = new UpdateUserRequest
+        {
+            Id = userId,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Username = user.Username,
+            Email = user.Email,
+            FacultyId = user.FacultyId,
+            Role = user.Role,
+            IndexNumber = user.IndexNumber,
+            Status = UserStatus.Inactive
+        };
 
-        await userRepository.UpdateAsync(user);
-        await userRepository.SaveAsync();
+        return await identityService.UpdateUserAsync(updateRequest);
+    }
 
+    public async Task<bool> ChangePasswordAsync(string userId, string newPassword)
+    {
+        var user = await identityService.FindByIdAsync(userId);
+        if (user == null) return false;
 
+        var updateRequest = new UpdateUserRequest
+        {
+            Id = userId,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Username = user.Username,
+            Email = user.Email,
+            FacultyId = user.FacultyId,
+            Role = user.Role,
+            Status = user.Status,
+            IndexNumber = user.IndexNumber,
+            Password = newPassword
+        };
 
-        return true;
+        return await identityService.UpdateUserAsync(updateRequest);
+    }
+
+    public async Task<int> CountUsers(UserFilterRequest filter)
+    {
+        return await identityService.CountAsync(filter);
+    }
+
+    private static string GenerateTemporaryPassword()
+    {
+        var guid = Guid.NewGuid().ToString().Replace("-", "");
+        return $"z{guid[..8].ToUpper()}1!";
     }
 }

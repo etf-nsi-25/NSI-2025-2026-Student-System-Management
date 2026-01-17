@@ -11,11 +11,27 @@ import {
   CModalHeader,
   CModalBody,
   CModalFooter,
+  CFormLabel,
 } from '@coreui/react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAuthContext } from '../../init/auth'
 import './ProfileSettings.css'
+import { useAPI } from '../../context/services'
+
+interface UserProfile {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  studentId: string;
+  birthDate: string;
+  address: string;
+  program: string;
+}
 
 export function ProfileSettings() {
+  const { authInfo } = useAuthContext();
+  const api = useAPI();
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [verificationMethod, setVerificationMethod] =
@@ -26,18 +42,46 @@ export function ProfileSettings() {
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const student = {
-    firstName: 'Student',
-    lastName: 'User',
-    email: 'student.user@example.com',
-    phone: '+000 000 000',
-    studentId: 'STU000001',
-    birthDate: '2000-01-01',
-    address: 'N/A',
-    program: 'Study Program',
-  }
+  const [userProfile, setUserProfile] = useState<UserProfile>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: 'N/A', // Not available in Identity API - at least I don't see it
+    studentId: '',
+    birthDate: 'N/A', // Not available in Identity API - at least I don't see it
+    address: 'N/A', // Not available in Identity API - at least I don't see it
+    program: 'N/A', // Not available in Identity API - at least I don't see it
+  });
 
-  const handleSavePassword = () => {
+  useEffect(() => {
+    if (authInfo) {
+      // pre-fill from auth token while loading
+      setUserProfile(prev => ({
+        ...prev,
+        firstName: authInfo.fullName.split(' ')[0] || '',
+        lastName: authInfo.fullName.split(' ').slice(1).join(' ') || '',
+        email: authInfo.email,
+      }));
+
+      //  details from API not hardocded
+      api.getCurrentUser()
+        .then(data => {
+          //  console.log(data);
+          setUserProfile(prev => ({
+            ...prev,
+            firstName: data.firstName || prev.firstName,
+            lastName: data.lastName || prev.lastName,
+            studentId: data.indexNumber || 'N/A',
+            // in case email not in response since using username
+            email: data.email || authInfo.email,
+          }));
+        })
+        .catch(err => console.error(err));
+    }
+  }, [authInfo]);
+
+
+  const handleSavePassword = async () => {
     setErrorMessage(null)
 
     if (!password || !confirmPassword) {
@@ -55,14 +99,21 @@ export function ProfileSettings() {
       return
     }
 
-    
-    setShowResetModal(false)
-    setShowSuccessModal(true)
 
-    setPassword('')
-    setConfirmPassword('')
-    setVerificationMethod('email')
-    setErrorMessage(null)
+    setShowResetModal(false)
+
+    try {
+      await api.changePassword({ newPassword: password });
+
+      setShowSuccessModal(true)
+      setPassword('')
+      setConfirmPassword('')
+      setVerificationMethod('email')
+      setErrorMessage(null)
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Failed to update password');
+      setShowResetModal(true); // Re-open modal if it failed
+    }
   }
 
   const closeResetModal = () => {
@@ -74,21 +125,21 @@ export function ProfileSettings() {
 
   return (
     <div className="page-container">
-      <h1 className="page-title">Student profile settings</h1>
+      <h1 className="page-title">Profile settings</h1>
 
       {/* PROFILE */}
       <CCard className="content-card mb-4">
         <CCardBody className="profile-header">
-          <div className="avatar">
-            {student.firstName[0]}
-            {student.lastName[0]}
+          <div id="profile-avatar-gigantic">
+            {userProfile.firstName && userProfile.firstName[0]}
+            {userProfile.lastName && userProfile.lastName[0]}
           </div>
           <div className="profile-info">
             <h2>
-              {student.firstName} {student.lastName}
+              {userProfile.firstName} {userProfile.lastName}
             </h2>
-            <p>{student.email}</p>
-            <p>Student ID: {student.studentId}</p>
+            <p>{userProfile.email}</p>
+            {userProfile.studentId && userProfile.studentId !== 'N/A' && <p>Student ID: {userProfile.studentId}</p>}
           </div>
         </CCardBody>
       </CCard>
@@ -101,28 +152,38 @@ export function ProfileSettings() {
         <CCardBody>
           <CRow className="g-3">
             <CCol md={6}>
-              <CFormInput label="First name" value={student.firstName} readOnly />
+              <CFormLabel>First name</CFormLabel>
+              <CFormInput value={userProfile.firstName} readOnly />
             </CCol>
             <CCol md={6}>
-              <CFormInput label="Last name" value={student.lastName} readOnly />
+              <CFormLabel>Last name</CFormLabel>
+              <CFormInput value={userProfile.lastName} readOnly />
             </CCol>
             <CCol md={6}>
-              <CFormInput label="Email" value={student.email} readOnly />
+              <CFormLabel>Email</CFormLabel>
+              <CFormInput value={userProfile.email} readOnly />
             </CCol>
             <CCol md={6}>
-              <CFormInput label="Phone" value={student.phone} readOnly />
+              <CFormLabel>Phone</CFormLabel>
+              <CFormInput value={userProfile.phone} readOnly />
+            </CCol>
+            {userProfile.studentId && userProfile.studentId !== 'N/A' && (
+              <CCol md={6}>
+                <CFormLabel>Student ID</CFormLabel>
+                <CFormInput value={userProfile.studentId} readOnly />
+              </CCol>
+            )}
+            <CCol md={6}>
+              <CFormLabel>Birth date</CFormLabel>
+              <CFormInput value={userProfile.birthDate} readOnly />
             </CCol>
             <CCol md={6}>
-              <CFormInput label="Student ID" value={student.studentId} readOnly />
+              <CFormLabel>Address</CFormLabel>
+              <CFormInput value={userProfile.address} readOnly />
             </CCol>
             <CCol md={6}>
-              <CFormInput label="Birth date" value={student.birthDate} readOnly />
-            </CCol>
-            <CCol md={6}>
-              <CFormInput label="Address" value={student.address} readOnly />
-            </CCol>
-            <CCol md={6}>
-              <CFormInput label="Program" value={student.program} readOnly />
+              <CFormLabel>Program</CFormLabel>
+              <CFormInput value={userProfile.program} readOnly />
             </CCol>
           </CRow>
         </CCardBody>

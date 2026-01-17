@@ -1,8 +1,9 @@
 ﻿using Identity.Application.Interfaces;
-using Identity.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using Identity.Core.DTO;
 using Identity.Core.Enums;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace Identity.API.Controllers
 {
@@ -18,6 +19,7 @@ namespace Identity.API.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -28,17 +30,19 @@ namespace Identity.API.Controllers
                 return BadRequest(ModelState);
             }
 
+            var requesterRole = GetCurrentUserRole();
+
             try
             {
                 var userId = await _userService.CreateUserAsync(
                     request.Username,
-                    request.Password,
                     request.FirstName,
                     request.LastName,
                     request.Email,
                     request.FacultyId,
                     request.IndexNumber,
-                    request.Role
+                    request.Role,
+                    requesterRole
                 );
 
                 return CreatedAtAction(
@@ -48,6 +52,7 @@ namespace Identity.API.Controllers
                     {
                         Id = userId,
                         Username = request.Username,
+                        Email = request.Email,
                         FirstName = request.FirstName,
                         LastName = request.LastName,
                         IndexNumber = request.IndexNumber,
@@ -71,10 +76,55 @@ namespace Identity.API.Controllers
             }
         }
 
-        [HttpGet("{userId:guid}")]
+        [HttpGet("me")]
+        [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var userIdStr = User.FindFirstValue("userId");
+            if (string.IsNullOrEmpty(userIdStr))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _userService.GetUserByIdAsync(userIdStr);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return Ok(user);
+        }
+
+        [HttpPost("me/change-password")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ChangeCurrentPassword([FromBody] ChangePasswordRequest request)
+        {
+            var userId = User.FindFirstValue("userId");
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var result = await _userService.ChangePasswordAsync(userId, request.NewPassword);
+                if (!result) return NotFound();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpGet("{userId}")]
         [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetUserById(Guid userId)
+        public async Task<IActionResult> GetUserById(string userId)
         {
             var user = await _userService.GetUserByIdAsync(userId);
             if (user == null)
@@ -98,11 +148,11 @@ namespace Identity.API.Controllers
             return Ok(usersList);
         }
 
-        [HttpPut("{userId:guid}")]
+        [HttpPut("{userId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateUser(Guid userId, [FromBody] UpdateUserRequest request)
+        public async Task<IActionResult> UpdateUser(string userId, [FromBody] UpdateUserRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -130,15 +180,14 @@ namespace Identity.API.Controllers
             }
         }
 
-        [HttpPatch("{userId:guid}/deactivate")]
+        [HttpPatch("{userId}/deactivate")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> DeactivateUser(Guid userId)
+        public async Task<IActionResult> DeactivateUser(string userId)
         {
             try
             {
-
                 var result = await _userService.DeactivateUserAsync(userId);
 
                 if (!result)
@@ -158,11 +207,11 @@ namespace Identity.API.Controllers
             }
         }
 
-        [HttpDelete("{userId:guid}")]
+        [HttpDelete("{userId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> DeleteUser(Guid userId)
+        public async Task<IActionResult> DeleteUser(string userId)
         {
             try
             {
@@ -183,6 +232,66 @@ namespace Identity.API.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
+        }
+
+        [HttpPost("{userId}/change-password")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ChangePassword(string userId, [FromBody] ChangePasswordRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                if (!CanModifyUser(userId))
+                {
+                    return Forbid();
+                }
+
+                var result = await _userService.ChangePasswordAsync(userId, request.NewPassword);
+
+                if (!result)
+                {
+                    return NotFound();
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        private bool IsAdmin()
+        {
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+            return userRole == UserRole.Admin.ToString() || userRole == UserRole.Superadmin.ToString();
+        }
+
+        private UserRole? GetCurrentUserRole()
+        {
+            var roleStr = User.FindFirstValue(ClaimTypes.Role);
+            if (!string.IsNullOrEmpty(roleStr) && Enum.TryParse<UserRole>(roleStr, out var role))
+            {
+                return role;
+            }
+            return null;
+        }
+
+        private bool IsSelf(string userId)
+        {
+            var currentUserId = User.FindFirstValue("userId");
+            return currentUserId == userId.ToString();
+        }
+
+        private bool CanModifyUser(string userId)
+        {
+            return IsAdmin() || IsSelf(userId);
         }
     }
 }

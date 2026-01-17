@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
@@ -11,18 +11,18 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0"/>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.21">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0"/>
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2"/>
 		<PackageReference Include="NetArchTest.Rules" Version="1.3.2"/>
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
+		<PackageReference Include="FluentValidation.AspNetCore" Version="11.2.2"/>
 		<ProjectReference Include="..\Modules\Identity\Identity.API\Identity.API.csproj"/>
 		<ProjectReference Include="..\Modules\University\University.API\University.API.csproj"/>
 		<ProjectReference Include="..\Modules\Faculty\Faculty.API\Faculty.API.csproj"/>
 		<ProjectReference Include="..\Modules\Support\Support.API\Support.API.csproj"/>
-		<ProjectReference Include="..\Modules\Notifications\Notifications.API\Notifications.API.csproj"/>
 		<ProjectReference Include="..\Modules\Analytics\Analytics.API\Analytics.API.csproj"/>
 		<ProjectReference Include="..\Modules\Identity\Identity.Infrastructure\Identity.Infrastructure.csproj"/>
 		<ProjectReference Include="..\Modules\University\University.Infrastructure\University.Infrastructure.csproj"/>
@@ -32,7 +32,7 @@
 		<ProjectReference Include="..\Modules\Analytics\Analytics.Infrastructure\Analytics.Infrastructure.csproj"/>
 		<ProjectReference Include="..\Modules\EventBus\EventBus.Infrastructure\EventBus.Infrastructure.csproj"/>
 	</ItemGroup>
-
+  
 	<Target Name="BuildUI" BeforeTargets="Build">
 		<Exec Command="npm install" WorkingDirectory="../Frontend"/>
 		<Exec Command="npm run build" WorkingDirectory="../Frontend"/>
