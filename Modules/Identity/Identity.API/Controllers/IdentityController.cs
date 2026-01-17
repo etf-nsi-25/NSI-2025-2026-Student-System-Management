@@ -18,10 +18,30 @@ namespace Identity.API.Controllers
             _userService = userService;
         }
 
+        private UserRole GetRequiredUserRole()
+        {
+            var roleStr = User.FindFirstValue(ClaimTypes.Role);
+            if (!Enum.TryParse<UserRole>(roleStr, out var role))
+                throw new UnauthorizedAccessException("Invalid role");
+
+            return role;
+        }
+
+        private Guid GetFacultyIdFromToken()
+        {
+            var facultyIdStr = User.FindFirstValue("facultyId");
+            if (!Guid.TryParse(facultyIdStr, out var facultyId))
+                throw new UnauthorizedAccessException("Invalid faculty");
+
+            return facultyId;
+        }
+
+
         [HttpPost]
-        [AllowAnonymous]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
         {
@@ -30,7 +50,15 @@ namespace Identity.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var requesterRole = GetCurrentUserRole();
+            var requesterRole = GetRequiredUserRole();
+
+            if (requesterRole != UserRole.Admin)
+                return Forbid();
+
+            if (request.Role != UserRole.Student)
+                return Forbid("Admin can only create Student users.");
+
+            var facultyId = GetFacultyIdFromToken();
 
             try
             {
@@ -39,28 +67,24 @@ namespace Identity.API.Controllers
                     request.FirstName,
                     request.LastName,
                     request.Email,
-                    request.FacultyId,
+                    facultyId,
                     request.IndexNumber,
-                    request.Role,
+                    UserRole.Student,
                     requesterRole
                 );
 
-                return CreatedAtAction(
-                    nameof(GetUserById),
-                    new { userId = userId },
-                    new UserResponse
-                    {
-                        Id = userId,
-                        Username = request.Username,
-                        Email = request.Email,
-                        FirstName = request.FirstName,
-                        LastName = request.LastName,
-                        IndexNumber = request.IndexNumber,
-                        Role = request.Role,
-                        FacultyId = request.FacultyId,
-                        Status = UserStatus.Active
-                    }
-                );
+                return CreatedAtAction(nameof(GetUserById), new { userId }, new UserResponse
+                {
+                    Id = userId,
+                    Username = request.Username,
+                    Email = request.Email,
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
+                    IndexNumber = request.IndexNumber,
+                    Role = UserRole.Student,
+                    FacultyId = facultyId,
+                    Status = UserStatus.Active
+                });
             }
             catch (InvalidOperationException ex)
             {
