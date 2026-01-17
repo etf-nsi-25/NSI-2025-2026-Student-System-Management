@@ -21,4 +21,6 @@ public class UserResponse
     public UserRole Role { get; set; } 
 
     public UserStatus Status { get; set; } 
+
+    public bool TwoFactorEnabled { get; set; }
 }

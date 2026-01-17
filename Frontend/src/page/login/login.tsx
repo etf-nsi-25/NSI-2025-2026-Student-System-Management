@@ -40,25 +40,18 @@ export function Login() {
 
     try {
 
-      const authInfoData = await loginWithCredentials(email, password);
-      
-      setAuthInfo(authInfoData);
+      const result = await loginWithCredentials(email, password);
 
-      // Check if user needs to complete 2FA setup
-      // If your API returns a flag like `requires2FASetup`, check it here
-      // For now, assuming 2FA setup is always required first
-      
-      // Navigate based on user role after 2FA setup
-      // First, send to 2FA setup
-      // result.requires2FASetup)
-
-      if (!authInfoData.email) {
-        // TODO: maybe first implement the 2fa with non-dummy data before actually putting it here?
-        // navigate("/2fa/setup");
-      } else {
-        const dashboardRoute = getDashboardRoute(authInfoData.role);
-        navigate(dashboardRoute);
+      if (result.kind === '2fa') {
+        sessionStorage.setItem('twoFactorToken', result.twoFactorToken);
+        navigate('/2fa/verify');
+        return;
       }
+
+      setAuthInfo(result.authInfo);
+
+      const dashboardRoute = getDashboardRoute(result.authInfo.role);
+      navigate(dashboardRoute);
     } catch (error) {
       setError(extractApiErrorMessage(error));
     }

@@ -4,16 +4,21 @@ using Microsoft.AspNetCore.Identity;
 using Identity.Core.DTO; 
 using Microsoft.EntityFrameworkCore; 
 using Identity.Infrastructure.Mappers; 
+using System.Text.Encodings.Web;
+using Npgsql;
+using QRCoder;
 
 namespace Identity.Infrastructure.Services;
 
 public class IdentityService : IIdentityService
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly UrlEncoder _urlEncoder;
 
-    public IdentityService(UserManager<ApplicationUser> userManager)
+    public IdentityService(UserManager<ApplicationUser> userManager, UrlEncoder urlEncoder)
     {
         _userManager = userManager;
+        _urlEncoder = urlEncoder;
     }
 
     public async Task<UserResponse?> FindByEmailAsync(string email)
@@ -34,6 +39,113 @@ public class IdentityService : IIdentityService
         if (appUser == null) return false;
         
         return await _userManager.CheckPasswordAsync(appUser, password);
+    }
+
+    public async Task<bool> IsTwoFactorEnabledAsync(string userId)
+    {
+        var appUser = await _userManager.FindByIdAsync(userId);
+        return appUser?.TwoFactorEnabled ?? false;
+    }
+
+    public async Task<TwoFactorSetupInfo> GenerateTwoFactorSetupAsync(string userId, string issuer)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            throw new InvalidOperationException("User not found");
+        }
+
+        // Ensure a fresh key each time setup is started.
+        try
+        {
+            await _userManager.ResetAuthenticatorKeyAsync(user);
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException pg
+                                           && pg.SqlState == "23505"
+                                           && pg.ConstraintName == "PK_AspNetUserTokens")
+        {
+            // If the UI triggers /enable-2fa twice (common in React StrictMode),
+            // both requests can race to insert the same AspNetUserTokens row.
+            // In that case, just continue and read whichever key is currently stored.
+        }
+
+        // Reload to ensure we read the latest authenticator key if another request won the race.
+        user = await _userManager.FindByIdAsync(userId) ?? user;
+
+        var key = await _userManager.GetAuthenticatorKeyAsync(user);
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            throw new InvalidOperationException("Failed to generate authenticator key");
+        }
+
+        var otpAuthUri = GenerateOtpAuthUri(issuer, user.Email ?? user.UserName ?? string.Empty, key);
+        var qrCodeDataUri = GenerateQrCodeDataUri(otpAuthUri);
+
+        return new TwoFactorSetupInfo(
+            ManualKey: key,
+            QrCodeImageBase64: qrCodeDataUri,
+            OtpAuthUri: otpAuthUri);
+    }
+
+    public async Task<bool> ConfirmTwoFactorSetupAsync(string userId, string code)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return false;
+        }
+
+        var isValid = await _userManager.VerifyTwoFactorTokenAsync(
+            user,
+            TokenOptions.DefaultAuthenticatorProvider,
+            code);
+
+        if (!isValid)
+        {
+            return false;
+        }
+
+        await _userManager.SetTwoFactorEnabledAsync(user, true);
+        return true;
+    }
+
+    public async Task<bool> VerifyTwoFactorCodeAsync(string userId, string code)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return false;
+        }
+
+        if (!user.TwoFactorEnabled)
+        {
+            return false;
+        }
+
+        return await _userManager.VerifyTwoFactorTokenAsync(
+            user,
+            TokenOptions.DefaultAuthenticatorProvider,
+            code);
+    }
+
+    private string GenerateOtpAuthUri(string issuer, string email, string key)
+    {
+        // Matches the format used by common authenticator apps.
+        // otpauth://totp/{issuer}:{email}?secret={key}&issuer={issuer}&digits=6
+        var encodedIssuer = _urlEncoder.Encode(issuer);
+        var encodedEmail = _urlEncoder.Encode(email);
+        var encodedKey = _urlEncoder.Encode(key);
+
+        return $"otpauth://totp/{encodedIssuer}:{encodedEmail}?secret={encodedKey}&issuer={encodedIssuer}&digits=6";
+    }
+
+    private static string GenerateQrCodeDataUri(string payload)
+    {
+        var generator = new QRCodeGenerator();
+        var data = generator.CreateQrCode(payload, QRCodeGenerator.ECCLevel.Q);
+        var qrCode = new PngByteQRCode(data);
+        var pngBytes = qrCode.GetGraphic(20);
+        return $"data:image/png;base64,{Convert.ToBase64String(pngBytes)}";
     }
 
     public async Task<(bool Success, string[] Errors)> CreateUserAsync(CreateUserRequest request, string password)
