@@ -2,6 +2,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Analytics.Core\Analytics.Core.csproj" />
+    <ProjectReference Include="..\..\EventBus\EventBus.MediatR\EventBus.MediatR.csproj" />
+    <ProjectReference Include="..\..\Identity\Identity.Core\Identity.Core.csproj" />
+    <ProjectReference Include="..\..\Identity\Identity.Application\Identity.Application.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

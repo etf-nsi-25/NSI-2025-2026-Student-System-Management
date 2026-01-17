@@ -30,7 +30,6 @@
     <ProjectReference Include="..\Modules\Identity\Identity.Application\Identity.Application.csproj" />
     <ProjectReference Include="..\Modules\Identity\Identity.Core\Identity.Core.csproj" />
     <ProjectReference Include="..\Modules\Identity\Identity.Infrastructure\Identity.Infrastructure.csproj" />
-    <ProjectReference Include="..\Modules\Notifications\Notifications.API\Notifications.API.csproj" />
     <ProjectReference Include="..\Modules\Notifications\Notifications.Application\Notifications.Application.csproj" />
     <ProjectReference Include="..\Modules\Notifications\Notifications.Core\Notifications.Core.csproj" />
     <ProjectReference Include="..\Modules\Notifications\Notifications.Infrastructure\Notifications.Infrastructure.csproj" />

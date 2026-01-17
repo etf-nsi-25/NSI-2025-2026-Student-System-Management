@@ -4,7 +4,7 @@ using Identity.Core.Enums;
 namespace Identity.Core.Events;
 
 public record UserCreatedEvent(
-    Guid UserId, 
+    string UserId, 
     string Username, 
     string FirstName, 
     string LastName, 

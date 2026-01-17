@@ -239,6 +239,54 @@ namespace Faculty.Infrastructure.Migrations
                     b.ToTable("Enrollment", "public");
                 });
 
+            modelBuilder.Entity("Faculty.Core.Entities.Exam", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ExamDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ExamType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid>("FacultyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("RegDeadline")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("FacultyId");
+
+                    b.ToTable("Exam", "public");
+                });
+
             modelBuilder.Entity("Faculty.Infrastructure.Schemas.ExamRegistrationSchema", b =>
                 {
                     b.Property<int>("Id")
@@ -590,7 +638,7 @@ namespace Faculty.Infrastructure.Migrations
                     b.HasOne("Faculty.Infrastructure.Schemas.ExamSchema", "Exam")
                         .WithMany("ExamRegistrations")
                         .HasForeignKey("ExamId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Faculty.Infrastructure.Schemas.StudentSchema", "Student")
@@ -639,7 +687,7 @@ namespace Faculty.Infrastructure.Migrations
                     b.HasOne("Faculty.Infrastructure.Schemas.ExamSchema", "Exam")
                         .WithMany("StudentExamGrades")
                         .HasForeignKey("ExamId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Faculty.Infrastructure.Schemas.StudentSchema", "Student")

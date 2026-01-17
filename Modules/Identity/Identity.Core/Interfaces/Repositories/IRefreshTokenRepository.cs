@@ -6,6 +6,6 @@ namespace Identity.Core.Interfaces.Repositories;
 public interface IRefreshTokenRepository : IBaseRepository<RefreshToken>
 {
     Task<RefreshToken?> GetByTokenAsync(string token, CancellationToken cancellationToken = default);
-    Task<IEnumerable<RefreshToken>> GetActiveTokensByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
-    Task RevokeAllUserTokensAsync(Guid userId, string reason, CancellationToken cancellationToken = default);
+    Task<IEnumerable<RefreshToken>> GetActiveTokensByUserIdAsync(string userId, CancellationToken cancellationToken = default);
+    Task RevokeAllUserTokensAsync(string userId, string reason, CancellationToken cancellationToken = default);
 }

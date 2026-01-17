@@ -3,10 +3,10 @@
 }
 
 .page-title {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  color: white;
-  margin-bottom: 2rem;
+  color: #1e4d8b;
+  margin-bottom: 2.5rem;
 }
 
 .content-card {
@@ -36,18 +36,48 @@
 .profile-header {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 2.5rem;
+  padding: 1rem 0.5rem;
 }
 
-.avatar {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background-color: #2563eb;
-  color: white;
-  font-size: 1.5rem;
-  font-weight: 600;
+#profile-avatar-gigantic {
+  width: 120px !important;
+  height: 120px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #1e4d8b 0%, #133e87 100%) !important;
+  color: white !important;
+  font-size: 3rem !important;
+  font-weight: 700 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 6px 16px rgba(19, 62, 135, 0.2) !important;
+}
+
+.profile-info {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.profile-info h2 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.1;
+}
+
+.profile-info p {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* Fix for invisible labels */
+.form-label {
+  color: #1e293b !important;
+  font-weight: 500;
 }

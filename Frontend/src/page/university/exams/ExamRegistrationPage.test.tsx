@@ -7,18 +7,22 @@ const getAvailableStudentExamsMock = vi.hoisted(() => vi.fn());
 const getRegisteredStudentExamsMock = vi.hoisted(() => vi.fn());
 const registerForStudentExamMock = vi.hoisted(() => vi.fn());
 
+const toastContextMock = vi.hoisted(() => ({
+  pushToast: pushToastMock,
+}));
+
+const apiContextMock = vi.hoisted(() => ({
+  getAvailableStudentExams: getAvailableStudentExamsMock,
+  getRegisteredStudentExams: getRegisteredStudentExamsMock,
+  registerForStudentExam: registerForStudentExamMock,
+}));
+
 vi.mock("../../../context/toast", () => ({
-  useToast: () => ({
-    pushToast: pushToastMock,
-  }),
+  useToast: () => toastContextMock,
 }));
 
 vi.mock("../../../context/services", () => ({
-  useAPI: () => ({
-    getAvailableStudentExams: getAvailableStudentExamsMock,
-    getRegisteredStudentExams: getRegisteredStudentExamsMock,
-    registerForStudentExam: registerForStudentExamMock,
-  }),
+  useAPI: () => apiContextMock,
 }));
 
 import ExamRegistrationPage from "./ExamRegistrationPage";

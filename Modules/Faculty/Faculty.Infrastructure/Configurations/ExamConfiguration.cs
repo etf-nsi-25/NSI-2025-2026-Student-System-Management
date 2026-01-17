@@ -14,6 +14,8 @@ public class ExamConfiguration : IEntityTypeConfiguration<ExamSchema>
         builder.Property(e => e.FacultyId).IsRequired();
         builder.Property(e => e.CourseId).IsRequired();
         builder.Property(e => e.Name).HasMaxLength(200);
+        builder.Property(e => e.Location).HasMaxLength(200);
+        builder.Property(e => e.ExamType).IsRequired().HasMaxLength(50);
         builder.Property(e => e.ExamDate);
         builder.Property(e => e.RegDeadline);
         builder.Property(e => e.CreatedAt).IsRequired();

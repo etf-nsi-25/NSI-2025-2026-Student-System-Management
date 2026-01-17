@@ -46,7 +46,7 @@ export function isAssistant(userRole: string): boolean {
 // Get dashboard route based on role
 export function getDashboardRoute(userRole: string): string {
   const role = userRole.toLowerCase();
-  
+
   switch (role) {
     case 'student':
       return '/student/dashboard';

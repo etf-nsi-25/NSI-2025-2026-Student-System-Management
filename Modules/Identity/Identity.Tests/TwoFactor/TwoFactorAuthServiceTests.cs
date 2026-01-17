@@ -1,57 +1,61 @@
-﻿using System.Reflection;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using Xunit;
 using Identity.Application.Services;
 using Identity.Core.DomainServices;
-using Identity.Core.Entities;
-using Identity.Core.Repositories;
+using Identity.Core.Interfaces.Services; 
+using Identity.Core.Enums;
+using Identity.Core.DTO; 
 
 namespace Identity.Tests.TwoFactor
 {
     public class TwoFactorAuthServiceTests
     {
-        private readonly Mock<IUserRepository> _userRepositoryMock;
+        private readonly Mock<IIdentityService> _identityServiceMock; 
         private readonly Mock<ITotpProvider> _totpProviderMock;
         private readonly TwoFactorDomainService _domainService;
         private readonly TwoFactorAuthService _service;
 
         public TwoFactorAuthServiceTests()
         {
-            _userRepositoryMock = new Mock<IUserRepository>();
+            _identityServiceMock = new Mock<IIdentityService>();
             _totpProviderMock = new Mock<ITotpProvider>();
 
             _domainService = new TwoFactorDomainService(_totpProviderMock.Object);
 
             _service = new TwoFactorAuthService(
-                _userRepositoryMock.Object,
+                _identityServiceMock.Object,
                 _domainService
             );
+        }
+
+        private UserResponse CreateValidUserResponse(string id, string username)
+        {
+            return new UserResponse
+            {
+                Id = id,
+                Username = username,
+                Email = username + "@test.com",
+                FirstName = "First",
+                LastName = "Last",
+                FacultyId = Guid.NewGuid(),
+                Role = UserRole.Student,
+                Status = UserStatus.Active
+            };
         }
 
         [Fact]
         public async Task EnableTwoFactorAsync_ReturnsSetupResult_WhenUserExists()
         {
             // Arrange
-            var userId = Guid.NewGuid();
-            var user = (User)Activator.CreateInstance(typeof(User), nonPublic: true)!;
+            var userId = "user-123";
+            var username = "testuser";
+            var user = CreateValidUserResponse(userId, username);
 
-            var usernameProp = typeof(User).GetProperty(
-                "Username",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
-            usernameProp!.SetValue(user, "testuser");
-
-            var idProp = typeof(User).GetProperty(
-                "Id",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
-            idProp!.SetValue(user, userId);
-
-            _userRepositoryMock
-                .Setup(r => r.GetByIdAsync(userId))
+            _identityServiceMock
+                .Setup(s => s.FindByIdAsync(userId))
                 .ReturnsAsync(user);
 
             _totpProviderMock
@@ -59,11 +63,11 @@ namespace Identity.Tests.TwoFactor
                 .Returns("SECRET-XYZ");
 
             _totpProviderMock
-                .Setup(p => p.GenerateQrCode("testuser", "SECRET-XYZ"))
+                .Setup(p => p.GenerateQrCode(username, "SECRET-XYZ"))
                 .Returns("QR-BASE64");
 
             // Act
-            var result = await _service.EnableTwoFactorAsync(userId.ToString());
+            var result = await _service.EnableTwoFactorAsync(userId);
 
             // Assert
             result.ManualKey.Should().Be("SECRET-XYZ");
@@ -74,15 +78,15 @@ namespace Identity.Tests.TwoFactor
         public async Task EnableTwoFactorAsync_Throws_WhenUserNotFound()
         {
             // Arrange
-            var userId = Guid.NewGuid();
+            var userId = "unknown-id";
 
-            _userRepositoryMock
-                .Setup(r => r.GetByIdAsync(userId))
-                .ReturnsAsync((User?)null);
+            _identityServiceMock
+                .Setup(s => s.FindByIdAsync(userId))
+                .ReturnsAsync((UserResponse?)null); 
 
             // Act
             Func<Task> act = async () =>
-                await _service.EnableTwoFactorAsync(userId.ToString());
+                await _service.EnableTwoFactorAsync(userId);
 
             // Assert
             await act.Should().ThrowAsync<InvalidOperationException>();

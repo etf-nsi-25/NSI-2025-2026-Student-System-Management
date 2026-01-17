@@ -5,6 +5,7 @@ import { ExamEmptyState } from "../../../component/exams/ExamEmptyState";
 import { useToast } from "../../../context/toast";
 import { extractApiErrorMessage } from "../../../utils/apiError";
 import { useAPI } from "../../../context/services";
+import "./ExamRegistrationPage.css";
 import type {
   AvailableStudentExamDto,
   RegisteredStudentExamDto,
@@ -117,70 +118,61 @@ export default function ExamRegistrationPage() {
         new Date(a.examDate).getTime() - new Date(b.examDate).getTime()
     );
 
-    const handleRegister = async (id: number) => {
-      setSuccess(null);
-      setLoadingId(id);
-    
-      try {
-        const exam = (available ?? []).find(x => x.id === id);
-        if (!exam) return;
-    
-        if (!exam.regDeadline || new Date(exam.regDeadline) < new Date()) {
-          pushToast("error", "Cannot register", "Registration deadline has passed.");
-          return;
-        }
-    
-        await Promise.all([
-          api.registerForStudentExam(id),
-          delay(600), // UX delay – loading must be visible
-        ]);
+  const handleRegister = async (id: number) => {
+    setSuccess(null);
+    setLoadingId(id);
 
-        await loadData();
-    
-        setSuccess("Successfully registered for the exam.");
-      } catch (e: any) {
-        const status = e?.status as number | undefined;
-        if (!status || status >= 500) {
-          pushToast("error", "Something went wrong", "Please try again later.");
-        } else {
-          const msg = extractApiErrorMessage(e);
-          pushToast("error", "Registration failed", msg);
-        }
-      } finally {
-        setLoadingId(null);
+    try {
+      const exam = (available ?? []).find(x => x.id === id);
+      if (!exam) return;
+
+      if (!exam.regDeadline || new Date(exam.regDeadline) < new Date()) {
+        pushToast("error", "Cannot register", "Registration deadline has passed.");
+        return;
       }
-    };
-    
+
+      await Promise.all([
+        api.registerForStudentExam(id),
+        delay(600), // UX delay – loading must be visible
+      ]);
+
+      await loadData();
+
+      setSuccess("Successfully registered for the exam.");
+    } catch (e: any) {
+      const status = e?.status as number | undefined;
+      if (!status || status >= 500) {
+        pushToast("error", "Something went wrong", "Please try again later.");
+      } else {
+        const msg = extractApiErrorMessage(e);
+        pushToast("error", "Registration failed", msg);
+      }
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
 
   return (
-    <div
-      style={{
-        width: "100%",
-        minHeight: "100vh",
-        padding: "40px 16px",
-        background: "radial-gradient(circle at top, #151521, #050509)",
-        color: "#fff",
-      }}
-    >
-      <div style={{ width: "100%", maxWidth: 1200, margin: "0 auto" }}>
+    <div className="exam-registration-container">
+      <div className="exam-registration-content">
         {/* TITLE */}
-        <h1 className="ui-heading-lg mb-4 text-center">Exam Registration</h1>
+        <h1 className="exam-page-title">Exam Registration</h1>
 
         {/* SEARCH */}
-        <div className="d-flex justify-content-center mb-4">
+        <div className="exam-search-wrapper">
           <CFormInput
-            className="ui-input-base"
+            className="exam-search-input"
             placeholder="Search for a course..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ maxWidth: 480 }}
           />
         </div>
 
         {/* TABS */}
-        <div className="d-flex justify-content-center mb-3 gap-3">
+        <div className="exam-tabs-wrapper">
           <button
-            className={`ui-tab-btn ${tab === "available" ? "active" : ""}`}
+            className={`exam-tab-btn ${tab === "available" ? "active" : ""}`}
             onClick={() => {
               setTab("available");
               setSuccess(null);
@@ -190,7 +182,7 @@ export default function ExamRegistrationPage() {
           </button>
 
           <button
-            className={`ui-tab-btn ${tab === "registered" ? "active" : ""}`}
+            className={`exam-tab-btn ${tab === "registered" ? "active" : ""}`}
             onClick={() => {
               setTab("registered");
               setSuccess(null);
@@ -198,16 +190,14 @@ export default function ExamRegistrationPage() {
           >
             Registered Exams
           </button>
-
         </div>
-        
-        <div className="d-flex justify-content-center mb-5">
-          <div className="ui-info-banner">
+
+        <div className="exam-info-banner-wrapper">
+          <div className="exam-info-banner">
             {tab === "available" ? (
               <>
                 Showing exams you are eligible to register for. Only upcoming
-                exams are listed, already sorted by date. Use search to filter
-                by course name.
+                exams are listed, already sorted by date.
               </>
             ) : (
               <>
@@ -216,9 +206,12 @@ export default function ExamRegistrationPage() {
             )}
           </div>
         </div>
+
         {success && (
-          <div className="d-flex justify-content-center mb-3">
-            <div className="ui-alert ui-alert-success">{success}</div>
+          <div className="d-flex justify-content-center mb-4">
+            <div className="ui-alert ui-alert-success w-100" style={{ maxWidth: 800 }}>
+              {success}
+            </div>
           </div>
         )}
 

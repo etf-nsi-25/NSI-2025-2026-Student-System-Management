@@ -2,21 +2,22 @@ using Moq;
 using Identity.Application.Services;
 using Identity.Core.Interfaces.Repositories;
 using Identity.Core.Interfaces.Services;
-using Identity.Core.Repositories;
-using Identity.Core.Services;
 using Microsoft.Extensions.Logging;
 using Identity.Core.Entities;
-
 using Identity.Core.Enums;
 using Identity.Core.Models;
+using Identity.Core.DTO;
 using FluentAssertions;
+using Xunit;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Identity.Tests.Auth
 {
     public class AuthServiceTests
     {
-        private readonly Mock<IUserRepository> _mockUserRepo;
-        private readonly Mock<IIdentityHasherService> _mockHasher;
+        private readonly Mock<IIdentityService> _mockIdentityService;
         private readonly Mock<IJwtTokenService> _mockTokenService;
         private readonly Mock<IRefreshTokenRepository> _mockRefreshTokenRepo;
         private readonly Mock<ILogger<AuthService>> _mockLogger;
@@ -24,19 +25,33 @@ namespace Identity.Tests.Auth
 
         public AuthServiceTests()
         {
-            _mockUserRepo = new Mock<IUserRepository>();
-            _mockHasher = new Mock<IIdentityHasherService>();
+            _mockIdentityService = new Mock<IIdentityService>();
             _mockTokenService = new Mock<IJwtTokenService>();
             _mockRefreshTokenRepo = new Mock<IRefreshTokenRepository>();
             _mockLogger = new Mock<ILogger<AuthService>>();
 
             _authService = new AuthService(
                 _mockTokenService.Object,
-                _mockHasher.Object,
+                _mockIdentityService.Object,
                 _mockRefreshTokenRepo.Object,
-                _mockUserRepo.Object,
                 _mockLogger.Object
             );
+        }
+
+        private UserResponse CreateValidUserResponse(string id, string email, UserStatus status = UserStatus.Active)
+        {
+            return new UserResponse
+            {
+                Id = id,
+                Username = email,
+                Email = email,
+                FirstName = "Test",
+                LastName = "User",
+                FacultyId = Guid.NewGuid(),
+                Role = UserRole.Student,
+                Status = status,
+                IndexNumber = "12345"
+            };
         }
 
         [Fact]
@@ -44,27 +59,30 @@ namespace Identity.Tests.Auth
         {
             // Arrange
             var email = "test@test.com";
-            var password = "password";
-            var user = User.Create("username", "hash", "First", "Last", email, Guid.NewGuid(), UserRole.Student);
-            var accessToken = "access_token";
-            var refreshTokenString = "refresh_token_string";
+            var password = "Password123!";
+            var userId = "user-abc-123";
+
+            var userResponse = CreateValidUserResponse(userId, email);
+
+            var accessToken = "access_token_example";
+            var refreshTokenString = "refresh_token_example";
             var refreshToken = new RefreshToken 
             { 
                 Token = refreshTokenString,
-                UserId = user.Id,
+                UserId = userId,
                 ExpiresAt = DateTime.UtcNow.AddDays(7)
             };
 
-            _mockUserRepo.Setup(x => x.GetByEmailAsync(email, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(user);
+            _mockIdentityService.Setup(x => x.FindByEmailAsync(email))
+                .ReturnsAsync(userResponse);
 
-            _mockHasher.Setup(x => x.VerifyPassword(user, password, It.IsAny<string>()))
-                .Returns(true);
+            _mockIdentityService.Setup(x => x.CheckPasswordAsync(userId, password))
+                .ReturnsAsync(true);
 
             _mockTokenService.Setup(x => x.GenerateAccessToken(It.IsAny<TokenClaims>()))
                 .Returns(accessToken);
 
-            _mockTokenService.Setup(x => x.CreateRefreshToken(user.Id))
+            _mockTokenService.Setup(x => x.CreateRefreshToken(userId))
                 .Returns(refreshToken);
 
             // Act
@@ -78,17 +96,17 @@ namespace Identity.Tests.Auth
             _mockRefreshTokenRepo.Verify(x => x.AddAsync(It.IsAny<RefreshToken>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
-
         [Fact]
         public async Task AuthenticateAsync_ShouldThrowUnauthorized_WhenUserNotFound()
         {
             // Arrange
-            _mockUserRepo.Setup(x => x.GetByEmailAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((User?)null);
+            _mockIdentityService.Setup(x => x.FindByEmailAsync(It.IsAny<string>()))
+                .ReturnsAsync((UserResponse?)null);
 
-            // Act & Assert
+            // Act
             var act = async () => await _authService.AuthenticateAsync("test@test.com", "password");
             
+            // Assert
             await act.Should().ThrowAsync<UnauthorizedAccessException>()
                 .WithMessage("Invalid email or password");
         }
@@ -97,19 +115,40 @@ namespace Identity.Tests.Auth
         public async Task AuthenticateAsync_ShouldThrowUnauthorized_WhenPasswordIncorrect()
         {
             // Arrange
-            var user = User.Create("u", "hash", "f", "l", "test@test.com", Guid.NewGuid(), UserRole.Student);
+            var user = CreateValidUserResponse("id", "t@t.com");
             
-            _mockUserRepo.Setup(x => x.GetByEmailAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            _mockIdentityService.Setup(x => x.FindByEmailAsync(It.IsAny<string>()))
                 .ReturnsAsync(user);
             
-            _mockHasher.Setup(x => x.VerifyPassword(user, "wrongpass", It.IsAny<string>()))
-                .Returns(false);
+            _mockIdentityService.Setup(x => x.CheckPasswordAsync(user.Id, It.IsAny<string>()))
+                .ReturnsAsync(false);
 
-            // Act & Assert
-            var act = async () => await _authService.AuthenticateAsync("test@test.com", "wrongpass");
+            // Act
+            var act = async () => await _authService.AuthenticateAsync("t@t.com", "wrongpass");
                 
+            // Assert
             await act.Should().ThrowAsync<UnauthorizedAccessException>()
                 .WithMessage("Invalid email or password");
+        }
+
+        [Fact]
+        public async Task AuthenticateAsync_ShouldThrowUnauthorized_WhenUserIsDeactivated()
+        {
+            // Arrange
+            var user = CreateValidUserResponse("id", "t@t.com", UserStatus.Inactive);
+
+            _mockIdentityService.Setup(x => x.FindByEmailAsync(It.IsAny<string>()))
+                .ReturnsAsync(user);
+
+            _mockIdentityService.Setup(x => x.CheckPasswordAsync(user.Id, It.IsAny<string>()))
+                .ReturnsAsync(true);
+
+            // Act
+            var act = async () => await _authService.AuthenticateAsync("t@t.com", "pass");
+            
+            // Assert
+            await act.Should().ThrowAsync<UnauthorizedAccessException>()
+                .WithMessage("User is deactivated");
         }
     }
 }

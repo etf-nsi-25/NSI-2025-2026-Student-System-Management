@@ -6,10 +6,12 @@ import type {
     ExamRegistrationResponseDto,
     RegisteredStudentExamDto,
 } from '../dto/StudentExamsDTO';
+import type { CreateExamRequestDTO, ExamResponseDTO, UpdateExamRequestDTO } from '../dto/ExamDTO';
 
 import type { TwoFAConfirmResponse, TwoFASetupResponse } from '../models/2fa/TwoFA.types';
 import type { StudentRequestDto } from '../page/requests/RequestTypes';
 import type { RestClient } from './rest';
+import type { CreateFacultyRequestDTO, FacultyResponseDTO, UpdateFacultyRequestDTO } from '../dto/FacultyDTO';
 
 export class API {
     #restClient: RestClient;
@@ -40,7 +42,6 @@ export class API {
     }
 
     async enableTwoFactor(): Promise<TwoFASetupResponse> {
-        // nema body-a, userId je za sada hardcodan u backendu ("demo")
         return this.#restClient.post('/api/auth/enable-2fa');
     }
 
@@ -96,4 +97,50 @@ export class API {
         const dto = { status };
         return this.put<{ message: string }>(`/api/Support/requests/${id}/status`, dto);
     }
+
+    // Exam management methods
+    async getExams(): Promise<ExamResponseDTO[]> {
+        return this.get<ExamResponseDTO[]>('/api/exams');
+    }
+
+    async getExam(id: number | string): Promise<ExamResponseDTO> {
+        return this.get<ExamResponseDTO>(`/api/exams/${id}`);
+    }
+
+    async createExam(dto: CreateExamRequestDTO): Promise<ExamResponseDTO> {
+        return this.post<ExamResponseDTO>('/api/exams', dto);
+    }
+
+    async updateExam(id: number | string, dto: UpdateExamRequestDTO): Promise<ExamResponseDTO> {
+        return this.put<ExamResponseDTO>(`/api/exams/${id}`, dto);
+    }
+
+    async deleteExam(id: number | string): Promise<void> {
+        await this.delete<null>(`/api/exams/${id}`);
+    }
+
+    // Profile methods
+    async getCurrentUser(): Promise<any> {
+        return this.get<any>('/api/users/me');
+    }
+
+    async changePassword(body: any): Promise<any> {
+        return this.post<any>('/api/users/me/change-password', body);
+    }
+
+    async getFaculties(): Promise<FacultyResponseDTO[]> {
+        return this.get<FacultyResponseDTO[]>('/api/university/faculties');
+    }
+
+    async createFaculty(dto: CreateFacultyRequestDTO): Promise<FacultyResponseDTO> {
+        return this.post<FacultyResponseDTO>('/api/university/faculties', dto);
+    }
+
+    async updateFaculty(id: number, dto: UpdateFacultyRequestDTO): Promise<FacultyResponseDTO> {
+        return this.put<FacultyResponseDTO>(`/api/university/faculties/${id}`, dto);
+    }
+
+   async deleteFaculty(id: number): Promise<void> {
+      return this.delete<void>(`/api/university/faculties/${id}`);
+   }
 }
