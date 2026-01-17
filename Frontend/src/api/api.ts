@@ -143,4 +143,8 @@ export class API {
    async deleteFaculty(id: number): Promise<void> {
       return this.delete<void>(`/api/university/faculties/${id}`);
    }
+
+    async getTeacherFilterData(): Promise<{ courses: string[], years: string[] }> {
+        return this.get<{ courses: string[], years: string[] }>("/api/stats/teacher/filter-data");
+    }
 }

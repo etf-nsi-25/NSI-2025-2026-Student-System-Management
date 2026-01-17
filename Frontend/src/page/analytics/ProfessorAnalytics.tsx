@@ -1,5 +1,7 @@
-import  { useMemo, useState } from "react";
+import  { useMemo, useState, useEffect } from "react";
+import { useAPI } from "../../context/services";
 import "./ProfessorAnalytics.css";
+
 
 
 type CalendarLegendItem = {
@@ -7,7 +9,7 @@ type CalendarLegendItem = {
   className: string;
 };
 
-const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
+const WEEKDAYS = ["s", "M", "T", "W", "t", "F", "S"];
 
 function startOfMonth(d: Date) {
   return new Date(d.getFullYear(), d.getMonth(), 1);
@@ -116,26 +118,106 @@ export default function ProfessorAnalyticsPage() {
     setSelectedDate((prev) => clampToMonth(prev, next));
   };
 
+  
+  
+  const api = useAPI();
+  const [academicYears, setAcademicYears] = useState<string[]>([]);
+  const [courses, setCourses] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [selectedSemester, setSelectedSemester] = useState("1. semester");
+  const semesters = ["1. semester", "2. semester", "3. semester", "4. semester", "5. semester", "6. semester"];
+
+  useEffect(() => {
+    const fetchFilterData = async () => {
+      
+      if (!api) return;
+
+      try {
+        setIsLoading(true);
+         
+        const data = await api.getTeacherFilterData();
+        
+
+        if (data) {
+          setAcademicYears(data.years || []);
+          setCourses(data.courses || []);
+
+          if (data.years?.length) setSelectedYear(data.years[0]);
+          if (data.courses?.length) setSelectedCourse(data.courses[0]);
+        }
+      } catch (error) {
+        console.error("Greška:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchFilterData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="paPage" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <h3>Učitavanje podataka...</h3>
+      </div>
+    );
+  }
   return (
     <div className="paPage">
       {/* LEFT SIDEBAR (dropdowns + calendar) */}
       <aside className="paSidebar">
         <div className="paSelectStack">
+          {/* Godina */}
           <div className="paFakeSelect">
-            <span className="paFakeSelect__value">2025/2026</span>
+            <select 
+              className="paActualSelect" 
+              value={selectedYear} 
+              onChange={(e) => setSelectedYear(e.target.value)}
+              
+            >
+              {academicYears.map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+            <span className="paFakeSelect__value">{selectedYear}</span>
             <span className="paFakeSelect__chev">▾</span>
           </div>
-          <div className="paFakeSelect">
-            <span className="paFakeSelect__value">5. semester</span>
-            <span className="paFakeSelect__chev">▾</span>
-          </div>
-          <div className="paFakeSelect">
-            <span className="paFakeSelect__value">Artificial Intelligence</span>
-            <span className="paFakeSelect__chev">▾</span>
-          </div>
-        </div>
 
-        {/*Calendar*/}
+          {/* Semestar */}
+          <div className="paFakeSelect">
+            <select 
+              className="paActualSelect" 
+              value={selectedSemester} 
+              onChange={(e) => setSelectedSemester(e.target.value)}
+            >
+              {semesters.map(sem => (
+                <option key={sem} value={sem}>{sem}</option>
+              ))}
+            </select>
+            <span className="paFakeSelect__value">{selectedSemester}</span>
+            <span className="paFakeSelect__chev">▾</span>
+          </div>
+
+          {/* Kurs */}
+          <div className="paFakeSelect">
+            <select 
+              className="paActualSelect" 
+              value={selectedCourse} 
+              onChange={(e) => setSelectedCourse(e.target.value)}
+            >
+              {courses.map(course => (
+                <option key={course} value={course}>{course}</option>
+              ))}
+            </select>
+            <span className="paFakeSelect__value">{selectedCourse}</span>
+            <span className="paFakeSelect__chev">▾</span>
+          </div>
+      </div>
+
+      {/*Calendar*/}
         <section className="paCalendarCard">
           <div className="paCalendarHeader">
             <button className="paIconBtn" onClick={goPrev} aria-label="Previous month">
