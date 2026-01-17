@@ -73,7 +73,8 @@ public class AuthService : IAuthService
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken.Token,
-            ExpiresAt = refreshToken.ExpiresAt
+            ExpiresAt = refreshToken.ExpiresAt,
+            ForcePasswordChange = user.ForcePasswordChange
         };
     }
 
@@ -126,7 +127,8 @@ public class AuthService : IAuthService
         {
             AccessToken = accessToken,
             RefreshToken = newRefreshToken.Token,
-            ExpiresAt = newRefreshToken.ExpiresAt
+            ExpiresAt = newRefreshToken.ExpiresAt,
+            ForcePasswordChange = user.ForcePasswordChange
         };
     }
 

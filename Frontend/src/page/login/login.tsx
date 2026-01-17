@@ -51,6 +51,11 @@ export function Login() {
       // Navigate based on user role after 2FA setup
       // First, send to 2FA setup
       // result.requires2FASetup)
+      if (authInfoData.forcePasswordChange) {
+        navigate("/profile-settings", { replace: true });
+        return;
+      }
+
 
       if (!authInfoData.email) {
         // TODO: maybe first implement the 2fa with non-dummy data before actually putting it here?

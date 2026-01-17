@@ -55,7 +55,8 @@ public class AuthController : ControllerBase
             var response = new LoginResponseDto
             {
                 AccessToken = result.AccessToken,
-                TokenType = "Bearer"
+                TokenType = "Bearer",
+                ForcePasswordChange = result.ForcePasswordChange
             };
 
             return Ok(response);
@@ -105,7 +106,8 @@ public class AuthController : ControllerBase
             var response = new LoginResponseDto
             {
                 AccessToken = result.AccessToken,
-                TokenType = "Bearer"
+                TokenType = "Bearer",
+                ForcePasswordChange = result.ForcePasswordChange
             };
 
             return Ok(response);

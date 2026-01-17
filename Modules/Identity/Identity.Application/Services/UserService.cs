@@ -50,9 +50,10 @@ internal class UserService(
             LastName = lastName,
             FacultyId = facultyId,
             IndexNumber = indexNumber,
-            Role = role
+            Role = role,
+            ForcePasswordChange = true
         };
-        
+
         await userNotifierService.SendAccountCreatedNotification(email, tempPassword);
 
         var (success, errors) = await identityService.CreateUserAsync(createRequest, tempPassword);
@@ -180,7 +181,8 @@ internal class UserService(
             Role = user.Role,
             Status = user.Status,
             IndexNumber = user.IndexNumber,
-            Password = newPassword
+            Password = newPassword,
+            ForcePasswordChange = false
         };
 
         return await identityService.UpdateUserAsync(updateRequest);
