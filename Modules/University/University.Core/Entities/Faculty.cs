@@ -11,5 +11,10 @@ namespace University.Core.Entities
         public string? Description { get; set; }
         public DateTime EstablishedDate { get; set; }
         public Guid DeanId { get; set; }
+        
+        public ICollection<Department> Departments { get; set; } = new List<Department>();
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
     }
 }

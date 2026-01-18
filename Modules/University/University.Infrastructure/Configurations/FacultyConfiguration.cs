@@ -4,9 +4,9 @@ using University.Infrastructure.Entities;
 
 namespace University.Infrastructure.Configurations
 {
-    public class FacultyConfiguration : IEntityTypeConfiguration<Faculty>
+    public class FacultyConfiguration : IEntityTypeConfiguration<FacultySchema>
     {
-        public void Configure(EntityTypeBuilder<Faculty> builder)
+        public void Configure(EntityTypeBuilder<FacultySchema> builder)
         {
             builder.ToTable("Faculties");
             builder.HasKey(x => x.Id);

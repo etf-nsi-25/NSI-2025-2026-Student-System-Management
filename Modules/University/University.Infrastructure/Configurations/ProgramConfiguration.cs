@@ -4,9 +4,9 @@ using University.Infrastructure.Entities;
 
 namespace University.Infrastructure.Configurations
 {
-    public class ProgramConfiguration : IEntityTypeConfiguration<Program>
+    public class ProgramConfiguration : IEntityTypeConfiguration<ProgramSchema>
     {
-        public void Configure(EntityTypeBuilder<Program> builder)
+        public void Configure(EntityTypeBuilder<ProgramSchema> builder)
         {
             builder.ToTable("Programs");
             builder.HasKey(x => x.Id);
