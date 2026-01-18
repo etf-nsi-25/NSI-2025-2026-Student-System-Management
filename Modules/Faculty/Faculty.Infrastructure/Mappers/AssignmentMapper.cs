@@ -42,7 +42,8 @@ public static class AssignmentMapper
             DueDate = persistence.DueDate,
             MaxPoints = persistence.MaxPoints,
             CreatedAt = persistence.CreatedAt,
-            UpdatedAt = persistence.UpdatedAt
+            UpdatedAt = persistence.UpdatedAt,
+            StudentAssignments = new List<StudentAssignment>()
         };
 
         if (includeRelationships)
@@ -54,36 +55,38 @@ public static class AssignmentMapper
 
             if (persistence.StudentAssignments != null)
             {
-                domain.StudentAssignments = new List<StudentAssignment>();
+                domain.StudentAssignments = persistence.StudentAssignments
+                    .Select(ToDomainStudentAssignment)
+                    .ToList();
             }
-            else
-            {
-                domain.StudentAssignments = new List<StudentAssignment>();
-            }
-        }
-        else
-        {
-            domain.StudentAssignments = new List<StudentAssignment>();
         }
 
         return domain;
     }
 
-    public static IEnumerable<AssignmentSchema> ToPersistenceCollection(IEnumerable<Assignment> domainCollection)
+    private static StudentAssignment ToDomainStudentAssignment(StudentAssignmentSchema schema)
     {
-        if (domainCollection == null)
-            return Enumerable.Empty<AssignmentSchema>();
-
-        return domainCollection.Select(ToPersistence);
+        return new StudentAssignment
+        {
+            Id = schema.Id,
+            FacultyId = schema.FacultyId,
+            StudentId = schema.StudentId,
+            AssignmentId = schema.AssignmentId,
+            SubmissionDate = schema.SubmissionDate,
+            Points = schema.Points,
+            Grade = schema.Grade,
+            Feedback = schema.Feedback,
+            SubmissionUrl = schema.SubmissionUrl,
+            CreatedAt = schema.CreatedAt,
+            UpdatedAt = schema.UpdatedAt
+        };
     }
+
+    public static IEnumerable<AssignmentSchema> ToPersistenceCollection(IEnumerable<Assignment> domainCollection)
+        => domainCollection?.Select(ToPersistence) ?? Enumerable.Empty<AssignmentSchema>();
 
     public static IEnumerable<Assignment> ToDomainCollection(IEnumerable<AssignmentSchema> persistenceCollection, bool includeRelationships = false)
-    {
-        if (persistenceCollection == null)
-            return Enumerable.Empty<Assignment>();
-
-        return persistenceCollection.Select(p => ToDomain(p, includeRelationships));
-    }
+        => persistenceCollection?.Select(p => ToDomain(p, includeRelationships)) ?? Enumerable.Empty<Assignment>();
 
     public static void UpdatePersistence(AssignmentSchema persistence, Assignment domain)
     {
@@ -97,6 +100,6 @@ public static class AssignmentMapper
         persistence.Description = domain.Description;
         persistence.DueDate = domain.DueDate;
         persistence.MaxPoints = domain.MaxPoints;
-        persistence.UpdatedAt = domain.UpdatedAt ?? DateTime.UtcNow;
+        persistence.UpdatedAt = DateTime.UtcNow;
     }
 }

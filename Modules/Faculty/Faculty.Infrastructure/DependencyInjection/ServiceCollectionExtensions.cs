@@ -39,6 +39,8 @@ namespace Faculty.Infrastructure.DependencyInjection
             services.AddScoped<IUpcomingActivityService, UpcomingActivityService>();
             services.AddScoped<StudentService>();
             services.AddScoped<IStudentRepository, StudentRepository>();
+            services.AddScoped<IAssignmentRepository, AssignmentRepository>();
+            services.AddScoped<IAssignmentService, AssignmentService>();
             services.AddScoped<FacultyDbContextSeed>();
 
             // Tenant

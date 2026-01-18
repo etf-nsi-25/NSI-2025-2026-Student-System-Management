@@ -26,6 +26,10 @@ import { CreateExamPage } from '../page/exams/CreateExamPage.tsx';
 import { EditExamPage } from '../page/exams/EditExamPage.tsx'; import RequestManagement from '../page/requests/RequestManagement';
 import AcademicRecordsPage from '../page/academic-records/AcademicRecordsPage.tsx';
 import CourseOverviewDashboard from '../page/course-overview-dashboard/CourseOverviewDashboard.tsx';
+import AssignmentsPage from '../page/assignments/AssignmentsPage.tsx';
+
+
+
 
 
 
@@ -61,6 +65,7 @@ export function Router(): React.ReactNode {
         <Route path="exams" element={<AvailableExamsPage />} />
         <Route path="enrollment" element={<EnrollmentPage />} />
         <Route path="profile-settings" element={<ProfileSettings />} />
+        <Route path="assignments" element={<AssignmentsPage />} />
         <Route path="support" element={<StudentSupportPage />} />
         <Route path="student-enrollment" element={<EnrollmentStudentPage />} />
         <Route index element={<StudentDashboardPage />} />
@@ -119,7 +124,7 @@ export function Router(): React.ReactNode {
       } />
 
       <Route path="/faculty/request-management" element={
-        <AppLayout><RequestManagement /></AppLayout>
+        <RequestManagement />
       } />
 
       <Route path="/course-overview-dashboard" element={<AppLayout><CourseOverviewDashboard /></AppLayout>} />

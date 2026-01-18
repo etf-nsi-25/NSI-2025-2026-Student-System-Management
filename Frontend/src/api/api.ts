@@ -10,8 +10,12 @@ import type {
 import type { CreateExamRequestDTO, ExamResponseDTO, UpdateExamRequestDTO } from '../dto/ExamDTO';
 import type { CourseOverviewDTO } from '../dto/CourseOverviewDTO';
 import type { TwoFAConfirmResponse, TwoFASetupResponse } from '../models/2fa/TwoFA.types';
+import type { Assignment } from '../page/assignments/AssignmentTypes';
 import type { StudentRequestDto } from '../page/requests/RequestTypes';
+
+
 import type { RestClient } from './rest';
+
 import type { CreateFacultyRequestDTO, FacultyResponseDTO, UpdateFacultyRequestDTO } from '../dto/FacultyDTO';
 
 export class API {
@@ -103,7 +107,10 @@ export class API {
         return this.put<{ message: string }>(`/api/Support/requests/${id}/status`, dto);
     }
 
-    // Exam management methods
+    //student assignment overview
+    async getMyAssignmentsForCourse(courseId: string): Promise<Assignment[]> {
+        return this.get<Assignment[]>(`/api/faculty/my-assignments/courses/${courseId}`);
+    }
     async getExams(): Promise<ExamResponseDTO[]> {
         return this.get<ExamResponseDTO[]>('/api/exams');
     }
@@ -123,6 +130,7 @@ export class API {
     async deleteExam(id: number | string): Promise<void> {
         await this.delete<null>(`/api/exams/${id}`);
     }
+
 
     // Profile methods
     async getCurrentUser(): Promise<any> {
@@ -145,9 +153,9 @@ export class API {
         return this.put<FacultyResponseDTO>(`/api/university/faculties/${id}`, dto);
     }
 
-   async deleteFaculty(id: string): Promise<void> {
+    async deleteFaculty(id: string): Promise<void> {
       return this.delete<void>(`/api/university/faculties/${id}`);
-   }
+    }
 
    async getCourseOverview(courseId: string): Promise<CourseOverviewDTO> {
     return this.get<CourseOverviewDTO>(`/api/faculty/courses/${courseId}/overview`);
