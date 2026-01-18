@@ -1,6 +1,10 @@
+using Common.Core.Interfaces.Repsitories;
+using Faculty.Application;
 using Faculty.Application.Interfaces;
 using Faculty.Application.Services;
 using Faculty.Application.Validators;
+using Faculty.Core.Entities;
+using Faculty.Core.Http;
 using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Db;
 using Faculty.Infrastructure.EventHandler;
@@ -37,7 +41,14 @@ namespace Faculty.Infrastructure.DependencyInjection
 
             services.AddScoped<FacultyDbContextSeed>();
 
-            // Tenant
+            // Teacher
+            services.AddScoped<ITeacherService, TeacherService>();
+            services.AddScoped<ITeacherRepository, TeacherRepository>();
+
+            // Assignment 
+            services.AddScoped<IAssignmentService, AssignmentService>();
+            services.AddScoped<IBaseRepository<Assignment>, AssignmentRepository>();
+
             services.AddHttpContextAccessor();
             services.AddScoped<ITenantService, HttpTenantService>();
 
@@ -47,6 +58,12 @@ namespace Faculty.Infrastructure.DependencyInjection
             // Db
             services.AddDbContext<FacultyDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("Database")));
+
+            //AutoMapper
+            services.AddAutoMapper(cfg =>
+            {
+                cfg.AddProfile<MappingProfile>();
+            }, typeof(MappingProfile).Assembly);
 
             // Validators
             services.AddValidatorsFromAssemblyContaining<CreateExamRequestValidator>();

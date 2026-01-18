@@ -2,21 +2,12 @@
 using Faculty.Core.Entities;
 using Faculty.Application.Interfaces;
 using Faculty.Core.Interfaces;
+using AutoMapper;
 
 namespace Faculty.Application.Services
 {
-    public class CourseService : ICourseService
+    public class CourseService(ICourseRepository repo, ICourseAssignmentRepository _courseAssignmentRepo, IMapper _mapper) : ICourseService
     {
-        private readonly ICourseRepository _repo;
-
-        private readonly ICourseAssignmentRepository _courseAssignmentRepo;
-
-        public CourseService(ICourseRepository repo, ICourseAssignmentRepository courseAssignmentRepo)
-        {
-            _repo = repo;
-            _courseAssignmentRepo = courseAssignmentRepo;
-        }
-
         private CourseDTO ToDto(Course c) => new()
         {
             Id = c.Id,
@@ -40,37 +31,48 @@ namespace Faculty.Application.Services
         public async Task<CourseDTO> AddAsync(CourseDTO dto)
         {
             var entity = ToEntity(dto);
-            var created = await _repo.AddAsync(entity);
+            var created = await repo.AddAsync(entity);
             return ToDto(created);
         }
 
         public async Task<CourseDTO?> GetByIdAsync(Guid id)
         {
-            var course = await _repo.GetByIdAsync(id);
+            var course = await repo.GetByIdAsync(id);
             return course == null ? null : ToDto(course);
         }
 
         public async Task<List<CourseDTO>> GetAllAsync()
         {
-            var list = await _repo.GetAllAsync();
+            var list = await repo.GetAllAsync();
             return list.Select(ToDto).ToList();
         }
 
         public async Task<List<CourseDTO>> GetByTeacherAsync(string userId)
         {
-            var list = await _repo.GetByTeacherUserIdAsync(userId);
+            var list = await repo.GetByTeacherUserIdAsync(userId);
             return list.Select(ToDto).ToList();
         }
 
         public async Task<CourseDTO?> UpdateAsync(Guid id, CourseDTO dto)
         {
             dto.Id = id;
-            var updated = await _repo.UpdateAsync(ToEntity(dto));
+            var updated = await repo.UpdateAsync(ToEntity(dto));
             return updated == null ? null : ToDto(updated);
         }
 
         public async Task<bool> DeleteAsync(Guid id)
-            => await _repo.DeleteAsync(id);
+            => await repo.DeleteAsync(id);
+
+        public async Task<bool> IsTeacherAssignedToCourse(int teacherID, Guid courseID)
+        {
+            return await repo.IsTeacherAssignedToCourse(teacherID, courseID);
+        }
+
+        public (List<AssignmentDTO>, int) GetAssignmentsAsync(int teacherID, string? query, int pageSize, int pageNumber)
+        {
+            var (assignments, count) = repo.GetAssignmentsAsync(teacherID, query, pageSize, pageNumber);
+            return (_mapper.Map<List<AssignmentDTO>>(assignments), count);
+        }
 
         public async Task<TeacherDto?> GetTeacherForCourseAsync(Guid courseId)
         {

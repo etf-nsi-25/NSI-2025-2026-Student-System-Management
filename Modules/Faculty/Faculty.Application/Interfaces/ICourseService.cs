@@ -12,5 +12,7 @@ namespace Faculty.Application.Interfaces
         Task<bool> DeleteAsync(Guid id);
         Task<TeacherDto?> GetTeacherForCourseAsync(Guid courseId);
 
+        Task<bool> IsTeacherAssignedToCourse(int teacherID, Guid courseID);
+        (List<AssignmentDTO>, int) GetAssignmentsAsync(int teacherID, string? query, int pageSize, int pageNumber);
     }
 }

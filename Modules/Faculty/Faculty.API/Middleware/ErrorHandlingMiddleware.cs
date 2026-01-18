@@ -48,16 +48,28 @@ namespace Faculty.API.Middleware
 
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unhandled exception occurred.");
-
-                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 context.Response.ContentType = "application/json";
-
-                await context.Response.WriteAsJsonAsync(new
+                object response;
+                if (ex is UnauthorizedAccessException)
                 {
-                    error = "Internal Server Error"
-                });
-            }
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    response = new
+                    {
+                        error = "Unauthorized",
+                        message = ex.Message
+                    };
+                }
+                else
+                {
+                    _logger.LogError(ex, "Unhandled exception occurred.");
+
+                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    response = new
+                    {
+                        error = "Internal Server Error",
+                        message = ex.Message
+                    };
+                }
 
         }
     }

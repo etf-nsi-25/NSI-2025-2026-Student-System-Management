@@ -1,3 +1,4 @@
+using Common.Infrastructure.Repositories;
 using Faculty.Core.Entities;
 using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Db;
@@ -6,11 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Faculty.Infrastructure.Repositories
 {
-    public class TeacherRepository : ITeacherRepository
+    public class TeacherRepository : BaseRepository<Teacher>, ITeacherRepository
     {
         private readonly FacultyDbContext _context;
 
-        public TeacherRepository(FacultyDbContext context)
+        public TeacherRepository(FacultyDbContext context) : base(context)
         {
             _context = context;
         }

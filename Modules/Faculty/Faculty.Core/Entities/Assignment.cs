@@ -5,7 +5,7 @@ namespace Faculty.Core.Entities;
 /// <summary>
 /// Represents an assignment for a course.
 /// </summary>
-public class Assignment : ITenantAware
+public class Assignment : ITenantAware, ISoftDeletable
 {
     public int Id { get; set; }
     public Guid FacultyId { get; set; }
@@ -20,5 +20,6 @@ public class Assignment : ITenantAware
     // Navigation properties
     public Course Course { get; set; } = null!;
     public ICollection<StudentAssignment> StudentAssignments { get; set; } = new List<StudentAssignment>();
+    public bool IsDeleted { get; set; } = false;
 }
 

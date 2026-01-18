@@ -28,7 +28,7 @@ public class FacultyDbContext : DbContext
     public DbSet<CourseSchema> Courses { get; set; } = null!;
     public DbSet<CourseAssignmentSchema> CourseAssignments { get; set; } = null!;
     public DbSet<EnrollmentSchema> Enrollments { get; set; } = null!;
-    public DbSet<AssignmentSchema> Assignments { get; set; } = null!;
+    public DbSet<Assignment> Assignments { get; set; } = null!;
     public DbSet<StudentAssignmentSchema> StudentAssignments { get; set; } = null!;
     public DbSet<ExamSchema> Exams { get; set; } = null!;
     public DbSet<ExamRegistrationSchema> ExamRegistrations { get; set; } = null!;

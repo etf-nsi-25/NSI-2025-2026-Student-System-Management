@@ -1,7 +1,8 @@
 using Common.Core.Tenant;
+using Faculty.Infrastructure.Http;
 using Microsoft.AspNetCore.Http;
 
-namespace Faculty.Infrastructure.Http;
+namespace Faculty.Core.Http;
 
 /// <summary>
 /// HTTP-based implementation of ITenantService that extracts TenantId from authenticated user claims.

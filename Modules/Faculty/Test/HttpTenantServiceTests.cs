@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Common.Core.Tenant;
+using Faculty.Core.Http;
 using Faculty.Infrastructure.Http;
 using Microsoft.AspNetCore.Http;
 using Moq;

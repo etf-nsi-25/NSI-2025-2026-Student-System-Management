@@ -9,6 +9,7 @@ using Identity.Infrastructure.Entities;
 using Identity.Infrastructure.Repositories;
 using Identity.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -94,6 +95,34 @@ namespace Identity.Infrastructure.DependencyInjection
                         ValidateLifetime = true,
                         ClockSkew = TimeSpan.FromMinutes(1)
                     };
+                options.Events = new JwtBearerEvents
+                {
+                    OnChallenge = context =>
+                    {
+                        context.HandleResponse();
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        context.Response.ContentType = "application/json";
+
+                        return context.Response.WriteAsJsonAsync(new
+                        {
+                            statusCode = 401,
+                            error = "Unauthorized",
+                            message = "Missing or invalid token."
+                        });
+                    },
+                    OnForbidden = context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        context.Response.ContentType = "application/json";
+
+                        return context.Response.WriteAsJsonAsync(new
+                        {
+                            statusCode = 403,
+                            error = "Forbidden",
+                            message = "You do not have permission to access this resource."
+                        });
+                    }
+                };
                 });
 
             services.AddAuthorization();

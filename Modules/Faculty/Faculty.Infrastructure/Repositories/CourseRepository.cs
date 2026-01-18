@@ -4,6 +4,7 @@ using Faculty.Infrastructure.Db;
 using Faculty.Infrastructure.Http;
 using Faculty.Infrastructure.Mappers;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Faculty.Infrastructure.Repositories
 {
@@ -100,6 +101,30 @@ namespace Faculty.Infrastructure.Repositories
             await _context.SaveChangesAsync(cancellationToken);
 
             return true;
+        }
+
+        public async Task<bool> IsTeacherAssignedToCourse(int teacherID, Guid courseID)
+        {
+            return (await _context.CourseAssignments.CountAsync(ca => ca.TeacherId == teacherID && ca.CourseId == courseID)) != 0;
+        }
+
+        public (List<Assignment>, int) GetAssignmentsAsync(int teacherID, string? query, int pageSize, int pageNumber)
+        {
+            var listOfCourses = _context.CourseAssignments.Where(ca => ca.TeacherId == teacherID).ToList();
+            List<Assignment> assignmentList = new();
+
+            for (int i = 0; i < listOfCourses.Count; i++)
+            {
+                assignmentList.AddRange(_context.Assignments.Where(a => listOfCourses[i].CourseId == a.CourseId).Include(a => a.Course).ToList() ?? []);
+            }
+
+            if(String.IsNullOrEmpty(query))
+                assignmentList = assignmentList.Where(a => a.Name.Contains(query!)).ToList();
+            var total = assignmentList.Count;
+
+            assignmentList = assignmentList.OrderByDescending(a => a.DueDate).ThenBy(a => a.Name).Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToList();
+
+            return (assignmentList, total);
         }
     }
 }
