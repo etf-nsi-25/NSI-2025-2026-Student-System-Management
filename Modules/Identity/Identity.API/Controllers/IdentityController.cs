@@ -52,21 +52,16 @@ namespace Identity.API.Controllers
 
             var requesterRole = GetRequiredUserRole();
 
-            if (requesterRole == UserRole.Admin)
-            {
-                if (request.Role != UserRole.Student)
-                    return Forbid("Admin can only create Student users.");
-            }
-            else if (requesterRole == UserRole.Superadmin)
-            {
-                
-            }
-            else
-            {
+            if (requesterRole != UserRole.Admin && requesterRole != UserRole.Superadmin)
                 return Forbid();
+
+            if (requesterRole == UserRole.Admin && (request.Role == UserRole.Admin || request.Role == UserRole.Superadmin))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden,
+                    new { Error = "Admin can only create Student users." });
             }
 
-            var facultyId = GetFacultyIdFromToken();
+            var facultyId = request.FacultyId;
 
             try
             {
@@ -75,7 +70,7 @@ namespace Identity.API.Controllers
                     request.FirstName,
                     request.LastName,
                     request.Email,
-                    facultyId,
+                    request.FacultyId,
                     request.IndexNumber,
                     request.Role,
                     requesterRole
@@ -90,7 +85,7 @@ namespace Identity.API.Controllers
                     LastName = request.LastName,
                     IndexNumber = request.IndexNumber,
                     Role = request.Role,
-                    FacultyId = facultyId,
+                    FacultyId = request.FacultyId,
                     Status = UserStatus.Active
                 });
             }
