@@ -1,4 +1,14 @@
 import { useState, useMemo, useEffect, type ChangeEvent, type FormEvent } from 'react';
+import {
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
+  CButton,
+  CForm,
+  CFormInput,
+} from '@coreui/react';
 
 import './FacultyListingPage.css';
 import { useAPI } from '../../context/services';
@@ -270,41 +280,67 @@ export function FacultyListingPage() {
           </table>
         </div>
 
-        {/* Modal */}
-        {showModal && (
-          <div className='modal-backdrop'>
-            <div className='modal'>
-              <h3>{editingFaculty ? 'Edit Faculty' : 'Create Faculty'}</h3>
+        <CModal
+          visible={showModal}
+          onClose={() => setShowModal(false)}
+          alignment="center"
+          size="lg"
+          className="modal-z-fix"
+        >
+          <CModalHeader>
+            <CModalTitle>{editingFaculty ? 'Edit Faculty' : 'Create Faculty'}</CModalTitle>
+          </CModalHeader>
+          <CModalBody>
+            <CForm onSubmit={handleSubmit}>
+              <div className='mb-3'>
+                <CFormInput
+                  label="Faculty Name"
+                  type='text'
+                  name='name'
+                  value={newFaculty.name ?? ''}
+                  onChange={handleChange}
+                  feedback={errors.name}
+                  invalid={!!errors.name}
+                />
+              </div>
 
-              <form onSubmit={handleSubmit}>
-                <div className='form-group'>
-                  <label>Faculty Name:</label>
-                  <input type='text' name='name' value={newFaculty.name ?? ''} onChange={handleChange} />
-                  {errors.name && <p className='error-text'>{errors.name}</p>}
-                </div>
+              <div className='mb-3'>
+                <CFormInput
+                  label="Address"
+                  type='text'
+                  name='address'
+                  value={newFaculty.address ?? ''}
+                  onChange={handleChange}
+                  feedback={errors.address}
+                  invalid={!!errors.address}
+                />
+              </div>
 
-                <div className='form-group'>
-                  <label>Address:</label>
-                  <input type='text' name='address' value={newFaculty.address ?? ''} onChange={handleChange} />
-                  {errors.address && <p className='error-text'>{errors.address}</p>}
-                </div>
-
-                <div className='form-group'>
-                  <label>Code:</label>
-                  <input type='text' name='code' value={newFaculty.code ?? ''} onChange={handleChange} />
-                  {errors.code && <p className='error-text'>{errors.code}</p>}
-                </div>
-
-                <div className='modal-actions'>
-                  <button type='button' onClick={() => setShowModal(false)}>
-                    Cancel
-                  </button>
-                  <button type='submit'>{editingFaculty ? 'Save Changes' : 'Create'}</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+              <div className='mb-3'>
+                <CFormInput
+                  label="Code"
+                  type='text'
+                  name='code'
+                  value={newFaculty.code ?? ''}
+                  onChange={handleChange}
+                  feedback={errors.code}
+                  invalid={!!errors.code}
+                />
+              </div>
+            </CForm>
+          </CModalBody>
+          <CModalFooter>
+            <CButton color="secondary" onClick={() => setShowModal(false)}>
+              Cancel
+            </CButton>
+            <CButton color="primary" onClick={() => {
+              const fakeEvent = { preventDefault: () => { } } as any;
+              handleSubmit(fakeEvent);
+            }}>
+              {editingFaculty ? 'Save Changes' : 'Create'}
+            </CButton>
+          </CModalFooter>
+        </CModal>
       </div>
 
       {/* Toasts – custom, no CoreUI */}
