@@ -18,7 +18,9 @@ namespace University.Infrastructure.Db
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema("public");
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(UniversityDbContext).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(
+                typeof(UniversityDbContext).Assembly
+            );
             base.OnModelCreating(modelBuilder);
         }
     }

@@ -4,17 +4,20 @@ import { jwtDecode } from 'jwt-decode';
 interface RefreshResponse {
   accessToken: string;
   tokenType: string;
+  forcePasswordChange: boolean;
 }
 
 interface TwoFactorLoginRequiredResponse {
   requiresTwoFactor: true;
   twoFactorToken: string;
+  forcePasswordChange: boolean;
 }
 
 interface LoginOkResponse {
   requiresTwoFactor?: false;
   accessToken: string;
   tokenType: string;
+  forcePasswordChange: boolean;
 }
 
 type LoginResponse = LoginOkResponse | TwoFactorLoginRequiredResponse;
@@ -66,6 +69,7 @@ export async function loginWithCredentials(email: string, password: string): Pro
       role: decoded.role,
       tenantId: decoded.tenantId,
       fullName: decoded.fullName,
+      forcePasswordChange: data.forcePasswordChange
     };
     return { kind: 'ok', authInfo };
   } catch (error) {
@@ -101,6 +105,7 @@ export async function verifyTwoFactorLogin(twoFactorToken: string, code: string)
     role: decoded.role,
     tenantId: decoded.tenantId,
     fullName: decoded.fullName,
+    forcePasswordChange: data.forcePasswordChange
   };
 }
 
@@ -157,6 +162,7 @@ export async function attemptSilentRefresh(): Promise<AuthInfo> {
         role: decoded.role,
         tenantId: decoded.tenantId,
         fullName: decoded.fullName,
+        forcePasswordChange: data.forcePasswordChange
       };
 
       return authInfo;

@@ -32,10 +32,9 @@ namespace University.Infrastructure.Repositories
             return schemas.Select(s => FacultyMapper.ToDomain(s));
         }
 
-        public async Task<Faculty?> GetByIdAsync(object id, CancellationToken cancellationToken = default)
+        public async Task<Faculty?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var intId = (int)id;
-            var schema = await _context.Faculties.FirstOrDefaultAsync(x => x.Id == intId, cancellationToken);
+            var schema = await _context.Faculties.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
             return FacultyMapper.ToDomain(schema);
         }
 
@@ -113,6 +112,11 @@ namespace University.Infrastructure.Repositories
         {
             var schema = await _context.Faculties.FirstOrDefaultAsync(f => f.Code == code);
             return FacultyMapper.ToDomain(schema);
+        }
+
+        public Task<Faculty?> GetByIdAsync(object id, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
         }
     }
 }

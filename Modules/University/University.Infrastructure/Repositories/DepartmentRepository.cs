@@ -111,7 +111,7 @@ namespace University.Infrastructure.Repositories
             await DeleteAsync(entity.Id, cancellationToken);
         }
 
-        public async Task<IEnumerable<Department>> GetAllByFacultyIdAsync(int facultyId)
+        public async Task<IEnumerable<Department>> GetAllByFacultyIdAsync(Guid facultyId)
         {
             var schemas = await _context.Departments
                 .Include(d => d.Faculty)

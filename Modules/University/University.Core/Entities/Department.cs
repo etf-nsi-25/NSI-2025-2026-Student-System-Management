@@ -3,7 +3,7 @@
     public class Department
     {
         public int Id { get; set; }
-        public int FacultyId { get; set; }
+        public Guid FacultyId { get; set; }
         public Faculty Faculty { get; set; } = default!;
         public string Name { get; set; } = default!;
         public string Code { get; set; } = default!;
