@@ -31,4 +31,6 @@ public interface IUserService
     Task<bool> ChangePasswordAsync(string userId, string newPassword);
 
     Task<int> CountUsers(UserFilterRequest filter);
+
+    Task<List<string>> CreateStudentsBatch(List<StudentImport> students);
 }

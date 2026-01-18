@@ -16,7 +16,7 @@ public class UserCreatedHandler(
         DomainEventNotification<UserCreatedEvent> notification,
         CancellationToken cancellationToken)
     {
-        if (notification.Event.Role == UserRole.Student)
+        if (notification.Event.Role == UserRole.Student && notification.Event.IsLastInBatch)
         {
             await statsService.GetOrUpdateStatAsync(MetricKey.CountStudents, Scope.University, Guid.Empty, true);
         }

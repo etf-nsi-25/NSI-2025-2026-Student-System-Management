@@ -10,5 +10,6 @@ public record UserCreatedEvent(
     string LastName, 
     Guid FacultyId, 
     UserRole Role,
-    string? IndexNumber
+    string? IndexNumber,
+    bool IsLastInBatch
 ) : IEvent;
