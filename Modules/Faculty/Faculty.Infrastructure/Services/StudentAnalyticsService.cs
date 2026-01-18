@@ -67,7 +67,7 @@ public class StudentAnalyticsService : IStudentAnalyticsService
 
         return new StudentSummaryDTO
         {
-            GPA = Math.Round(gpa, 2),
+            gpa = Math.Round(gpa, 2),
             PassedSubjects = passedEnrollments.Count,
             TotalSubjects = totalEnrollments
         };
