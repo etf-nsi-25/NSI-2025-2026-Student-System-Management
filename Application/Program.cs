@@ -1,28 +1,28 @@
 using Analytics.API.Controllers;
 using Analytics.Infrastructure;
+using Application.Seed;
+using Common.Core.Tenant;
 using Common.Infrastructure.DependencyInjection;
 using EventBus.Infrastructure;
-using Application.Seed;
 using Faculty.Infrastructure.Db;
 using Faculty.Infrastructure.DependencyInjection;
+using FluentValidation.AspNetCore;
 using Identity.API.Controllers;
 using Identity.Infrastructure.Db;
 using Identity.Infrastructure.DependencyInjection;
+using Identity.Infrastructure.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.EntityFrameworkCore;
-using Notifications.Infrastructure;
+using Microsoft.OpenApi.Models;
 using Support.API.Controllers;
 using Support.Infrastructure;
 using Support.Infrastructure.Db;
 using University.API.Controllers;
 using University.Infrastructure;
 using University.Infrastructure.Db;
-using FluentValidation.AspNetCore;
 using FacultyController = Faculty.API.Controllers.FacultyController;
-using Common.Core.Tenant;
 using Notifications.Infrastructure.DependencyInjection;
-using Identity.Infrastructure.Entities;
 using Analytics.Infrastructure.Db;
 using Analytics.Infrastructure.Db.Seed;
 
@@ -66,25 +66,56 @@ builder.Services.AddFluentValidationClientsideAdapters();
 
 // Add Swagger
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(c =>
 {
-    // Load all XML documentation files (e.g. Application.xml, Identity.API.xml)
+    // xml docs
     var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml");
-
     foreach (var xmlPath in xmlFiles)
     {
         c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
     }
+
+    // bearer jwt - adds the lock + authorize button
+    c.AddSecurityDefinition(
+        "Bearer",
+        new OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "Bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "Enter: Bearer {your JWT token}",
+        }
+    );
+
+    c.AddSecurityRequirement(
+        new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer",
+                    },
+                },
+                Array.Empty<string>()
+            },
+        }
+    );
 });
 
 var app = builder.Build();
+app.UseMiddleware<Application.GlobalExceptionHandlingMiddleware>();
 
 // Put false if you dont want to apply migrations on start
 var applyMigrations = true;
 
 if (applyMigrations)
 {
-
     using (var scope = app.Services.CreateScope())
     {
         var services = scope.ServiceProvider;
@@ -193,5 +224,35 @@ app.UseSwaggerUI();
 
 // Map controllers
 app.MapControllers();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapGet(
+        "/__routes",
+        (Microsoft.AspNetCore.Routing.EndpointDataSource ds) =>
+        {
+            var routes = ds
+                .Endpoints.OfType<RouteEndpoint>()
+                .Select(e =>
+                {
+                    var methods = e
+                        .Metadata.OfType<Microsoft.AspNetCore.Routing.HttpMethodMetadata>()
+                        .FirstOrDefault()
+                        ?.HttpMethods;
+
+                    return new
+                    {
+                        pattern = e.RoutePattern.RawText,
+                        methods = methods?.ToArray() ?? Array.Empty<string>(),
+                        displayName = e.DisplayName,
+                    };
+                })
+                .OrderBy(r => r.pattern)
+                .ToList();
+
+            return Results.Ok(routes);
+        }
+    );
+}
 
 app.Run();

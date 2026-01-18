@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 
 using Microsoft.AspNetCore.Mvc;
 
-using System.Collections.Generic;   
+using System.Collections.Generic;
 
 
 namespace Faculty.API.Controllers
@@ -84,9 +84,19 @@ namespace Faculty.API.Controllers
             bool ok = await _service.DeleteAsync(id);
             return ok ? Ok(new { success = true }) : NotFound();
         }
-    }
+
+        [HttpGet("{courseId}/teacher")]
+        [Authorize]
+        public async Task<IActionResult> GetTeacherForCourse(Guid courseId)
+        {
+            var teacher = await _service.GetTeacherForCourseAsync(courseId);
+            return teacher == null ? NotFound() : Ok(teacher);
+        }
+
 
     }
+
+}
 
 
 

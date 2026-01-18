@@ -18,6 +18,7 @@ public static class UserMapper
             Role = appUser.Role,
             Status = appUser.Status,
             Email = appUser.Email ?? string.Empty,
+            TwoFactorEnabled = appUser.TwoFactorEnabled,
         };
     }
 

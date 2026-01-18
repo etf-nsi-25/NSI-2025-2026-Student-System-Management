@@ -81,25 +81,30 @@ export default function AcademicRecordsPage() {
     setIsClient(true);
   }, []);
 
-  useEffect(() => {
-    if (!isClient) return;
-
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const data = await api.getAllCourses();
-        setCourses(Array.isArray(data) ? (data as unknown as CourseApiDto[]) : []);
-      } catch (err: any) {
-        setError(err.message || "Error loading academic records from server.");
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await api.getAllCourses();
+      if (Array.isArray(data)) {
+        setCourses(data as unknown as CourseApiDto[]);
+      } else {
         setCourses([]);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (err: any) {
+      const errorMessage = err.message || "Error loading academic records.";
+      const status = err.status ? `(${err.status})` : "";
+      setError(`${errorMessage} ${status}`);
+      setCourses([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchData();
+  useEffect(() => {
+    if (isClient) {
+      fetchData();
+    }
   }, [isClient, api]);
 
   const semesters = useMemo(() => {
@@ -149,10 +154,19 @@ export default function AcademicRecordsPage() {
   if (!isClient) return null;
 
   return (
-    <div className="p-3 p-md-4 bg-light min-vh-100">
+    <div className="p-3 p-md-4 bg-light min-vh-100" data-testid="academic-records-page">
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
         <h2 className="fw-bold mb-0">Academic Records</h2>
         <div className="d-flex gap-2">
+          <CButton 
+            color="secondary" 
+            variant="outline" 
+            onClick={fetchData} 
+            disabled={loading}
+            data-testid="refresh-button"
+          >
+            {loading ? <CSpinner size="sm" /> : "Refresh"}
+          </CButton>
           <CButton color="primary" variant="outline" className="shadow-sm">
             Detailed Transcript
           </CButton>
@@ -177,7 +191,7 @@ export default function AcademicRecordsPage() {
       </div>
 
       {error && (
-        <CAlert color="danger" className="mb-4">
+        <CAlert color="danger" className="mb-4 shadow-sm" data-testid="error-alert">
           {error}
         </CAlert>
       )}
@@ -185,15 +199,15 @@ export default function AcademicRecordsPage() {
       <CCard className="mb-4 border-0 shadow-sm">
         <CCardBody className="p-0">
           {loading ? (
-            <div className="text-center py-5">
+            <div className="text-center py-5" data-testid="loading-spinner">
               <CSpinner color="primary" />
             </div>
           ) : filteredCourses.length === 0 ? (
-            <div className="text-center text-muted py-5">
+            <div className="text-center text-muted py-5" data-testid="no-data-message">
               No data available.
             </div>
           ) : (
-            <CTable hover responsive align="middle" className="mb-0">
+            <CTable hover responsive align="middle" className="mb-0" data-testid="academic-table">
               <CTableHead color="light">
                 <CTableRow>
                   <CTableHeaderCell className="ps-4">Code</CTableHeaderCell>
@@ -285,11 +299,11 @@ export default function AcademicRecordsPage() {
 
         <CCol xs={12} lg={4}>
           <div className="d-flex flex-column gap-3 h-100">
-            <CCard className="border-0 shadow-sm text-center p-4 flex-grow-1 d-flex justify-content-center">
+            <CCard className="border-0 shadow-sm text-center p-4 flex-grow-1 d-flex justify-content-center" data-testid="gpa-card">
               <div className="text-muted small mb-1">Current GPA</div>
               <div className="display-4 fw-bold text-primary">{gpa}</div>
             </CCard>
-            <CCard className="border-0 shadow-sm text-center p-4 flex-grow-1 d-flex justify-content-center bg-primary text-white">
+            <CCard className="border-0 shadow-sm text-center p-4 flex-grow-1 d-flex justify-content-center bg-primary text-white" data-testid="ects-card">
               <div className="small mb-1 opacity-75">ECTS Completed</div>
               <div className="display-4 fw-bold">{completedEcts}</div>
             </CCard>

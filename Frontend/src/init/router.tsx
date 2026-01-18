@@ -11,6 +11,7 @@ import HelpPage from '../page/help/HelpPage.tsx';
 import AttendancePage from '../page/attendance/AttendancePage.tsx';
 import CourseListPage from '../page/university/courses/CourseListPage';
 import TwoFASetupPage from "../page/identity/2FASetupPage";
+import TwoFAVerifyLoginPage from '../page/identity/2FAVerifyLoginPage';
 import { Login } from '../page/login/login.tsx';
 import { ProtectedRoute } from '../component/ProtectedRoute.tsx';
 import AvailableExamsPage from '../page/university/exams/ExamRegistrationPage.tsx';
@@ -34,6 +35,7 @@ export function Router(): React.ReactNode {
 
       {/* master routes */}
       <Route path="/login" element={<Login />} />
+      <Route path="/2fa/verify" element={<TwoFAVerifyLoginPage />} />
 
       <Route path="/" element={
         <ProtectedRoute>

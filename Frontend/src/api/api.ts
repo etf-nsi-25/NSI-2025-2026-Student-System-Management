@@ -14,31 +14,31 @@ import type { RestClient } from './rest';
 import type { CreateFacultyRequestDTO, FacultyResponseDTO, UpdateFacultyRequestDTO } from '../dto/FacultyDTO';
 
 export class API {
-    #restClient: RestClient;
+    #restClient: RestClient
 
     constructor(restClient: RestClient) {
-        this.#restClient = restClient;
+        this.#restClient = restClient
     }
 
-    get<T>(url: string) {
-        return this.#restClient.get<T>(url);
+    get<TResponse>(url: string): Promise<TResponse> {
+        return this.#restClient.get<TResponse>(url)
     }
 
-    post<T>(url: string, body?: unknown) {
-        return this.#restClient.post<T>(url, body);
+    post<TResponse>(url: string, body?: unknown): Promise<TResponse> {
+        return this.#restClient.post<TResponse>(url, body)
     }
 
-    put<T>(url: string, body?: unknown) {
-        return this.#restClient.put<T>(url, body);
+    put<TResponse>(url: string, body?: unknown): Promise<TResponse> {
+        return this.#restClient.put<TResponse>(url, body)
     }
 
-    delete<T>(url: string) {
-        return this.#restClient.delete<T>(url);
+    delete<TResponse>(url: string): Promise<TResponse> {
+        return this.#restClient.delete<TResponse>(url)
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async getHelloUniversity(): Promise<any> {
-        // DO NOT USE ANY, this is only for demonstration
-        return this.#restClient.get('/api/University');
+        return this.#restClient.get("/api/University")
     }
 
     async enableTwoFactor(): Promise<TwoFASetupResponse> {
@@ -46,32 +46,31 @@ export class API {
     }
 
     async verifyTwoFactorSetup(code: string): Promise<TwoFAConfirmResponse> {
-        return this.#restClient.post('/api/auth/verify-2fa-setup', { code });
+        return this.post<TwoFAConfirmResponse>("/api/auth/verify-2fa-setup", { code })
     }
 
-    async verifyTwoFactorLogin(code: string): Promise<TwoFAConfirmResponse> {
-        return this.#restClient.post('/api/auth/verify-2fa', { code });
+    async verifyTwoFactorLogin(code: string, twoFactorToken: string): Promise<TwoFAConfirmResponse> {
+        return this.#restClient.post('/api/auth/verify-2fa', { code, twoFactorToken });
     }
 
-    // Course management methods
     async getAllCourses(): Promise<Course[]> {
-        return this.get<Course[]>("/api/faculty/courses");
+        return this.get<Course[]>("/api/faculty/courses")
     }
 
     async getCourse(id: string): Promise<Course> {
-        return this.get<Course>(`/api/faculty/courses/${id}`);
+        return this.get<Course>(`/api/faculty/courses/${id}`)
     }
 
     async createCourse(dto: CourseDTO): Promise<Course> {
-        return this.post<Course>("/api/faculty/courses", dto);
+        return this.post<Course>("/api/faculty/courses", dto)
     }
 
     async updateCourse(id: string, dto: CourseDTO): Promise<Course> {
-        return this.put<Course>(`/api/faculty/courses/${id}`, dto);
+        return this.put<Course>(`/api/faculty/courses/${id}`, dto)
     }
 
     async deleteCourse(id: string): Promise<void> {
-        return this.delete<void>(`/api/faculty/courses/${id}`);
+        return this.delete<void>(`/api/faculty/courses/${id}`)
     }
 
     // Student exam registration

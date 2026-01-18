@@ -1,5 +1,7 @@
-﻿import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useRef, useState } from "react";
 import "./2FA.css";
+
+import { useLocation, useNavigate } from "react-router";
 
 import { useAPI } from "../../context/services.tsx";
 import type { TwoFASetupResponse } from "../../models/2fa/TwoFA.types";
@@ -23,6 +25,16 @@ import {
 
 const TwoFASetupPage: React.FC = () => {
   const api = useAPI();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const returnTo =
+    (location.state as { returnTo?: string } | null | undefined)?.returnTo ||
+    "/profile";
+
+  // React 18 StrictMode intentionally runs effects twice in dev.
+  // This prevents double POSTs to /api/auth/enable-2fa.
+  const didFetchRef = useRef(false);
 
   const [data, setData] = useState<TwoFASetupResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -32,6 +44,20 @@ const TwoFASetupPage: React.FC = () => {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
+    if (!success) return;
+    const timeoutId = window.setTimeout(() => {
+      navigate(returnTo, { replace: true });
+    }, 1200);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [navigate, returnTo, success]);
+
+  useEffect(() => {
+    if (didFetchRef.current) return;
+    didFetchRef.current = true;
+
     const fetchSetupData = async () => {
       try {
         setLoading(true);
@@ -118,16 +144,9 @@ const TwoFASetupPage: React.FC = () => {
               <CBadge
                 color="secondary"
                 shape="rounded-pill"
-                className="ui-badge ui-badge-soft"
+                className="ui-badge ui-badge-secondary"
               >
-                Security
-              </CBadge>
-              <CBadge
-                color="primary"
-                shape="rounded-pill"
-                className="ui-badge ui-badge-primary"
-              >
-                STEP 1 · ENABLE 2FA
+                ENABLE 2FA
               </CBadge>
             </div>
             <h1 className="twofa-title">Protect your account</h1>
@@ -200,7 +219,7 @@ const TwoFASetupPage: React.FC = () => {
                       color="success"
                       className="ui-alert ui-alert-success mt-2 twofa-alert"
                     >
-                      2FA is successfully enabled on your account.
+                      2FA is successfully enabled on your account. Redirecting...
                     </CAlert>
                   )}
 
