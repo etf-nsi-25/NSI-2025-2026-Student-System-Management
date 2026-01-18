@@ -56,10 +56,18 @@ namespace Faculty.Application.Services
             return list.Select(ToDto).ToList();
         }
 
-        public async Task<List<CourseDTO>> GetByTeacherAsync(string userId)
+
+        public async Task<List<ProfessorCourseDTO>> GetProfessorCoursesAsync(string userId)
         {
-            var list = await _repo.GetByTeacherUserIdAsync(userId);
-            return list.Select(ToDto).ToList();
+            var coursesWithCount = await _repo.GetProfessorCoursesWithStudentCountAsync(userId);
+            return coursesWithCount.Select(x => new ProfessorCourseDTO
+            {
+                Id = x.Course.Id,
+                Name = x.Course.Name,
+                Code = x.Course.Code,
+                Status = x.StudentCount > 0 ? "Active" : "Inactive",
+                StudentCount = x.StudentCount
+            }).ToList();
         }
 
         public async Task<CourseDTO?> UpdateAsync(Guid id, CourseDTO dto)

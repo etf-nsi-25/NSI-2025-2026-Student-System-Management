@@ -30,4 +30,5 @@ public class UpdateUserRequest
 
     public string Id { get; set; } = string.Empty;
     public string? Password { get; set; }
+    public bool ForcePasswordChange { get; set; }
 }

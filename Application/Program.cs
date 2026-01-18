@@ -36,9 +36,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services from modules
 builder.Services.AddCommonModule();
 builder.Services.AddIdentityModule(builder.Configuration);
+builder.Services.AddSupportModule(builder.Configuration);
 builder.Services.AddUniversityModule(builder.Configuration);
 builder.Services.AddFacultyModule(builder.Configuration);
-builder.Services.AddSupportModule(builder.Configuration);
 builder.Services.AddNotificationsModule(builder.Configuration);
 builder.Services.AddAnalyticsModule(builder.Configuration);
 builder.Services.AddEventBus();
@@ -49,9 +49,9 @@ var mvcBuilder = builder.Services.AddControllers();
 var moduleControllers = new[]
 {
     typeof(IdentityController).Assembly,
+    typeof(SupportController).Assembly,
     typeof(UniversityController).Assembly,
     typeof(FacultyController).Assembly,
-    typeof(SupportController).Assembly,
     typeof(AnalyticsController).Assembly
 };
 
@@ -147,6 +147,17 @@ if (applyMigrations)
                 Console.WriteLine($"Error migrating IdentityDbContext: {ex.Message}");
             }
 
+            // Support module
+            try
+            {
+                var supportDb = services.GetRequiredService<SupportDbContext>();
+                supportDb.Database.Migrate();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error migrating SupportDbContext: {ex.Message}");
+            }
+
             // University module
             try
             {
@@ -159,17 +170,6 @@ if (applyMigrations)
             catch (Exception ex)
             {
                 Console.WriteLine($"Error migrating UniversityDbContext: {ex.Message}");
-            }
-
-            // Support module
-            try
-            {
-                var supportDb = services.GetRequiredService<SupportDbContext>();
-                supportDb.Database.Migrate();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error migrating SupportDbContext: {ex.Message}");
             }
 
             // Faculty module

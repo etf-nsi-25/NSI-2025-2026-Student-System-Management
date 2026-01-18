@@ -101,5 +101,33 @@ namespace Faculty.Infrastructure.Repositories
 
             return true;
         }
+
+         public async Task<List<(Course Course, int StudentCount)>> GetProfessorCoursesWithStudentCountAsync(string userId, CancellationToken cancellationToken = default)
+        {
+            var teacherSchema = await _context.Teachers.FirstOrDefaultAsync(t => t.UserId == userId);
+            if (teacherSchema == null)
+            {
+                return new List<(Course, int)>();
+            }
+
+            var courseIds = await _context.CourseAssignments
+                .Where(ca => ca.TeacherId == teacherSchema.Id)
+                .Select(ca => ca.CourseId)
+                .Distinct()
+                .ToListAsync();
+
+            var coursesWithCount = await _context.Courses
+                .Where(c => courseIds.Contains(c.Id))
+                .Select(c => new
+                {
+                    Course = c,
+                    StudentCount = c.Enrollments.Count
+                })
+                .ToListAsync();
+
+            return coursesWithCount
+                .Select(x => (CourseMapper.ToDomain(x.Course, includeRelationships: false), x.StudentCount))
+                .ToList();
+        }
     }
 }

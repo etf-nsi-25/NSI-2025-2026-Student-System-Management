@@ -75,6 +75,7 @@ public class AuthController : ControllerBase
             {
                 AccessToken = result.AccessToken,
                 TokenType = "Bearer",
+                ForcePasswordChange = result.ForcePasswordChange,
                 RequiresTwoFactor = false,
                 TwoFactorToken = null
             };
@@ -126,7 +127,8 @@ public class AuthController : ControllerBase
             var response = new LoginResponseDto
             {
                 AccessToken = result.AccessToken,
-                TokenType = "Bearer"
+                TokenType = "Bearer",
+                ForcePasswordChange = result.ForcePasswordChange
             };
 
             return Ok(response);

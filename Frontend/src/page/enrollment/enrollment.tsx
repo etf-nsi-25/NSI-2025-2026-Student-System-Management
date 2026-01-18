@@ -211,9 +211,16 @@ export default function EnrollmentPage() {
                                         </CBadge>
                                     </div>
 
-                                    <CButton className="enroll-button active-button" onClick={() => handleEnrollClick(course)}>
-                                        Enroll
-                                    </CButton>
+
+                                    {course.status === "enrolled" ? (
+                                        <CButton className="enroll-button enrolled-button" disabled>
+                                            Enrolled
+                                        </CButton>
+                                    ) : (
+                                        <CButton className="enroll-button active-button" onClick={() => handleEnrollClick(course)}>
+                                            Enroll
+                                        </CButton>
+                                    )}
                                 </CCardBody>
                             </CCard>
                         </CCol>

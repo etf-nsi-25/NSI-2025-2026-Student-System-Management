@@ -10,6 +10,7 @@ namespace Faculty.Core.Interfaces
         Task<Course?> UpdateAsync(Course course, CancellationToken cancellationToken = default);
         Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
         Task<List<Course>> GetByTeacherUserIdAsync(string userId, CancellationToken cancellationToken = default);
+        Task<List<(Course Course, int StudentCount)>> GetProfessorCoursesWithStudentCountAsync(string userId, CancellationToken cancellationToken = default);
 
     }
 

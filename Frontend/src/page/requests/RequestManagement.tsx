@@ -19,7 +19,7 @@ import CIcon from '@coreui/icons-react';
 import { cilPlus, cilDescription, cilOptions, cilZoom } from '@coreui/icons';
 import ConfirmationModal from './ConfirmationModal';
 import RequestDetailsModal from './RequestDetailsModal';
-import type { StudentRequestDto } from './RequestTypes'; 
+import type { StudentRequestDto } from './RequestTypes';
 import './RequestManagement.css';
 import { parseDate } from '../../utils/requestUtils';
 import StatusBadge from '../../component/StatusBadge';
@@ -67,14 +67,14 @@ export function RequestManagement() {
 
     const handleConfirmationSuccess = useCallback(async (
         newStatus: 'Approved' | 'Rejected',
-        requestId: string  
+        requestId: string
     ) => {
         setIsProcessing(true);
         try {
             await api.updateStatus(requestId, newStatus);
-            
+
             setIsConfirmationModalOpen(false);
-            await fetchRequests(); 
+            await fetchRequests();
         } catch (err) {
             console.error('Error fetching requests:', err);
         } finally {
@@ -84,9 +84,9 @@ export function RequestManagement() {
 
     const filteredRequests = useMemo(() => {
         const lowerCaseSearchTerm = searchTerm.toLowerCase().trim();
-        return requests.filter(request => 
-            request.studentIndex.toLowerCase().includes(lowerCaseSearchTerm) ||
-            request.requestType.toLowerCase().includes(lowerCaseSearchTerm)
+        return requests.filter(request =>
+            (request.studentIndex || '').toLowerCase().includes(lowerCaseSearchTerm) ||
+            (request.requestType || '').toLowerCase().includes(lowerCaseSearchTerm)
         );
     }, [requests, searchTerm]);
 
@@ -94,23 +94,23 @@ export function RequestManagement() {
         const isConfirmationAllowed = request.status === 'Pending';
         return (
             <div className="d-flex justify-content-center gap-2">
-                <CButton 
-                    color="transparent" 
+                <CButton
+                    color="transparent"
                     className="p-1 ui-btn-action ui-btn-plus"
                     onClick={() => handleOpenConfirmationModal(request)}
                     disabled={!isConfirmationAllowed}
                 >
                     <CIcon icon={cilPlus} />
                 </CButton>
-                <CButton 
-                    color="transparent" 
+                <CButton
+                    color="transparent"
                     className="p-1 ui-btn-action ui-btn-view"
                     onClick={() => handleViewDetails(request)}
                 >
                     <CIcon icon={cilDescription} />
                 </CButton>
-                <CButton 
-                    color="transparent" 
+                <CButton
+                    color="transparent"
                     className="p-1 ui-btn-action"
                     onClick={() => handleMoreActions(request)}
                 >
@@ -179,7 +179,7 @@ export function RequestManagement() {
                 <ConfirmationModal
                     visible={isConfirmationModalOpen}
                     onClose={() => setIsConfirmationModalOpen(false)}
-                    request={selectedRequest} 
+                    request={selectedRequest}
                     onSuccess={handleConfirmationSuccess}
                     isProcessing={isProcessing}
                 />

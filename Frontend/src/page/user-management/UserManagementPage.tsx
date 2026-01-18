@@ -17,21 +17,26 @@ import {
 
 } from "@coreui/react";
 
+import type { FacultyResponseDTO } from "../../dto/FacultyDTO";
 import CreateUserModal from "./CreateUserModal";
 import EditUserModal from "./EditUserModal";
 import DeactivateUserModal from "./DeactivateUserModal";
 import UserDetailsModal from "./UserDetailsModal";
 import BulkUploadUsersModal from "./BulkUploadUsersModal";
 
-import { fetchUsers, getAvailableFaculties } from "../../service/identityApi";
+import { fetchUsers } from "../../service/identityApi";
 import type { User, Role } from "../../service/identityApi";
+import { useAPI } from "../../context/services";
+import { useAuthContext } from "../../init/auth";
 
 import "../../styles/coreui-custom.css";
 
-const ROLES: Role[] = ["Professor", "Assistant", "Student", "Staff"];
-const availableFaculties = getAvailableFaculties();
+const ROLES: Role[] = ["Professor", "Assistant", "Student", "Admin", "Superadmin"];
+
 
 const UserManagementPage: React.FC = () => {
+  const api = useAPI();
+  const { authInfo } = useAuthContext();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -42,27 +47,50 @@ const UserManagementPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [_loading, setLoading] = useState(true);
 
+  const [availableFaculties, setAvailableFaculties] = useState<FacultyResponseDTO[]>([]);
   const [selectedFaculty, setSelectedFaculty] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
   const [searchText, setSearchText] = useState("");
 
-  // Debug: log when create modal open state changes
+  // Enforce faculty selection for Admin - set after faculties are loaded
   useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log('UserManagementPage: isCreateModalOpen =', isCreateModalOpen);
-  }, [isCreateModalOpen]);
+    if (authInfo?.role === 'Admin' && authInfo.tenantId && availableFaculties.length > 0) {
+      setSelectedFaculty(authInfo.tenantId);
+    }
+  }, [authInfo, availableFaculties]);
+
+
 
   const fetchUserList = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await fetchUsers();
+      const data = await fetchUsers(api);
       setUsers(data);
+
+      // Fetch faculties
+      const facultiesData = await api.getFaculties();
+
+
+
+      // For Admin users, filter to show only their faculty
+      const filteredFaculties = authInfo?.role === 'Admin' && authInfo.tenantId
+        ? facultiesData.filter(f => f.id === authInfo.tenantId)
+        : facultiesData;
+
+
+      setAvailableFaculties(filteredFaculties);
+
+      // Set selected faculty for Admin after faculties are loaded
+      if (authInfo?.role === 'Admin' && authInfo.tenantId) {
+        setSelectedFaculty(authInfo.tenantId);
+      }
     } catch {
       setUsers([]);
+      setAvailableFaculties([]); //  set faculties to empty on error
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [api, authInfo]);
 
   // When a new user is created, append it immediately for instant feedback,
   // then refresh the list from the mock API to keep authoritative state.
@@ -115,9 +143,22 @@ const UserManagementPage: React.FC = () => {
         u.lastName.toLowerCase().includes(q) ||
         u.email.toLowerCase().includes(q);
 
-      return fac && role && text;
+      // Visibility Logic
+      let isVisible = true;
+      if (authInfo?.role === 'Admin') {
+        // Admin only sees Professor/Student/Assistant AND only from their own faculty
+        isVisible =
+          u.role !== 'Superadmin' &&
+          u.role !== 'Admin' &&
+          u.facultyId === authInfo.tenantId;
+      } else if (authInfo?.role === 'Superadmin') {
+        // Superadmin sees ONLY Admins
+        isVisible = u.role === 'Admin';
+      }
+
+      return fac && role && text && isVisible;
     });
-  }, [users, selectedFaculty, selectedRole, searchText]);
+  }, [users, selectedFaculty, selectedRole, searchText, authInfo]);
 
   return (
     <div>
@@ -152,8 +193,9 @@ const UserManagementPage: React.FC = () => {
                       <CFormSelect
                         id="filter-faculty"
                         name="filterFaculty"
-                        value={selectedFaculty}
+                        value={authInfo?.role === 'Admin' ? authInfo.tenantId : selectedFaculty}
                         onChange={(e) => setSelectedFaculty(e.target.value)}
+                        disabled={authInfo?.role === 'Admin'}
                         className="top-select"
                       >
                         <option value="">All</option>
@@ -173,7 +215,11 @@ const UserManagementPage: React.FC = () => {
                         className="top-select"
                       >
                         <option value="">All</option>
-                        {ROLES.map((r) => (
+                        {ROLES.filter(r => {
+                          if (authInfo?.role === 'Admin') return r !== 'Superadmin' && r !== 'Admin';
+                          if (authInfo?.role === 'Superadmin') return r === 'Admin';
+                          return false;
+                        }).map((r) => (
                           <option key={r}>{r}</option>
                         ))}
                       </CFormSelect>
@@ -189,8 +235,7 @@ const UserManagementPage: React.FC = () => {
                 <CButton
                   className="btn-blue"
                   onClick={() => {
-                    // eslint-disable-next-line no-console
-                    console.log('+ Add User clicked');
+
                     setIsCreateModalOpen(true);
                   }}
                 >
@@ -238,9 +283,6 @@ const UserManagementPage: React.FC = () => {
                             color="info"
                             variant="outline"
                             onClick={() => {
-                              // debug
-                              // eslint-disable-next-line no-console
-                              console.log('UserManagementPage: Edit clicked', { id: u.id, username: u.username });
                               setSelectedUser(u);
                               setIsEditModalOpen(true);
                             }}

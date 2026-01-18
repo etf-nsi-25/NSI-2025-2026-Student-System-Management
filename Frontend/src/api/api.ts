@@ -1,5 +1,6 @@
 import type { Course } from '../component/faculty/courses/types/Course';
 import type { CourseDTO } from '../dto/CourseDTO';
+import type { ProfessorCourseDTO } from '../dto/ProfessorCourseDTO';
 import type {
     AvailableStudentExamDto,
     ExamRegistrationRequestDto,
@@ -34,6 +35,11 @@ export class API {
 
     delete<TResponse>(url: string): Promise<TResponse> {
         return this.#restClient.delete<TResponse>(url)
+    }
+
+
+    patch<TResponse>(url: string, body?: unknown): Promise<TResponse> {
+        return this.#restClient.patch<TResponse>(url, body)
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -135,11 +141,19 @@ export class API {
         return this.post<FacultyResponseDTO>('/api/university/faculties', dto);
     }
 
-    async updateFaculty(id: number, dto: UpdateFacultyRequestDTO): Promise<FacultyResponseDTO> {
+    async updateFaculty(id: string, dto: UpdateFacultyRequestDTO): Promise<FacultyResponseDTO> {
         return this.put<FacultyResponseDTO>(`/api/university/faculties/${id}`, dto);
     }
 
-   async deleteFaculty(id: number): Promise<void> {
+   async deleteFaculty(id: string): Promise<void> {
       return this.delete<void>(`/api/university/faculties/${id}`);
    }
+
+    async getUpcomingActivities(): Promise<any> {
+        return this.get<any>('/api/faculty/courses/upcoming-activities');
+    }
+
+    async getProfessorCourses(): Promise<ProfessorCourseDTO[]> {
+        return this.get<ProfessorCourseDTO[]>('/api/faculty/courses/assigned');
+    }
 }
