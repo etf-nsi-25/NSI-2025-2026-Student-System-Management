@@ -32,12 +32,6 @@ namespace University.Infrastructure.Repositories
             return schemas.Select(s => FacultyMapper.ToDomain(s));
         }
 
-        public async Task<Faculty?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
-        {
-            var schema = await _context.Faculties.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-            return FacultyMapper.ToDomain(schema);
-        }
-
         public async Task<Faculty?> FirstOrDefaultAsync(Expression<Func<Faculty, bool>> predicate, CancellationToken cancellationToken = default)
         {
             // Simple implementation for common cases
@@ -94,8 +88,7 @@ namespace University.Infrastructure.Repositories
 
         public async Task DeleteAsync(object id, CancellationToken cancellationToken = default)
         {
-            var intId = (int)id;
-            var schema = await _context.Faculties.FindAsync(new object[] { intId }, cancellationToken);
+            var schema = await _context.Faculties.FirstOrDefaultAsync(x => x.Id == (Guid)id, cancellationToken);
             if (schema != null)
             {
                 _context.Faculties.Remove(schema);
@@ -114,9 +107,10 @@ namespace University.Infrastructure.Repositories
             return FacultyMapper.ToDomain(schema);
         }
 
-        public Task<Faculty?> GetByIdAsync(object id, CancellationToken cancellationToken = default)
+        public async Task<Faculty?> GetByIdAsync(object id, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var schema = await _context.Faculties.FirstOrDefaultAsync(x => x.Id == (Guid)id, cancellationToken);
+            return FacultyMapper.ToDomain(schema);
         }
     }
 }

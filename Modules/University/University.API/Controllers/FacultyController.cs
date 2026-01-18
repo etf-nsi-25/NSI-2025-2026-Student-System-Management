@@ -1,7 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using System;
 using University.Application.DTOs;
 using University.Application.Interfaces;
 
@@ -94,9 +91,9 @@ namespace University.API.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            catch (Exception)
-            {
-                return StatusCode(500, $"An error occurred while updating the faculty with id {id}.");
+            catch (Exception ex)
+            {   
+                return StatusCode(500, $"An error occurred while updating the faculty with id {id}. {ex.Message}");
             }
         }
 
