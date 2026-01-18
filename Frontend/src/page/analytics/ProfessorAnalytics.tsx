@@ -1,8 +1,8 @@
-import  { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useAPI } from "../../context/services";
+import { GradesOverview } from "../../component/analytics/GradesOverview";
+import { fetchGrades } from "../../component/analytics/mockGradesService";
 import "./ProfessorAnalytics.css";
-
-
 
 type CalendarLegendItem = {
   label: string;
@@ -33,6 +33,17 @@ function clampToMonth(date: Date, monthDate: Date) {
   }
   return date;
 }
+
+export type GradeSlice = { label: string; value: number; color: string };
+
+export const COLORS = {
+  low: '#2f3abf',
+  six: '#f093c6',
+  seven: '#e93aa0',
+  eight: '#19c7e6',
+  nine: '#a7f06a',
+  ten: '#e6db39',
+};
 
 export default function ProfessorAnalyticsPage() {
 
@@ -118,12 +129,13 @@ export default function ProfessorAnalyticsPage() {
     setSelectedDate((prev) => clampToMonth(prev, next));
   };
 
-  
-  
   const api = useAPI();
   const [academicYears, setAcademicYears] = useState<string[]>([]);
   const [courses, setCourses] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [gradeData, setGradeData] = useState<GradeSlice[]>([]);
+  const [gradesLoading, setGradesLoading] = useState(false);
 
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
@@ -132,14 +144,12 @@ export default function ProfessorAnalyticsPage() {
 
   useEffect(() => {
     const fetchFilterData = async () => {
-      
       if (!api) return;
 
       try {
         setIsLoading(true);
-         
+
         const data = await api.getTeacherFilterData();
-        
 
         if (data) {
           setAcademicYears(data.years || []);
@@ -158,6 +168,38 @@ export default function ProfessorAnalyticsPage() {
     fetchFilterData();
   }, []);
 
+  useEffect(() => {
+    const fetch = async () => {
+      if (!selectedCourse) return;
+      setGradesLoading(true);
+
+      // Try backend first. backend returns { courseId, distribution: {"5": 12, ...}, totalCount, passedCount }
+      try {
+        if (api) {
+          const res = await api.get<any>(`/api/stats/course/${selectedCourse}`);
+          if (res) {
+            const dist = res.distribution || res.distribution || res?.Distribution || res?.distribution;
+            const colorList = Object.values(COLORS);
+            const slices: GradeSlice[] = Object.keys(dist || {}).map((k, i) => ({ label: k, value: dist[k], color: colorList[i % colorList.length] }));
+            setGradeData(slices.length ? slices : await fetchGrades("all"));
+            setGradesLoading(false);
+            return;
+          }
+        }
+      } catch (e) {
+        // fallback to mock
+      }
+
+      // fallback to mock data depending on semester selection
+      const f = selectedSemester?.toLowerCase()?.includes('midterm') ? 'midterm' : 'final';
+      const mock = await fetchGrades(f);
+      setGradeData(mock);
+      setGradesLoading(false);
+    };
+
+    fetch();
+  }, [selectedCourse, selectedYear, selectedSemester, api]);
+
   if (isLoading) {
     return (
       <div className="paPage" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -172,11 +214,10 @@ export default function ProfessorAnalyticsPage() {
         <div className="paSelectStack">
           {/* Godina */}
           <div className="paFakeSelect">
-            <select 
-              className="paActualSelect" 
-              value={selectedYear} 
+            <select
+              className="paActualSelect"
+              value={selectedYear}
               onChange={(e) => setSelectedYear(e.target.value)}
-              
             >
               {academicYears.map(year => (
                 <option key={year} value={year}>{year}</option>
@@ -188,9 +229,9 @@ export default function ProfessorAnalyticsPage() {
 
           {/* Semestar */}
           <div className="paFakeSelect">
-            <select 
-              className="paActualSelect" 
-              value={selectedSemester} 
+            <select
+              className="paActualSelect"
+              value={selectedSemester}
               onChange={(e) => setSelectedSemester(e.target.value)}
             >
               {semesters.map(sem => (
@@ -203,9 +244,9 @@ export default function ProfessorAnalyticsPage() {
 
           {/* Kurs */}
           <div className="paFakeSelect">
-            <select 
-              className="paActualSelect" 
-              value={selectedCourse} 
+            <select
+              className="paActualSelect"
+              value={selectedCourse}
               onChange={(e) => setSelectedCourse(e.target.value)}
             >
               {courses.map(course => (
@@ -215,9 +256,9 @@ export default function ProfessorAnalyticsPage() {
             <span className="paFakeSelect__value">{selectedCourse}</span>
             <span className="paFakeSelect__chev">▾</span>
           </div>
-      </div>
+        </div>
 
-      {/*Calendar*/}
+        {/*Calendar*/}
         <section className="paCalendarCard">
           <div className="paCalendarHeader">
             <button className="paIconBtn" onClick={goPrev} aria-label="Previous month">
@@ -297,22 +338,17 @@ export default function ProfessorAnalyticsPage() {
           <section className="paCard paChartCard">
             <div className="paCardHeader">
               <h2 className="paTitle">Grades overview</h2>
-
-              {/*Reserved: chart controls (icon + small dropdown) */}
-              <div className="paHeaderRight">
-                <button className="paMiniIconBtn" type="button" aria-label="Chart options">
-                  ⚙
-                </button>
-                <div className="paTinySelect" aria-label="Tiny select placeholder">
-                  <span>202</span>
-                  <span className="paTinyChev">▾</span>
-                </div>
-              </div>
             </div>
 
-            <div className="paChartPlaceholder">
-              <div className="paChartCircle" aria-hidden="true" />
-              <div className="paChartHint">[Reserved for chart component]</div>
+            <div>
+              {gradesLoading ? (
+                <div className="paChartPlaceholder">
+                  <div className="paChartCircle" aria-hidden="true" />
+                  <div className="paChartHint">Učitavanje grafikona...</div>
+                </div>
+              ) : (
+                <GradesOverview data={gradeData} size={300} />
+              )}
             </div>
           </section>
 

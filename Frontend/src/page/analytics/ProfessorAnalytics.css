@@ -17,7 +17,9 @@
   --other: #1f2937;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 .paPage {
   min-height: 100vh;
@@ -58,7 +60,10 @@
   font-weight: 700;
   color: #0f131a;
 }
-.paFakeSelect__chev { opacity: 0.7; }
+
+.paFakeSelect__chev {
+  opacity: 0.7;
+}
 
 .paActualSelect {
   position: absolute;
@@ -66,10 +71,10 @@
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: 0; 
+  opacity: 0;
   cursor: pointer;
-  z-index: 2; 
-  appearance: none; 
+  z-index: 2;
+  appearance: none;
 }
 
 /* ===== Calendar ===== */
@@ -105,7 +110,10 @@
   background: rgba(15, 23, 42, 0.03);
   cursor: pointer;
 }
-.paIconBtn:hover { background: rgba(15, 23, 42, 0.06); }
+
+.paIconBtn:hover {
+  background: rgba(15, 23, 42, 0.06);
+}
 
 .paCalendarGrid {
   display: grid;
@@ -139,13 +147,22 @@
   color: #1f2a44;
 }
 
-.paDay.isOutMonth { opacity: 0.35; }
-.paDay.isToday { border-color: rgba(43, 103, 246, 0.35); }
+.paDay.isOutMonth {
+  opacity: 0.35;
+}
+
+.paDay.isToday {
+  border-color: rgba(43, 103, 246, 0.35);
+}
+
 .paDay.isSelected {
   background: var(--soft);
   border-color: rgba(43, 103, 246, 0.35);
 }
-.paDay:hover { background: rgba(15, 23, 42, 0.06); }
+
+.paDay:hover {
+  background: rgba(15, 23, 42, 0.06);
+}
 
 /* Dots */
 .calDot {
@@ -154,6 +171,7 @@
   border-radius: 999px;
   display: inline-block;
 }
+
 .paDay .calDot {
   position: absolute;
   bottom: 6px;
@@ -161,9 +179,18 @@
   width: 8px;
   height: 8px;
 }
-.calDot--quiz { background: var(--quiz); }
-.calDot--midterm { background: var(--midterm); }
-.calDot--other { background: var(--other); }
+
+.calDot--quiz {
+  background: var(--quiz);
+}
+
+.calDot--midterm {
+  background: var(--midterm);
+}
+
+.calDot--other {
+  background: var(--other);
+}
 
 /* Legend row */
 .paLegend {
@@ -186,7 +213,9 @@
   font-weight: 700;
 }
 
-.paLegendLabel { white-space: nowrap; }
+.paLegendLabel {
+  white-space: nowrap;
+}
 
 .paLegendRight {
   display: flex;
@@ -203,7 +232,10 @@
   font-size: 12px;
   cursor: pointer;
 }
-.paLinkBtn:hover { text-decoration: underline; }
+
+.paLinkBtn:hover {
+  text-decoration: underline;
+}
 
 .paDotsBtn {
   width: 34px;
@@ -247,7 +279,10 @@
   font-weight: 900;
   cursor: pointer;
 }
-.paPrimaryBtn:hover { filter: brightness(0.97); }
+
+.paPrimaryBtn:hover {
+  filter: brightness(0.97);
+}
 
 /* ===== Main ===== */
 .paMain {
@@ -271,7 +306,7 @@
 
 .paChartCard {
   padding: 16px 16px 18px;
-  min-height: 320px;
+  min-height: 400px;
 }
 
 .paCardHeader {
@@ -318,9 +353,13 @@
   color: #1f2a44;
   font-size: 12px;
 }
-.paTinyChev { opacity: 0.7; }
+
+.paTinyChev {
+  opacity: 0.7;
+}
 
 .paChartPlaceholder {
+  padding-top: 40px;
   height: calc(100% - 44px);
   display: grid;
   place-items: center;
@@ -333,6 +372,7 @@
   border-radius: 999px;
   border: 14px solid rgba(15, 23, 42, 0.08);
   background: radial-gradient(circle at 30% 30%, rgba(43, 103, 246, 0.12), rgba(0, 0, 0, 0));
+
 }
 
 .paChartHint {
@@ -371,7 +411,9 @@
 }
 
 /* Table */
-.paTableCard { padding: 14px; }
+.paTableCard {
+  padding: 14px;
+}
 
 .paTableHeader,
 .paRow {
@@ -434,9 +476,11 @@
   .paPage {
     grid-template-columns: 300px 1fr;
   }
+
   .paTopRow {
     grid-template-columns: 1fr;
   }
+
   .paStatsCol {
     grid-template-columns: repeat(5, 1fr);
   }
@@ -446,20 +490,25 @@
   .paPage {
     grid-template-columns: 1fr;
   }
+
   .paSidebar {
     order: 2;
   }
+
   .paMain {
     order: 1;
   }
+
   .paStatsCol {
     grid-template-columns: repeat(2, 1fr);
   }
+
   .paTableHeader,
   .paRow {
     grid-template-columns: 1fr 1fr;
     row-gap: 8px;
   }
+
   .paTableHeader .paTh:nth-child(3),
   .paTableHeader .paTh:nth-child(4),
   .paRow .paTd:nth-child(3),
@@ -472,4 +521,58 @@
   .paStatsCol {
     grid-template-columns: 1fr;
   }
+}
+
+/* ===== Grades overview ===== */
+.chart-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center
+}
+
+.legend-and-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 12px;
+  margin-left: 0;
+  left: 18px;
+  bottom: 18px
+}
+
+.legend {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  flex-wrap: wrap
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px
+}
+
+.legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  display: inline-block
+}
+
+.legend-label {
+  font-size: 12px;
+  color: #333
+}
+
+.loading {
+  padding: 40px;
+  text-align: center;
+  color: #666
+}
+
+.slice-group text {
+  font-weight: 600
 }
