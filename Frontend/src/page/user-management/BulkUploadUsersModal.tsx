@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter, CButton, CFormLabel, CFormInput, CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell } from "@coreui/react";
+import { useAPI } from "../../context/services";
 
 type StudentImportPreview = {
     firstName: string;
@@ -17,6 +18,8 @@ interface Props {
 }
 
 export default function BulkUploadUsersModal({isOpen, onClose, onSuccess,}: Props) {
+    const api = useAPI();   
+    
     const [step, setStep] = useState<"upload" | "preview">("upload");
     const [file, setFile] = useState<File | null>(null);
     const [previewUsers, setPreviewUsers] = useState<StudentImportPreview[]>([]);
@@ -41,21 +44,9 @@ export default function BulkUploadUsersModal({isOpen, onClose, onSuccess,}: Prop
     try {
         const formData = new FormData();
         formData.append("file", file);
-        const authInfo = JSON.parse(localStorage.getItem("authInfo") || "{}");
-        const res = await fetch("/api/faculty/students/import/preview", {
-            method: "POST",
-            body: formData,
-            headers: {
-                Authorization: `Bearer ${authInfo.accessToken}`,
-            },
-        });
 
-        if (!res.ok) {
-            const text = await res.text();
-            throw new Error(text || "Preview failed");
-        }
+        const data = await api.post<StudentImportPreview[]>("/api/faculty/students/import/preview", formData);
 
-        const data: StudentImportPreview[] = await res.json();
         setPreviewUsers(data);
         setStep("preview");
     } catch (e: any) {
@@ -67,20 +58,7 @@ export default function BulkUploadUsersModal({isOpen, onClose, onSuccess,}: Prop
         try {
             const validStudents = previewUsers.filter((u) => u.errors.length === 0);
 
-            const authInfo = JSON.parse(localStorage.getItem("authInfo") || "{}");
-            const res = await fetch("/api/faculty/students/import/commit", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${authInfo.accessToken}`,
-                },
-                body: JSON.stringify(validStudents),
-            });
-
-            if (!res.ok) {
-                const text = await res.text();
-                throw new Error(text || "Import failed");
-            }
+            await api.post("/api/faculty/students/import/commit", validStudents);
 
             onSuccess();
             resetAndClose();
