@@ -86,6 +86,13 @@ namespace University.Infrastructure.Migrations
                 oldType: "timestamp with time zone");
 
             migrationBuilder.AddColumn<Guid>(
+               name: "FacultyGuid",
+               table: "DocumentRequests",
+               type: "uuid",
+               nullable: false,
+               defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
+
+            migrationBuilder.AddColumn<Guid>(
                 name: "FacultyGuid",
                 schema: "public",
                 table: "Departments",
@@ -129,6 +136,37 @@ namespace University.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(DateTime),
                 oldType: "timestamp with time zone");
+
+            migrationBuilder.Sql(@"
+                UPDATE Public.""Departments"" d
+                SET ""FacultyGuid"" = f.""Guid""
+                FROM ""Faculties"" f
+                WHERE f.""Id"" = d.""FacultyId""
+                AND (
+                    d.""FacultyGuid"" IS NULL
+                    OR d.""FacultyGuid"" = '00000000-0000-0000-0000-000000000000'
+                    );
+                ");
+
+            migrationBuilder.Sql(@"
+                UPDATE Public.""DocumentRequests"" dr
+                SET ""FacultyGuid"" = f.""Guid""
+                FROM ""Faculties"" f
+                WHERE f.""Id"" = dr.""FacultyId""
+                AND (
+                    dr.""FacultyGuid"" IS NULL
+                    OR dr.""FacultyGuid"" = '00000000-0000-0000-0000-000000000000'
+                    );
+                ");
+
+            migrationBuilder.DropColumn(
+                name: "FacultyId",
+                table: "DocumentRequests");
+
+            migrationBuilder.RenameColumn(
+                name: "FacultyGuid",
+                table: "DocumentRequests",
+                newName: "FacultyId");
         }
 
         /// <inheritdoc />
@@ -246,6 +284,18 @@ namespace University.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(DateTime),
                 oldType: "timestamp without time zone");
+
+            migrationBuilder.AddColumn<int>(
+                name: "FacultyId",
+                table: "DocumentRequests",
+                type: "integer",
+                nullable: false,
+                defaultValue: 0);
+
+            migrationBuilder.RenameColumn(
+                name: "FacultyId",
+                table: "DocumentRequests",
+                newName: "FacultyGuid");
         }
     }
 }
