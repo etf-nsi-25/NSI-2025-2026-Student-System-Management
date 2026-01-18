@@ -4,7 +4,6 @@ using FluentAssertions;
 using Moq;
 using Xunit;
 using Identity.Application.Services;
-using Identity.Core.DomainServices;
 using Identity.Core.Interfaces.Services; 
 using Identity.Core.Enums;
 using Identity.Core.DTO; 
@@ -13,27 +12,6 @@ namespace Identity.Tests.TwoFactor
 {
     public class TwoFactorFlowTests
     {
-        private class FakeTotpProvider : ITotpProvider
-        {
-            public string LastGeneratedSecret { get; private set; } = string.Empty;
-
-            public string GenerateSecret()
-            {
-                LastGeneratedSecret = "INTEGRATION-SECRET";
-                return LastGeneratedSecret;
-            }
-
-            public string GenerateQrCode(string username, string secret)
-            {
-                return $"QR:{username}:{secret}";
-            }
-
-            public bool ValidateCode(string secret, string code)
-            {
-                return code == "123456";
-            }
-        }
-
         private UserResponse CreateFlowUser(string userId)
         {
             return new UserResponse
@@ -54,16 +32,21 @@ namespace Identity.Tests.TwoFactor
         {
             // Arrange
             var userId = "flow-user-id";
-            var userResponse = CreateFlowUser(userId);
-
             var identityServiceMock = new Mock<IIdentityService>();
             identityServiceMock
-                .Setup(s => s.FindByIdAsync(userId))
-                .ReturnsAsync(userResponse);
+                .Setup(s => s.GenerateTwoFactorSetupAsync(userId, It.IsAny<string>()))
+                .ReturnsAsync(new TwoFactorSetupInfo(
+                    ManualKey: "INTEGRATION-SECRET",
+                    QrCodeImageBase64: "data:image/png;base64,AAA",
+                    OtpAuthUri: "otpauth://totp/x"));
+            identityServiceMock
+                .Setup(s => s.ConfirmTwoFactorSetupAsync(userId, "123456"))
+                .ReturnsAsync(true);
+            identityServiceMock
+                .Setup(s => s.VerifyTwoFactorCodeAsync(userId, "123456"))
+                .ReturnsAsync(true);
 
-            var totpProvider = new FakeTotpProvider();
-            var domainService = new TwoFactorDomainService(totpProvider);
-            var service = new TwoFactorAuthService(identityServiceMock.Object, domainService);
+            var service = new TwoFactorAuthService(identityServiceMock.Object);
 
             var setupResult = await service.EnableTwoFactorAsync(userId);
 
@@ -86,16 +69,15 @@ namespace Identity.Tests.TwoFactor
         {
             // Arrange
             var userId = "flow-user-id";
-            var userResponse = CreateFlowUser(userId);
-
             var identityServiceMock = new Mock<IIdentityService>();
             identityServiceMock
-                .Setup(s => s.FindByIdAsync(userId))
-                .ReturnsAsync(userResponse);
+                .Setup(s => s.ConfirmTwoFactorSetupAsync(userId, It.IsAny<string>()))
+                .ReturnsAsync(false);
+            identityServiceMock
+                .Setup(s => s.VerifyTwoFactorCodeAsync(userId, It.IsAny<string>()))
+                .ReturnsAsync(false);
 
-            var totpProvider = new FakeTotpProvider();
-            var domainService = new TwoFactorDomainService(totpProvider);
-            var service = new TwoFactorAuthService(identityServiceMock.Object, domainService);
+            var service = new TwoFactorAuthService(identityServiceMock.Object);
 
             // === Setup confirmation with incorrect code ===
             var badSetup = await service.VerifySetupAsync(userId, "000000");

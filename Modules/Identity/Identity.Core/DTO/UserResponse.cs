@@ -23,4 +23,6 @@ public class UserResponse
     public UserStatus Status { get; set; } 
     
     public bool ForcePasswordChange { get; set; }
+
+    public bool TwoFactorEnabled { get; set; }
 }

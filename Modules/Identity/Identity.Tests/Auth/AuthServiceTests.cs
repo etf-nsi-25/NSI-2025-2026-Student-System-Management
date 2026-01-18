@@ -76,8 +76,14 @@ namespace Identity.Tests.Auth
             _mockIdentityService.Setup(x => x.FindByEmailAsync(email))
                 .ReturnsAsync(userResponse);
 
+            _mockIdentityService.Setup(x => x.FindByIdAsync(userId))
+                .ReturnsAsync(userResponse);
+
             _mockIdentityService.Setup(x => x.CheckPasswordAsync(userId, password))
                 .ReturnsAsync(true);
+
+            _mockIdentityService.Setup(x => x.IsTwoFactorEnabledAsync(userId))
+                .ReturnsAsync(false);
 
             _mockTokenService.Setup(x => x.GenerateAccessToken(It.IsAny<TokenClaims>()))
                 .Returns(accessToken);
