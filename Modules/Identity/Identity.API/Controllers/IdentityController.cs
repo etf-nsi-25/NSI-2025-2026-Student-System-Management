@@ -58,8 +58,7 @@ namespace Identity.API.Controllers
                         IndexNumber = request.IndexNumber,
                         Role = request.Role,
                         FacultyId = request.FacultyId,
-                        Status = UserStatus.Active,
-                        ForcePasswordChange = request.ForcePasswordChange
+                        Status = UserStatus.Active
                     }
                 );
             }

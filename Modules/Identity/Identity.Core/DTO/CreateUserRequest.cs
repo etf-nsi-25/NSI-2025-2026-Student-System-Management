@@ -26,5 +26,4 @@ public class CreateUserRequest
     
     [Required]
     public required UserRole Role { get; set; }
-    public bool ForcePasswordChange { get; set; } = true;
 }

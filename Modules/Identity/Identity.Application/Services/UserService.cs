@@ -50,9 +50,8 @@ internal class UserService(
             LastName = lastName,
             FacultyId = facultyId,
             IndexNumber = indexNumber,
-            Role = role,
-            ForcePasswordChange = true
-        };
+            Role = role
+            };
 
         await userNotifierService.SendAccountCreatedNotification(email, tempPassword);
 

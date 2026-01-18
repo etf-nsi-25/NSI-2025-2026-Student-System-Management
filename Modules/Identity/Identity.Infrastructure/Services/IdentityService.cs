@@ -160,7 +160,7 @@ public class IdentityService : IIdentityService
             Role = request.Role,
             IndexNumber = request.IndexNumber,
             Status = Identity.Core.Enums.UserStatus.Active,
-            ForcePasswordChange = request.ForcePasswordChange
+            ForcePasswordChange = true
         };
 
         var result = await _userManager.CreateAsync(appUser, password);
