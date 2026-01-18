@@ -12,6 +12,7 @@ import type { TwoFAConfirmResponse, TwoFASetupResponse } from '../models/2fa/Two
 import type { StudentRequestDto } from '../page/requests/RequestTypes';
 import type { RestClient } from './rest';
 import type { CreateFacultyRequestDTO, FacultyResponseDTO, UpdateFacultyRequestDTO } from '../dto/FacultyDTO';
+import type { StudentPerformanceDto } from '../dto/StudentPerformanceDTO';
 
 export class API {
     #restClient: RestClient;
@@ -146,5 +147,9 @@ export class API {
 
     async getTeacherFilterData(): Promise<{ courses: string[], years: string[] }> {
         return this.get<{ courses: string[], years: string[] }>("/api/stats/teacher/filter-data");
+    }
+
+    async getStudentPerformance(courseId: string): Promise<StudentPerformanceDto[]> {
+        return this.get<StudentPerformanceDto[]>(`/api/stats/teacher/performance/${courseId}`);
     }
 }

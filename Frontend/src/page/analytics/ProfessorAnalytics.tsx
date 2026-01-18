@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { useAPI } from "../../context/services";
 import { GradesOverview } from "../../component/analytics/GradesOverview";
 import { fetchGrades } from "../../component/analytics/mockGradesService";
+import type { StudentPerformanceDto } from '../../dto/StudentPerformanceDTO';
 import "./ProfessorAnalytics.css";
 
 type CalendarLegendItem = {
@@ -49,6 +50,8 @@ export default function ProfessorAnalyticsPage() {
 
   const [monthCursor, setMonthCursor] = useState<Date>(() => startOfMonth(new Date(2025, 10, 1))); // Nov 2025
   const [selectedDate, setSelectedDate] = useState<Date>(() => new Date(2025, 10, 13));
+  const [performanceData, setPerformanceData] = useState<StudentPerformanceDto[]>([]);
+  const [isTableLoading, setIsTableLoading] = useState(false);
 
   const markers = useMemo(() => {
     const m = new Map<string, string>();
@@ -199,6 +202,25 @@ export default function ProfessorAnalyticsPage() {
 
     fetch();
   }, [selectedCourse, selectedYear, selectedSemester, api]);
+
+  useEffect(() => {
+    const fetchPerformance = async () => {
+        if (!api || !selectedCourse || !selectedYear) return;
+
+        try {
+            setIsTableLoading(true);
+            // Možeš dodati i year u API ako želiš filtrirati i po godini
+            const data = await api.getStudentPerformance(selectedCourse); 
+            setPerformanceData(data);
+        } catch (error) {
+            console.error("Greška:", error);
+        } finally {
+            setIsTableLoading(false);
+        }
+    };
+
+    fetchPerformance();
+}, [selectedCourse, selectedYear, selectedSemester, api]);
 
   if (isLoading) {
     return (
@@ -387,28 +409,24 @@ export default function ProfessorAnalyticsPage() {
             <div className="paTh">Status</div>
           </div>
 
-          {/*Placeholder rows (remove/replace with real component later) */}
-          {[
-            { id: "22232", att: "7/10", score: "75/100", ok: true },
-            { id: "21232", att: "7/10", score: "23/100", ok: false },
-            { id: "22432", att: "7/10", score: "75/100", ok: true },
-            { id: "12232", att: "7/10", score: "75/100", ok: true },
-            { id: "29232", att: "7/10", score: "75/100", ok: true },
-            { id: "25434", att: "7/10", score: "23/100", ok: false },
-            { id: "26543", att: "7/10", score: "75/100", ok: true },
-            { id: "17654", att: "7/10", score: "23/100", ok: false },
-          ].map((r) => (
-            <div key={r.id} className="paRow">
-              <div className="paTd">{r.id}</div>
-              <div className="paTd">{r.att}</div>
-              <div className="paTd">{r.score}</div>
-              <div className="paTd">
-                <span className={r.ok ? "paChip paChip--ok" : "paChip paChip--bad"}>
-                  {r.ok ? "✓ Passed" : "✕ Failed"}
-                </span>
+          {isTableLoading ? (
+            <div className="paRow">Učitavanje studenata...</div>
+          ) : performanceData.length === 0 ? (
+            <div className="paRow">Nema podataka za odabrani kurs.</div>
+          ) : (
+            performanceData.map((student) => (
+              <div key={student.studentId} className="paRow">
+                <div className="paTd">{student.studentId}</div>
+                <div className="paTd">{student.attendance}</div>
+                <div className="paTd">{student.score}/100</div>
+                <div className="paTd">
+                  <span className={student.passed ? "paChip paChip--ok" : "paChip paChip--bad"}>
+                    {student.passed ? "✓ Passed" : "✕ Failed"}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </section>
       </main>
     </div>

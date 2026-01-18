@@ -70,4 +70,43 @@ public class TeacherAnalyticsService : ITeacherAnalyticsService
 
         return filterData;
     }
+
+    public async Task<List<StudentPerformanceDto>> GetStudentPerformanceAsync(string courseName)
+{
+    var sql = @"
+        SELECT 
+            s.""IndexNumber"" as StudentId,
+            s.""FirstName"" || ' ' || s.""LastName"" as StudentName,
+            COALESCE(e.""Grade"", 0) as Score,
+            (SELECT COUNT(*) FROM ""Attendance"" a WHERE a.""StudentId"" = s.""Id"" AND a.""CourseId"" = c.""Id"" AND a.""Status"" = 'Present') as PresentCount,
+            (SELECT COUNT(*) FROM ""Attendance"" a WHERE a.""StudentId"" = s.""Id"" AND a.""CourseId"" = c.""Id"") as TotalClasses
+        FROM ""Enrollment"" e
+        JOIN ""Student"" s ON e.""StudentId"" = s.""Id""
+        JOIN ""Course"" c ON e.""CourseId"" = c.""Id""
+        WHERE c.""Name"" = {0}"; // Filtriramo po imenu jer to imamo na frontendu
+
+    var rawData = await _context.Database
+        .SqlQueryRaw<RawPerformanceData>(sql, courseName)
+        .ToListAsync();
+
+    return rawData.Select(item => new StudentPerformanceDto
+    {
+        StudentId = item.StudentId,
+        StudentName = item.StudentName,
+        Score = item.Score,
+        Passed = item.Score >= 55,
+        Attendance = item.TotalClasses > 0 
+            ? $"{item.PresentCount}/{item.TotalClasses}" 
+            : "0/0"
+    }).ToList();
+}
+}
+
+public class RawPerformanceData
+{
+    public string StudentId { get; set; } = string.Empty;
+    public string StudentName { get; set; } = string.Empty;
+    public int Score { get; set; }
+    public int PresentCount { get; set; }
+    public int TotalClasses { get; set; }
 }

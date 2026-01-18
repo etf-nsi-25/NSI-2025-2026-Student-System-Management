@@ -104,5 +104,13 @@ public class AnalyticsController : ControllerBase
         return Ok(data);
     }
 
+    [Authorize]
+    [HttpGet("teacher/performance/{courseName}")]
+    public async Task<IActionResult> GetStudentPerformance(string courseName)
+    {
+        var data = await _teacherAnalyticsService.GetStudentPerformanceAsync(courseName);
+        return Ok(data);
+    }
+
 }
 
