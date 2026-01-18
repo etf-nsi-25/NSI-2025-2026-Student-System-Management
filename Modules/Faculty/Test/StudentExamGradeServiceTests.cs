@@ -13,46 +13,52 @@ public class StudentExamGradeServiceTests
     private readonly Mock<IStudentExamGradeRepository> _repo = new();
     private readonly Mock<ILogger<StudentExamGradeService>> _logger = new();
 
-    private readonly Guid _facultyId = Guid.NewGuid();
     private readonly int _teacherId = 42;
 
-    private StudentExamGradeService CreateService() => new(_repo.Object, _logger.Object);
+    private StudentExamGradeService CreateService()
+        => new(_repo.Object, _logger.Object);
 
     [Fact]
     public async Task CreateGrade_Success()
     {
-        _repo.Setup(r => r.ExamBelongsToFacultyAndTeacherAsync(1, _facultyId, _teacherId, It.IsAny<CancellationToken>()))
+        _repo.Setup(r => r.ExamBelongsToTeacherAsync(1, _teacherId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
+
         _repo.Setup(r => r.GetAsync(1, 1, It.IsAny<CancellationToken>()))
             .ReturnsAsync((StudentExamGrade?)null);
+
         _repo.Setup(r => r.CreateAsync(It.IsAny<StudentExamGrade>(), It.IsAny<CancellationToken>()))
-            .Callback<StudentExamGrade, CancellationToken>((g, ct) => g.Student = new Student { FirstName = "John", LastName = "Doe" })
-            .ReturnsAsync((StudentExamGrade g, CancellationToken ct) => g);
+            .Callback<StudentExamGrade, CancellationToken>((g, _) =>
+                g.Student = new Student { FirstName = "John", LastName = "Doe" })
+            .ReturnsAsync((StudentExamGrade g, CancellationToken _) => g);
 
         var service = CreateService();
 
         var result = await service.CreateOrUpdateAsync(
+            examId: 1,
+            studentId: 1,
             new GradeRequestDTO
             {
-                StudentId = 1,
-                ExamId = 1,
                 Points = 85,
                 Passed = true,
                 Url = "https://example.com"
             },
-            _facultyId,
             _teacherId,
             default);
 
-        _repo.Verify(r => r.CreateAsync(It.Is<StudentExamGrade>(g => g.StudentId == 1 && g.Points == 85), default), Times.Once);
+        _repo.Verify(
+            r => r.CreateAsync(It.Is<StudentExamGrade>(g => g.StudentId == 1 && g.Points == 85), default),
+            Times.Once);
+
         Assert.Equal("John Doe", result.StudentName);
     }
 
     [Fact]
     public async Task UpdateGrade_Success()
     {
-        _repo.Setup(r => r.ExamBelongsToFacultyAndTeacherAsync(1, _facultyId, _teacherId, It.IsAny<CancellationToken>()))
+        _repo.Setup(r => r.ExamBelongsToTeacherAsync(1, _teacherId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
+
         _repo.Setup(r => r.GetAsync(1, 1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new StudentExamGrade
             {
@@ -61,28 +67,30 @@ public class StudentExamGradeServiceTests
                 Points = 60,
                 Passed = true,
                 DateRecorded = DateTime.UtcNow,
-                FacultyId = _facultyId,
                 Student = new Student { FirstName = "John", LastName = "Doe" }
             });
+
         _repo.Setup(r => r.UpdateAsync(It.IsAny<StudentExamGrade>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((StudentExamGrade g, CancellationToken ct) => g);
+            .ReturnsAsync((StudentExamGrade g, CancellationToken _) => g);
 
         var service = CreateService();
 
         var result = await service.CreateOrUpdateAsync(
+            examId: 1,
+            studentId: 1,
             new GradeRequestDTO
             {
-                StudentId = 1,
-                ExamId = 1,
                 Points = 70,
                 Passed = true,
                 Url = "https://example.com"
             },
-            _facultyId,
             _teacherId,
             default);
 
-        _repo.Verify(r => r.UpdateAsync(It.Is<StudentExamGrade>(g => g.Points == 70), default), Times.Once);
+        _repo.Verify(
+            r => r.UpdateAsync(It.Is<StudentExamGrade>(g => g.Points == 70), default),
+            Times.Once);
+
         Assert.Equal("John Doe", result.StudentName);
     }
 
@@ -93,39 +101,35 @@ public class StudentExamGradeServiceTests
         {
             StudentId = 1,
             ExamId = 1,
-            FacultyId = _facultyId,
             Student = new Student { FirstName = "John", LastName = "Doe" }
         };
 
-        _repo.Setup(r => r.GetAsync(1, 1, It.IsAny<CancellationToken>())).ReturnsAsync(grade);
-        _repo.Setup(r => r.ExamBelongsToFacultyAndTeacherAsync(1, _facultyId, _teacherId, It.IsAny<CancellationToken>()))
+        _repo.Setup(r => r.GetAsync(1, 1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(grade);
+
+        _repo.Setup(r => r.ExamBelongsToTeacherAsync(1, _teacherId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
         var service = CreateService();
 
-        await service.DeleteAsync(1, 1, _facultyId, _teacherId, default);
+        await service.DeleteAsync(1, 1, _teacherId, default);
 
-        _repo.Verify(r => r.DeleteAsync(It.IsAny<StudentExamGrade>(), default), Times.Once);
+        _repo.Verify(r => r.DeleteAsync(grade, default), Times.Once);
     }
 
     [Fact]
     public async Task UnauthorizedAccess_Throws()
     {
-        _repo.Setup(r => r.ExamBelongsToFacultyAndTeacherAsync(1, _facultyId, _teacherId, It.IsAny<CancellationToken>()))
+        _repo.Setup(r => r.ExamBelongsToTeacherAsync(1, _teacherId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
 
         var service = CreateService();
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
             service.CreateOrUpdateAsync(
-                new GradeRequestDTO
-                {
-                    StudentId = 1,
-                    ExamId = 1,
-                    Points = 80,
-                    Passed = true
-                },
-                _facultyId,
+                1,
+                1,
+                new GradeRequestDTO { Points = 80, Passed = true },
                 _teacherId,
                 default));
     }
@@ -133,21 +137,16 @@ public class StudentExamGradeServiceTests
     [Fact]
     public async Task InvalidPoints_Throws()
     {
-        _repo.Setup(r => r.ExamBelongsToFacultyAndTeacherAsync(1, _facultyId, _teacherId, It.IsAny<CancellationToken>()))
+        _repo.Setup(r => r.ExamBelongsToTeacherAsync(1, _teacherId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
         var service = CreateService();
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             service.CreateOrUpdateAsync(
-                new GradeRequestDTO
-                {
-                    StudentId = 1,
-                    ExamId = 1,
-                    Points = 120,
-                    Passed = true
-                },
-                _facultyId,
+                1,
+                1,
+                new GradeRequestDTO { Points = 120, Passed = true },
                 _teacherId,
                 default));
     }
@@ -157,38 +156,35 @@ public class StudentExamGradeServiceTests
     {
         var grades = new List<StudentExamGrade>
         {
-            new StudentExamGrade
+            new()
             {
                 StudentId = 1,
                 Points = 80,
                 Passed = true,
-                DateRecorded = DateTime.UtcNow,
-                FacultyId = _facultyId,
                 Student = new Student { FirstName = "John", LastName = "Doe" }
             },
-            new StudentExamGrade
+            new()
             {
                 StudentId = 2,
                 Points = 50,
                 Passed = false,
-                DateRecorded = DateTime.UtcNow,
-                FacultyId = _facultyId,
                 Student = new Student { FirstName = "Jane", LastName = "Smith" }
             }
         };
 
-        _repo.Setup(r => r.ExamBelongsToFacultyAndTeacherAsync(1, _facultyId, _teacherId, It.IsAny<CancellationToken>()))
+        _repo.Setup(r => r.ExamBelongsToTeacherAsync(1, _teacherId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
+
         _repo.Setup(r => r.GetAllForExamAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(grades);
 
         var service = CreateService();
 
-        var result = await service.GetAllForExamAsync(1, _facultyId, _teacherId, default);
+        var result = await service.GetAllForExamAsync(1, _teacherId, default);
 
         Assert.Equal(2, result.Grades.Count());
-        Assert.Contains(result.Grades, g => g.StudentId == 1 && g.StudentName == "John Doe");
-        Assert.Contains(result.Grades, g => g.StudentId == 2 && g.StudentName == "Jane Smith");
+        Assert.Contains(result.Grades, g => g.StudentName == "John Doe");
+        Assert.Contains(result.Grades, g => g.StudentName == "Jane Smith");
     }
 
     [Fact]
@@ -201,15 +197,17 @@ public class StudentExamGradeServiceTests
             Points = 60,
             Passed = true,
             DateRecorded = DateTime.UtcNow.AddDays(-1),
-            FacultyId = _facultyId,
             Student = new Student { FirstName = "John", LastName = "Doe" }
         };
 
-        _repo.Setup(r => r.GetAsync(1, 1, It.IsAny<CancellationToken>())).ReturnsAsync(grade);
-        _repo.Setup(r => r.UpdateAsync(It.IsAny<StudentExamGrade>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((StudentExamGrade g, CancellationToken ct) => g);
-        _repo.Setup(r => r.ExamBelongsToFacultyAndTeacherAsync(1, _facultyId, _teacherId, It.IsAny<CancellationToken>()))
+        _repo.Setup(r => r.ExamBelongsToTeacherAsync(1, _teacherId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
+
+        _repo.Setup(r => r.GetAsync(1, 1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(grade);
+
+        _repo.Setup(r => r.UpdateAsync(It.IsAny<StudentExamGrade>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((StudentExamGrade g, CancellationToken _) => g);
 
         var service = CreateService();
 
@@ -219,63 +217,15 @@ public class StudentExamGradeServiceTests
             DateRecorded = DateTime.UtcNow
         };
 
-        var result = await service.UpdateAsync(1, 1, dto, _facultyId, _teacherId, default);
+        var result = await service.UpdateAsync(1, 1, dto, _teacherId, default);
 
-        _repo.Verify(r => r.UpdateAsync(It.Is<StudentExamGrade>(
-            g => g.Points == 40 && g.Passed == false && g.DateRecorded == dto.DateRecorded.Value), default), Times.Once);
+        _repo.Verify(
+            r => r.UpdateAsync(It.Is<StudentExamGrade>(
+                g => g.Points == 40 &&
+                     g.Passed == false &&
+                     g.DateRecorded == dto.DateRecorded), default),
+            Times.Once);
 
         Assert.Equal("John Doe", result.StudentName);
-    }
-    
-    [Fact]
-    public async Task UpdateComponents_InvalidPoints_Throws()
-    {
-        var grade = new StudentExamGrade
-        {
-            StudentId = 1,
-            ExamId = 1,
-            Points = 60,
-            Passed = true,
-            DateRecorded = DateTime.UtcNow,
-            FacultyId = _facultyId,
-            Student = new Student { FirstName = "John", LastName = "Doe" }
-        };
-
-        _repo.Setup(r => r.GetAsync(1, 1, It.IsAny<CancellationToken>())).ReturnsAsync(grade);
-
-        _repo.Setup(r => r.ExamBelongsToFacultyAndTeacherAsync(1, _facultyId, _teacherId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
-
-        var service = CreateService();
-
-        var dto = new GradeUpdateRequestDTO { Points = 150 };
-
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            service.UpdateAsync(1, 1, dto, _facultyId, _teacherId, default));
-    }
-    
-    [Fact]
-    public async Task UpdateComponents_Unauthorized_Throws()
-    {
-        var grade = new StudentExamGrade
-        {
-            StudentId = 1,
-            ExamId = 1,
-            Points = 60,
-            Passed = true,
-            DateRecorded = DateTime.UtcNow,
-            FacultyId = _facultyId,
-            Student = new Student { FirstName = "John", LastName = "Doe" }
-        };
-
-        _repo.Setup(r => r.GetAsync(1, 1, It.IsAny<CancellationToken>())).ReturnsAsync(grade);
-        _repo.Setup(r => r.ExamBelongsToFacultyAndTeacherAsync(1, _facultyId, _teacherId, It.IsAny<CancellationToken>())).ReturnsAsync(false);
-
-        var service = CreateService();
-
-        var dto = new GradeUpdateRequestDTO { Points = 70 };
-
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
-            service.UpdateAsync(1, 1, dto, _facultyId, _teacherId, default));
     }
 }
