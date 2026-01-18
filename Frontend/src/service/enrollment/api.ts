@@ -11,7 +11,19 @@ export async function getCourses(
     filterStatus: "all" | "mandatory" | "elective" | string = "all",
 ) {
     try {
-        let allCourses: Course[] = await api.getAllCourses();
+
+        const [allCoursesData, myEnrollments] = await Promise.all([
+            api.getAllCourses(),
+            getMyEnrollments(api).catch(() => [] as StudentEnrollmentItemDto[])
+        ]);
+
+        let allCourses: Course[] = allCoursesData.map(course => {
+            const enrollment = myEnrollments.find(e => e.courseId === course.id);
+            return {
+                ...course,
+                status: enrollment ? 'enrolled' : 'none'
+            };
+        });
 
         if (searchQuery) {
             const query = searchQuery.toLowerCase();
