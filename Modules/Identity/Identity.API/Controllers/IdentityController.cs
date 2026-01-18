@@ -55,7 +55,7 @@ namespace Identity.API.Controllers
             if (requesterRole != UserRole.Admin && requesterRole != UserRole.Superadmin)
                 return Forbid();
 
-            if (requesterRole == UserRole.Admin && (request.Role == UserRole.Admin || request.Role == UserRole.Superadmin))
+            if (requesterRole == UserRole.Admin && request.Role != UserRole.Student)
             {
                 return StatusCode(StatusCodes.Status403Forbidden,
                     new { Error = "Admin can only create Student users." });
