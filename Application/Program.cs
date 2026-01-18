@@ -39,7 +39,7 @@ builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddSupportModule(builder.Configuration);
 builder.Services.AddUniversityModule(builder.Configuration);
 builder.Services.AddFacultyModule(builder.Configuration);
-builder.Services.AddNotificationsModule();
+builder.Services.AddNotificationsModule(builder.Configuration);
 builder.Services.AddAnalyticsModule(builder.Configuration);
 builder.Services.AddEventBus();
 
@@ -52,7 +52,6 @@ var moduleControllers = new[]
     typeof(SupportController).Assembly,
     typeof(UniversityController).Assembly,
     typeof(FacultyController).Assembly,
-    typeof(NotificationsController).Assembly,
     typeof(AnalyticsController).Assembly
 };
 
