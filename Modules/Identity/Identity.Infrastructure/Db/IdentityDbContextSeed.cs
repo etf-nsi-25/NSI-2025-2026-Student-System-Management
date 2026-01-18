@@ -22,47 +22,57 @@ public class IdentityDbContextSeed
         Guid teacherId,
         Guid studentId)
     {
-        // Define our test users
-        var usersToSeed = new List<(string Email, string UserName, UserRole Role, string Id, string? Index)>
-        {
-            ("superadmin@unsa.ba", "superadmin", UserRole.Superadmin, superAdminId.ToString(), null),
-            ("admin@unsa.ba", "admin", UserRole.Admin, adminId.ToString(), null),
-            ("emir.buza@unsa.ba", "teacher", UserRole.Teacher, teacherId.ToString(), null),
-            ("niko.nikic@unsa.ba", "student", UserRole.Student, studentId.ToString(), "IB20001")
-        };
+        if (await userManager.Users.AnyAsync())
+            return;
 
-        foreach (var (email, username, role, userId, index) in usersToSeed)
+        var superAdminAppUser = new ApplicationUser
         {
-            var user = await userManager.FindByEmailAsync(email);
-            if (user == null)
-            {
-                user = new ApplicationUser
-                {
-                    Id = userId,
-                    UserName = username,
-                    Email = email,
-                    FirstName = username == "student" ? "Niko" : username == "teacher" ? "Emir" : "System",
-                    LastName = username == "student" ? "Nikic" : username == "teacher" ? "Buza" : "Admin",
-                    EmailConfirmed = true,
-                    Role = role,
-                    FacultyId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                    IndexNumber = index
-                };
-                await userManager.CreateAsync(user, "Test123!");
-            }
-            else
-            {
-                // Force update role and facultyId for existing test users if they are 0/empty
-                bool changed = false;
-                if (user.Role == 0) { user.Role = role; changed = true; }
-                if (user.FacultyId == Guid.Empty) { user.FacultyId = Guid.Parse("11111111-1111-1111-1111-111111111111"); changed = true; }
-                if (string.IsNullOrEmpty(user.IndexNumber) && !string.IsNullOrEmpty(index)) { user.IndexNumber = index; changed = true; }
-                
-                if (changed)
-                {
-                    await userManager.UpdateAsync(user);
-                }
-            }
-        }
+            Id = superAdminId.ToString(),
+            UserName = "superadmin",
+            Email = "superadmin@unsa.ba",
+            FirstName = "Super",
+            LastName = "Admin",
+            EmailConfirmed = true,
+            Role = UserRole.Superadmin
+        };
+        await userManager.CreateAsync(superAdminAppUser, "Test123!");
+
+        var adminAppUser = new ApplicationUser
+        {
+            Id = adminId.ToString(),
+            UserName = "admin",
+            Email = "admin@unsa.ba",
+            FirstName = "Admin",
+            LastName = "User",
+            EmailConfirmed = true,
+            Role = UserRole.Admin
+        };
+        await userManager.CreateAsync(adminAppUser, "Test123!");
+
+        var teacherAppUser = new ApplicationUser
+        {
+            Id = teacherId.ToString(),
+            UserName = "teacher",
+            Email = "emir.buza@unsa.ba",
+            FirstName = "Emir",
+            LastName = "Buza",
+            EmailConfirmed = true,
+            Role = UserRole.Teacher
+        };
+        await userManager.CreateAsync(teacherAppUser, "Test123!");
+
+        var studentAppUser = new ApplicationUser
+        {
+            Id = studentId.ToString(),
+            UserName = "student",
+            Email = "niko.nikic@unsa.ba",
+            FirstName = "Niko",
+            LastName = "Nikic",
+            EmailConfirmed = true,
+            Role = UserRole.Student,
+            IndexNumber = "IB20001"
+        };
+        await userManager.CreateAsync(studentAppUser, "Test123!");
+
     }
 }
