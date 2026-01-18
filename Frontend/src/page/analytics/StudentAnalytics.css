@@ -8,11 +8,26 @@
   .student-analytics-page {
     padding: 1.5rem;
   }
+
+  /* Stack calendar and stats vertically on tablets */
+  .student-analytics-card {
+    margin-bottom: 1rem;
+  }
 }
 
 @media (max-width: 576px) {
   .student-analytics-page {
     padding: 1rem;
+  }
+
+  /* Ensure cards stack properly on mobile */
+  .student-analytics-card {
+    margin-bottom: 1rem;
+  }
+
+  /* Make GPA and Total Passed cards full width on mobile */
+  .student-analytics-stat-card {
+    margin-bottom: 0.75rem;
   }
 }
 
@@ -205,6 +220,60 @@
   justify-content: center;
 }
 
+/* Loading states for individual widgets */
+.student-analytics-widget-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  min-height: 120px;
+}
+
+.student-analytics-widget-loading .spinner-border-sm {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-width: 0.2em;
+}
+
+.student-analytics-widget-loading p {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Error states for individual widgets */
+.student-analytics-widget-error {
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background-color: #fef3c7;
+  border: 1px solid #fbbf24;
+}
+
+.student-analytics-widget-error small {
+  color: #92400e;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Empty states for individual widgets */
+.student-analytics-widget-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  min-height: 120px;
+  text-align: center;
+}
+
+.student-analytics-widget-empty p {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
 .student-analytics-title {
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 700;
@@ -229,8 +298,41 @@
 
 .student-analytics-card-header-center {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
   margin-bottom: 0.75rem;
+}
+
+/* Week navigation controls */
+.student-analytics-week-navigation {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.student-analytics-week-navigation .btn {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.student-analytics-week-navigation .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.student-analytics-week-range {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 500;
+  white-space: nowrap;
+  min-width: 180px;
+  text-align: center;
 }
 
 .student-analytics-card-eyebrow {
@@ -399,30 +501,7 @@
   opacity: 0.55;
 }
 
-.student-analytics-weekly-event.is-RSRV {
-  background: #eef0f6;
-  border-color: rgba(17, 24, 39, 0.18);
-}
-
-.student-analytics-weekly-event.is-TS {
-  background: #fbf7ff;
-  border-color: rgba(148, 163, 184, 0.35);
-}
-
-.student-analytics-weekly-event.is-MPVI {
-  background: #f1f8ea;
-  border-color: rgba(34, 197, 94, 0.25);
-}
-
-.student-analytics-weekly-event.is-NSI {
-  background: #fdf5e6;
-  border-color: rgba(234, 179, 8, 0.25);
-}
-
-.student-analytics-weekly-event.is-IPMIS {
-  background: #fff7f7;
-  border-color: rgba(34, 197, 94, 0.25);
-}
+/* Weekly event colors are now applied via inline styles based on API color values */
 
 /* Metrics cards */
 .student-analytics-card-title-row {
@@ -688,13 +767,7 @@
   display: inline-block;
 }
 
-.student-analytics-legend-dot.is-tutorials {
-  border-color: #8b5cf6;
-}
-
-.student-analytics-legend-dot.is-lectures {
-  border-color: #3b82f6;
-}
+/* Legend dot border colors are now applied via inline styles based on API color values */
 
 .student-analytics-attendance-legend-label {
   font-weight: 500;
@@ -832,35 +905,7 @@
   text-align: left;
 }
 
-.student-analytics-subjects-bar.is-RSRV {
-  --cui-progress-bar-bg: #3b82f6;
-  background: #3b82f6 !important;
-  background-color: #3b82f6 !important;
-}
-
-.student-analytics-subjects-bar.is-IPMIS {
-  --cui-progress-bar-bg: #8b5cf6;
-  background: #8b5cf6 !important;
-  background-color: #8b5cf6 !important;
-}
-
-.student-analytics-subjects-bar.is-NSI {
-  --cui-progress-bar-bg: #f8e7b2;
-  background: #f8e7b2 !important;
-  background-color: #f8e7b2 !important;
-}
-
-.student-analytics-subjects-bar.is-MPVI {
-  --cui-progress-bar-bg: #6cc6a7;
-  background: #6cc6a7 !important;
-  background-color: #6cc6a7 !important;
-}
-
-.student-analytics-subjects-bar.is-TS {
-  --cui-progress-bar-bg: #e6a27c;
-  background: #e6a27c !important;
-  background-color: #e6a27c !important;
-}
+/* Subject bar colors are now applied via inline styles based on API color values */
 
 .student-analytics-subjects-legend {
   margin-top: 0.25rem;
@@ -888,6 +933,15 @@
   font-weight: 500;
   color: #1f2937;
   white-space: nowrap;
+  line-height: 1.2;
+}
+
+.student-analytics-subjects-legend-status {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 400;
+  margin-top: 0.15rem;
+  line-height: 1.2;
 }
 
 .student-analytics-subjects-legend .student-analytics-subjects-legend-value {
@@ -898,26 +952,7 @@
   text-align: right;
 }
 
-/* Reuse the same outlined-dot style, but with subject-specific borders */
-.student-analytics-legend-dot.is-RSRV {
-  border-color: #3b82f6;
-}
-
-.student-analytics-legend-dot.is-IPMIS {
-  border-color: #8b5cf6;
-}
-
-.student-analytics-legend-dot.is-NSI {
-  border-color: #f8e7b2;
-}
-
-.student-analytics-legend-dot.is-MPVI {
-  border-color: #6cc6a7;
-}
-
-.student-analytics-legend-dot.is-TS {
-  border-color: #e6a27c;
-}
+/* Legend dot border colors are now applied via inline styles based on API color values */
 
 /* Calendar */
 .student-analytics-calendar-header {
@@ -983,6 +1018,29 @@
   color: #ffffff;
 }
 
+/* Custom colors for calendar highlights to match design */
+.student-analytics-calendar-day.bg-primary {
+  background-color: #34d399 !important; /* Green for Exam */
+}
+
+.student-analytics-calendar-day.bg-info {
+  background-color: #60a5fa !important; /* Blue for Midterm */
+}
+
+.student-analytics-calendar-day.bg-success {
+  background-color: #34d399 !important; /* Green for Exam */
+}
+
+.student-analytics-calendar-day.bg-warning {
+  background-color: #fcd34d !important; /* Yellow for Public holiday */
+}
+
+/* Purple color for Quiz (if needed) */
+.student-analytics-calendar-day.bg-purple {
+  background-color: #a78bfa !important; /* Purple for Quiz */
+  color: #ffffff !important;
+}
+
 .student-analytics-calendar-day.is-normal {
   background-color: #e9eef6 !important;
   border: none !important;
@@ -996,6 +1054,16 @@
 
 .student-analytics-calendar-day.is-normal:hover:not(:disabled) {
   background-color: #dde6f2 !important;
+}
+
+.student-analytics-calendar-day.cursor-pointer {
+  cursor: pointer;
+}
+
+.student-analytics-calendar-day.is-highlight.cursor-pointer:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+  transition: all 0.2s ease;
 }
 
 /* Popular topics */
@@ -1063,6 +1131,170 @@
   flex: 0 0 auto;
 }
 
+/* Calendar responsive */
+@media (max-width: 992px) {
+  .student-analytics-calendar-table {
+    font-size: 0.9rem;
+  }
+
+  .student-analytics-calendar-day {
+    font-size: 0.8rem;
+  }
+
+  .student-analytics-calendar-cell {
+    padding: 0.2rem;
+  }
+
+  .student-analytics-calendar-select {
+    font-size: 1.05rem;
+    max-width: 200px;
+    height: 42px;
+  }
+}
+
+@media (max-width: 768px) {
+  .student-analytics-calendar-table {
+    font-size: 0.85rem;
+  }
+
+  .student-analytics-calendar-day {
+    font-size: 0.75rem;
+    padding: 0.25rem;
+    min-height: 32px;
+  }
+
+  .student-analytics-calendar-cell {
+    padding: 0.15rem;
+  }
+
+  .student-analytics-calendar-weekday {
+    font-size: 0.7rem;
+    padding: 0.5rem 0.15rem;
+  }
+
+  .student-analytics-calendar-select {
+    font-size: 1rem;
+    max-width: 180px;
+    height: 40px;
+    padding: 0 2rem 0 2rem;
+  }
+
+  .student-analytics-popular-header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .student-analytics-topic-dot {
+    width: 28px;
+    height: 28px;
+  }
+
+  .student-analytics-topic-label {
+    font-size: 0.9rem;
+  }
+
+  .student-analytics-popular-list .list-group-item {
+    padding: 0.75rem 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .student-analytics-calendar-table {
+    font-size: 0.75rem;
+    width: 100%;
+  }
+
+  .student-analytics-calendar-day {
+    font-size: 0.7rem;
+    padding: 0.2rem;
+    min-height: 28px;
+    border-radius: 8px;
+  }
+
+  .student-analytics-calendar-cell {
+    padding: 0.1rem;
+  }
+
+  .student-analytics-calendar-weekday {
+    font-size: 0.65rem;
+    padding: 0.4rem 0.1rem;
+  }
+
+  .student-analytics-calendar-select {
+    font-size: 0.9rem;
+    max-width: 160px;
+    height: 38px;
+    padding: 0 1.5rem 0 1.5rem;
+  }
+
+  .student-analytics-calendar-header {
+    margin-bottom: 0.5rem;
+  }
+
+  .student-analytics-topic-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+  }
+
+  .student-analytics-topic-label {
+    font-size: 0.85rem;
+  }
+
+  .student-analytics-popular-list .list-group-item {
+    padding: 0.6rem 0;
+  }
+
+  .student-analytics-side-divider {
+    margin: 0.75rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .student-analytics-calendar-table {
+    font-size: 0.7rem;
+  }
+
+  .student-analytics-calendar-day {
+    font-size: 0.65rem;
+    min-height: 26px;
+    border-radius: 6px;
+  }
+
+  .student-analytics-calendar-select {
+    font-size: 0.85rem;
+    max-width: 140px;
+    height: 36px;
+    padding: 0 1.25rem 0 1.25rem;
+  }
+
+  .student-analytics-topic-dot {
+    width: 20px;
+    height: 20px;
+  }
+
+  .student-analytics-topic-label {
+    font-size: 0.8rem;
+  }
+}
+
+/* Week navigation responsive */
+@media (max-width: 768px) {
+  .student-analytics-week-navigation {
+    gap: 0.5rem;
+  }
+
+  .student-analytics-week-navigation .btn {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.6rem;
+  }
+
+  .student-analytics-week-range {
+    font-size: 0.85rem;
+    min-width: 150px;
+  }
+}
+
 @media (max-width: 576px) {
   .student-analytics-weekly-desktop {
     display: none !important;
@@ -1070,5 +1302,20 @@
 
   .student-analytics-weekly-mobile {
     display: block !important;
+  }
+
+  .student-analytics-week-navigation {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .student-analytics-week-navigation .btn {
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .student-analytics-week-range {
+    width: 100%;
+    min-width: auto;
   }
 }
