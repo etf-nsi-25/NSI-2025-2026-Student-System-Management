@@ -36,6 +36,11 @@ export class API {
         return this.#restClient.delete<TResponse>(url)
     }
 
+
+    patch<TResponse>(url: string, body?: unknown): Promise<TResponse> {
+        return this.#restClient.patch<TResponse>(url, body)
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async getHelloUniversity(): Promise<any> {
         return this.#restClient.get("/api/University")
@@ -139,7 +144,7 @@ export class API {
         return this.put<FacultyResponseDTO>(`/api/university/faculties/${id}`, dto);
     }
 
-   async deleteFaculty(id: number): Promise<void> {
-      return this.delete<void>(`/api/university/faculties/${id}`);
-   }
+    async deleteFaculty(id: number): Promise<void> {
+        return this.delete<void>(`/api/university/faculties/${id}`);
+    }
 }
