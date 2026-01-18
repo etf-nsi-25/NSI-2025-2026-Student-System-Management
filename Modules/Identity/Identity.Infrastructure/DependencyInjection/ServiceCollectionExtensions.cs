@@ -5,23 +5,21 @@ using Identity.Core.Configuration;
 using Identity.Core.Interfaces.Repositories;
 using Identity.Core.Interfaces.Services;
 using Identity.Infrastructure.Db;
+using Identity.Infrastructure.Entities;
 using Identity.Infrastructure.Repositories;
+using Identity.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Identity.Infrastructure.Entities;
-using Identity.Infrastructure.Services;
 
 namespace Identity.Infrastructure.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddIdentityModule(
-            this IServiceCollection services,
-            IConfiguration configuration)
+        public static IServiceCollection AddIdentityModule(this IServiceCollection services, IConfiguration configuration)
         {
             // Load environment variables
             var env = DotNetEnv.Env.TraversePath().Load();
@@ -50,12 +48,10 @@ namespace Identity.Infrastructure.DependencyInjection
                     .AddDefaultTokenProviders();
             }
 
-            // Register services
             services.AddScoped<IIdentityService, IdentityService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddSingleton<IJwtTokenService, JwtTokenService>();
-            services.AddScoped<IdentityDbContextSeed>();
 
             services.AddScoped<ITwoFactorAuthService, TwoFactorAuthService>();
             services.AddSingleton<ITwoFactorLoginSessionStore, TwoFactorLoginSessionStore>();
@@ -76,24 +72,31 @@ namespace Identity.Infrastructure.DependencyInjection
             }
 
             services.AddAuthentication(options =>
-                {
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
                 .AddJwtBearer(options =>
                 {
+                    var keyBytes = Convert.FromBase64String(jwtSettings.SigningKey);
+
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(jwtSettings.SigningKey)),
-                        ValidateAudience = true,
-                        ValidAudience = jwtSettings.Audience,
+                        IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
+
                         ValidateIssuer = true,
                         ValidIssuer = jwtSettings.Issuer,
+
+                        ValidateAudience = true,
+                        ValidAudience = jwtSettings.Audience,
+
                         ValidateLifetime = true,
-                        ClockSkew = TimeSpan.Zero
+                        ClockSkew = TimeSpan.FromMinutes(1)
                     };
                 });
+
+            services.AddAuthorization();
 
             return services;
         }

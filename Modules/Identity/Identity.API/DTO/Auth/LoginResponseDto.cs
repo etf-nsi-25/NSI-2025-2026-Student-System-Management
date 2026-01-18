@@ -4,6 +4,7 @@ public class LoginResponseDto
 {
     public string AccessToken { get; set; } = string.Empty;
     public string TokenType { get; set; } = "Bearer";
+    public bool ForcePasswordChange { get; set; }
 
     public bool RequiresTwoFactor { get; set; }
 

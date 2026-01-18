@@ -133,6 +133,7 @@ const CourseListPage = () => {
       <CModal
         visible={showConfirmDelete}
         onClose={() => setShowConfirmDelete(false)}
+        className="modal-z-fix"
       >
         <CModalHeader closeButton>
           <CModalTitle>Confirm Deletion</CModalTitle>

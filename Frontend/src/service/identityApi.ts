@@ -1,4 +1,6 @@
-export type Role = 'Professor' | 'Assistant' | 'Student' | 'Staff';
+import type { API } from '../api/api';
+
+export type Role = 'Professor' | 'Assistant' | 'Student' | 'Admin' | 'Superadmin';
 export type Status = 'Active' | 'Inactive';
 
 export interface Faculty {
@@ -16,95 +18,137 @@ export interface User {
     facultyId: string;
     status: Status;
     lastActive: string;
-    indexNumber?: string; 
-} 
-
-export let MOCK_USERS: User[] = [
-    { id: 'u1', username: 'adnan', firstName: 'Prof. Adnan', lastName: 'Adnan', email: 'adnan.adnan@unsa.ba', role: 'Professor', facultyId: 'f1', status: 'Active', lastActive: 'Today, 09:15', indexNumber: undefined },
-    { id: 'u2', username: 'lamija', firstName: 'Lamija', lastName: 'Salihović', email: 'lamija.s@unsa.ba', role: 'Student', facultyId: 'f1', status: 'Active', lastActive: 'Yesterday', indexNumber: '19045' },
-    { id: 'u3', username: 'lejla', firstName: 'Lejla', lastName: 'Čelić', email: 'lejla@etf.unsa.ba', role: 'Assistant', facultyId: 'f1', status: 'Active', lastActive: '1 week ago', indexNumber: undefined },
-    { id: 'u4', username: 'nejla', firstName: 'Nejla', lastName: 'Nejla', email: 'nejla@etf.unsa.ba', role: 'Staff', facultyId: 'f2', status: 'Active', lastActive: 'Today', indexNumber: undefined },
-];
+    indexNumber?: string;
+}
 
 export const getAvailableFaculties = (): Faculty[] => [
-    { id: 'f1', name: 'ETF UNSA' },
+    { id: '11111111-1111-1111-1111-111111111111', name: 'ETF UNSA' },
     { id: 'f2', name: 'EKOF UNSA' },
     { id: 'f3', name: 'MED UNSA' },
 ];
 
-export const fetchUsers = async (): Promise<User[]> => {
-    // eslint-disable-next-line no-console
-    console.log('identityApi.fetchUsers: returning MOCK_USERS (count=', MOCK_USERS.length, ')');
-    return new Promise(resolve => setTimeout(() => resolve(MOCK_USERS), 500));
+// Mappings based on backend enums (Reverting to INTEGERS as verified by curl)
+const mapFrontendRoleToBackend = (role: Role): number => {
+    switch (role) {
+        case 'Professor': return 3; // Teacher
+        case 'Assistant': return 4;
+        case 'Student': return 5;
+        case 'Admin': return 2; // Admin
+        case 'Superadmin': return 1; // Superadmin
+        default: return 5;
+    }
 };
 
-type CreateUserPayload = Omit<User, 'id' | 'lastActive' | 'status'> & { password: string; status?: Status };
+const mapFrontendStatusToBackend = (status: Status): number => {
+    return status === 'Active' ? 1 : 2;
+};
 
-export const createUser = async (data: CreateUserPayload): Promise<User> => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            // debug
-            // eslint-disable-next-line no-console
-            console.log('identityApi.createUser called with', data);
+const mapBackendRole = (role: number | string): Role => {
+    // Handle both int (if backend changes mind) and string
+    if (typeof role === 'string') {
+        if (role === 'Teacher') return 'Professor';
+        if (role === 'Staff') return 'Admin'; // Graceful handling for old data if any
+        return role as Role;
+    }
+    switch (role) {
+        case 3: return 'Professor';
+        case 4: return 'Assistant';
+        case 5: return 'Student';
+        case 1: return 'Superadmin';
+        case 2: return 'Admin';
+        default: return 'Admin';
+    }
+};
 
-            if (MOCK_USERS.some(u => u.username === data.username)) {
-                // eslint-disable-next-line no-console
-                console.warn('identityApi.createUser: username already exists', data.username);
-                return reject({ message: "Username je već zauzet." });
-            }
+const mapBackendStatus = (status: number | string): Status => {
+    if (typeof status === 'string') return status as Status;
+    return status === 1 ? 'Active' : 'Inactive';
+};
 
-            const newUser: User = {
-                ...data,
-                id: `u${MOCK_USERS.length + 1}`,
-                lastActive: 'Never',
-                status: (data as any).status || 'Active',
-                indexNumber: (data as any).role === 'Student' ? (data as any).indexNumber : undefined,
-            };
-            MOCK_USERS.push(newUser);
-            // eslint-disable-next-line no-console
-            console.log('identityApi.createUser: pushed new user; MOCK_USERS length =', MOCK_USERS.length);
-            resolve(newUser);
-        }, 800);
-    });
+export const fetchUsers = async (api: API): Promise<User[]> => {
+    // Backend returns { items: [...], totalCount: ... }
+    const response: any = await api.get('/api/users');
+    const items = response.items || [];
+
+    return items.map((u: any) => ({
+        id: u.id,
+        username: u.username,
+        firstName: u.firstName,
+        lastName: u.lastName,
+        email: u.email,
+        role: mapBackendRole(u.role),
+        facultyId: u.facultyId,
+        status: mapBackendStatus(u.status),
+        lastActive: 'Unknown', // Backend doesn't track this
+        indexNumber: u.indexNumber
+    }));
+};
+
+type CreateUserPayload = Omit<User, 'id' | 'lastActive' | 'status'> & { status?: Status };
+
+export const createUser = async (api: API, data: CreateUserPayload): Promise<User> => {
+    // Explicitly construct payload to ensure cleaner JSON and correct types
+    const payload = {
+        username: data.username,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        facultyId: data.facultyId,
+        // Backend expects specific string enum names: Teacher, Student, etc.
+        role: mapFrontendRoleToBackend(data.role),
+        indexNumber: data.indexNumber || null
+    };
+
+    // DEBUG: Log payload to see what we are sending
+    // eslint-disable-next-line no-console
+    console.log('Sending createUser payload:', JSON.stringify(payload, null, 2));
+
+    // Backend returns the created UserResponse
+    const response: any = await api.post('/api/users', payload);
+
+    return {
+        id: response.id,
+        username: response.username,
+        firstName: response.firstName,
+        lastName: response.lastName,
+        email: response.email,
+        role: mapBackendRole(response.role),
+        facultyId: response.facultyId,
+        status: mapBackendStatus(response.status),
+        lastActive: 'Just now',
+        indexNumber: response.indexNumber
+    };
 };
 
 export const updateUser = async (
+    api: API,
     id: string,
-    data: Partial<Omit<User, 'id' | 'username' | 'email' | 'lastActive'>>
+    data: Partial<Omit<User, 'id' | 'lastActive'>>
 ): Promise<User> => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const index = MOCK_USERS.findIndex(u => u.id === id);
-            if (index === -1) {
-                return reject({ message: "Korisnik nije pronađen." });
-            }
+    // Calls IdentityController.UpdateUser(string userId, [FromBody] UpdateUserRequest request)
+    // Explicit construction for UpdateUserRequest
+    const payload = {
+        id: id,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        facultyId: data.facultyId,
+        role: data.role ? mapFrontendRoleToBackend(data.role as Role) : undefined,
+        // UserStatus Enum: Active=1, Inactive=2 (Integers verified)
+        status: data.status ? mapFrontendStatusToBackend(data.status as Status) : undefined,
+        indexNumber: data.indexNumber || null,
+        email: data.email,
+        username: data.username
+    };
 
-            const updatedUser: User = {
-                ...MOCK_USERS[index],
-                ...data,
-                status: (data as any).status || MOCK_USERS[index].status,
-                indexNumber: data.role === 'Student' ? data.indexNumber : undefined,
-            };
+    await api.put(`/api/users/${id}`, payload);
 
-            MOCK_USERS[index] = updatedUser;
-            resolve(updatedUser);
-        }, 800);
-    });
+    return { ...data, id } as User;
 };
 
 
-export const deleteUser = async (id: string): Promise<void> => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const initialLength = MOCK_USERS.length;
-            MOCK_USERS = MOCK_USERS.filter(u => u.id !== id);
-            if (MOCK_USERS.length < initialLength) {
-                resolve();
-            } else {
-                reject({ message: "Korisnik nije pronađen za brisanje." });
-            }
-        }, 500);
-    });
+export const deleteUser = async (api: API, id: string): Promise<void> => {
+    // Calls IdentityController.DeleteUser(string userId)
+    await api.delete(`/api/users/${id}`);
 };
 
 export const getFacultyName = (facultyId: string): string => {
@@ -112,15 +156,9 @@ export const getFacultyName = (facultyId: string): string => {
     return faculty ? faculty.name : 'N/A';
 };
 
-export const deactivateUser = async (id: string): Promise<User> => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const index = MOCK_USERS.findIndex(u => u.id === id);
-            if (index === -1) {
-                return reject({ message: "Korisnik nije pronađen." });
-            }
-            MOCK_USERS[index] = { ...MOCK_USERS[index], status: 'Inactive' };
-            resolve(MOCK_USERS[index]);
-        }, 500);
-    });
+export const deactivateUser = async (api: API, id: string): Promise<User> => {
+    // Calls IdentityController.DeactivateUser(string userId)
+    await api.patch(`/api/users/${id}/deactivate`);
+    // Similar to update, returns NoContent.
+    return { id, status: 'Inactive' } as User;
 };

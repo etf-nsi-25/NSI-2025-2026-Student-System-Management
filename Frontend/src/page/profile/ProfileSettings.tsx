@@ -31,7 +31,7 @@ interface UserProfile {
 }
 
 export function ProfileSettings() {
-  const { authInfo } = useAuthContext();
+  const { authInfo, setAuthInfo } = useAuthContext();
   const api = useAPI();
   const navigate = useNavigate();
   const location = useLocation();
@@ -56,6 +56,7 @@ export function ProfileSettings() {
     address: 'N/A', // Not available in Identity API - at least I don't see it
     program: 'N/A', // Not available in Identity API - at least I don't see it
   });
+  const mustChangePassword = !!authInfo?.forcePasswordChange;
 
   useEffect(() => {
     if (authInfo) {
@@ -85,6 +86,12 @@ export function ProfileSettings() {
     }
   }, [authInfo]);
 
+  useEffect(() => {
+    if (authInfo?.forcePasswordChange) {
+      setShowResetModal(true);
+    }
+  }, [authInfo?.forcePasswordChange]);
+
 
   const handleSavePassword = async () => {
     setErrorMessage(null)
@@ -110,11 +117,17 @@ export function ProfileSettings() {
     try {
       await api.changePassword({ newPassword: password });
 
-      setShowSuccessModal(true)
-      setPassword('')
-      setConfirmPassword('')
-      setVerificationMethod('email')
-      setErrorMessage(null)
+      setShowSuccessModal(true);
+
+      setAuthInfo(undefined);
+      localStorage.removeItem("authInfo");
+
+      navigate("/login", { replace: true });
+
+      setPassword('');
+      setConfirmPassword('');
+      setVerificationMethod('email');
+      setErrorMessage(null);
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : 'Failed to update password');
       setShowResetModal(true); // Re-open modal if it failed
@@ -126,6 +139,10 @@ export function ProfileSettings() {
     setErrorMessage(null)
     setPassword('')
     setConfirmPassword('')
+  }
+
+  const handleModalClose = () => {
+    if (!mustChangePassword) closeResetModal();
   }
 
   return (
@@ -226,10 +243,10 @@ export function ProfileSettings() {
       {/* RESET PASSWORD MODAL */}
       <CModal
         visible={showResetModal}
-        onClose={closeResetModal}
+        onClose={handleModalClose}
         alignment="center"
-        backdrop={false}
-        focus={false}
+        backdrop={false}     
+        keyboard={false}   
       >
         <CModalHeader>
           <strong>Reset password</strong>
@@ -271,7 +288,7 @@ export function ProfileSettings() {
         </CModalBody>
 
         <CModalFooter>
-          <CButton color="secondary" onClick={closeResetModal}>
+          <CButton color="secondary" onClick={closeResetModal}  disabled={mustChangePassword}>
             Cancel
           </CButton>
           <CButton color="primary" onClick={handleSavePassword}>
@@ -286,7 +303,6 @@ export function ProfileSettings() {
         onClose={() => setShowSuccessModal(false)}
         alignment="center"
         backdrop={false}
-        focus={false}
       >
         <CModalHeader>
           <strong>Success</strong>

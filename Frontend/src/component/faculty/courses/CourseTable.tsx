@@ -26,7 +26,6 @@ const CourseTable = ({ search, courses, onEdit, onDelete }: Props) => {
     <CTable hover responsive>
       <CTableHead color="light">
         <CTableRow>
-          <CTableHeaderCell>ID</CTableHeaderCell>
           <CTableHeaderCell>Name</CTableHeaderCell>
           <CTableHeaderCell>Code</CTableHeaderCell>
           <CTableHeaderCell>Type</CTableHeaderCell>
@@ -39,7 +38,6 @@ const CourseTable = ({ search, courses, onEdit, onDelete }: Props) => {
       <CTableBody>
         {filtered.map((course) => (
           <CTableRow key={course.id}>
-            <CTableDataCell>{course.id}</CTableDataCell>
             <CTableDataCell>{course.name}</CTableDataCell>
             <CTableDataCell>{course.code}</CTableDataCell>
             <CTableDataCell>{course.type}</CTableDataCell>

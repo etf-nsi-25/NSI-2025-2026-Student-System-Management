@@ -4,9 +4,9 @@ using University.Infrastructure.Entities;
 
 namespace University.Infrastructure.Configurations
 {
-    public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
+    public class DepartmentConfiguration : IEntityTypeConfiguration<DepartmentSchema>
     {
-        public void Configure(EntityTypeBuilder<Department> builder)
+        public void Configure(EntityTypeBuilder<DepartmentSchema> builder)
         {
             builder.ToTable("Departments");
             builder.HasKey(x => x.Id);

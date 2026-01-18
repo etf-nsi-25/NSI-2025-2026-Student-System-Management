@@ -1,6 +1,6 @@
 ﻿namespace University.Infrastructure.Entities
 {
-    public class Program
+    public class ProgramSchema
     {
         public int Id { get; set; }
         public int DepartmentId { get; set; }
@@ -10,7 +10,7 @@
         public int DurationYears { get; set; }
         public int Credits { get; set; }
 
-        public Department Department { get; set; } = default!;
+        public DepartmentSchema Department { get; set; } = default!;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }

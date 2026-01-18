@@ -27,6 +27,10 @@ public class JwtTokenService : IJwtTokenService
         }
 
         _signingKey = new SymmetricSecurityKey(keyBytes);
+
+        Console.WriteLine($"JWT SIGN (generator) key len: {keyBytes.Length}");
+        Console.WriteLine($"JWT SIGN (generator) key prefix: {_jwtSettings.SigningKey.Substring(0, 8)}");
+
     }
 
     public string GenerateAccessToken(TokenClaims claims)

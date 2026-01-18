@@ -1,11 +1,3 @@
-type ValidationErrors = {
-  userId?: string;
-  facultyId?: string;
-  requestType?: string;
-  status?: string;
-  details?: string;
-};
-
 import { useState } from 'react';
 import {
   CCard,
@@ -21,26 +13,27 @@ import {
   CDropdownToggle,
   CDropdownMenu,
   CDropdownItem,
-  CTable,
-  CTableRow,
-  CTableHead,
-  CTableHeaderCell,
-  CTableBody,
-  CTableDataCell,
-  CBadge,
   CAlert,
   CSpinner,
 } from '@coreui/react';
 import './documentCenter.css';
 import { useAPI } from '../../context/services.tsx';
 
+type ValidationErrors = {
+  userId?: string;
+  facultyId?: string;
+  requestType?: string;
+  status?: string;
+  details?: string;
+};
+
 export default function DocumentCenterDashboard() {
   const [requestType, setRequestType] = useState('');
   const [status, setStatus] = useState('');
   const [details, setDetails] = useState('');
 
-  const [userId, setUserId] = useState(''); 
-  const [facultyId, setFacultyId] = useState(1);
+  const [userId, setUserId] = useState('');
+  const [facultyId, setFacultyId] = useState('');
 
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [submitting, setSubmitting] = useState(false);
@@ -53,8 +46,7 @@ export default function DocumentCenterDashboard() {
     const newErrors: ValidationErrors = {};
 
     if (!userId.trim()) newErrors.userId = 'UserId is required.';
-    if (!facultyId || Number(facultyId) <= 0)
-      newErrors.facultyId = 'FacultyId must be greater than 0.';
+    if (!facultyId.trim()) newErrors.facultyId = 'FacultyId is required.';
     if (!requestType) newErrors.requestType = 'Request type is required.';
     if (!status) newErrors.status = 'Status is required.';
     if (!details.trim()) newErrors.details = 'Details are required.';
@@ -75,28 +67,25 @@ export default function DocumentCenterDashboard() {
     setErrors({});
 
     const payload = {
-      userId: userId,
-      facultyId: Number(facultyId),
+      userId,
+      facultyId,
       documentType: requestType,
-      status: status
+      status,
     };
 
     try {
       setSubmitting(true);
-
-      api.post('/api/Support/document-request', payload)
-          .then(response => {
-            console.log('Created request: ', response);
-            setSubmitSuccess('Request successfully submitted.');
-            setRequestType('');
-            setStatus('');
-            setDetails('');
-          });
+      await api.post('/api/Support/document-request', payload);
+      setSubmitSuccess('Request successfully submitted.');
+      setRequestType('');
+      setStatus('');
+      setDetails('');
+      setFacultyId('');
+      setUserId('');
     } catch (err) {
       const error = err as Error;
       setSubmitError(error.message || 'Error while submitting request.');
-    }
-     finally {
+    } finally {
       setSubmitting(false);
     }
   };
@@ -105,6 +94,8 @@ export default function DocumentCenterDashboard() {
     setRequestType('');
     setStatus('');
     setDetails('');
+    setFacultyId('');
+    setUserId('');
     setErrors({});
     setSubmitError('');
     setSubmitSuccess('');
@@ -118,16 +109,8 @@ export default function DocumentCenterDashboard() {
         </CCardHeader>
 
         <CCardBody>
-          {submitError && (
-            <CAlert color="danger" className="mb-3">
-              {submitError}
-            </CAlert>
-          )}
-          {submitSuccess && (
-            <CAlert color="success" className="mb-3">
-              {submitSuccess}
-            </CAlert>
-          )}
+          {submitError && <CAlert color="danger">{submitError}</CAlert>}
+          {submitSuccess && <CAlert color="success">{submitSuccess}</CAlert>}
 
           <CForm onSubmit={handleSubmit}>
             <CRow className="mb-3">
@@ -136,98 +119,58 @@ export default function DocumentCenterDashboard() {
                 <CFormInput
                   value={userId}
                   onChange={(e) => setUserId(e.target.value)}
-                  placeholder="Enter user Id"
+                  placeholder="Enter user id"
                 />
-                {errors.userId && (
-                  <div className="text-danger small mt-1">
-                    {errors.userId}
-                  </div>
-                )}
+                {errors.userId && <div className="text-danger small">{errors.userId}</div>}
               </CCol>
 
               <CCol md={6}>
-                <CFormLabel>Faculty Id</CFormLabel>
+                <CFormLabel>Faculty Id (GUID)</CFormLabel>
                 <CFormInput
-                  type="number"
+                  type="text"
                   value={facultyId}
-                  onChange={(e) => setFacultyId(Number(e.target.value))}
-                  placeholder="Enter faculty id"
+                  onChange={(e) => setFacultyId(e.target.value)}
+                  placeholder="Enter faculty GUID"
                 />
-                {errors.facultyId && (
-                  <div className="text-danger small mt-1">
-                    {errors.facultyId}
-                  </div>
-                )}
+                {errors.facultyId && <div className="text-danger small">{errors.facultyId}</div>}
               </CCol>
             </CRow>
 
             <CRow className="mb-3">
               <CCol md={6}>
-                <CFormLabel className="mb-1">Request Type</CFormLabel>
-
+                <CFormLabel>Request Type</CFormLabel>
                 <CDropdown className="w-100">
-                  <CDropdownToggle
-                    color="secondary"
-                    className="w-100 text-start"
-                  >
+                  <CDropdownToggle color="secondary" className="w-100 text-start">
                     {requestType || 'Choose request type'}
                   </CDropdownToggle>
-
                   <CDropdownMenu>
-                    <CDropdownItem
-                      onClick={() => setRequestType('Enrollment Certificate')}
-                    >
+                    <CDropdownItem onClick={() => setRequestType('Enrollment Certificate')}>
                       Enrollment Certificate
                     </CDropdownItem>
-                    <CDropdownItem
-                      onClick={() => setRequestType('Transcript')}
-                    >
+                    <CDropdownItem onClick={() => setRequestType('Transcript')}>
                       Transcript
                     </CDropdownItem>
-                    <CDropdownItem
-                      onClick={() => setRequestType('Other document')}
-                    >
+                    <CDropdownItem onClick={() => setRequestType('Other document')}>
                       Other document
                     </CDropdownItem>
                   </CDropdownMenu>
                 </CDropdown>
-
-                {errors.requestType && (
-                  <div className="text-danger small mt-1">
-                    {errors.requestType}
-                  </div>
-                )}
+                {errors.requestType && <div className="text-danger small">{errors.requestType}</div>}
               </CCol>
 
               <CCol md={6}>
-                <CFormLabel className="mb-1">Status Request</CFormLabel>
-
+                <CFormLabel>Status</CFormLabel>
                 <CDropdown className="w-100">
-                  <CDropdownToggle
-                    color="secondary"
-                    className="w-100 text-start"
-                  >
-                    {status || 'Choose status request'}
+                  <CDropdownToggle color="secondary" className="w-100 text-start">
+                    {status || 'Choose status'}
                   </CDropdownToggle>
-
                   <CDropdownMenu>
-                    <CDropdownItem onClick={() => setStatus('Pending')}>
-                      Pending
-                    </CDropdownItem>
-                    <CDropdownItem onClick={() => setStatus('Approved')}>
-                      Approved
-                    </CDropdownItem>
-                    <CDropdownItem onClick={() => setStatus('Rejected')}>
-                      Rejected
-                    </CDropdownItem>
+                    <CDropdownItem onClick={() => setStatus('Pending')}>Pending</CDropdownItem>
+                    <CDropdownItem onClick={() => setStatus('Approved')}>Approved</CDropdownItem>
+                    <CDropdownItem onClick={() => setStatus('Rejected')}>Rejected</CDropdownItem>
                   </CDropdownMenu>
                 </CDropdown>
-
-                {errors.status && (
-                  <div className="text-danger small mt-1">
-                    {errors.status}
-                  </div>
-                )}
+                {errors.status && <div className="text-danger small">{errors.status}</div>}
               </CCol>
             </CRow>
 
@@ -235,33 +178,19 @@ export default function DocumentCenterDashboard() {
               <CCol md={12}>
                 <CFormLabel>Request details</CFormLabel>
                 <CFormInput
-                  placeholder="Enter request details"
                   value={details}
                   onChange={(e) => setDetails(e.target.value)}
+                  placeholder="Enter request details"
                 />
-                {errors.details && (
-                  <div className="text-danger small mt-1">
-                    {errors.details}
-                  </div>
-                )}
+                {errors.details && <div className="text-danger small">{errors.details}</div>}
               </CCol>
             </CRow>
 
             <div className="text-end">
-              <CButton
-                type="button"
-                color="secondary"
-                onClick={handleCancel}
-                disabled={submitting}
-              >
+              <CButton color="secondary" onClick={handleCancel} disabled={submitting}>
                 Cancel
               </CButton>
-              <CButton
-                type="submit"
-                color="primary"
-                className="ms-2"
-                disabled={submitting}
-              >
+              <CButton type="submit" color="primary" className="ms-2" disabled={submitting}>
                 {submitting ? (
                   <>
                     <CSpinner size="sm" className="me-2" />
@@ -275,94 +204,6 @@ export default function DocumentCenterDashboard() {
           </CForm>
         </CCardBody>
       </CCard>
-
-      {}
-      <CCard className="shadow-sm mt-4">
-        <CCardHeader>
-          <h4>Active Requests</h4>
-        </CCardHeader>
-
-        <CCardBody>
-          <CTable striped hover responsive>
-            <CTableHead>
-              <CTableRow>
-                <CTableHeaderCell scope="col">ID</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Request Type</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Status</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Created</CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-
-            <CTableBody>
-              <CTableRow>
-                <CTableHeaderCell scope="row">1</CTableHeaderCell>
-                <CTableDataCell>Enrollment Certificate</CTableDataCell>
-                <CTableDataCell>
-                  <CBadge color="warning" className="status-badge">
-                    Pending
-                  </CBadge>
-                </CTableDataCell>
-                <CTableDataCell>2025-01-12</CTableDataCell>
-              </CTableRow>
-
-              <CTableRow>
-                <CTableHeaderCell scope="row">2</CTableHeaderCell>
-                <CTableDataCell>Transcript</CTableDataCell>
-                <CTableDataCell>
-                  <CBadge color="success" className="status-badge">
-                    Approved
-                  </CBadge>
-                </CTableDataCell>
-                <CTableDataCell>2025-01-08</CTableDataCell>
-              </CTableRow>
-            </CTableBody>
-          </CTable>
-        </CCardBody>
-      </CCard>
-
-      <CCard className="shadow-sm mt-4">
-        <CCardHeader>
-          <h4>Previous Requests</h4>
-        </CCardHeader>
-
-        <CCardBody>
-          <CTable striped hover responsive>
-            <CTableHead>
-              <CTableRow>
-                <CTableHeaderCell scope="col">ID</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Request Type</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Status</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Created</CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-
-            <CTableBody>
-              <CTableRow>
-                <CTableHeaderCell scope="row">1</CTableHeaderCell>
-                <CTableDataCell>Enrollment Certificate</CTableDataCell>
-                <CTableDataCell>
-                  <CBadge color="warning" className="status-badge">
-                    Pending
-                  </CBadge>
-                </CTableDataCell>
-                <CTableDataCell>2025-01-12</CTableDataCell>
-              </CTableRow>
-
-              <CTableRow>
-                <CTableHeaderCell scope="row">2</CTableHeaderCell>
-                <CTableDataCell>Transcript</CTableDataCell>
-                <CTableDataCell>
-                  <CBadge color="success" className="status-badge">
-                    Approved
-                  </CBadge>
-                </CTableDataCell>
-                <CTableDataCell>2025-01-08</CTableDataCell>
-              </CTableRow>
-            </CTableBody>
-          </CTable>
-        </CCardBody>
-      </CCard>
-
     </div>
   );
 }

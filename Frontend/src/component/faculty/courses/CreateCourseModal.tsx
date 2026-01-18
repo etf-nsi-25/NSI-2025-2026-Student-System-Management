@@ -25,7 +25,7 @@ const CreateCourseModal = ({ visible, onClose, onCreate }: Props) => {
     name: "",
     ects: 0,
     code: "",
-    type: "mandatory", 
+    type: "mandatory",
     programId: "",
   });
 
@@ -44,7 +44,13 @@ const CreateCourseModal = ({ visible, onClose, onCreate }: Props) => {
   };
 
   return (
-    <CModal visible={visible} onClose={onClose} alignment="center" size="lg">
+    <CModal
+      visible={visible}
+      onClose={onClose}
+      alignment="center"
+      size="lg"
+      className="modal-z-fix"
+    >
       <CModalHeader closeButton>
         <CModalTitle>Create Course</CModalTitle>
       </CModalHeader>
