@@ -27,13 +27,13 @@ public class StudentExamGradeController : ControllerBase
     }
 
     [HttpPost("exams/{examId}/students/{studentId}")]
-    public async Task<IActionResult> CreateOrUpdate(
+    public async Task<IActionResult> Create(
         int examId,
         int studentId,
         [FromBody] GradeRequestDTO requestDto,
         CancellationToken ct)
     {
-        var result = await _service.CreateOrUpdateAsync(
+        var result = await _service.CreateAsync(
             examId,
             studentId,
             requestDto,

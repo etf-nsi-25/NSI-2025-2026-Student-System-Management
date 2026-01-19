@@ -9,7 +9,7 @@ public interface IStudentExamGradeService
         int teacherId,
         CancellationToken ct);
 
-    Task<GradeResponseDTO> CreateOrUpdateAsync(
+    Task<GradeResponseDTO> CreateAsync(
         int examId,
         int studentId,
         GradeRequestDTO requestDto,

@@ -34,13 +34,12 @@ public class StudentExamGradeServiceTests
 
         var service = CreateService();
 
-        var result = await service.CreateOrUpdateAsync(
+        var result = await service.CreateAsync(
             examId: 1,
             studentId: 1,
             new GradeRequestDTO
             {
                 Points = 85,
-                Passed = true,
                 Url = "https://example.com"
             },
             _teacherId,
@@ -75,13 +74,12 @@ public class StudentExamGradeServiceTests
 
         var service = CreateService();
 
-        var result = await service.CreateOrUpdateAsync(
+        var result = await service.CreateAsync(
             examId: 1,
             studentId: 1,
             new GradeRequestDTO
             {
                 Points = 70,
-                Passed = true,
                 Url = "https://example.com"
             },
             _teacherId,
@@ -92,6 +90,30 @@ public class StudentExamGradeServiceTests
             Times.Once);
 
         Assert.Equal("John Doe", result.StudentName);
+    }
+
+    [Fact]
+    public async Task CreateGrade_AlreadyExists_Throws()
+    {
+        _repo.Setup(r => r.ExamBelongsToTeacherAsync(1, _teacherId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+        _repo.Setup(r => r.GetAsync(1, 1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new StudentExamGrade());
+
+        var service = CreateService();
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.CreateAsync(
+                examId: 1,
+                studentId: 1,
+                new GradeRequestDTO
+                {
+                    Points = 70,
+                    Url = "https://example.com"
+                },
+                _teacherId,
+                default));
     }
 
     [Fact]
@@ -126,10 +148,10 @@ public class StudentExamGradeServiceTests
         var service = CreateService();
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
-            service.CreateOrUpdateAsync(
+            service.CreateAsync(
                 1,
                 1,
-                new GradeRequestDTO { Points = 80, Passed = true },
+                new GradeRequestDTO { Points = 80 },
                 _teacherId,
                 default));
     }
@@ -143,10 +165,10 @@ public class StudentExamGradeServiceTests
         var service = CreateService();
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            service.CreateOrUpdateAsync(
+            service.CreateAsync(
                 1,
                 1,
-                new GradeRequestDTO { Points = 120, Passed = true },
+                new GradeRequestDTO { Points = 120 },
                 _teacherId,
                 default));
     }

@@ -3,6 +3,7 @@ using Faculty.Application.Interfaces;
 using Faculty.Core.Entities;
 using Faculty.Core.Interfaces;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics.Metrics;
 
 namespace Faculty.Application.Services;
 
@@ -24,17 +25,12 @@ public class StudentExamGradeService : IStudentExamGradeService
         int teacherId,
         CancellationToken ct)
     {
-        if (!await _repo.ExamBelongsToTeacherAsync(examId, teacherId, ct))
-        {
-            _logger.LogWarning(
-                "Unauthorized GET attempt for ExamId={ExamId} by TeacherId={TeacherId}",
-                examId,
-                teacherId);
-
-            throw new UnauthorizedAccessException("You can view only your own exams.");
-        }
-
         var grades = (await _repo.GetAllForExamAsync(examId, ct)).ToList();
+
+        if (!grades.Any()) 
+        { 
+            throw new KeyNotFoundException($"Exam {examId} not found."); 
+        }
 
         _logger.LogInformation(
             "Fetched {Count} grades for ExamId={ExamId} by TeacherId={TeacherId}",
@@ -58,7 +54,7 @@ public class StudentExamGradeService : IStudentExamGradeService
         };
     }
 
-    public async Task<GradeResponseDTO> CreateOrUpdateAsync(
+    public async Task<GradeResponseDTO> CreateAsync(
         int examId,
         int studentId,
         GradeRequestDTO requestDto,
@@ -96,7 +92,7 @@ public class StudentExamGradeService : IStudentExamGradeService
                 StudentId = studentId,
                 ExamId = examId,
                 Points = requestDto.Points,
-                Passed = requestDto.Passed,
+                Passed = requestDto.Points >= 55,
                 URL = requestDto.Url,
                 DateRecorded = DateTime.UtcNow
             };
@@ -111,18 +107,11 @@ public class StudentExamGradeService : IStudentExamGradeService
         }
         else
         {
-            grade.Points = requestDto.Points;
-            grade.Passed = requestDto.Passed;
-            grade.URL = requestDto.Url;
-            grade.DateRecorded = DateTime.UtcNow;
+            _logger.LogWarning(
+                "Attempt to create duplicate grade for StudentId={StudentId} ExamId={ExamId} by TeacherId={TeacherId}",
+                requestDto.StudentId, requestDto.ExamId, teacherId);
 
-            await _repo.UpdateAsync(grade, ct);
-
-            _logger.LogInformation(
-                "Updated grade for StudentId={StudentId} ExamId={ExamId} by TeacherId={TeacherId}",
-                studentId,
-                examId,
-                teacherId);
+            throw new InvalidOperationException("Grade already exists.");
         }
 
         return new GradeResponseDTO
