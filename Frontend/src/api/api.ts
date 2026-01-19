@@ -10,6 +10,7 @@ import type {
 import type { CreateExamRequestDTO, ExamResponseDTO, UpdateExamRequestDTO } from '../dto/ExamDTO';
 import type { CourseOverviewDTO } from '../dto/CourseOverviewDTO';
 import type { TwoFAConfirmResponse, TwoFASetupResponse } from '../models/2fa/TwoFA.types';
+import type { AssignmentDTO, AssignmentsPaginated } from '../models/assignments/Assignments.types';
 import type { Assignment } from '../page/assignments/AssignmentTypes';
 import type { StudentRequestDto } from '../page/requests/RequestTypes';
 
@@ -83,6 +84,27 @@ export class API {
         return this.delete<void>(`/api/faculty/courses/${id}`)
     }
 
+    //Assignments management methods
+    async getAllAssignments(query?: string, pageSize: number = 10, pageNumber: number = 1): Promise<AssignmentsPaginated> {
+        const params = new URLSearchParams();
+        if (query) params.append('query', query);
+        params.append('pageSize', pageSize.toString());
+        params.append('pageNumber', pageNumber.toString());
+        
+        return this.get<AssignmentsPaginated>(`/api/Assignment?${params.toString()}`);
+    }
+
+    async createAssignment(dto: AssignmentDTO): Promise<void> {
+        return this.post<void>("/api/Assignment", dto);
+    }
+
+    async updateAssignment(id: string, dto: AssignmentDTO): Promise<void> {
+        return this.put<void>(`/api/Assignment/${id}`, dto);
+    }
+
+    async deleteAssignment(id: string): Promise<void> {
+        return this.delete<void>(`/api/Assignment/${id}`);
+    }
     // Student exam registration
     async getAvailableStudentExams(): Promise<AvailableStudentExamDto[]> {
         return this.get<AvailableStudentExamDto[]>("/api/faculty/student-exams/available");

@@ -1,0 +1,251 @@
+/* Assignment Management Custom Styles */
+
+.assignmentContainer {
+  min-height: 100vh;
+  background-color: #c5d3dd;
+  padding: 2rem;
+}
+
+.contentWrapper {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.pageTitle {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #374151;
+}
+
+/* Section Cards */
+.sectionCard {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.sectionCardBody {
+  padding: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e5a96;
+  margin-bottom: 1.5rem;
+}
+
+/* Form Grid Layout */
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+}
+
+.formFieldFullWidth {
+  grid-column: 1 / -1;
+}
+
+.formLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.formInput,
+.formSelect,
+.formTextarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.formInput:focus,
+.formSelect:focus,
+.formTextarea:focus {
+  border-color: #1e5a96;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(30, 90, 150, 0.1);
+}
+
+.formTextarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.errorText {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Buttons */
+.createButton {
+  background-color: #1e5a96;
+  color: white;
+  padding: 0.5rem 3rem;
+  font-weight: 600;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.createButton:hover {
+  background-color: #164676;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+/* Search Bar */
+.searchContainer {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding-left: 2.5rem;
+  padding-right: 0.75rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: white;
+}
+
+.searchInput:focus {
+  border-color: #1e5a96;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(30, 90, 150, 0.1);
+}
+
+/* Table */
+.tableContainer {
+  overflow: auto;
+  max-height: 500px;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+}
+
+.table {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.tableHeader {
+  background-color: #f3f4f6;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tableHeaderCell {
+  font-weight: 600;
+  color: #374151;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+.tableRow {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.15s;
+}
+
+.tableRow:hover {
+  background-color: #f9fafb;
+}
+
+.tableCell {
+  padding: 0.75rem 1rem;
+  color: #374151;
+}
+
+.actionsCell {
+  width: 120px;
+  text-align: center;
+}
+
+.actionButtonsContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.actionButton {
+  padding: 0.25rem;
+  color: #6b7280;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.actionButton:hover.editButton {
+  color: #1e5a96;
+}
+
+.actionButton:hover.deleteButton {
+  color: #dc2626;
+}
+
+/* Modal Overrides */
+.modalContent {
+  border-radius: 0.5rem;
+}
+
+.modalHeader {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1.5rem;
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.modalBody {
+  padding: 1.5rem;
+}
+
+.modalFooter {
+  border-top: 1px solid #e5e7eb;
+  padding: 1rem 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
