@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { 
-    CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter, 
-    CForm, CFormLabel, CFormInput, CFormSelect, CButton 
+import {
+    CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter,
+    CForm, CFormLabel, CFormInput, CFormSelect, CButton
 } from '@coreui/react';
+import { useAPI } from "../../context/services";
 import { updateUser } from "../../service/identityApi";
-import type { User, Faculty, Role, Status } from "../../service/identityApi"; // <--- ISPRAVLJENO
-
+import type { User, Faculty, Role, Status } from "../../service/identityApi";
+import { useAuthContext } from "../../init/auth";
 
 interface EditUserModalProps {
     isOpen: boolean;
@@ -18,6 +19,8 @@ interface EditUserModalProps {
 const EditUserModal: React.FC<EditUserModalProps> = ({
     isOpen, onClose, user, faculties, onUpdated,
 }) => {
+    const api = useAPI();
+    const { authInfo } = useAuthContext();
     const [form, setForm] = useState({
         firstName: "", lastName: "", facultyId: "", role: "", indexNumber: "", status: "",
     });
@@ -27,7 +30,20 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     const [message, setMessage] = useState<{ text: string; type: "success" | "danger" | "" }>({
         text: "", type: "",
     });
-    
+
+    const availableRoles = ['Professor', 'Assistant', 'Student', 'Admin', 'Superadmin'].filter(r => {
+        // Must allow keeping current role even if generally restricted (e.g. looking at an Admin)
+        // But for *changing* role, restrictions apply.
+        // Simplified Logic per request:
+        if (authInfo?.role === 'Superadmin') {
+            // Superadmin can only manage Admins. 
+            // Exception: If they are editing an existing Admin, 'Admin' is valid.
+            return r === 'Admin';
+        }
+        if (authInfo?.role === 'Admin') return r !== 'Superadmin' && r !== 'Admin';
+        return r !== 'Superadmin' && r !== 'Admin';
+    });
+
     // Učitavanje trenutnih korisničkih podataka u formu
     useEffect(() => {
         if (user) {
@@ -53,18 +69,18 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
         if (!form.lastName) newErrors.lastName = "Prezime je obavezno.";
         if (!form.role) newErrors.role = "Rola je obavezna.";
         if (!form.facultyId) newErrors.facultyId = "Fakultet je obavezan.";
-        
+
         if (form.role === "Student" && !form.indexNumber) {
             newErrors.indexNumber = "Broj indeksa je obavezan za studente.";
         }
-        
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-         if (name === "role" && value !== "Student") {
+        if (name === "role" && value !== "Student") {
             setForm({ ...form, role: value, indexNumber: "" });
         } else {
             setForm({ ...form, [name]: value });
@@ -87,12 +103,15 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                 role: form.role as Role,
                 indexNumber: form.role === "Student" ? form.indexNumber : "",
                 status: form.status as Status,
+                // Include required fields that are not editable but required by DTO
+                email: user.email,
+                username: user.username
             };
             // debug
             // eslint-disable-next-line no-console
             console.log('EditUserModal: updating user', { id: user.id, payload });
 
-            const updated = await updateUser(user.id, payload as any);
+            const updated = await updateUser(api, user.id, payload as any); // <--- UPDATED
             // eslint-disable-next-line no-console
             console.log('EditUserModal: updateUser returned', updated);
 
@@ -114,32 +133,32 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     return (
         <CModal visible={isOpen} onClose={onClose} size="sm" className="modal-super-high-zindex">
             <CModalHeader closeButton>
-                        <CModalTitle>Edit User</CModalTitle>
-                    </CModalHeader>
-                     <CForm onSubmit={handleSave}>
+                <CModalTitle>Edit User</CModalTitle>
+            </CModalHeader>
+            <CForm onSubmit={handleSave}>
                 <CModalBody>
-                    
-                            <div className="mb-3">
-                                <CFormLabel htmlFor="edit-firstName">First Name</CFormLabel>
-                                <CFormInput 
-                                    id="edit-firstName"
-                                    name="firstName" 
-                                    autoComplete="given-name"
-                                    value={form.firstName} 
-                                    onChange={handleChange} 
-                                    invalid={!!errors.firstName}
-                                />
-                                 {errors.firstName && <div className="text-danger small">{errors.firstName}</div>}
-                            </div>
+
+                    <div className="mb-3">
+                        <CFormLabel htmlFor="edit-firstName">First Name</CFormLabel>
+                        <CFormInput
+                            id="edit-firstName"
+                            name="firstName"
+                            autoComplete="given-name"
+                            value={form.firstName}
+                            onChange={handleChange}
+                            invalid={!!errors.firstName}
+                        />
+                        {errors.firstName && <div className="text-danger small">{errors.firstName}</div>}
+                    </div>
 
                     <div className="mb-3">
                         <CFormLabel htmlFor="edit-lastName">Last Name</CFormLabel>
-                        <CFormInput 
+                        <CFormInput
                             id="edit-lastName"
-                            name="lastName" 
+                            name="lastName"
                             autoComplete="family-name"
-                            value={form.lastName} 
-                            onChange={handleChange} 
+                            value={form.lastName}
+                            onChange={handleChange}
                             invalid={!!errors.lastName}
                         />
                         {errors.lastName && <div className="text-danger small">{errors.lastName}</div>}
@@ -147,12 +166,13 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 
                     <div className="mb-3">
                         <CFormLabel htmlFor="edit-facultyId">Faculty</CFormLabel>
-                        <CFormSelect 
+                        <CFormSelect
                             id="edit-facultyId"
-                            name="facultyId" 
-                            value={form.facultyId} 
+                            name="facultyId"
+                            value={authInfo?.role === 'Admin' ? authInfo.tenantId : form.facultyId}
                             onChange={handleChange}
                             invalid={!!errors.facultyId}
+                            disabled={authInfo?.role === 'Admin'}
                         >
                             {faculties.map((f) => (
                                 <option key={f.id} value={f.id}>
@@ -165,17 +185,16 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 
                     <div className="mb-3">
                         <CFormLabel htmlFor="edit-role">Role</CFormLabel>
-                        <CFormSelect 
+                        <CFormSelect
                             id="edit-role"
-                            name="role" 
-                            value={form.role} 
+                            name="role"
+                            value={form.role}
                             onChange={handleChange}
                             invalid={!!errors.role}
                         >
-                            <option value="Professor">Professor</option>
-                            <option value="Assistant">Assistant</option>
-                            <option value="Student">Student</option>
-                            <option value="Staff">Staff</option>
+                            {availableRoles.map(r => (
+                                <option key={r} value={r}>{r}</option>
+                            ))}
                         </CFormSelect>
                         {errors.role && <div className="text-danger small">{errors.role}</div>}
                     </div>
@@ -196,19 +215,19 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                     {form.role === "Student" && (
                         <div className="mb-3">
                             <CFormLabel htmlFor="edit-indexNumber">Index Number</CFormLabel>
-                            <CFormInput 
+                            <CFormInput
                                 id="edit-indexNumber"
-                                name="indexNumber" 
+                                name="indexNumber"
                                 autoComplete="off"
-                                value={form.indexNumber} 
-                                onChange={handleChange} 
+                                value={form.indexNumber}
+                                onChange={handleChange}
                                 invalid={!!errors.indexNumber}
                             />
                             {errors.indexNumber && <div className="text-danger small">{errors.indexNumber}</div>}
                         </div>
                     )}
 
-                    
+
                     {message.text && (
                         <div className={`p-2 mt-3 text-center alert alert-${message.type}`}>
                             {message.text}
@@ -216,9 +235,9 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                     )}
                 </CModalBody>
                 <CModalFooter>
-                    <CButton 
-                        color="primary" 
-                        type="submit" 
+                    <CButton
+                        color="primary"
+                        type="submit"
                         disabled={loading}
                     >
                         {loading ? "Saving..." : "Save"}
@@ -227,7 +246,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                         Cancel
                     </CButton>
                 </CModalFooter>
-             </CForm>
+            </CForm>
         </CModal>
     );
 };

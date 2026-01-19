@@ -4,7 +4,27 @@ import { jwtDecode } from 'jwt-decode';
 interface RefreshResponse {
   accessToken: string;
   tokenType: string;
+  forcePasswordChange: boolean;
 }
+
+interface TwoFactorLoginRequiredResponse {
+  requiresTwoFactor: true;
+  twoFactorToken: string;
+  forcePasswordChange: boolean;
+}
+
+interface LoginOkResponse {
+  requiresTwoFactor?: false;
+  accessToken: string;
+  tokenType: string;
+  forcePasswordChange: boolean;
+}
+
+type LoginResponse = LoginOkResponse | TwoFactorLoginRequiredResponse;
+
+export type LoginResult =
+  | { kind: '2fa'; twoFactorToken: string }
+  | { kind: 'ok'; authInfo: AuthInfo };
 
 // This serves as a global lock to prevent multiple invocations of access token refresh to invalidate
 // each other's refresh tokens
@@ -16,7 +36,7 @@ let refreshInProgress: Promise<AuthInfo> | null = null;
  * @throws Error if refresh fails
  */
 
-export async function loginWithCredentials(email: string, password: string): Promise<AuthInfo> {
+export async function loginWithCredentials(email: string, password: string): Promise<LoginResult> {
   try {
     const response = await fetch(`/api/auth/login`, {
       method: 'POST',
@@ -30,7 +50,15 @@ export async function loginWithCredentials(email: string, password: string): Pro
       console.warn('Login failed:', response.status);
       throw new Error('Login failed');
     }
-    const data : RefreshResponse = await response.json();
+    const data: LoginResponse = await response.json();
+
+    if ('requiresTwoFactor' in data && data.requiresTwoFactor) {
+      return { kind: '2fa', twoFactorToken: data.twoFactorToken };
+    }
+
+    if (!data.accessToken) {
+      throw new Error('Login failed');
+    }
     // Decode JWT to extract claims
     const decoded = jwtDecode<AccessToken>(data.accessToken);
     const authInfo: AuthInfo = {
@@ -41,14 +69,45 @@ export async function loginWithCredentials(email: string, password: string): Pro
       role: decoded.role,
       tenantId: decoded.tenantId,
       fullName: decoded.fullName,
+      forcePasswordChange: data.forcePasswordChange
     };
-    return authInfo;
+    return { kind: 'ok', authInfo };
   } catch (error) {
 
     console.error('Login error:', error);
     throw error;
   }
 };
+
+export async function verifyTwoFactorLogin(twoFactorToken: string, code: string): Promise<AuthInfo> {
+  const response = await fetch(`/api/auth/verify-2fa`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ twoFactorToken, code }),
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    console.warn('2FA verification failed:', response.status);
+    throw new Error('2FA verification failed');
+  }
+
+  const data: RefreshResponse = await response.json();
+
+  const decoded = jwtDecode<AccessToken>(data.accessToken);
+  return {
+    accessToken: data.accessToken,
+    expiresOn: decoded.exp * 1000,
+    email: decoded.email,
+    userId: decoded.userId,
+    role: decoded.role,
+    tenantId: decoded.tenantId,
+    fullName: decoded.fullName,
+    forcePasswordChange: data.forcePasswordChange
+  };
+}
 
 export async function logoutFromServer(): Promise<void> {
   try {
@@ -103,6 +162,7 @@ export async function attemptSilentRefresh(): Promise<AuthInfo> {
         role: decoded.role,
         tenantId: decoded.tenantId,
         fullName: decoded.fullName,
+        forcePasswordChange: data.forcePasswordChange
       };
 
       return authInfo;

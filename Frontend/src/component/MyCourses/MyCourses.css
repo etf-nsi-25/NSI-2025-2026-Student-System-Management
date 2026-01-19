@@ -1,0 +1,234 @@
+.my-courses-section {
+    margin-bottom: 2rem;
+    width: 100%;
+}
+
+.my-courses-title {
+    color: #1a365d;
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.my-courses-grid {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 1.5rem !important;
+}
+
+.course-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 260px !important;
+    min-width: 260px !important;
+    max-width: 260px !important;
+}
+
+.course-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.course-card-header {
+    margin-bottom: 1rem;
+}
+
+.course-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a365d;
+    margin: 0 0 0.25rem 0;
+    line-height: 1.3;
+}
+
+.course-code {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.course-card-body {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 0.75rem !important;
+    padding: 0 !important;
+}
+
+.student-count {
+    font-size: 0.9rem;
+    color: #475569;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-badge.active {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.status-badge.mandatory {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.status-badge.elective {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.status-badge.inactive {
+    background-color: #f1f5f9;
+    color: #64748b;
+}
+
+.view-course-btn {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    background-color: #1a365d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.view-course-btn:hover {
+    background-color: #2d4a7c;
+}
+
+.my-courses-loading,
+.my-courses-error,
+.my-courses-empty {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    text-align: center;
+}
+
+.my-courses-error {
+    color: #dc2626;
+}
+
+.my-courses-empty {
+    color: #64748b;
+}
+
+/* Custom Modal Styles */
+.custom-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.custom-modal {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow: auto;
+}
+
+.custom-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.custom-modal-header h3 {
+    margin: 0;
+    color: #1a365d;
+    font-size: 1.25rem;
+}
+
+.custom-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #64748b;
+    padding: 0;
+    line-height: 1;
+}
+
+.custom-modal-close:hover {
+    color: #1a365d;
+}
+
+.custom-modal-body {
+    padding: 1.5rem;
+}
+
+.custom-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.custom-modal-btn {
+    padding: 0.5rem 1.5rem;
+    background-color: #1a365d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.custom-modal-btn:hover {
+    background-color: #2d4a7c;
+}
+
+.course-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.course-modal-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.course-modal-row:last-child {
+    border-bottom: none;
+}
+
+.course-modal-label {
+    font-weight: 600;
+    color: #1a365d;
+}
+
+.course-modal-value {
+    color: #475569;
+}

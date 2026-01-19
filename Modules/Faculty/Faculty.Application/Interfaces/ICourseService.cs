@@ -7,8 +7,10 @@ namespace Faculty.Application.Interfaces
         Task<CourseDTO> AddAsync(CourseDTO course);
         Task<CourseDTO?> GetByIdAsync(Guid id);
         Task<List<CourseDTO>> GetAllAsync();
-        Task<List<CourseDTO>> GetByTeacherAsync(string userId);
+        Task<List<ProfessorCourseDTO>> GetProfessorCoursesAsync(string userId);
         Task<CourseDTO?> UpdateAsync(Guid id, CourseDTO course);
         Task<bool> DeleteAsync(Guid id);
+        Task<TeacherDto?> GetTeacherForCourseAsync(Guid courseId);
+
     }
 }

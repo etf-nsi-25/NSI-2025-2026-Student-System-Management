@@ -17,7 +17,7 @@ public class StudentService(IStudentRepository repository)
                     IndexNumber = userCreatedEvent.IndexNumber!,
                     LastName = userCreatedEvent.LastName,
                     FirstName = userCreatedEvent.FirstName,
-                    EnrollmentDate = DateTime.UtcNow, // TODO: probably not NOW, this is just an example
+                    EnrollmentDate = DateTime.UtcNow, 
                     CreatedAt = DateTime.UtcNow
                 },
                 ct

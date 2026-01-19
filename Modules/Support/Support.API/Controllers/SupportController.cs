@@ -151,6 +151,18 @@ namespace Support.API.Controllers
 		}
 
 		[Authorize(Roles = "Admin")]
+		[HttpGet("enrollment-requests/all")]
+		public async Task<IActionResult> GetAllEnrollmentRequestsForFaculty([FromQuery] Guid facultyId)
+		{
+			var items = await _dbContext.EnrollmentRequests.AsNoTracking()
+				.Where(r => r.FacultyId.Equals(facultyId))
+				.OrderByDescending(r => r.CreatedAt)
+				.ToListAsync();
+
+			return Ok(items);
+		}
+
+		[Authorize(Roles = "Admin")]
 		[HttpPut("enrollment-requests/{id:guid}/approve")]
 		public async Task<IActionResult> ApproveEnrollmentRequest([FromRoute] Guid id, [FromBody] DecideEnrollmentRequestDTO? dto)
 		{
@@ -204,12 +216,12 @@ namespace Support.API.Controllers
 
                 var response = requests.Select(r => new 
                 {
-                    Id = r.Id.ToString(),
-                    Date = r.CreatedAt,
-                    StudentIndex = r.UserId,
-                    RequestType = r.DocumentType,
-                    RequestDetails = $"Request for {r.DocumentType}",
-                    Status = r.Status
+                    id = r.Id, // Keep as int to match interface or handle string conversion in frontend
+                    createdAt = r.CreatedAt, // Changed from date to createdAt
+                    userId = r.UserId, // Changed from studentIndex to userId
+                    documentType = r.DocumentType, // Changed from requestType to documentType
+                    facultyId = r.FacultyId,
+                    status = r.Status
                 });
 
                 return Ok(response);

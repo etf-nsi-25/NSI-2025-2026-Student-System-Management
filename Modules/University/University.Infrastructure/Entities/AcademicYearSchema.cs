@@ -1,6 +1,6 @@
 ﻿namespace University.Infrastructure.Entities
 {
-    public class AcademicYear
+    public class AcademicYearSchema
     {
         public int Id { get; set; }
         public string Year { get; set; } = default!;

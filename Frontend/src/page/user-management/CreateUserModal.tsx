@@ -1,32 +1,43 @@
-import React, { useState } from "react";
-import { 
+import React, { useState, useEffect } from "react";
+import {
     CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter,
-    CForm, CFormLabel, CFormInput, CFormSelect, CButton 
+    CForm, CFormLabel, CFormInput, CFormSelect, CButton
 } from '@coreui/react';
-import { createUser } from "../../service/identityApi"; 
-import type { Faculty, Role, User  } from "../../service/identityApi"; 
+import { useAPI } from "../../context/services"; // <--- ADDED
+import { createUser } from "../../service/identityApi";
+import type { Faculty, Role, User } from "../../service/identityApi";
+import { useAuthContext } from "../../init/auth";
 
 interface Props {
     isOpen: boolean;
     onClose: () => void;
     availableFaculties: Faculty[];
-    onSuccess: (created?: User) => void; 
+    onSuccess: (created?: User) => void;
 }
 
-const ROLES: Role[] = ['Professor', 'Assistant', 'Student', 'Staff'];
+const ROLES: Role[] = ['Professor', 'Assistant', 'Student', 'Admin', 'Superadmin'];
 
 const initialFormState = {
-    firstName: "", lastName: "", username: "", 
-    password: "", role: "" as Role | "", faculty: "", indexNumber: ""
+    firstName: "", lastName: "", username: "",
+    role: "" as Role | "", faculty: "", indexNumber: ""
 };
 
 export default function CreateUserModal({ isOpen, onClose, availableFaculties, onSuccess }: Props) {
+    const api = useAPI(); // <--- ADDED
+    const { authInfo } = useAuthContext();
     const [form, setForm] = useState(initialFormState);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<{ text: string; type: "success" | "danger" | "" }>({ text: "", type: "" });
 
     // (Debugging code removed) — modal no longer logs DOM diagnostics in production.
+
+    // Set default faculty for Admin
+    useEffect(() => {
+        if (isOpen && authInfo?.role === 'Admin' && authInfo.tenantId) {
+            setForm(prev => ({ ...prev, faculty: authInfo.tenantId }));
+        }
+    }, [isOpen, authInfo]);
 
     // Keep behavior consistent with other modals: don't render modal markup when closed.
     if (!isOpen) return null;
@@ -37,23 +48,21 @@ export default function CreateUserModal({ isOpen, onClose, availableFaculties, o
         if (!form.firstName) newErrors.firstName = "Ime je obavezno.";
         if (!form.lastName) newErrors.lastName = "Prezime je obavezno.";
         if (!form.username) newErrors.username = "Email je obavezan.";
-        if (!form.password) newErrors.password = "Lozinka je obavezna.";
         if (!form.role) newErrors.role = "Rola je obavezna.";
         if (!form.faculty) newErrors.faculty = "Fakultet je obavezan.";
-        
+
         if (form.role === "Student" && !form.indexNumber) {
             newErrors.indexNumber = "Broj indeksa je obavezan za studente.";
         }
-        
-       // validate that the username field contains a valid email (we use username as email)
-       if (form.username && !/\S+@\S+\.\S+/.test(form.username)) {
-           newErrors.username = "Email format nije validan.";
-       }
+
+        // validate that the username field contains a valid email (we use username as email)
+        if (form.username && !/\S+@\S+\.\S+/.test(form.username)) {
+            newErrors.username = "Email format nije validan.";
+        }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
-
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -79,20 +88,20 @@ export default function CreateUserModal({ isOpen, onClose, availableFaculties, o
                 lastName: form.lastName,
                 email: form.username, // username field holds the user's email
                 username: form.username,
-                password: form.password,
+                // password removed - backend generates random password and emails it
                 role: form.role as Role,
                 facultyId: form.faculty,
                 indexNumber: form.role === 'Student' ? form.indexNumber : undefined,
             };
 
-            const created = await createUser(dataToCreate);
+            const created = await createUser(api, dataToCreate); // <--- UPDATED
 
             setMessage({ text: "Korisnik uspješno kreiran!", type: "success" });
-            
+
             setTimeout(() => {
-                onSuccess(created); 
-                setForm(initialFormState); 
-                onClose(); 
+                onSuccess(created);
+                setForm(initialFormState);
+                onClose();
             }, 1000);
 
         } catch (err: any) {
@@ -111,74 +120,66 @@ export default function CreateUserModal({ isOpen, onClose, availableFaculties, o
             </CModalHeader>
             <CForm onSubmit={handleSave}>
                 <CModalBody>
-                    
+
                     <div className="mb-3">
                         <CFormLabel htmlFor="firstName">First Name</CFormLabel>
-                        <CFormInput 
+                        <CFormInput
                             id="firstName"
-                            name="firstName" 
+                            name="firstName"
                             autoComplete="given-name"
-                            value={form.firstName} 
-                            onChange={handleChange} 
-                            invalid={!!errors.firstName} 
+                            value={form.firstName}
+                            onChange={handleChange}
+                            invalid={!!errors.firstName}
                         />
                         {errors.firstName && <div className="text-danger small">{errors.firstName}</div>}
                     </div>
 
                     <div className="mb-3">
                         <CFormLabel htmlFor="lastName">Last Name</CFormLabel>
-                        <CFormInput 
+                        <CFormInput
                             id="lastName"
-                            name="lastName" 
+                            name="lastName"
                             autoComplete="family-name"
-                            value={form.lastName} 
-                            onChange={handleChange} 
+                            value={form.lastName}
+                            onChange={handleChange}
                             invalid={!!errors.lastName}
                         />
-                         {errors.lastName && <div className="text-danger small">{errors.lastName}</div>}
+                        {errors.lastName && <div className="text-danger small">{errors.lastName}</div>}
                     </div>
 
                     {/* email input removed — username field will accept the user's email */}
 
                     <div className="mb-3">
                         <CFormLabel htmlFor="username">Username</CFormLabel>
-                        <CFormInput 
+                        <CFormInput
                             id="username"
-                            name="username" 
+                            name="username"
                             type="email"
                             autoComplete="email"
-                            value={form.username} 
-                            onChange={handleChange} 
+                            value={form.username}
+                            onChange={handleChange}
                             invalid={!!errors.username}
                         />
                         {errors.username && <div className="text-danger small">{errors.username}</div>}
                     </div>
 
                     <div className="mb-3">
-                        <CFormLabel htmlFor="password">Password</CFormLabel>
-                        <CFormInput 
-                            id="password"
-                            type="password"
-                            name="password" 
-                            autoComplete="new-password"
-                            value={form.password} 
-                            onChange={handleChange} 
-                            invalid={!!errors.password}
-                        />
-                         {errors.password && <div className="text-danger small">{errors.password}</div>}
-                    </div>
-
-                    <div className="mb-3">
                         <CFormLabel htmlFor="role">Select Role</CFormLabel>
-                        <CFormSelect 
+                        <CFormSelect
                             id="role"
-                            name="role" 
-                            value={form.role} 
+                            name="role"
+                            value={form.role}
                             onChange={handleChange}
                             invalid={!!errors.role}
                         >
                             <option value="">Select role</option>
-                            {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                            {ROLES.filter(r => {
+                                // Superadmin can ONLY create Admins
+                                if (authInfo?.role === 'Superadmin') return r === 'Admin';
+                                // Admin can see everything EXCEPT Superadmin AND Admin (cannot create peers)
+                                if (authInfo?.role === 'Admin') return r !== 'Superadmin' && r !== 'Admin';
+                                return false;
+                            }).map(r => <option key={r} value={r}>{r}</option>)}
                         </CFormSelect>
                         {errors.role && <div className="text-danger small">{errors.role}</div>}
                     </div>
@@ -199,16 +200,20 @@ export default function CreateUserModal({ isOpen, onClose, availableFaculties, o
                     )}
 
                     <div className="mb-3">
-                        <CFormLabel htmlFor="faculty">Select Faculty</CFormLabel>
-                        <CFormSelect 
+                        <CFormLabel htmlFor="faculty">Faculty</CFormLabel>
+                        <CFormSelect
                             id="faculty"
-                            name="faculty" 
-                            value={form.faculty} 
-                            onChange={handleChange}
+                            name="faculty"
+                            value={authInfo?.role === 'Admin' ? authInfo.tenantId : form.faculty}
+                            onChange={(e) => {
+                                setForm({ ...form, faculty: e.target.value });
+                                setErrors({ ...errors, faculty: "" });
+                            }}
                             invalid={!!errors.faculty}
+                            disabled={authInfo?.role === 'Admin'}
                         >
                             <option value="">Select Faculty</option>
-                            {availableFaculties.map(f => (
+                            {availableFaculties.map((f) => (
                                 <option key={f.id} value={f.id}>
                                     {f.name}
                                 </option>
@@ -226,8 +231,8 @@ export default function CreateUserModal({ isOpen, onClose, availableFaculties, o
 
                 </CModalBody>
                 <CModalFooter>
-                    <CButton 
-                        color="primary" 
+                    <CButton
+                        color="primary"
                         type="submit"
                         disabled={loading || message.type === 'success'}
                     >

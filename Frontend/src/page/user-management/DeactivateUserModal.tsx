@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { 
-    CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter, 
-    CButton 
+import {
+    CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter,
+    CButton
 } from '@coreui/react';
+import { useAPI } from "../../context/services"; // <--- ADDED
 import { deactivateUser, deleteUser } from "../../service/identityApi";
 import type { User } from "../../service/identityApi"; // <--- ISPRAVLJENO
 
@@ -14,6 +15,7 @@ interface Props {
 }
 
 const DeactivateUserModal: React.FC<Props> = ({ isOpen, onClose, user, onSuccess }) => {
+    const api = useAPI(); // <--- ADDED
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<{ text: string; type: "success" | "danger" | "" }>({ text: "", type: "" });
 
@@ -27,7 +29,7 @@ const DeactivateUserModal: React.FC<Props> = ({ isOpen, onClose, user, onSuccess
             // eslint-disable-next-line no-console
             console.log('DeactivateUserModal: deactivating user', { id: user.id, username: user.username });
 
-            const result = await deactivateUser(user.id);
+            const result = await deactivateUser(api, user.id); // <--- UPDATED
             // eslint-disable-next-line no-console
             console.log('DeactivateUserModal: deactivateUser returned', result);
             setMessage({ text: "Korisnik uspješno deaktiviran.", type: "success" });
@@ -54,7 +56,7 @@ const DeactivateUserModal: React.FC<Props> = ({ isOpen, onClose, user, onSuccess
             // eslint-disable-next-line no-console
             console.log('DeactivateUserModal: deleting user', { id: user.id, username: user.username });
 
-            await deleteUser(user.id);
+            await deleteUser(api, user.id); // <--- UPDATED
             // eslint-disable-next-line no-console
             console.log('DeactivateUserModal: deleteUser completed for', user.id);
             setMessage({ text: "Korisnik uspješno izbrisan.", type: "success" });
@@ -75,7 +77,7 @@ const DeactivateUserModal: React.FC<Props> = ({ isOpen, onClose, user, onSuccess
                 <CModalTitle>Akcije za Korisnika</CModalTitle>
             </CModalHeader>
             <CModalBody className="text-center">
-                
+
                 <p className="h5 mb-3">**{user.firstName} {user.lastName}** ({user.role})</p>
                 <p className="text-danger mb-4">Odaberite željenu akciju za ovog korisnika.</p>
 
@@ -86,25 +88,25 @@ const DeactivateUserModal: React.FC<Props> = ({ isOpen, onClose, user, onSuccess
                 )}
             </CModalBody>
             <CModalFooter className="justify-content-center flex-column gap-2">
-                
-                <CButton 
-                    color="warning" 
-                    onClick={handleDeactivate} 
+
+                <CButton
+                    color="warning"
+                    onClick={handleDeactivate}
                     disabled={loading || user.status === 'Inactive'}
                     className="w-100"
                 >
                     {loading && message.type !== 'success' ? "Deactivating..." : (user.status === 'Inactive' ? "Već Neaktivan" : "Deaktiviraj")}
                 </CButton>
-                
-                <CButton 
-                    color="danger" 
-                    onClick={handleDelete} 
+
+                <CButton
+                    color="danger"
+                    onClick={handleDelete}
                     disabled={loading}
                     className="w-100"
                 >
                     {loading && message.type !== 'success' ? "Deleting..." : "Obriši Trajno"}
                 </CButton>
-                
+
                 <CButton color="secondary" onClick={onClose} disabled={loading} className="w-100 mt-2">
                     Poništi
                 </CButton>

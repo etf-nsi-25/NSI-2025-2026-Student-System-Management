@@ -25,7 +25,7 @@ public class AuthService : IAuthService
         _logger = logger;
     }
 
-        public async Task<AuthResult> AuthenticateAsync(
+    public async Task<PrimaryAuthResult> AuthenticatePrimaryAsync(
         string email,
         string password,
         CancellationToken cancellationToken = default)
@@ -34,7 +34,7 @@ public class AuthService : IAuthService
 
         var user = await _identityService.FindByEmailAsync(email);
 
-        if (user == null) 
+        if (user == null)
         {
             _logger.LogWarning("Authentication failed: User not found - {Email}", email);
             throw new UnauthorizedAccessException("Invalid email or password");
@@ -47,19 +47,34 @@ public class AuthService : IAuthService
             throw new UnauthorizedAccessException("Invalid email or password");
         }
 
-        if (user.Status == UserStatus.Inactive) 
+        if (user.Status == UserStatus.Inactive)
         {
             _logger.LogWarning("Authentication failed: User is deactivated - {Email}", email);
             throw new UnauthorizedAccessException("User is deactivated");
         }
 
+        var requiresTwoFactor = await _identityService.IsTwoFactorEnabledAsync(user.Id);
+
+        return new PrimaryAuthResult(user.Id, requiresTwoFactor);
+    }
+
+    public async Task<AuthResult> IssueTokensAsync(string userId, CancellationToken cancellationToken = default)
+    {
+        var user = await _identityService.FindByIdAsync(userId);
+
+        if (user == null)
+        {
+            _logger.LogWarning("Token issuance failed: User not found - {UserId}", userId);
+            throw new UnauthorizedAccessException("User not found or inactive");
+        }
+
         var tokenClaims = new TokenClaims
         {
-            UserId = user.Id, 
-            Email = user.Email, 
+            UserId = user.Id,
+            Email = user.Email,
             Role = user.Role,
-            TenantId = user.FacultyId.ToString(), 
-            FullName = $"{user.FirstName} {user.LastName}".Trim()
+            TenantId = user.FacultyId.ToString() ?? string.Empty,
+            FullName = $"{user.FirstName ?? ""} {user.LastName ?? ""}".Trim()
         };
 
         var accessToken = _jwtTokenService.GenerateAccessToken(tokenClaims);
@@ -67,14 +82,31 @@ public class AuthService : IAuthService
 
         await _refreshTokenRepository.AddAsync(refreshToken, cancellationToken);
 
-        _logger.LogInformation("Authentication successful for user: {UserId}", user.Id);
+        _logger.LogInformation("Token issuance successful for user: {UserId}", user.Id);
 
         return new AuthResult
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken.Token,
-            ExpiresAt = refreshToken.ExpiresAt
+            ExpiresAt = refreshToken.ExpiresAt,
+            ForcePasswordChange = user.ForcePasswordChange
         };
+    }
+
+    public async Task<AuthResult> AuthenticateAsync(
+        string email,
+        string password,
+        CancellationToken cancellationToken = default)
+    {
+        var primary = await AuthenticatePrimaryAsync(email, password, cancellationToken);
+
+        if (primary.RequiresTwoFactor)
+        {
+            _logger.LogInformation("Authentication requires 2FA for user: {UserId}", primary.UserId);
+            throw new UnauthorizedAccessException("Two-factor authentication required");
+        }
+
+        return await IssueTokensAsync(primary.UserId, cancellationToken);
     }
 
     public async Task<AuthResult> RefreshAuthenticationAsync(
@@ -126,7 +158,8 @@ public class AuthService : IAuthService
         {
             AccessToken = accessToken,
             RefreshToken = newRefreshToken.Token,
-            ExpiresAt = newRefreshToken.ExpiresAt
+            ExpiresAt = newRefreshToken.ExpiresAt,
+            ForcePasswordChange = user.ForcePasswordChange
         };
     }
 

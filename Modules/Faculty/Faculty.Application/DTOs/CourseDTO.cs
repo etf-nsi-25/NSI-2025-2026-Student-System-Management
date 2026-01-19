@@ -18,12 +18,11 @@ namespace Faculty.Application.DTOs
         public string Code { get; set; }
 
         [Required]
-        [RegularExpression("^(mandatory|elective)$",
+        [RegularExpression("^(?i)(mandatory|elective)$",
             ErrorMessage = "Type must be either 'Mandatory' or 'Elective'.")]
         public string Type { get; set; }
 
-        [Required]
-        public string ProgramId { get; set; }
+        public string? ProgramId { get; set; }
 
         [Range(1, 15, ErrorMessage = "ECTS must be between 1 and 15.")]
         public int ECTS { get; set; }

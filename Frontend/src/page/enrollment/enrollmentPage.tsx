@@ -35,7 +35,7 @@ export const EnrollmentStudentPage: React.FC = () => {
   const { authInfo } = useAuthContext();
 
   const userId = authInfo?.userId;
-  const facultyId = authInfo?.tenantId; 
+  const facultyId = authInfo?.tenantId;
 
   const [enrollments, setEnrollments] = useState<EnrollmentRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -94,7 +94,7 @@ export const EnrollmentStudentPage: React.FC = () => {
         userId,
         facultyId,
         academicYear: CURRENT_ACADEMIC_YEAR,
-        semester: 1, 
+        semester: 1,
       });
 
       setSuccessMessage(

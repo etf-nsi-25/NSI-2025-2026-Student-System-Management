@@ -1,16 +1,28 @@
 using Identity.API.DTO;
 using Identity.Application.Interfaces;
+using Identity.Core.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+
+namespace Identity.API.Controllers;
 
 [ApiController]
 [Route("api/auth")]
 public class TwoFactorAuthController : ControllerBase
 {
     private readonly ITwoFactorAuthService _svc;
+    private readonly ITwoFactorLoginSessionStore _twoFactorLoginSessionStore;
+    private readonly IAuthService _authService;
 
-    public TwoFactorAuthController(ITwoFactorAuthService svc)
+    public TwoFactorAuthController(
+        ITwoFactorAuthService svc,
+        ITwoFactorLoginSessionStore twoFactorLoginSessionStore,
+        IAuthService authService)
     {
         _svc = svc;
+        _twoFactorLoginSessionStore = twoFactorLoginSessionStore;
+        _authService = authService;
     }
 
     /// <summary>
@@ -50,10 +62,15 @@ public class TwoFactorAuthController : ControllerBase
     /// 2FA setup initialized. Check the response body for success and error fields.
     /// </response>
     [HttpPost("enable-2fa")]
+    [Authorize]
     public async Task<IActionResult> Enable()
     {
-        // TODO: replace with real authenticated user ID when auth is implemented
-        string userId = "1";
+        var userId = User.FindFirstValue("userId");
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Unauthorized(new { message = "Missing userId claim." });
+        }
+
         var res = await _svc.EnableTwoFactorAsync(userId);
         return Ok(res);
     }
@@ -115,9 +132,15 @@ public class TwoFactorAuthController : ControllerBase
     /// <response code="404">User not found.</response>
     /// <response code="429">Too many failed attempts (rate limited).</response>
     [HttpPost("verify-2fa-setup")]
+    [Authorize]
     public async Task<IActionResult> VerifySetup([FromBody] TwoFAConfirmRequest dto)
     {
-        string userId = "1";
+        var userId = User.FindFirstValue("userId");
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Unauthorized(new { message = "Missing userId claim." });
+        }
+
         var res = await _svc.VerifySetupAsync(userId, dto.Code);
 
         if (!res.Success)
@@ -180,14 +203,41 @@ public class TwoFactorAuthController : ControllerBase
     /// <response code="404">User not found.</response>
     /// <response code="429">Too many failed attempts (rate limited).</response>
     [HttpPost("verify-2fa")]
-    public async Task<IActionResult> VerifyLogin([FromBody] TwoFAConfirmRequest dto)
+    public async Task<IActionResult> VerifyLogin([FromBody] TwoFAVerifyLoginRequest dto)
     {
-        string userId = "1";
+        if (!_twoFactorLoginSessionStore.TryGetUserId(dto.TwoFactorToken, out var userId))
+        {
+            return BadRequest(new { message = "Invalid or expired two-factor token." });
+        }
+
         var res = await _svc.VerifyLoginAsync(userId, dto.Code);
 
         if (!res.Success)
-            return BadRequest(res);
+        {
+            return Unauthorized(new { message = res.Message ?? "Invalid or expired code. Please try again." });
+        }
 
-        return Ok(res);
+        var authResult = await _authService.IssueTokensAsync(userId);
+
+        HttpContext.Response.Cookies.Append(
+            "refreshToken",
+            authResult.RefreshToken,
+            new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Expires = authResult.ExpiresAt
+            });
+
+        _twoFactorLoginSessionStore.Invalidate(dto.TwoFactorToken);
+
+        return Ok(new Identity.API.DTO.Auth.LoginResponseDto
+        {
+            AccessToken = authResult.AccessToken,
+            TokenType = "Bearer",
+            RequiresTwoFactor = false,
+            TwoFactorToken = null
+        });
     }
 }

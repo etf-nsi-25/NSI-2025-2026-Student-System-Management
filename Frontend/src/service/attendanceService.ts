@@ -1,4 +1,4 @@
-import type { Faculty, Program, Course, AttendanceRecord, AttendanceStats } from "../models/attendance/Attendance.types";
+import type { AttendanceRecord, AttendanceStats, Student } from "../models/attendance/Attendance.types";
 import type { API } from "../api/api";
 
 type SaveAttendanceRequestDTO = {
@@ -9,67 +9,49 @@ type SaveAttendanceRequestDTO = {
         status: NonNullable<AttendanceRecord["status"]>;
         note?: string;
     }>;
-
 };
 
-// Mock Data
-const MOCK_FACULTIES: Faculty[] = [
-    { id: 'f1', name: 'Faculty of Engineering' },
-    { id: 'f2', name: 'Faculty of Science' },
-    { id: 'f3', name: 'Faculty of Arts' },
-];
-
-const MOCK_PROGRAMS: Program[] = [
-    { id: 'p1', name: 'Computer Science', facultyId: 'f1' },
-    { id: 'p2', name: 'Electrical Engineering', facultyId: 'f1' },
-    { id: 'p3', name: 'Physics', facultyId: 'f2' },
-    { id: 'p4', name: 'History', facultyId: 'f3' },
-];
-
-const MOCK_COURSES: Course[] = [
-    { id: 'c1', name: 'Introduction to Programming', code: 'CS101', programId: 'p1' },
-    { id: 'c2', name: 'Data Structures', code: 'CS102', programId: 'p1' },
-    { id: 'c3', name: 'Circuit Analysis', code: 'EE101', programId: 'p2' },
-    { id: 'c4', name: 'Quantum Mechanics', code: 'PHY201', programId: 'p3' },
-    { id: 'c5', name: 'World History', code: 'HIS101', programId: 'p4' },
-];
-
-const MOCK_STUDENTS = [
-    { id: 1, firstName: 'John', lastName: 'Doe', indexNumber: '12345', avatarUrl: 'https://ui-avatars.com/api/?name=John+Doe' },
-    { id: 2, firstName: 'Jane', lastName: 'Smith', indexNumber: '12346', avatarUrl: 'https://ui-avatars.com/api/?name=Jane+Smith' },
-    { id: 3, firstName: 'Alice', lastName: 'Johnson', indexNumber: '12347', avatarUrl: 'https://ui-avatars.com/api/?name=Alice+Johnson' },
-    { id: 4, firstName: 'Bob', lastName: 'Brown', indexNumber: '12348', avatarUrl: 'https://ui-avatars.com/api/?name=Bob+Brown' },
-    { id: 5, firstName: 'Charlie', lastName: 'Davis', indexNumber: '12349', avatarUrl: 'https://ui-avatars.com/api/?name=Charlie+Davis' },
-];
-
-// Helper to simulate delay
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-export const getFaculties = async (): Promise<Faculty[]> => {
-    await delay(500);
-    return MOCK_FACULTIES;
+type EnrolledStudentDto = {
+    studentId: number;
+    firstName: string;
+    lastName: string;
+    indexNumber: string;
+    avatarUrl?: string;
+    status: AttendanceRecord["status"];
+    note?: string | null;
 };
 
-export const getPrograms = async (facultyId: string): Promise<Program[]> => {
-    await delay(300);
-    return MOCK_PROGRAMS.filter(p => p.facultyId === facultyId);
+type AttendanceStatsResponseDto = {
+    totalRecords: number;
+    presentCount: number;
+    absentCount: number;
+    lateCount: number;
+    presentPercentage: number;
+    absentPercentage: number;
+    latePercentage: number;
 };
 
-export const getCourses = async (programId: string): Promise<Course[]> => {
-    await delay(300);
-    return MOCK_COURSES.filter(c => c.programId === programId);
-};
+export const getAttendance = async (api: API, courseId: string, date: string): Promise<AttendanceRecord[]> => {
+    const enrolled = await api.get<EnrolledStudentDto[]>(
+        `/api/faculty/attendance/courses/${encodeURIComponent(courseId)}/date/${encodeURIComponent(date)}`
+    );
 
-export const getAttendance = async (courseId: string, date: string): Promise<AttendanceRecord[]> => {
-    await delay(800);
-    return MOCK_STUDENTS.map(student => ({
-        id: Math.floor(Math.random() * 10000),
-        studentId: student.id,
-        courseId: courseId,
-        lectureDate: date,
-        status: Math.random() > 0.2 ? (Math.random() > 0.5 ? 'Present' : 'Absent') : null, // Random status or null
-        note: '',
-        student: student
+    const lectureDate = date;
+
+    return enrolled.map((s): AttendanceRecord => ({
+        id: s.studentId,
+        studentId: s.studentId,
+        courseId,
+        lectureDate,
+        status: s.status ?? null,
+        note: s.note ?? '',
+        student: {
+            id: s.studentId,
+            firstName: s.firstName,
+            lastName: s.lastName,
+            indexNumber: s.indexNumber,
+            avatarUrl: s.avatarUrl,
+        } as Student,
     }));
 };
 
@@ -93,18 +75,79 @@ export const saveAttendance = async (api: API, attendanceData: AttendanceRecord[
     return true;
 };
 
-export const exportAttendance = async (courseId: string, date: string): Promise<boolean> => {
-    await delay(1000);
-    console.log(`Exporting attendance for course ${courseId} on ${date}`);
-    return true;
+export const exportAttendance = async (courseId: string, date: string, accessToken?: string): Promise<boolean> => {
+    const url = `/api/faculty/attendance/courses/${encodeURIComponent(courseId)}/date/${encodeURIComponent(date)}/export`;
+
+    if (typeof window === 'undefined') {
+        return false;
+    }
+
+    if (!accessToken) {
+        window.open(url, '_blank');
+        return true;
+    }
+
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+            },
+            credentials: 'include',
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to export attendance');
+        }
+
+        const blob = await response.blob();
+        const contentDisposition = response.headers.get('Content-Disposition');
+
+        let filename = 'attendance-export';
+        if (contentDisposition) {
+            const match = /filename="?([^";]+)"?/i.exec(contentDisposition);
+            if (match && match[1]) {
+                filename = match[1];
+            }
+        }
+
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(downloadUrl);
+
+        return true;
+    } catch (error) {
+        console.error('Error exporting attendance', error);
+        return false;
+    }
 };
 
-export const getAttendanceStats = async (courseId: string, month: string): Promise<AttendanceStats> => {
-    await delay(600);
-    const seed = courseId.length + month.length; 
+export const getAttendanceStats = async (api: API, courseId: string, month: string): Promise<AttendanceStats> => {
+    const [yearStr, monthStr] = month.split("-");
+    const year = Number(yearStr);
+    const monthIndex = Number(monthStr); 
+
+    if (!year || !monthIndex) {
+        throw new Error(`Invalid month format for attendance statistics: ${month}`);
+    }
+
+    const startDate = new Date(year, monthIndex - 1, 1);
+    const endDate = new Date(year, monthIndex, 0); 
+
+    const startDateStr = startDate.toISOString().split("T")[0];
+    const endDateStr = endDate.toISOString().split("T")[0];
+
+    const stats = await api.get<AttendanceStatsResponseDto>(
+        `/api/faculty/attendance/courses/${encodeURIComponent(courseId)}/statistics?startDate=${encodeURIComponent(startDateStr)}&endDate=${encodeURIComponent(endDateStr)}`
+    );
     return {
-        present: 60 + (seed % 20),
-        absent: 10 + (seed % 10),
-        late: 5 + (seed % 5)
+        present: stats.presentCount,
+        absent: stats.absentCount,
+        late: stats.lateCount,
     };
 };

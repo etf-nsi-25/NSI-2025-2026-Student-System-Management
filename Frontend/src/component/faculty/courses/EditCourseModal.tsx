@@ -26,17 +26,17 @@ type Props = {
 const EditCourseModal = ({ visible, course, onClose, onSave }: Props) => {
   const [form, setForm] = useState<CourseDTO | null>(null);
 
-useEffect(() => {
-  if (course) {
-    setForm({
-      name: course.name,
-      ects: course.ects,
-      code: course.code,
-      type: course.type.toLowerCase(),
-      programId: course.programId
-    });
-  }
-}, [course]);
+  useEffect(() => {
+    if (course) {
+      setForm({
+        name: course.name,
+        ects: course.ects,
+        code: course.code,
+        type: course.type.toLowerCase(),
+        programId: course.programId ?? ""
+      });
+    }
+  }, [course]);
 
   const update = (key: keyof CourseDTO, value: any) => {
     if (!form) return;
@@ -46,7 +46,13 @@ useEffect(() => {
   if (!form || !course) return null;
 
   return (
-    <CModal visible={visible} onClose={onClose} alignment="center" size="lg">
+    <CModal
+      visible={visible}
+      onClose={onClose}
+      alignment="center"
+      size="lg"
+      className="modal-z-fix"
+    >
       <CModalHeader>
         <CModalTitle>Edit Course</CModalTitle>
       </CModalHeader>

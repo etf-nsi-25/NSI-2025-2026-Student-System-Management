@@ -3,16 +3,18 @@ using Faculty.Core.Entities;
 using Faculty.Application.Interfaces;
 using Faculty.Core.Interfaces;
 
-
 namespace Faculty.Application.Services
 {
     public class CourseService : ICourseService
     {
         private readonly ICourseRepository _repo;
 
-        public CourseService(ICourseRepository repo)
+        private readonly ICourseAssignmentRepository _courseAssignmentRepo;
+
+        public CourseService(ICourseRepository repo, ICourseAssignmentRepository courseAssignmentRepo)
         {
             _repo = repo;
+            _courseAssignmentRepo = courseAssignmentRepo;
         }
 
         private CourseDTO ToDto(Course c) => new()
@@ -54,10 +56,18 @@ namespace Faculty.Application.Services
             return list.Select(ToDto).ToList();
         }
 
-        public async Task<List<CourseDTO>> GetByTeacherAsync(string userId)
+
+        public async Task<List<ProfessorCourseDTO>> GetProfessorCoursesAsync(string userId)
         {
-            var list = await _repo.GetByTeacherUserIdAsync(userId);
-            return list.Select(ToDto).ToList();
+            var coursesWithCount = await _repo.GetProfessorCoursesWithStudentCountAsync(userId);
+            return coursesWithCount.Select(x => new ProfessorCourseDTO
+            {
+                Id = x.Course.Id,
+                Name = x.Course.Name,
+                Code = x.Course.Code,
+                Status = x.StudentCount > 0 ? "Active" : "Inactive",
+                StudentCount = x.StudentCount
+            }).ToList();
         }
 
         public async Task<CourseDTO?> UpdateAsync(Guid id, CourseDTO dto)
@@ -69,5 +79,17 @@ namespace Faculty.Application.Services
 
         public async Task<bool> DeleteAsync(Guid id)
             => await _repo.DeleteAsync(id);
+
+        public async Task<TeacherDto?> GetTeacherForCourseAsync(Guid courseId)
+        {
+            var teacher = await _courseAssignmentRepo.GetTeacherForCourseAsync(courseId);
+            if (teacher == null) return null;
+
+            return new TeacherDto
+            {
+                Id = teacher.Id,
+                FullName = $"{teacher.FirstName} {teacher.LastName}"
+            };
+        }
     }
 }
