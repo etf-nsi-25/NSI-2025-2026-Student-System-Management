@@ -14,7 +14,9 @@ namespace Support.Infrastructure.Db
         {
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(SupportDbContext).Assembly);
-
+            modelBuilder.ApplyConfigurationsFromAssembly(
+	            typeof(SupportDbContext).Assembly
+            );
             base.OnModelCreating(modelBuilder);
         }
     }

@@ -1,7 +1,11 @@
-export default function DashboardPage(){
+import MyCourses from '../../component/MyCourses/MyCourses';
+import UpcomingActivities from '../../component/UpcomingActivities/UpcomingActivities';
+
+export default function DashboardPage() {
     return (
-        <div>
-            Dashboard Page
+        <div className="page-container">
+            <MyCourses />
+            <UpcomingActivities />
         </div>
     )
 }

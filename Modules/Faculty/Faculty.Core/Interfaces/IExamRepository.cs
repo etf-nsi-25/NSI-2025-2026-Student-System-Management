@@ -12,6 +12,7 @@ namespace Faculty.Core.Interfaces
         Task<Exam> AddAsync(Exam exam);
         Task<Exam?> GetByIdAsync(int id);
         Task<List<Exam>> GetExamsByTeacherAsync(int teacherId);
+        Task<List<Exam>> GetUpcomingByCourseIdsAsync(List<Guid> courseIds);
         Task<Exam?> UpdateAsync(Exam exam);
         Task<bool> DeleteAsync(int id);
         Task<bool> IsTeacherAssignedToCourseAsync(int teacherId, Guid courseId);

@@ -4,9 +4,9 @@ using University.Infrastructure.Entities;
 
 namespace University.Infrastructure.Configurations
 {
-    public class AcademicYearConfiguration : IEntityTypeConfiguration<AcademicYear>
+    public class AcademicYearConfiguration : IEntityTypeConfiguration<AcademicYearSchema>
     {
-        public void Configure(EntityTypeBuilder<AcademicYear> builder)
+        public void Configure(EntityTypeBuilder<AcademicYearSchema> builder)
         {
             builder.ToTable("AcademicYears");
             builder.HasKey(x => x.Id);

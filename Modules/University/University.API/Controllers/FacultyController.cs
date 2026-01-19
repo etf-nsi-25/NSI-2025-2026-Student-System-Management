@@ -1,7 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using System;
 using University.Application.DTOs;
 using University.Application.Interfaces;
 
@@ -33,7 +30,7 @@ namespace University.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetFacultyById(int id)
+        public async Task<IActionResult> GetFacultyById(Guid id)
         {
             try
             {
@@ -74,7 +71,7 @@ namespace University.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateFaculty(int id, [FromBody] UpdateFacultyDto dto)
+        public async Task<IActionResult> UpdateFaculty(Guid id, [FromBody] UpdateFacultyDto dto)
         {
             if (!ModelState.IsValid)
             {
@@ -94,14 +91,14 @@ namespace University.API.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            catch (Exception)
-            {
-                return StatusCode(500, $"An error occurred while updating the faculty with id {id}.");
+            catch (Exception ex)
+            {   
+                return StatusCode(500, $"An error occurred while updating the faculty with id {id}. {ex.Message}");
             }
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteFaculty(int id)
+        public async Task<IActionResult> DeleteFaculty(Guid id)
         {
             try
             {

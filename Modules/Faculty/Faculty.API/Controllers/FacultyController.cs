@@ -16,10 +16,12 @@ namespace Faculty.API.Controllers
     public class FacultyController : ControllerBase
     {
         private readonly ICourseService _service;
+        private readonly IUpcomingActivityService _upcomingActivityService;
 
-        public FacultyController(ICourseService service)
+        public FacultyController(ICourseService service, IUpcomingActivityService upcomingActivityService)
         {
             _service = service;
+            _upcomingActivityService = upcomingActivityService;
         }
 
         private string GetCurrentUserId()
@@ -38,12 +40,13 @@ namespace Faculty.API.Controllers
             => Ok(await _service.GetAllAsync());
 
         [HttpGet("assigned")]
+        [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> GetAssignedToTeacher()
         {
             try
             {
                 var userId = GetCurrentUserId();
-                var result = await _service.GetByTeacherAsync(userId);
+                var result = await _service.GetProfessorCoursesAsync(userId);
                 return Ok(result);
             }
             catch (UnauthorizedAccessException ex)
@@ -84,9 +87,33 @@ namespace Faculty.API.Controllers
             bool ok = await _service.DeleteAsync(id);
             return ok ? Ok(new { success = true }) : NotFound();
         }
-    }
 
+        [HttpGet("{courseId}/teacher")]
+        [Authorize]
+        public async Task<IActionResult> GetTeacherForCourse(Guid courseId)
+        {
+            var teacher = await _service.GetTeacherForCourseAsync(courseId);
+            return teacher == null ? NotFound() : Ok(teacher);
+        }
+
+
+        [HttpGet("upcoming-activities")]
+        [Authorize(Roles = "Teacher")]
+        public async Task<IActionResult> GetUpcomingActivities()
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var result = await _upcomingActivityService.GetUpcomingActivitiesAsync(userId);
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { error = ex.Message });
+            }
+        }
     }
+}
 
 
 

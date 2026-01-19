@@ -1,7 +1,7 @@
 import React from "react";
-import { 
-    CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter, 
-    CButton, CRow, CCol 
+import {
+    CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter,
+    CButton, CRow, CCol
 } from '@coreui/react';
 import type { User } from "../../service/identityApi"; // <--- ISPRAVLJENO
 
@@ -10,7 +10,7 @@ interface UserDetailsModalProps {
     isOpen: boolean;
     onClose: () => void;
     user: User | null;
-    onEditUser: (user: User) => void; 
+    onEditUser: (user: User) => void;
 }
 
 // Mock Podaci za dozvole
@@ -18,14 +18,15 @@ const MOCK_PERMISSIONS: { [key in User['role']]: string } = {
     Professor: "Edit Courses, Grade Students",
     Assistant: "View Courses, Grade Students",
     Student: "View Grades, Enroll in Courses",
-    Staff: "Manage University Data",
+    Admin: "Manage University Data",
+    Superadmin: "Manage All System Data",
 };
 
 const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
     isOpen,
     onClose,
     user,
-    onEditUser 
+    onEditUser
 }) => {
     if (!isOpen || !user) return null;
 
@@ -35,7 +36,7 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
     };
 
     const handleEditClick = () => {
-        onEditUser(user); 
+        onEditUser(user);
     };
 
     return (
@@ -44,7 +45,7 @@ const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
                 <CModalTitle>User Details</CModalTitle>
             </CModalHeader>
             <CModalBody>
-                
+
                 {/* Prikaz detalja u Core UI stilu (CRow i CCol za layout) */}
                 <CRow className="mb-2">
                     <CCol xs={5} className="font-weight-bold text-muted">Name:</CCol>

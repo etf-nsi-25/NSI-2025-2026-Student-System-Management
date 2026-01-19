@@ -2,8 +2,9 @@ export type Course = {
   id: string;
   name: string;
   code: string;
-  type: string;      
+  type: string;
   programId: string;
   ects: number;
-  professor: string
+  professor: string;
+  status?: 'enrolled' | 'pending' | 'none';
 };

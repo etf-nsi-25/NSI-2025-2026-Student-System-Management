@@ -1,6 +1,6 @@
 import type { AuthInfo } from '../init/auth.tsx';
 
-type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
+type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 export type ErrorResponse = {
     message: Promise<string>;
@@ -38,6 +38,10 @@ export class RestClient {
 
     async put<T>(url: string, body?: unknown): Promise<T> {
         return this.#submitRequestWithFallback<T>(url, 'PUT', body);
+    }
+
+    async patch<T>(url: string, body?: unknown): Promise<T> {
+        return this.#submitRequestWithFallback<T>(url, 'PATCH', body);
     }
 
     async delete<T>(url: string): Promise<T> {
@@ -95,7 +99,7 @@ export class RestClient {
                 method: method,
                 body: JSON.stringify(body),
                 headers: {
-                    'Authorization': `Bearer ${ this.#authInfo.accessToken }`,
+                    'Authorization': `Bearer ${this.#authInfo.accessToken}`,
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },

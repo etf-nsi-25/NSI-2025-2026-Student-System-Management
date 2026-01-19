@@ -159,30 +159,44 @@ public class IdentityService : IIdentityService
             FacultyId = request.FacultyId,
             Role = request.Role,
             IndexNumber = request.IndexNumber,
-            Status = Identity.Core.Enums.UserStatus.Active 
+            Status = Identity.Core.Enums.UserStatus.Active,
+            ForcePasswordChange = true
         };
 
         var result = await _userManager.CreateAsync(appUser, password);
         return (result.Succeeded, result.Errors.Select(e => e.Description).ToArray());
     }
 
-        public async Task<bool> UpdateUserAsync(UpdateUserRequest request)
+    public async Task<bool> UpdateUserAsync(UpdateUserRequest request)
     {
         var appUser = await _userManager.FindByIdAsync(request.Id);
         if (appUser == null) return false;
+        
+        if (!string.IsNullOrWhiteSpace(request.Password))
+        {
+            var token = await _userManager.GeneratePasswordResetTokenAsync(appUser);
+            var resetResult = await _userManager.ResetPasswordAsync(appUser, token, request.Password);
+
+            if (!resetResult.Succeeded)
+            {
+                return false;
+            }
+        }
 
         appUser.FirstName = request.FirstName;
         appUser.LastName = request.LastName;
         appUser.Email = request.Email;
-        appUser.UserName = request.Username; 
+        appUser.UserName = request.Username;
         appUser.FacultyId = request.FacultyId;
         appUser.Role = request.Role;
         appUser.IndexNumber = request.IndexNumber;
         appUser.Status = request.Status;
+        appUser.ForcePasswordChange = request.ForcePasswordChange; 
 
         var result = await _userManager.UpdateAsync(appUser);
         return result.Succeeded;
     }
+
 
     public async Task<bool> DeleteUserAsync(string userId)
     {

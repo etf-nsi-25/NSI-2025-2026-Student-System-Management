@@ -1,5 +1,5 @@
 export type FacultyResponseDTO = {
-  id: number;
+  id: string; // GUID from backend
   name: string;
   address: string;
   code: string;

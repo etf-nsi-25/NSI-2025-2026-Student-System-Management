@@ -1,0 +1,175 @@
+/* Container */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+/* Main Card */
+.mainCard {
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.mainCardBody {
+  padding: 24px;
+}
+
+.sectionTitle {
+  color: #1e3a8a;
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-bottom: 24px;
+}
+
+/* Assignments List */
+.assignmentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Assignment Card */
+.assignmentCard {
+  background-color: rgba(219, 234, 254, 0.6);
+  border: none;
+  border-radius: 16px;
+  margin-bottom: 0;
+}
+
+.cardBody {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+}
+
+/* Left Section */
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  background-color: #1e3a8a;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.subtitle {
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+/* Right Section */
+.rightSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  background-color: #1e3a8a;
+  border-radius: 50%;
+}
+
+.statusText {
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+/* Submit Button */
+.submitButton {
+  background-color: #1e3a8a !important;
+  border-color: #1e3a8a !important;
+  padding: 6px 24px !important;
+  font-weight: 500;
+}
+
+.submitButton:hover {
+  background-color: #1e40af !important;
+  border-color: #1e40af !important;
+}
+
+/* Points Text */
+.pointsText {
+  color: #1e293b;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+/* Missed Text */
+.missedText {
+  color: #dc2626;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+/* Loading State */
+.loadingBody {
+  padding: 32px;
+  text-align: center;
+}
+
+.spinner {
+  color: #1e3a8a !important;
+}
+
+.loadingText {
+  color: #1e3a8a;
+  font-weight: 500;
+  margin-top: 16px;
+  margin-bottom: 0;
+}
+
+.errorText {
+  color: #dc2626;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Empty State */
+.emptyState {
+  border: 2px dashed #e2e8f0;
+  border-radius: 12px;
+  background-color: #f8fafc;
+  padding: 48px;
+  text-align: center;
+}
+
+.emptyState p {
+  color: #94a3b8;
+  font-weight: 500;
+  margin: 0;
+}

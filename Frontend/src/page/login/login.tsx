@@ -49,6 +49,11 @@ export function Login() {
       }
 
       setAuthInfo(result.authInfo);
+      
+      if (result.authInfo.forcePasswordChange) {
+        navigate("/profile-settings", { replace: true });
+        return;
+      }
 
       const dashboardRoute = getDashboardRoute(result.authInfo.role);
       navigate(dashboardRoute);

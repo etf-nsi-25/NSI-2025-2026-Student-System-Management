@@ -29,7 +29,7 @@ namespace University.Application.Services
             });
         }   
 
-        public async Task<FacultyDto?> GetFacultyByIdAsync(int id)
+        public async Task<FacultyDto?> GetFacultyByIdAsync(Guid id)
         {
             var faculty = await _facultyRepository.GetByIdAsync(id);
             if (faculty == null) return null;
@@ -69,7 +69,7 @@ namespace University.Application.Services
             };
         }
 
-        public async Task<FacultyDto?> UpdateFacultyAsync(int id, UpdateFacultyDto dto)
+        public async Task<FacultyDto?> UpdateFacultyAsync(Guid id, UpdateFacultyDto dto)
         {
             var faculty = await _facultyRepository.GetByIdAsync(id);
             if (faculty == null) return null;
@@ -102,7 +102,7 @@ namespace University.Application.Services
             
         }
 
-        public async Task<bool> DeleteFacultyAsync(int id)
+        public async Task<bool> DeleteFacultyAsync(Guid id)
         {
             var faculty = await _facultyRepository.GetByIdAsync(id);
             if (faculty == null) return false;

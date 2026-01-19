@@ -23,6 +23,7 @@ export interface AuthInfo {
     role: string,
     tenantId: string,
     fullName: string,
+    forcePasswordChange: boolean
 }
 
 export interface AuthContextData {
