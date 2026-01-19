@@ -24,6 +24,8 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IStatsService, StatsService>();
 
+        services.AddScoped<ITeacherAnalyticsService, TeacherAnalyticsService>();
+
         services.Scan(scan => scan
             .FromAssemblyOf<StudentCountCalculator>()
             .AddClasses(classes => classes.AssignableTo<IStatsCalculator>())

@@ -25,6 +25,7 @@ import { ExamPage } from '../page/exams/ExamPage.tsx';
 import { CreateExamPage } from '../page/exams/CreateExamPage.tsx';
 import { EditExamPage } from '../page/exams/EditExamPage.tsx'; import RequestManagement from '../page/requests/RequestManagement';
 import AcademicRecordsPage from '../page/academic-records/AcademicRecordsPage.tsx';
+import ProfessorAnalyticsPage from '../page/analytics/ProfessorAnalytics.tsx';
 import CourseOverviewDashboard from '../page/course-overview-dashboard/CourseOverviewDashboard.tsx';
 import AssignmentsPage from '../page/assignments/AssignmentsPage.tsx';
 
@@ -78,10 +79,24 @@ export function Router(): React.ReactNode {
         </ProtectedRoute>
       } />
 
+      {/* Teacher area */}
+      <Route path="/teacher" element={
+        <ProtectedRoute>
+          <AppLayout><Outlet /></AppLayout>
+        </ProtectedRoute>
+      }>
+        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="analytics" element={<ProfessorAnalyticsPage />} />
+        <Route index element={<DashboardPage />} />
+      </Route>
+
+
+
       {/* feature/PBI_258 routes */}
       <Route path="/users" element={<AppLayout><UserManagementPage /></AppLayout>} />
       <Route path="/dashboard" element={<AppLayout><DashboardPage /></AppLayout>} />
       <Route path="/admin/dashboard" element={<AppLayout><DashboardPage /></AppLayout>} />
+      {/*<Route path="/teacher/dashboard" element={<AppLayout><DashboardPage /></AppLayout>} />*/}
       <Route path="/teacher/dashboard" element={
         <ProtectedRoute allowedRoles={["teacher"]}>
           <AppLayout><DashboardPage /></AppLayout>

@@ -79,6 +79,8 @@ const AppLayout: React.FC<PropsWithChildren<object>> = ({ children }) => {
           { type: 'item', label: "Professor Dashboard", path: "/teacher/dashboard", icon: cilSpeedometer },
           //     { type: 'item', label: "Course Management", path: "/course-management", icon: cilEducation },
           { type: 'item', label: "Attendance", path: "/attendance", icon: cilClipboard },
+          { type: 'item', label: "Professor analytics", path: "/teacher/analytics", icon: cilChartLine },
+          { type: 'item', label: "Request Management", path: "/faculty/request-management", icon: cilFile },
           //     { type: 'item', label: "Request Management", path: "/faculty/request-management", icon: cilFile },
           { type: 'title', label: 'Settings' },
           { type: 'item', label: "Profile settings", path: "/profile-settings", icon: cilUser },
