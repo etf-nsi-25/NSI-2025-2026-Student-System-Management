@@ -26,6 +26,7 @@ import DocumentCenterDashboard from '../page/document-center/documentCenter.tsx'
 import AppLayout from '../component/AppLayout/AppLayout.tsx';
 import DefaultLayout from '../component/UniversityDashboardLayout/DefaultLayout.tsx';
 import UniversityDashboard from "../page/university-dashboard/UniversityDashboard.tsx";
+import GradeManagementPage from "../page/teacher/GradeManagementPage.tsx"
 import RequestManagement from '../page/requests/RequestManagement';
 import AcademicRecordsPage from '../page/academic-records/AcademicRecordsPage.tsx';
 
@@ -95,6 +96,11 @@ export function Router(): React.ReactNode {
       <Route path="/support" element={<DefaultLayout><StudentSupport /></DefaultLayout>} />
       <Route path="/help" element={<DefaultLayout><HelpPage /></DefaultLayout>} />
 
+      {/*Teacher area*/}
+
+      <Route path="/teacher">
+        <Route path="grades" element={<GradeManagementPage />} />
+      </Route>
 
       <Route path="/student/request-management" element={
         <ProtectedRoute>

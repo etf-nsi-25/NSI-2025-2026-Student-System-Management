@@ -1,5 +1,6 @@
 import type { Course } from '../component/faculty/courses/types/Course';
 import type { CourseDTO } from '../dto/CourseDTO';
+import type { StudentGradeListResponse } from '../dto/GradeDTO';
 
 import type { TwoFAConfirmResponse, TwoFASetupResponse } from '../models/2fa/TwoFA.types';
 import type { StudentRequestDto } from '../page/requests/RequestTypes';
@@ -67,6 +68,14 @@ export class API {
         return this.delete<void>(`/api/faculty/courses/${id}`);
     }
 
+    async getGrades(examId: number): Promise<StudentGradeListResponse> {
+        return this.get<StudentGradeListResponse>(`/api/grades/${examId}`);
+    }
+
+    async saveGrades(examId: number, grades: { studentId: number; points: number | null }[]): Promise<void> {
+        return this.post(`/api/grades/${examId}`, { grades });
+    }
+  
     //request management 
     async getAllRequests(): Promise<StudentRequestDto[]> {
         return this.get<StudentRequestDto[]>(`/api/Support/requests`);
