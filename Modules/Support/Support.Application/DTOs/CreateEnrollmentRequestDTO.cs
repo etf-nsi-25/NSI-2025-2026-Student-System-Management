@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace Support.Application.DTOs
 {
-	public class CreateEnrollmentRequestDTO
-	{
-		public string UserId { get; set; }
-		public Guid FacultyId { get; set; }
-		public string AcademicYear { get; set; } = default!;
-		public int Semester { get; set; } 
-	}
+    public class CreateEnrollmentRequestDTO
+    {
+        public Guid UserId { get; set; }
+        public Guid FacultyId { get; set; }
+        public string AcademicYear { get; set; } = default!;
+        public int Semester { get; set; }
+    }
 }
+

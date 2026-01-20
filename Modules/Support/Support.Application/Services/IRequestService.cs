@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Support.Application.DTOs;
 
-namespace Support.Application.Services
+namespace Support.Core.Interfaces;
+
+public interface IRequestService
 {
-    public interface IRequestService
-    {
-        Task<CreateRequestResponseDto> CreateRequestAsync(CreateRequestDto dto);
-    }
+    Task<CreateRequestResponseDto> CreateRequestAsync(
+        Guid userId,
+        CreateRequestDto dto);
 }
