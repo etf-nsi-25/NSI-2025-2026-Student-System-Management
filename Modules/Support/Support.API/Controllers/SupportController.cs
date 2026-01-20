@@ -5,249 +5,151 @@ using Microsoft.EntityFrameworkCore;
 using Support.Application.DTOs;
 using Support.Core.Entities;
 using Support.Infrastructure.Db;
+using Support.Infrastructure.Services;
 using University.Infrastructure.Db;
 
-namespace Support.API.Controllers
+namespace Support.API.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class SupportController : ControllerBase
 {
-	[ApiController]
-	[Route("api/[controller]")]
-	public class SupportController : ControllerBase
-	{
-		private readonly SupportDbContext _dbContext;
-		private readonly UniversityDbContext _universityDbContext;
-		private readonly FacultyDbContext _facultyDbContext;
+    private readonly SupportDbContext _dbContext;
+    private readonly UniversityDbContext _universityDbContext;
+    private readonly FacultyDbContext _facultyDbContext;
+    private readonly IDocumentPdfGenerator _pdfGenerator;
 
-		public SupportController(
-			SupportDbContext dbContext,
-			UniversityDbContext universityDbContext,
-			FacultyDbContext facultyDbContext)
-		{
-			_dbContext = dbContext;
-			_universityDbContext = universityDbContext;
-			_facultyDbContext = facultyDbContext;
-		}
+    public SupportController(
+        SupportDbContext dbContext,
+        UniversityDbContext universityDbContext,
+        FacultyDbContext facultyDbContext,
+        IDocumentPdfGenerator pdfGenerator)
+    {
+        _dbContext = dbContext;
+        _universityDbContext = universityDbContext;
+        _facultyDbContext = facultyDbContext;
+        _pdfGenerator = pdfGenerator;
+    }
 
-		[HttpPost("document-request")]
-		[Authorize]
-		public async Task<IActionResult> CreateDocumentRequest([FromBody] CreateDocumentRequestDTO dto)
-		{
-			var studentExists = await _facultyDbContext.Students
-				.AnyAsync(s => s.UserId == dto.UserId);
+   
+    [Authorize]
+    [HttpPost("document-request")]
+    public async Task<IActionResult> CreateDocumentRequest([FromBody] CreateDocumentRequestDTO dto)
+    {
+        var userIdClaim = User.FindFirst("userId")?.Value;
+        if (string.IsNullOrWhiteSpace(userIdClaim))
+            return Unauthorized();
 
-			if (!studentExists)
-				return BadRequest($"User/Student with ID '{dto.UserId}' does not exist.");
+        var userId = Guid.Parse(userIdClaim);
 
-			var facultyExists = await _universityDbContext.Faculties
-				.AnyAsync(f => f.Id == dto.FacultyId);
+        var studentExists = await _facultyDbContext.Students
+            .IgnoreQueryFilters()
+            .AnyAsync(s =>
+                s.UserId == userId.ToString() &&
+                s.FacultyId == dto.FacultyId
+            );
 
-			if (!facultyExists)
-				return BadRequest($"Faculty with ID '{dto.FacultyId}' does not exist.");
+        if (!studentExists)
+            return BadRequest("Student does not exist.");
 
-			var request = new DocumentRequest
-			{
-				UserId = dto.UserId,
-				FacultyId = dto.FacultyId,
-				DocumentType = dto.DocumentType,
-				Status = dto.Status,
-				CreatedAt = DateTime.UtcNow,
-				CompletedAt = null
-			};
+        var facultyExists = await _universityDbContext.Faculties
+            .AnyAsync(f => f.Id == dto.FacultyId);
 
-			_dbContext.DocumentRequests.Add(request);
-			await _dbContext.SaveChangesAsync();
+        if (!facultyExists)
+            return BadRequest("Faculty does not exist.");
 
-			return Ok(request);
-		}
+       var request = new DocumentRequest
+{
+    Id = Guid.NewGuid(),
+    UserId = userId,
+    FacultyId = dto.FacultyId,
+    DocumentType = dto.DocumentType,
+    Status = "Pending",
+    CreatedAt = DateTime.UtcNow,
+    CompletedAt = null,
+    Payload = dto.Payload
+};
 
-		[HttpPost("enrollment-requests")]
-		public async Task<IActionResult> CreateEnrollmentRequest([FromBody] CreateEnrollmentRequestDTO dto)
-		{
-			if (dto.Semester is not (1 or 2))
-				return BadRequest("Semester must be 1 or 2.");
 
-			if (string.IsNullOrWhiteSpace(dto.AcademicYear))
-				return BadRequest("AcademicYear is required.");
+        _dbContext.DocumentRequests.Add(request);
+        await _dbContext.SaveChangesAsync();
 
-			var studentExists = await _facultyDbContext.Students
-				.AnyAsync(s => s.UserId == dto.UserId);
-
-			if (!studentExists)
-				return BadRequest($"Student with UserId '{dto.UserId}' does not exist.");
-
-			/*var facultyExists = await _universityDbContext.Faculties
-				.AnyAsync(f => f.Id.Equals(dto.FacultyId));
-
-			if (!facultyExists)
-				return BadRequest($"Faculty with ID '{dto.FacultyId}' does not exist.");*/
-
-			var duplicate = await _dbContext.EnrollmentRequests.AnyAsync(r =>
-				r.UserId == dto.UserId &&
-				r.AcademicYear == dto.AcademicYear &&
-				r.Semester == dto.Semester &&
-				r.Status != "Rejected"
-			);
-
-			if (duplicate)
-				return BadRequest("You already have an enrollment request for the same academic year and semester.");
-
-			var request = new EnrollmentRequest
-			{
-				Id = Guid.NewGuid(),
-				UserId = dto.UserId,
-				FacultyId = dto.FacultyId,
-				AcademicYear = dto.AcademicYear.Trim(),
-				Semester = dto.Semester,
-				Status = "Pending",
-				CreatedAt = DateTime.UtcNow,
-				DecisionAt = null,
-				DecidedByUserId = null,
-				DecisionNote = null
-			};
-
-			_dbContext.EnrollmentRequests.Add(request);
-			await _dbContext.SaveChangesAsync();
-
-			return CreatedAtAction(nameof(GetEnrollmentRequestById), new { id = request.Id }, request);
-		}
-
-		[HttpGet("enrollment-requests/{id:guid}")]
-		public async Task<IActionResult> GetEnrollmentRequestById([FromRoute] Guid id)
-		{
-			var req = await _dbContext.EnrollmentRequests.AsNoTracking()
-				.FirstOrDefaultAsync(x => x.Id == id);
-
-			return req is null ? NotFound() : Ok(req);
-		}
-
-		[HttpGet("enrollment-requests/my")]
-		public async Task<IActionResult> GetMyEnrollmentRequests([FromQuery] string userId)
-		{
-			var items = await _dbContext.EnrollmentRequests.AsNoTracking()
-				.Where(r => r.UserId == userId)
-				.OrderByDescending(r => r.CreatedAt)
-				.Select(r => new
-				{
-					r.Id,
-					r.CreatedAt,
-					r.AcademicYear,
-					r.Semester,
-					r.Status
-				})
-				.ToListAsync();
-
-			return Ok(items);
-		}
-
-		[Authorize(Roles = "Admin")]
-		[HttpGet("enrollment-requests/pending")]
-		public async Task<IActionResult> GetPendingEnrollmentRequestsForFaculty([FromQuery] Guid facultyId)
-		{
-			var items = await _dbContext.EnrollmentRequests.AsNoTracking()
-				.Where(r => r.FacultyId.Equals(facultyId) && r.Status == "Pending")
-				.OrderBy(r => r.CreatedAt)
-				.ToListAsync();
-
-			return Ok(items);
-		}
-
-		[Authorize(Roles = "Admin")]
-		[HttpGet("enrollment-requests/all")]
-		public async Task<IActionResult> GetAllEnrollmentRequestsForFaculty([FromQuery] Guid facultyId)
-		{
-			var items = await _dbContext.EnrollmentRequests.AsNoTracking()
-				.Where(r => r.FacultyId.Equals(facultyId))
-				.OrderByDescending(r => r.CreatedAt)
-				.ToListAsync();
-
-			return Ok(items);
-		}
-
-		[Authorize(Roles = "Admin")]
-		[HttpPut("enrollment-requests/{id:guid}/approve")]
-		public async Task<IActionResult> ApproveEnrollmentRequest([FromRoute] Guid id, [FromBody] DecideEnrollmentRequestDTO? dto)
-		{
-			var req = await _dbContext.EnrollmentRequests
-				.FirstOrDefaultAsync(r => r.Id == id);
-
-			if (req is null) return NotFound();
-
-			if (req.Status != "Pending")
-				return BadRequest($"Only Pending requests can be approved. Current status: {req.Status}");
-
-			req.Status = "Approved";
-			req.DecisionAt = DateTime.UtcNow;
-			req.DecidedByUserId = dto?.AdminUserId;
-			req.DecisionNote = dto?.Note;
-
-			await _dbContext.SaveChangesAsync();
-			return Ok(req);
-		}
-
-		[Authorize(Roles = "Admin")]
-		[HttpPut("enrollment-requests/{id:guid}/reject")]
-		public async Task<IActionResult> RejectEnrollmentRequest([FromRoute] Guid id, [FromBody] DecideEnrollmentRequestDTO? dto)
-		{
-			var req = await _dbContext.EnrollmentRequests
-				.FirstOrDefaultAsync(r => r.Id == id);
-
-			if (req is null) return NotFound();
-
-			if (req.Status != "Pending")
-				return BadRequest($"Only Pending requests can be rejected. Current status: {req.Status}");
-
-			req.Status = "Rejected";
-			req.DecisionAt = DateTime.UtcNow;
-			req.DecidedByUserId = dto?.AdminUserId;
-			req.DecisionNote = dto?.Note;
-
-			await _dbContext.SaveChangesAsync();
-			return Ok(req);
-		}
-
-        [HttpGet("requests")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAllRequests()
+        return Ok(new
         {
-            try
+            request.Id,
+            request.Status
+        });
+    }
+
+    
+    [Authorize(Roles = "Admin")]
+    [HttpGet("document-requests")]
+    public async Task<IActionResult> GetAllDocumentRequests()
+    {
+        var items = await _dbContext.DocumentRequests
+            .AsNoTracking()
+            .OrderByDescending(r => r.CreatedAt)
+            .Select(r => new
             {
-                var requests = await _dbContext.DocumentRequests
-                    .OrderByDescending(r => r.CreatedAt)
-                    .ToListAsync();
+                r.Id,
+                r.UserId,
+                r.FacultyId,
+                r.DocumentType,
+                r.Status,
+                r.CreatedAt
+            })
+            .ToListAsync();
 
-                var response = requests.Select(r => new 
-                {
-                    id = r.Id, // Keep as int to match interface or handle string conversion in frontend
-                    createdAt = r.CreatedAt, // Changed from date to createdAt
-                    userId = r.UserId, // Changed from studentIndex to userId
-                    documentType = r.DocumentType, // Changed from requestType to documentType
-                    facultyId = r.FacultyId,
-                    status = r.Status
-                });
+        return Ok(items);
+    }
 
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
+   
+    [Authorize(Roles = "Admin")]
+    [HttpPut("document-requests/{id:guid}/approve")]
+    public async Task<IActionResult> ApproveDocumentRequest(Guid id)
+    {
+        var request = await _dbContext.DocumentRequests
+            .FirstOrDefaultAsync(r => r.Id == id);
 
-        [HttpPut("requests/{id}/status")] 
-		[Authorize(Roles = "Admin")]
-		public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusDto dto)
-		{
-			var request = await _dbContext.DocumentRequests.FindAsync(id);
-			
-			if (request == null) 
-				return NotFound(new { message = $"Request with ID {id} not found." });
+        if (request == null)
+            return NotFound();
 
-			request.Status = dto.Status;
-			
-			if (dto.Status == "Approved") 
-				request.CompletedAt = DateTime.UtcNow;
+        if (request.Status != "Pending")
+            return BadRequest($"Only Pending requests can be approved. Current status: {request.Status}");
 
-			await _dbContext.SaveChangesAsync();
-			return Ok(new { message = "Status updated successfully" });
-		}
+        request.Status = "Approved";
+        await _dbContext.SaveChangesAsync();
+
+        return Ok(new
+        {
+            request.Id,
+            request.Status
+        });
+    }
+
+   
+    [Authorize]
+    [HttpGet("document-requests/{id:guid}/pdf")]
+    public async Task<IActionResult> DownloadPdf(Guid id)
+    {
+        var request = await _dbContext.DocumentRequests
+            .FirstOrDefaultAsync(r => r.Id == id);
+
+        if (request == null)
+            return NotFound();
+
+        if (request.Status != "Approved")
+            return BadRequest("Request is not approved.");
+
+        var pdfBytes = _pdfGenerator.Generate(
+            "Student Confirmation",
+            $"Request ID: {request.Id}\nUser: {request.UserId}\nFaculty: {request.FacultyId}"
+        );
+
+        return File(
+            pdfBytes,
+            "application/pdf",
+            $"document-{request.Id}.pdf"
+        );
     }
 }
