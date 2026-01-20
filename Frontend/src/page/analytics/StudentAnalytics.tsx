@@ -106,34 +106,27 @@ type StudentPerformanceDashboardData = {
   popularTopics: PopularTopic[]
 }
 
-// Helper function to load student performance dashboard data from API
 async function loadStudentPerformanceDashboard(
   api: ReturnType<typeof useAPI>,
   monthKey: string,
-  _attendanceContext: string, // Not used here - attendance is loaded separately
-  _subjectsContext: string // Not used here - backend doesn't support semester filtering yet
+  _attendanceContext: string,
+  _subjectsContext: string
 ): Promise<StudentPerformanceDashboardData> {
-  // Parse month key (format: "YYYY-MM")
   const [year, month] = monthKey.split('-').map(Number)
   
-  // Get current week's Monday for schedule
   const today = new Date()
   const currentWeekMonday = new Date(today)
   const dayOfWeek = today.getDay()
-  const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1) // Adjust to Monday
+  const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)
   currentWeekMonday.setDate(diff)
   
-  // Load all data in parallel (attendance, schedule, and subjects are loaded separately in component)
   const [summary, calendar] = await Promise.all([
     api.getStudentSummary(),
     api.getMonthlyCalendar(year, month),
   ])
 
-  // Attendance and schedule are now loaded separately in the component
-  // Use empty data as placeholder
   const attendance: StudentAttendanceStatsDTO = { contextLabel: `for ${_attendanceContext}`, items: [] }
 
-  // Transform API data to component format
   return {
     headerTitle: 'Performance dashboard',
     gpa: summary.gpa ?? 0,
@@ -141,13 +134,12 @@ async function loadStudentPerformanceDashboard(
     calendar: {
       currentMonth: new Date(calendar.currentMonth),
       highlightedDays: calendar.highlightedDays.map(h => {
-        // Map eventType to color for backward compatibility
         const colorMap: Record<string, 'primary' | 'info' | 'success' | 'warning'> = {
-          'Exam': 'success', // Green for exams
-          'Assignment': 'info', // Blue for assignments
-          'Midterm': 'info', // Blue for midterms
-          'Quiz': 'warning', // Yellow/Purple for quizzes
-          'PublicHoliday': 'warning', // Yellow for public holidays
+          'Exam': 'success',
+          'Assignment': 'info',
+          'Midterm': 'info',
+          'Quiz': 'warning',
+          'PublicHoliday': 'warning',
         };
         
         const eventType = (h.eventType || 'Exam') as 'Exam' | 'Assignment' | 'Midterm' | 'Quiz' | 'PublicHoliday';
@@ -165,7 +157,7 @@ async function loadStudentPerformanceDashboard(
     weeklySchedule: {
       startHour: 9,
       endHour: 18,
-      blocks: [], // Schedule is loaded separately
+      blocks: [],
     },
     attendance: {
       contextLabel: attendance.contextLabel,
@@ -177,10 +169,9 @@ async function loadStudentPerformanceDashboard(
       })),
     },
     subjects: {
-      contextLabel: '', // Will be set when subjects are loaded separately
-      items: [], // Will be populated when subjects are loaded separately
+      contextLabel: '',
+      items: [],
     },
-    // Popular Topics removed - no API endpoint available
     popularTopics: [],
   }
 }
@@ -193,9 +184,8 @@ function makeCalendarMatrix(monthDate: Date) {
   const monthStart = startOfMonth(monthDate)
   const monthEnd = endOfMonth(monthDate)
 
-  // Render a full calendar grid (includes previous/next month days) like the design
-  const gridStart = startOfWeek(monthStart, { weekStartsOn: 0 }) // Sunday
-  const gridEnd = endOfWeek(monthEnd, { weekStartsOn: 0 }) // Saturday
+  const gridStart = startOfWeek(monthStart, { weekStartsOn: 0 })
+  const gridEnd = endOfWeek(monthEnd, { weekStartsOn: 0 })
   const days = eachDayOfInterval({ start: gridStart, end: gridEnd })
 
   const weeks: Array<Array<Date>> = []
@@ -209,16 +199,11 @@ function formatTime(minutes: number) {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
 }
 
-/**
- * Centralized error handling for analytics API calls.
- * Extracts user-friendly error messages and handles different error types.
- */
 function handleAnalyticsError(error: unknown): string {
   const errorObj = error as { status?: number; message?: unknown }
   const status = errorObj?.status
   const rawMessage = extractApiErrorMessage(error)
 
-  // Handle specific HTTP status codes with user-friendly messages
   switch (status) {
     case 401:
       return 'Your session has expired. Please log in again to view your analytics.'
@@ -231,7 +216,6 @@ function handleAnalyticsError(error: unknown): string {
     case 503:
       return 'The server is experiencing issues. Please try again in a few moments.'
     default:
-      // Use extracted message if available, otherwise use generic message
       if (rawMessage && rawMessage !== 'Unexpected error.') {
         return rawMessage
       }
@@ -252,11 +236,10 @@ export function StudentAnalytics() {
   const [subjectsContext, setSubjectsContext] = useState('current')
   const [scheduleDay, setScheduleDay] = useState<Weekday>('Mon')
 
-  // State for weekly schedule navigation
   const [selectedWeekStart, setSelectedWeekStart] = useState<Date>(() => {
     const today = new Date()
     const dayOfWeek = today.getDay()
-    const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1) // Adjust to Monday
+    const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)
     const monday = new Date(today)
     monday.setDate(diff)
     return monday
@@ -265,7 +248,6 @@ export function StudentAnalytics() {
   const [scheduleLoading, setScheduleLoading] = useState(false)
   const [scheduleError, setScheduleError] = useState<string | null>(null)
   
-  // Calendar event modal state
   const [selectedEvent, setSelectedEvent] = useState<{
     day: number
     eventType: string
@@ -275,18 +257,15 @@ export function StudentAnalytics() {
   } | null>(null)
   const [showEventModal, setShowEventModal] = useState(false)
   
-  // Separate state for attendance widget
   const [attendanceData, setAttendanceData] = useState<StudentAttendanceStatsDTO | null>(null)
   const [attendanceLoading, setAttendanceLoading] = useState(false)
   const [attendanceError, setAttendanceError] = useState<string | null>(null)
   
-  // Separate state for subjects widget
   const [subjectsData, setSubjectsData] = useState<SubjectProgressDTO | null>(null)
   const [subjectsLoading, setSubjectsLoading] = useState(false)
   const [subjectsError, setSubjectsError] = useState<string | null>(null)
   const [courses, setCourses] = useState<Course[]>([])
 
-  // Load courses once on mount
   useEffect(() => {
     let cancelled = false
 
@@ -295,14 +274,11 @@ export function StudentAnalytics() {
         const allCourses = await api.getAllCourses()
         if (!cancelled) {
           setCourses(allCourses)
-          // Set initial attendance context to first course if available and not already set
           if (allCourses.length > 0 && attendanceContext === '') {
             setAttendanceContext(allCourses[0].code)
           }
         }
       } catch {
-        // Ignore errors - courses will be empty
-        // Set default to first course if available
         if (!cancelled && attendanceContext === '' && courses.length > 0) {
           setAttendanceContext(courses[0].code)
         }
@@ -313,9 +289,8 @@ export function StudentAnalytics() {
     return () => {
       cancelled = true
     }
-  }, [api]) // Only depend on api, attendanceContext is checked inside
+  }, [api])
 
-  // Load weekly schedule separately when selectedWeekStart changes
   useEffect(() => {
     let cancelled = false
 
@@ -345,7 +320,6 @@ export function StudentAnalytics() {
     }
   }, [api, selectedWeekStart])
 
-  // Load main dashboard data (without schedule - it's loaded separately)
   useEffect(() => {
     let cancelled = false
 
@@ -356,14 +330,12 @@ export function StudentAnalytics() {
         const result = await loadStudentPerformanceDashboard(api, monthKey, attendanceContext, subjectsContext)
         if (!cancelled) {
           setData(result)
-          setError(null) // Clear any previous errors on success
+          setError(null)
         }
       } catch (e) {
         if (!cancelled) {
           const userFriendlyMessage = handleAnalyticsError(e)
           setError(userFriendlyMessage)
-          // Keep existing data if available to maintain layout
-          // Only clear data if it's an authentication error
           const errorObj = e as { status?: number }
           if (errorObj?.status === 401 || errorObj?.status === 403) {
             setData(null)
@@ -378,9 +350,8 @@ export function StudentAnalytics() {
     return () => {
       cancelled = true
     }
-  }, [api, monthKey, subjectsContext]) // Removed attendanceContext from dependencies
+  }, [api, monthKey, subjectsContext])
 
-  // Load attendance data separately when attendanceContext changes
   useEffect(() => {
     let cancelled = false
 
@@ -394,7 +365,6 @@ export function StudentAnalytics() {
         setAttendanceLoading(true)
         setAttendanceError(null)
         
-        // Find course by code
         const course = courses.find(c => c.code === attendanceContext)
         
         if (!course) {
@@ -414,7 +384,6 @@ export function StudentAnalytics() {
         if (!cancelled) {
           const userFriendlyMessage = handleAnalyticsError(e)
           setAttendanceError(userFriendlyMessage)
-          // Set empty data on error to show empty state
           setAttendanceData({ contextLabel: `for ${attendanceContext}`, items: [] })
         }
       } finally {
@@ -428,7 +397,6 @@ export function StudentAnalytics() {
     }
   }, [api, attendanceContext, courses])
 
-  // Load subjects data separately when subjectsContext changes
   useEffect(() => {
     let cancelled = false
 
@@ -437,16 +405,8 @@ export function StudentAnalytics() {
         setSubjectsLoading(true)
         setSubjectsError(null)
         
-        // Determine semesterId based on subjectsContext
-        // For now, we'll use a simplified approach:
-        // - "current" = current academic year (no filter, or current year)
-        // - "previous" = previous academic year
-        // In a real system, you'd have actual semester GUIDs
-        // For now, pass undefined as backend doesn't fully support semester filtering yet
-        // But we'll prepare the structure for when it does
         const result = await api.getSubjectProgress(undefined)
         
-        // Sort items by percent descending (highest first) to match the design
         const sortedResult = {
           ...result,
           items: [...result.items].sort((a, b) => b.percent - a.percent)
@@ -498,14 +458,12 @@ export function StudentAnalytics() {
     return map
   }, [data])
 
-  // Generate month options for dropdown (current month ± 6 months)
   const monthOptions = useMemo(() => {
     const options: Array<{ value: string; label: string }> = []
     const now = new Date()
     const currentYear = now.getFullYear()
     const currentMonth = now.getMonth() + 1
 
-    // Generate options for current month ± 6 months
     for (let i = -6; i <= 6; i++) {
       const date = new Date(currentYear, currentMonth - 1 + i, 1)
       const year = date.getFullYear()
@@ -518,7 +476,6 @@ export function StudentAnalytics() {
     return options
   }, [])
 
-  // Calculate schedule days based on selected week
   const scheduleDays = useMemo(() => {
     const days: Array<{ day: Weekday; date: number }> = []
     const weekdays: Weekday[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
@@ -535,7 +492,6 @@ export function StudentAnalytics() {
     return days
   }, [selectedWeekStart])
 
-  // Use scheduleData if available, otherwise fall back to data.weeklySchedule
   const currentSchedule = scheduleData || data?.weeklySchedule
   const scheduleStartHour = useMemo(() => (currentSchedule ? currentSchedule.startHour : 9), [currentSchedule])
   const scheduleEndHour = useMemo(() => (currentSchedule ? currentSchedule.endHour : 18), [currentSchedule])
@@ -544,24 +500,21 @@ export function StudentAnalytics() {
     const map = new Map<Weekday, CourseBlock[]>()
     for (const d of ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'] as Weekday[]) map.set(d, [])
     
-    // Map subject code to consistent color (same as subjects widget)
     const getColorFromCode = (code: string): 'info' | 'primary' | 'success' | 'warning' | 'danger' => {
       const colors: ('info' | 'primary' | 'success' | 'warning' | 'danger')[] = [
-        'primary', // Blue
-        'success', // Green
-        'warning', // Yellow
-        'info', // Purple
-        'danger', // Brown/Orange
+        'primary',
+        'success',
+        'warning',
+        'info',
+        'danger',
       ]
       const hash = code.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
       return colors[Math.abs(hash) % colors.length]
     }
     
-    // Use scheduleData if available, otherwise use data.weeklySchedule
     const blocks = currentSchedule?.blocks ?? []
     for (const b of blocks) {
       const day = b.day as Weekday
-      // Map color on frontend based on subject code
       const color = getColorFromCode(b.subject)
       if (map.has(day)) {
         map.get(day)?.push({
@@ -571,7 +524,7 @@ export function StudentAnalytics() {
           startMinutes: b.startMinutes,
           endMinutes: b.endMinutes,
           type: b.type,
-          color: color, // Mapped on frontend
+          color: color,
         })
       }
     }
@@ -582,8 +535,6 @@ export function StudentAnalytics() {
 
   const scheduleRowHeightPx = 76
   const scheduleTotalHours = useMemo(() => {
-    // +1 so the last tick (e.g. 18:00) is not flush with the bottom edge,
-    // matching the Figma spacing and preventing blocks from visually overflowing.
     return Math.max(1, scheduleEndHour - scheduleStartHour + 1)
   }, [scheduleEndHour, scheduleStartHour])
 
@@ -601,8 +552,6 @@ export function StudentAnalytics() {
     )
   }
 
-  // Show error banner at top if error exists, but maintain layout if we have data
-  // This ensures the dashboard structure is preserved even on partial failures
   if (error && !data) {
     return (
       <CContainer fluid className="student-analytics-page">
@@ -629,7 +578,6 @@ export function StudentAnalytics() {
 
   return (
     <CContainer fluid className="student-analytics-page">
-      {/* Error banner at top - doesn't break layout */}
       {error && data && (
         <CRow className="mb-3">
           <CCol>
@@ -647,13 +595,11 @@ export function StudentAnalytics() {
       </CRow>
 
       <CRow className="g-4">
-        {/* LEFT */}
         <CCol xs={12} lg={8}>
           <CCard className="student-analytics-card student-analytics-card-lg mb-4">
             <CCardBody>
               <div className="student-analytics-card-header-center">
                 <div className="student-analytics-card-eyebrow">WEEKLY COURSE SCHEDULE</div>
-                {/* Week navigation controls */}
                 <div className="student-analytics-week-navigation">
                   <CButton
                     size="sm"
@@ -695,7 +641,6 @@ export function StudentAnalytics() {
                 </div>
               </div>
 
-              {/* Loading state for schedule */}
               {scheduleLoading && (
                 <div className="student-analytics-widget-loading">
                   <CSpinner size="sm" color="primary" />
@@ -703,21 +648,18 @@ export function StudentAnalytics() {
                 </div>
               )}
 
-              {/* Error state for schedule */}
               {scheduleError && !scheduleLoading && (
                 <div className="student-analytics-widget-error">
                   <small>Unable to load schedule. {scheduleError}</small>
                 </div>
               )}
 
-              {/* Empty state for schedule */}
               {!scheduleLoading && !scheduleError && currentSchedule && currentSchedule.blocks.length === 0 && (
                 <div className="student-analytics-widget-empty">
                   <p>No classes scheduled for this week.</p>
                 </div>
               )}
 
-              {/* Schedule content - only show if not loading or if we have data */}
               {(!scheduleLoading || currentSchedule) && currentSchedule && currentSchedule.blocks.length > 0 && (
               <div
                 className="student-analytics-weekly-schedule"
@@ -726,7 +668,6 @@ export function StudentAnalytics() {
                   ['--sa-schedule-row-height' as any]: `${scheduleRowHeightPx}px`,
                 }}
               >
-                {/* Desktop/tablet schedule (full week grid) */}
                 <div className="student-analytics-weekly-desktop">
                   <div className="student-analytics-weekly-schedule-header">
                     <div className="student-analytics-weekly-week-col">Week</div>
@@ -771,14 +712,12 @@ export function StudentAnalytics() {
                             const startRow = Math.max(1, Math.round(startOffsetMin / slotMinutes) + 1)
                             const endRow = Math.max(startRow + 1, Math.round(endOffsetMin / slotMinutes) + 1)
 
-                            // Map color to CSS background and border colors
-                            // Each color has a distinct background and matching border
                             const colorMap: Record<string, { bg: string; border: string }> = {
-                              primary: { bg: '#eef0f6', border: 'rgba(59, 130, 246, 0.3)' }, // Blue
-                              info: { bg: '#f1f8ea', border: 'rgba(34, 197, 94, 0.3)' }, // Green
-                              success: { bg: '#fdf5e6', border: 'rgba(234, 179, 8, 0.3)' }, // Yellow
-                              warning: { bg: '#fff7f7', border: 'rgba(239, 68, 68, 0.3)' }, // Red
-                              danger: { bg: '#fbf7ff', border: 'rgba(139, 92, 246, 0.3)' }, // Purple
+                              primary: { bg: '#eef0f6', border: 'rgba(59, 130, 246, 0.3)' },
+                              info: { bg: '#f1f8ea', border: 'rgba(34, 197, 94, 0.3)' },
+                              success: { bg: '#fdf5e6', border: 'rgba(234, 179, 8, 0.3)' },
+                              warning: { bg: '#fff7f7', border: 'rgba(239, 68, 68, 0.3)' },
+                              danger: { bg: '#fbf7ff', border: 'rgba(139, 92, 246, 0.3)' },
                             }
                             const colors = colorMap[b.color] || colorMap.primary
 
@@ -812,7 +751,6 @@ export function StudentAnalytics() {
                   </div>
                 </div>
 
-                {/* Mobile schedule: day tabs */}
                 <div className="student-analytics-weekly-mobile">
                   <CNav variant="tabs" className="student-analytics-weekly-tabs">
                     {scheduleDays.map((d) => (
@@ -861,14 +799,12 @@ export function StudentAnalytics() {
                           const startRow = Math.max(1, Math.round(startOffsetMin / slotMinutes) + 1)
                           const endRow = Math.max(startRow + 1, Math.round(endOffsetMin / slotMinutes) + 1)
 
-                          // Map color to CSS background and border colors
-                          // Each color has a distinct background and matching border
                           const colorMap: Record<string, { bg: string; border: string }> = {
-                            primary: { bg: '#eef0f6', border: 'rgba(59, 130, 246, 0.3)' }, // Blue
-                            info: { bg: '#f1f8ea', border: 'rgba(34, 197, 94, 0.3)' }, // Green
-                            success: { bg: '#fdf5e6', border: 'rgba(234, 179, 8, 0.3)' }, // Yellow
-                            warning: { bg: '#fff7f7', border: 'rgba(239, 68, 68, 0.3)' }, // Red
-                            danger: { bg: '#fbf7ff', border: 'rgba(139, 92, 246, 0.3)' }, // Purple
+                            primary: { bg: '#eef0f6', border: 'rgba(59, 130, 246, 0.3)' },
+                            info: { bg: '#f1f8ea', border: 'rgba(34, 197, 94, 0.3)' },
+                            success: { bg: '#fdf5e6', border: 'rgba(234, 179, 8, 0.3)' },
+                            warning: { bg: '#fff7f7', border: 'rgba(239, 68, 68, 0.3)' },
+                            danger: { bg: '#fbf7ff', border: 'rgba(139, 92, 246, 0.3)' },
                           }
                           const colors = colorMap[b.color] || colorMap.primary
 
@@ -930,7 +866,6 @@ export function StudentAnalytics() {
                     </div>
                   </div>
 
-                  {/* Loading state */}
                   {attendanceLoading && (
                     <div className="student-analytics-widget-loading">
                       <CSpinner size="sm" color="primary" />
@@ -938,7 +873,6 @@ export function StudentAnalytics() {
                     </div>
                   )}
 
-                  {/* Error state */}
                   {attendanceError && !attendanceLoading && (
                     <div className="student-analytics-widget-error">
                       <small>{attendanceError}</small>
@@ -963,11 +897,9 @@ export function StudentAnalytics() {
                     </div>
                   )}
 
-                  {/* Attendance chart - only show if we have data */}
                   {!attendanceLoading && attendanceData && attendanceData.items.length > 0 && (
                     <>
                   <div className="student-analytics-attendance-chart">
-                    {/* Tutorials (purple) shown on top like the design */}
                     {(() => {
                           const tutorials = attendanceData.items.find((x) => x.label === 'Tutorials')
                       if (!tutorials) return null
@@ -1007,11 +939,9 @@ export function StudentAnalytics() {
 
                   <CListGroup flush className="student-analytics-attendance-legend">
                         {attendanceData.items.map((item) => {
-                          // Map label to color on frontend
-                          // Lectures = blue (#3b82f6), Tutorials = purple (#8b5cf6)
                           const colorMap: Record<string, string> = {
-                            'Lectures': '#3b82f6', // Blue
-                            'Tutorials': '#8b5cf6', // Purple
+                            'Lectures': '#3b82f6',
+                            'Tutorials': '#8b5cf6',
                           }
                           const borderColor = colorMap[item.label] || '#3b82f6'
 
@@ -1076,7 +1006,6 @@ export function StudentAnalytics() {
                     </div>
                   </div>
 
-                  {/* Loading state */}
                   {subjectsLoading && (
                     <div className="student-analytics-widget-loading">
                       <CSpinner size="sm" color="primary" />
@@ -1084,21 +1013,18 @@ export function StudentAnalytics() {
                     </div>
                   )}
 
-                  {/* Error state */}
                   {subjectsError && !subjectsLoading && (
                     <div className="student-analytics-widget-error">
                       <small>Unable to load subjects progress. {subjectsError}</small>
                     </div>
                   )}
 
-                  {/* Empty state */}
                   {!subjectsLoading && !subjectsError && subjectsData && subjectsData.items.length === 0 && (
                     <div className="student-analytics-widget-empty">
                       <p>No subjects found for {subjectsData.contextLabel || 'selected period'}.</p>
                     </div>
                   )}
 
-                  {/* Subjects content - only show if not loading or if we have data */}
                   {!subjectsLoading && subjectsData && subjectsData.items.length > 0 && (
                     <>
                   <div className="student-analytics-subjects-scale">
@@ -1114,20 +1040,16 @@ export function StudentAnalytics() {
 
                   <div className="student-analytics-subjects-chart">
                     {(() => {
-                          // Use all items from API
                           if (!subjectsData) return null
                           const items = subjectsData.items
                           
-                          // Map subject code to consistent color (like backend used to do)
-                          // Use hash of code to get consistent color for each subject
                           const getColorFromCode = (code: string): string => {
-                            // Color palette matching the design
                             const colors = [
-                              '#3b82f6', // Blue (info)
-                              '#6cc6a7', // Green (success)
-                              '#f8e7b2', // Yellow (warning)
-                              '#8b5cf6', // Purple (primary)
-                              '#e6a27c', // Brown/Orange (danger)
+                              '#3b82f6',
+                              '#6cc6a7',
+                              '#f8e7b2',
+                              '#8b5cf6',
+                              '#e6a27c',
                             ]
                             const hash = code.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
                             return colors[Math.abs(hash) % colors.length]
@@ -1158,14 +1080,13 @@ export function StudentAnalytics() {
 
                   <CListGroup flush className="student-analytics-subjects-legend">
                         {subjectsData?.items.map((item) => {
-                          // Map subject code to consistent color (same as progress bars)
                           const getColorFromCode = (code: string): string => {
                             const colors = [
-                              '#3b82f6', // Blue (info)
-                              '#6cc6a7', // Green (success)
-                              '#f8e7b2', // Yellow (warning)
-                              '#8b5cf6', // Purple (primary)
-                              '#e6a27c', // Brown/Orange (danger)
+                              '#3b82f6',
+                              '#6cc6a7',
+                              '#f8e7b2',
+                              '#8b5cf6',
+                              '#e6a27c',
                             ]
                             const hash = code.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
                             return colors[Math.abs(hash) % colors.length]
@@ -1203,10 +1124,8 @@ export function StudentAnalytics() {
           </CRow>
         </CCol>
 
-        {/* RIGHT */}
         <CCol xs={12} lg={4}>
           <CRow className="g-4 mb-4">
-            {/* GPA Card */}
             <CCol xs={12} sm={6}>
               <CCard className="student-analytics-card student-analytics-stat-card h-100">
                 <CCardBody className="text-center">
@@ -1237,7 +1156,6 @@ export function StudentAnalytics() {
               </CCard>
             </CCol>
             
-            {/* Total Passed Card */}
             <CCol xs={12} sm={6}>
               <CCard className="student-analytics-card student-analytics-stat-card h-100">
                 <CCardBody className="text-center">
@@ -1288,7 +1206,6 @@ export function StudentAnalytics() {
                 </CFormSelect>
               </div>
 
-              {/* Loading state for calendar */}
               {loading && (
                 <div className="student-analytics-widget-loading">
                   <CSpinner size="sm" color="primary" />
@@ -1296,14 +1213,12 @@ export function StudentAnalytics() {
                 </div>
               )}
 
-              {/* Error state for calendar */}
               {error && !loading && (
                 <div className="student-analytics-widget-error">
                   <small>Unable to load calendar events. {error}</small>
                 </div>
               )}
 
-              {/* Calendar table - only show if not loading or if we have data */}
               {(!loading || data) && (
               <CTable borderless className="student-analytics-calendar-table mb-0">
                 <CTableHead>
@@ -1367,7 +1282,6 @@ export function StudentAnalytics() {
               </CTable>
               )}
 
-              {/* Empty state - show if no highlighted days and not loading */}
               {!loading && !error && data && data.calendar.highlightedDays.length === 0 && (
                 <div className="student-analytics-widget-empty">
                   <p>No events scheduled for this month.</p>
@@ -1385,7 +1299,6 @@ export function StudentAnalytics() {
               </div>
 
               <CListGroup className="student-analytics-popular-list">
-                {/* Quiz - purple (if we have warning or custom color) */}
                 <CListGroupItem className="student-analytics-popular-item">
                   <div className="student-analytics-popular-left">
                     <span className="student-analytics-topic-dot" style={{ backgroundColor: '#a78bfa' }} />
@@ -1400,7 +1313,6 @@ export function StudentAnalytics() {
                   </CButton>
                 </CListGroupItem>
                 
-                {/* Midterm - blue (info color) */}
                 <CListGroupItem className="student-analytics-popular-item">
                   <div className="student-analytics-popular-left">
                     <span className="student-analytics-topic-dot bg-info" />
@@ -1415,7 +1327,6 @@ export function StudentAnalytics() {
                   </CButton>
                 </CListGroupItem>
                 
-                {/* Exam - green (success/primary color) */}
                 <CListGroupItem className="student-analytics-popular-item">
                   <div className="student-analytics-popular-left">
                     <span className="student-analytics-topic-dot bg-success" />
@@ -1430,7 +1341,6 @@ export function StudentAnalytics() {
                   </CButton>
                 </CListGroupItem>
                 
-                {/* Public holiday - yellow (warning color) */}
                 <CListGroupItem className="student-analytics-popular-item">
                   <div className="student-analytics-popular-left">
                     <span className="student-analytics-topic-dot bg-warning" />
@@ -1450,7 +1360,6 @@ export function StudentAnalytics() {
         </CCol>
       </CRow>
 
-      {/* Calendar Event Details Modal */}
       <CModal 
         visible={showEventModal} 
         onClose={() => setShowEventModal(false)} 

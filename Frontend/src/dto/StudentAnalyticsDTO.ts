@@ -1,4 +1,3 @@
-// Student Analytics DTOs
 export interface StudentSummaryDTO {
     gpa: number;
     passedSubjects: number;
@@ -13,23 +12,23 @@ export interface WeeklyScheduleDTO {
 
 export interface CourseBlockDTO {
     id: string;
-    subject: string; // Course code
-    day: string; // "Mon", "Tue", "Wed", "Thu", "Fri"
-    startMinutes: number; // minutes since 00:00
-    endMinutes: number; // minutes since 00:00
-    type?: string; // "Lecture" or "Tutorial" - from Attendance Note field
+    subject: string;
+    day: string;
+    startMinutes: number;
+    endMinutes: number;
+    type?: string;
 }
 
 export interface MonthlyCalendarDTO {
-    currentMonth: string; // ISO date string
+    currentMonth: string;
     highlightedDays: HighlightedDayDTO[];
 }
 
 export interface HighlightedDayDTO {
     day: number;
     eventType: 'Exam' | 'Assignment' | 'Midterm' | 'Quiz' | 'PublicHoliday';
-    eventName?: string; // Optional: Name of the event (e.g., "Final Exam", "Homework 1")
-    courseCode?: string; // Optional: Course code (e.g., "RSRV", "MPVI")
+    eventName?: string;
+    courseCode?: string;
 }
 
 export interface StudentAttendanceStatsDTO {
@@ -38,10 +37,10 @@ export interface StudentAttendanceStatsDTO {
 }
 
 export interface AttendanceItemDTO {
-    label: string; // "Lectures" or "Tutorials"
+    label: string;
     percent: number;
-    presentCount: number; // Number of present/late attendances
-    totalCount: number; // Total number of attendances for this type
+    presentCount: number;
+    totalCount: number;
 }
 
 export interface SubjectProgressDTO {
@@ -52,5 +51,5 @@ export interface SubjectProgressDTO {
 export interface SubjectProgressItemDTO {
     code: string;
     percent: number;
-    status: string; // "In Progress", "Passed", "Failed", "Enrolled"
+    status: string;
 }

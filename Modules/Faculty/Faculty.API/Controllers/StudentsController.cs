@@ -5,9 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Faculty.API.Controllers;
 
-/// <summary>
-/// Controller for student-related endpoints.
-/// </summary>
 [ApiController]
 [Route("api/faculty/students/me")]
 [Authorize(Roles = "Student")]
@@ -20,9 +17,6 @@ public class StudentsController : ControllerBase
         _analyticsService = analyticsService ?? throw new ArgumentNullException(nameof(analyticsService));
     }
 
-    /// <summary>
-    /// Gets the current user ID from JWT claims.
-    /// </summary>
     private string GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst("userId");
@@ -33,10 +27,6 @@ public class StudentsController : ControllerBase
         return userIdClaim.Value;
     }
 
-    /// <summary>
-    /// Gets student summary with GPA and passed/total subjects.
-    /// GET /api/faculty/students/me/summary
-    /// </summary>
     [HttpGet("summary")]
     [ProducesResponseType(typeof(StudentSummaryDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -63,10 +53,6 @@ public class StudentsController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Gets weekly schedule for a student.
-    /// GET /api/faculty/students/me/schedule/weekly?startDate={date}
-    /// </summary>
     [HttpGet("schedule/weekly")]
     [ProducesResponseType(typeof(WeeklyScheduleDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -95,10 +81,6 @@ public class StudentsController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Gets monthly calendar events for a student.
-    /// GET /api/faculty/students/me/calendar/month?year={year}&month={month}
-    /// </summary>
     [HttpGet("calendar/month")]
     [ProducesResponseType(typeof(MonthlyCalendarDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -138,10 +120,6 @@ public class StudentsController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Gets attendance statistics for a student in a specific course.
-    /// GET /api/faculty/students/me/attendance?courseId={courseId}
-    /// </summary>
     [HttpGet("attendance")]
     [ProducesResponseType(typeof(StudentAttendanceStatsDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -170,10 +148,6 @@ public class StudentsController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Gets subject progress for a student in a specific semester.
-    /// GET /api/faculty/students/me/subjects/progress?semesterId={semesterId}
-    /// </summary>
     [HttpGet("subjects/progress")]
     [ProducesResponseType(typeof(SubjectProgressDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
