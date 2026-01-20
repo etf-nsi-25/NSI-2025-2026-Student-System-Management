@@ -8,6 +8,13 @@ import type {
     RegisteredStudentExamDto,
 } from '../dto/StudentExamsDTO';
 import type { CreateExamRequestDTO, ExamResponseDTO, UpdateExamRequestDTO } from '../dto/ExamDTO';
+import type {
+    StudentSummaryDTO,
+    WeeklyScheduleDTO,
+    MonthlyCalendarDTO,
+    StudentAttendanceStatsDTO,
+    SubjectProgressDTO,
+} from '../dto/StudentAnalyticsDTO';
 import type { CourseOverviewDTO } from '../dto/CourseOverviewDTO';
 import type { TwoFAConfirmResponse, TwoFASetupResponse } from '../models/2fa/TwoFA.types';
 import type { AssignmentDTO, AssignmentsPaginated } from '../models/assignments/Assignments.types';
@@ -188,5 +195,29 @@ export class API {
 
     async getProfessorCourses(): Promise<ProfessorCourseDTO[]> {
         return this.get<ProfessorCourseDTO[]>('/api/faculty/courses/assigned');
+    }
+
+    // Student analytics methods
+    async getStudentSummary(): Promise<StudentSummaryDTO> {
+        return this.get<StudentSummaryDTO>("/api/faculty/students/me/summary");
+    }
+
+    async getWeeklySchedule(startDate: string): Promise<WeeklyScheduleDTO> {
+        return this.get<WeeklyScheduleDTO>(`/api/faculty/students/me/schedule/weekly?startDate=${encodeURIComponent(startDate)}`);
+    }
+
+    async getMonthlyCalendar(year: number, month: number): Promise<MonthlyCalendarDTO> {
+        return this.get<MonthlyCalendarDTO>(`/api/faculty/students/me/calendar/month?year=${year}&month=${month}`);
+    }
+
+    async getAttendanceStats(courseId: string): Promise<StudentAttendanceStatsDTO> {
+        return this.get<StudentAttendanceStatsDTO>(`/api/faculty/students/me/attendance?courseId=${courseId}`);
+    }
+
+    async getSubjectProgress(semesterId?: string): Promise<SubjectProgressDTO> {
+        const url = semesterId 
+            ? `/api/faculty/students/me/subjects/progress?semesterId=${encodeURIComponent(semesterId.toString())}`
+            : `/api/faculty/students/me/subjects/progress`;
+        return this.get<SubjectProgressDTO>(url);
     }
 }

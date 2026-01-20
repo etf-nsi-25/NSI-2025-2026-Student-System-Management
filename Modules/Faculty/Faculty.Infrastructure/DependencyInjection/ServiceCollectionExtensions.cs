@@ -1,6 +1,7 @@
 using Faculty.Application.Interfaces;
 using Faculty.Application.Services;
 using Faculty.Application.Validators;
+using Faculty.Infrastructure.Services;
 using Faculty.Core.Interfaces;
 using Faculty.Infrastructure.Db;
 using Faculty.Infrastructure.EventHandler;
@@ -39,6 +40,7 @@ namespace Faculty.Infrastructure.DependencyInjection
             services.AddScoped<IUpcomingActivityService, UpcomingActivityService>();
             services.AddScoped<StudentService>();
             services.AddScoped<IStudentRepository, StudentRepository>();
+            services.AddScoped<IStudentAnalyticsService, StudentAnalyticsService>();
             services.AddScoped<IAssignmentRepository, AssignmentRepository>();
             services.AddScoped<IAssignmentService, AssignmentService>();
             services.AddScoped<FacultyDbContextSeed>();
