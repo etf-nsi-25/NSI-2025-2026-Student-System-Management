@@ -28,4 +28,8 @@ public interface IIdentityService
     Task<IEnumerable<UserResponse>> GetAllFilteredAsync(UserFilterRequest filter);
 
     Task<int> CountAsync(UserFilterRequest filter);
+
+    Task<(bool Success, string[] Errors)> CreateUsersBatchAsync(List<(CreateUserRequest request, string password)> batch);
+
+    Task<List<UserResponse>> FindByUsernamesAsync(List<string> usernames);
 }

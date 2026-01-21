@@ -481,3 +481,13 @@ body {
   font-size: 1.5rem;
   /* Povećaj font za naslov */
 }
+
+.bulk-preview-modal .modal-dialog {
+  max-width: 900px !important; 
+  width: 90% !important;
+}
+
+.bulk-preview-modal .modal-body {
+  max-height: 60vh;
+  overflow-y: auto;
+}

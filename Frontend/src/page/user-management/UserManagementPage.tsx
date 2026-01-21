@@ -22,6 +22,7 @@ import CreateUserModal from "./CreateUserModal";
 import EditUserModal from "./EditUserModal";
 import DeactivateUserModal from "./DeactivateUserModal";
 import UserDetailsModal from "./UserDetailsModal";
+import BulkUploadUsersModal from "./BulkUploadUsersModal";
 
 import { fetchUsers } from "../../service/identityApi";
 import type { User, Role } from "../../service/identityApi";
@@ -40,6 +41,7 @@ const UserManagementPage: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>([]);
@@ -240,7 +242,9 @@ const UserManagementPage: React.FC = () => {
                   + Add User
                 </CButton>
 
-                <CButton className="btn-blue">+ Add in bulk</CButton>
+                <CButton className="btn-blue" onClick={() => setIsBulkModalOpen(true)}>
+                  + Add in bulk
+                </CButton>
               </div>
 
             </CCardBody>
@@ -333,6 +337,7 @@ const UserManagementPage: React.FC = () => {
 
           <DeactivateUserModal isOpen={isDeactivateModalOpen} onClose={() => setIsDeactivateModalOpen(false)} user={selectedUser} onSuccess={handleDeactivateSuccess} />
 
+          <BulkUploadUsersModal isOpen={isBulkModalOpen} onClose={() => setIsBulkModalOpen(false)} onSuccess={fetchUserList}/>
         </CCol>
       </CContainer>
     </div>

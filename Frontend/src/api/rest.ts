@@ -93,15 +93,16 @@ export class RestClient {
     }
 
     async #submitRequest<T>(url: string, method: Method, body?: unknown): Promise<APIResponse<T>> {
+        const isFormData = body instanceof FormData;
         return fetch(
             url,
             {
                 method: method,
-                body: JSON.stringify(body),
+                body: isFormData? body : JSON.stringify(body),
                 headers: {
                     'Authorization': `Bearer ${this.#authInfo.accessToken}`,
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    ...(isFormData ? {} : { 'Content-Type': 'application/json' })
                 },
                 credentials: 'include'
             }

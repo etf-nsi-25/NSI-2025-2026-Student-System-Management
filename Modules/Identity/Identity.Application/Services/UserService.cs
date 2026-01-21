@@ -1,4 +1,4 @@
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using EventBus.Core;
 using Identity.Application.Interfaces;
 using Identity.Core.Events;
@@ -72,7 +72,8 @@ internal class UserService(
             createdUser.LastName,
             createdUser.FacultyId,
             createdUser.Role,
-            createdUser.IndexNumber
+            createdUser.IndexNumber,
+            true
         ), facultyId);
 
         return createdUser.Id;
@@ -211,5 +212,49 @@ internal class UserService(
     {
         var guid = Guid.NewGuid().ToString().Replace("-", "");
         return $"z{guid[..8].ToUpper()}1!";
+    }
+
+    public async Task<List<string>> CreateStudentsBatch(List<StudentImport> students)
+    {
+        if (students == null || students.Count == 0)
+            throw new ArgumentException("Student list is empty.");
+
+        var batch = students.Select(s =>
+        {
+            var tempPassword = GenerateTemporaryPassword();
+            var req = new CreateUserRequest
+            {
+                Username = s.Username!,
+                Email = s.Email,
+                FirstName = s.FirstName,
+                LastName = s.LastName,
+                FacultyId = s.FacultyId,
+                IndexNumber = s.IndexNumber,
+                Role = UserRole.Student
+            };
+
+            return (request: req, tempPassword: tempPassword);
+        }).ToList();
+
+        var (success, errors) = await identityService.CreateUsersBatchAsync(batch);
+
+        if (!success)
+            throw new Exception($"Batch user creation failed: {string.Join(" | ", errors)}");
+
+        List<string> usernames = students.Select(s => s.Username!).ToList();
+        var createdUsers = await identityService.FindByUsernamesAsync(usernames);
+
+        for (int i = 0; i < createdUsers.Count; i++)
+        {
+            var u = createdUsers[i];
+            bool isLast = i == createdUsers.Count - 1;
+
+            await eventBus.Dispatch(
+                new UserCreatedEvent(u.Id, u.Username, u.FirstName, u.LastName, u.FacultyId, u.Role, u.IndexNumber, isLast), 
+                u.FacultyId
+            );
+        }
+
+        return createdUsers.Select(u => u.Id).ToList();
     }
 }

@@ -1,7 +1,7 @@
+using Identity.Core.DTO; 
 using Identity.Core.Interfaces.Services;
 using Identity.Infrastructure.Entities; 
 using Microsoft.AspNetCore.Identity;
-using Identity.Core.DTO; 
 using Microsoft.EntityFrameworkCore; 
 using Identity.Infrastructure.Mappers; 
 using System.Text.Encodings.Web;
@@ -237,5 +237,39 @@ public class IdentityService : IIdentityService
             query = query.Where(u => u.Role == filter.Role);
 
         return await query.CountAsync();
+    }
+
+    public async Task<List<UserResponse>> FindByUsernamesAsync(List<string> usernames)
+    {
+        var normalized = usernames
+            .Where(u => !string.IsNullOrWhiteSpace(u))
+            .Select(u => u.ToLower())
+            .ToList();
+
+        if (normalized.Count == 0)
+            return new List<UserResponse>();
+
+        var users = await _userManager.Users
+            .Where(u => normalized.Contains(u.UserName.ToLower()))
+            .ToListAsync();
+
+        return users.Select(UserMapper.MapToResponse).ToList();
+    }
+    public async Task<(bool Success, string[] Errors)> CreateUsersBatchAsync(List<(CreateUserRequest request, string password)> batch)
+    {
+        if (batch == null || batch.Count == 0)
+            return (false, new[] { "Batch is empty" });
+
+        foreach (var (request, password) in batch)
+        {
+            var (success, err) = await CreateUserAsync(request, password);
+
+            if (!success)
+            {
+                return (false, new[] { $"{request.Username}: {string.Join(", ", err)}" });
+            }
+        }
+        return (true, Array.Empty<string>());
+       
     }
 }

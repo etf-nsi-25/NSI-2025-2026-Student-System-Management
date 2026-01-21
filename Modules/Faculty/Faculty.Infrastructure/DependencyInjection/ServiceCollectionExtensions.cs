@@ -42,6 +42,7 @@ namespace Faculty.Infrastructure.DependencyInjection
             services.AddScoped<IAssignmentRepository, AssignmentRepository>();
             services.AddScoped<IAssignmentService, AssignmentService>();
             services.AddScoped<FacultyDbContextSeed>();
+            services.AddScoped<IStudentImportService, StudentImportService>();
 
             // Tenant
             services.AddHttpContextAccessor();
